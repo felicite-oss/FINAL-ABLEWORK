@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+/* 1. Default (Standard) Theme */
+:root {
+  --bg-primary: #f3f4f6;
+  --bg-card: #ffffff;
+  --text-primary: #1f2937;
+  --text-secondary: #4b5563;
+  --border-accent: #3b82f6;
+  --btn-bg: #e5e7eb;
+  --btn-text: #1f2937;
+  --focus-ring: 2px solid #93c5fd;
+}
+
+/* 2. High Contrast Theme */
+.theme-High-Contrast {
+  --bg-primary: #000000;
+  --bg-card: #111111;
+  --text-primary: #ffff00;
+  --text-secondary: #ffffff;
+  --border-accent: #ffff00;
+  --btn-bg: #ffff00;
+  --btn-text: #000000;
+  --focus-ring: 4px solid #ffff00;
+}
+
+/* 3. Assist Mode Theme */
+.theme-Assist {
+  --bg-primary: #e0f2fe;
+  --bg-card: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --border-accent: #0284c7;
+  --btn-bg: #bae6fd;
+  --btn-text: #0369a1;
+  --focus-ring: 6px solid #b91c1c;
+}
+
+/* Apply the focus ring globally to all buttons and inputs when navigating with a keyboard/switch */
+button:focus-visible, input:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 4px;
+}
+
+/* Font Scaling Utilities for the Accessibility Menu */
+html.font-large {
+  font-size: 115%;
+}
+
+html.font-xlarge {
+  font-size: 135%;
+}
