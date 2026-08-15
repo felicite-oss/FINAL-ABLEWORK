@@ -4,7 +4,9 @@ import RegisterSelect from './pages/RegisterSelect';
 import ApplicantRegister from './pages/ApplicantRegister';
 import EmployerRegister from './pages/EmployerRegister';
 import AccessibilityToolbar from './components/AccessibilityToolbar';
+import ApplicantDashboard from './pages/ApplicantDashboard';
 import AbbyChatbot from './components/AbbyChatbot';
+import GlobalAccessibilityBar from './components/AccessibilityToolbar';
 
 // NEW: Navigation Pages
 import {
@@ -14,10 +16,12 @@ import {
   Terms,
   Contact
 } from './pages/NavigationPages';
+import { AccessibilityProvider } from './context/AccessibilityContext';
 
 
 function App() {
   return (
+    <AccessibilityProvider>  
     <Router>
       <div className="min-h-screen bg-[var(--bg-primary)] transition-colors duration-300 relative">
         
@@ -31,6 +35,7 @@ function App() {
           <Route path="/register-select" element={<RegisterSelect />} />
           <Route path="/register/applicant" element={<ApplicantRegister />} />
           <Route path="/register/employer" element={<EmployerRegister />} />
+          <Route path="/applicant-dashboard" element={<ApplicantDashboard />} />
 
 
           {/* NEW NAVIGATION ROUTES */}
@@ -46,6 +51,7 @@ function App() {
 
       </div>
     </Router>
+     </AccessibilityProvider>
   );
 }
 

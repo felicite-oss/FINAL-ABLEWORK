@@ -1,14 +1,20 @@
 import { useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // 1. Imported useNavigate
 import { AccessibilityContext } from '../context/AccessibilityContext';
 import headerLogo from '../assets/Final.png';
 import backgroundImg from '../assets/Final background.png';
 
 export default function Login() {
   const { mode } = useContext(AccessibilityContext);
+  const navigate = useNavigate(); // 2. Initialized navigate
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  
+  // 3. Added states for loading and error handling
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const isAssist = mode === 'Assist';
 
@@ -21,9 +27,39 @@ export default function Login() {
   const containerGap = isAssist ? 'gap-7 sm:gap-8' : 'gap-5 sm:gap-6';
   const formGap = isAssist ? 'gap-6' : 'gap-4 sm:gap-5';
 
-  const handleLogin = (e) => {
+  // 4. Fully updated handleLogin function to talk to the backend
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("Logging in with:", email, password);
+    setErrorMessage('');
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:5001/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Success! Redirect based on user role
+        if (data.user.role === 'employer') {
+          navigate('/employer-dashboard'); // We will need to create this route later!
+        } else {
+          navigate('/applicant-dashboard');
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
+      } else {
+        // Backend rejected login (wrong email/password)
+        setErrorMessage(data.error || 'Login failed. Please try again.');
+      }
+    } catch (error) {
+      console.error("Login request error:", error);
+      setErrorMessage("Cannot connect to the server. Is the backend running?");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -129,6 +165,13 @@ export default function Login() {
             </p>
           </div>
 
+          {/* 5. Added Error Message Display UI */}
+          {errorMessage && (
+            <div role="alert" className="w-full p-3 text-sm font-bold text-center text-red-800 bg-red-100 border border-red-400 rounded-lg">
+              {errorMessage}
+            </div>
+          )}
+
           <form onSubmit={handleLogin} className={`flex flex-col ${formGap} w-full`} aria-label="Sign in form" autoComplete="off">
             <div className="flex flex-col gap-2">
               <label className={`font-semibold text-[#03045E] ${labelSize}`} htmlFor="email">
@@ -166,10 +209,11 @@ export default function Login() {
 
             <button
               type="submit"
-              className={`mt-2 ${tapTargetSize} bg-[#03045E] hover:bg-[#2C7FFF] rounded-full font-semibold text-white shadow-md w-full transition cursor-pointer`}
+              disabled={isLoading}
+              className={`mt-2 ${tapTargetSize} bg-[#03045E] hover:bg-[#2C7FFF] disabled:opacity-50 disabled:cursor-not-allowed rounded-full font-semibold text-white shadow-md w-full transition cursor-pointer`}
               aria-label="Submit login credentials"
             >
-              Log In
+              {isLoading ? 'Logging In...' : 'Log In'}
             </button>
           </form>
 
