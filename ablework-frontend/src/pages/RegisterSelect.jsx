@@ -1,43 +1,191 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import headerLogo from '../assets/Final.png';
+import backgroundImg from '../assets/Final background.png';
 
 export default function RegisterSelect() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-[var(--bg-primary)] p-4 gap-8">
-      
-      <div className="text-center max-w-lg">
-        <h1 className="text-4xl font-bold text-[var(--text-primary)] mb-3">Join AbleWork</h1>
-        <p className="text-lg text-[var(--text-secondary)]">Please choose how you would like to use our platform:</p>
-      </div>
+    <main className="h-screen flex flex-col bg-[#f4f4f4] overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      {/* ===== HEADER (Fixed to Top) ===== */}
+      <header className="w-full bg-[#f4f4f4] border-b border-[#03045E]/10 fixed top-0 left-0 z-50">
+        <div className="w-full h-16 pl-4 pr-4 md:pr-8 flex items-center justify-between">
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
+          {/* Left side: Logo + Desktop Navigation */}
+          <div className="flex items-center gap-8">
+            {/* Logo - no link, so it won't navigate */}
+            <div className="flex items-center flex-shrink-0">
+              <img
+                src={headerLogo}
+                alt="AbleWork Logo"
+                className="h-20 w-auto object-contain max-h-full"
+              />
+            </div>
+            <nav className="hidden md:flex items-center gap-6 text-[15px] font-medium text-[#03045E]">
+              <Link to="/" className="hover:text-[#2C7FFF] transition">Home</Link>
+              <Link to="/about" className="hover:text-[#2C7FFF] transition">About Us</Link>
+              <Link to="/policy" className="hover:text-[#2C7FFF] transition">Policy</Link>
+              <button className="flex items-center gap-1 hover:text-[#2C7FFF] transition">
+                Careers
+                <svg className="w-3.5 h-3.5 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </nav>
+          </div>
+          {/* Desktop Log In */}
+          <div className="hidden md:flex items-center">
+            <Link
+              to="/login"
+              className="px-5 py-2 rounded-full bg-white text-[#03045E] text-sm font-medium border border-[#03045E] hover:bg-[#2C7FFF] hover:text-white hover:border-[#2C7FFF] transition"
+            >
+              Log In
+            </Link>
+          </div>
+          {/* Mobile Hamburger Button */}
+          <button
+            className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg bg-[#2C7FFF] text-[#f4f4f4]"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            {isOpen ? (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
+        </div>
+        {/* Mobile Menu - smooth slide */}
+        <div
+          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+            isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+          }`}
+        >
+          <div className="w-full bg-[#f4f4f4] border-t border-[#03045E]/10">
+            <nav className="flex flex-col px-6 py-5 gap-5 text-[16px] font-medium text-[#03045E]">
+              <Link to="/" className="hover:text-[#2C7FFF] transition" onClick={() => setIsOpen(false)}>
+                Home
+              </Link>
+              <Link to="/about" className="hover:text-[#2C7FFF] transition" onClick={() => setIsOpen(false)}>
+                About Us
+              </Link>
+              <Link to="/policy" className="hover:text-[#2C7FFF] transition" onClick={() => setIsOpen(false)}>
+                Policy
+              </Link>
+              <button className="flex items-center gap-1 hover:text-[#2C7FFF] transition text-left">
+                Careers
+                <svg className="w-3.5 h-3.5 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <Link
+                to="/login"
+                className="mt-2 px-5 py-2.5 rounded-full bg-white text-[#03045E] text-sm font-medium border border-[#03045E] hover:bg-[#2C7FFF] hover:text-white hover:border-[#2C7FFF] transition w-fit"
+                onClick={() => setIsOpen(false)}
+              >
+                Log In
+              </Link>
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      {/* ===== YOUR ORIGINAL CONTENT ===== */}
+      <div 
+        className="min-h-screen pt-16 flex flex-col items-center md:items-end justify-center p-4 sm:p-6 md:p-12 relative bg-no-repeat bg-cover bg-center md:bg-[size:1100px_auto] md:bg-left"
+        style={{
+          backgroundImage: `url(${backgroundImg})`,
+        }}
+      >
         
-        {/* Applicant Card */}
-        <Link 
-          to="/register/applicant"
-          className="p-8 bg-[var(--bg-card)] rounded-2xl shadow-xl border-4 border-transparent hover:border-[var(--border-accent)] flex flex-col items-center text-center transition-all cursor-pointer group"
-        >
-          <div className="text-5xl mb-4">👨‍💻</div>
-          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2 group-hover:text-[var(--border-accent)]">I am a Job Seeker</h2>
-          <p className="text-sm text-[var(--text-secondary)]">Looking for accessible jobs and career opportunities.</p>
-        </Link>
+        {/* ===== ONE OUTER CONTAINER (styled for mobile and web) ===== */}
+        <div className="w-full max-w-[340px] sm:max-w-xl md:max-w-3xl flex flex-col items-center justify-center gap-6 sm:gap-8 relative z-10
+                        bg-white/60 rounded-3xl shadow-xl border border-[#03045E]/10 
+                        pt-6 px-5 pb-8 sm:pt-8 sm:px-8 sm:pb-12 lg:pt-12 lg:px-12 lg:pb-20 
+                        min-h-[420px] sm:min-h-[480px] md:min-h-[560px] md:mt-16">
+          
+          <div className="text-center max-w-lg px-1">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tighter text-[#03045E] mb-3 sm:mb-4">
+              Join AbleWork
+            </h1>
+            <p className="text-sm sm:text-lg md:text-xl text-[#03045E]/80 leading-relaxed">
+              Please choose how you would like to use our platform
+            </p>
+          </div>
 
-        {/* Employer Card */}
-        <Link 
-          to="/register/employer"
-          className="p-8 bg-[var(--bg-card)] rounded-2xl shadow-xl border-4 border-transparent hover:border-[var(--border-accent)] flex flex-col items-center text-center transition-all cursor-pointer group"
-        >
-          <div className="text-5xl mb-4">🏢</div>
-          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2 group-hover:text-[var(--border-accent)]">I am an Employer</h2>
-          <p className="text-sm text-[var(--text-secondary)]">Looking to hire inclusive talent and post job listings.</p>
-        </Link>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 w-full max-w-2xl">
+    
+            {/* Applicant Card */}
+            <Link
+              to="/register/applicant"
+              className="p-5 sm:p-6 md:p-8 bg-[#f4f4f4] rounded-2xl shadow-md sm:shadow-xl border border-transparent hover:border-[#2C7FFF] flex flex-col items-center text-center transition-all cursor-pointer group"
+            >
+              <div className="mb-3 sm:mb-4 text-[#03045E] group-hover:text-[#2C7FFF] transition-colors">
+                <svg className="w-12 h-12 sm:w-14 sm:h-14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-bold text-[#03045E] mb-2 group-hover:text-[#2C7FFF]">
+                I am a Job Seeker
+              </h2>
+              <p className="text-xs sm:text-sm text-[#03045E]/70">
+                Looking for accessible jobs and career opportunities.
+              </p>
+            </Link>
+
+            {/* Employer Card */}
+            <Link
+              to="/register/employer"
+              className="p-5 sm:p-6 md:p-8 bg-[#f4f4f4] rounded-2xl shadow-md sm:shadow-xl border border-transparent hover:border-[#2C7FFF] flex flex-col items-center text-center transition-all cursor-pointer group"
+            >
+              <div className="mb-3 sm:mb-4 text-[#03045E] group-hover:text-[#2C7FFF] transition-colors">
+                <svg className="w-12 h-12 sm:w-14 sm:h-14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+                </svg>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-bold text-[#03045E] mb-2 group-hover:text-[#2C7FFF]">
+                I am an Employer
+              </h2>
+              <p className="text-xs sm:text-sm text-[#03045E]/70">
+                Looking to hire inclusive talent and post job listings.
+              </p>
+            </Link>
+          </div>
+        </div>
+        {/* ===== END ONE OUTER CONTAINER ===== */}
 
       </div>
 
-      <p className="mt-4 text-[var(--text-secondary)]">
-        Already have an account?{' '}
-        <Link to="/" className="font-bold text-[var(--border-accent)] hover:underline">Log in</Link>
-      </p>
+      {/* ===== FOOTER ===== */}
+      <footer className="w-full bg-[#03045E] text-[#f4f4f4] py-8 px-4 md:px-8 relative z-20">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          {/* Left: Branding / Copyright */}
+          <div className="flex flex-col items-center md:items-start gap-1 text-center md:text-left">
+            <span className="font-bold text-lg text-white">AbleWork</span>
+            <p className="text-xs text-[#f4f4f4]/70">
+              © {new Date().getFullYear()} AbleWork. All rights reserved.
+            </p>
+          </div>
 
+          {/* Center: Links */}
+          <div className="flex flex-wrap justify-center gap-6 text-sm text-[#f4f4f4]/90 font-medium">
+            <Link to="/" className="hover:text-[#2C7FFF] transition">Home</Link>
+            <Link to="/about" className="hover:text-[#2C7FFF] transition">About Us</Link>
+            <Link to="/policy" className="hover:text-[#2C7FFF] transition">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-[#2C7FFF] transition">Terms of Service</Link>
+            <Link to="/contact" className="hover:text-[#2C7FFF] transition">Contact Us</Link>
+          </div>
+
+          {/* Right: Tagline */}
+          <div className="text-xs text-[#f4f4f4]/60 text-center md:text-right">
+            Building an inclusive workforce for everyone.
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }

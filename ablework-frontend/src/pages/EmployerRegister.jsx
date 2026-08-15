@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import headerLogo from '../assets/Final.png';
+import backgroundImg from '../assets/Final background.png';
 
 export default function EmployerRegister() {
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
 
   // Company & Account Credentials
   const [companyName, setCompanyName] = useState('');
@@ -65,7 +68,6 @@ export default function EmployerRegister() {
     setStatusMessage({ type: '', text: '' });
     setIsLoading(true);
 
-    // Stripped down payload
     const payload = {
       companyName,
       email,
@@ -89,7 +91,7 @@ export default function EmployerRegister() {
 
       if (response.ok) {
         setStatusMessage({ type: 'success', text: "Registration successful! Redirecting..." });
-        setTimeout(() => navigate('/'), 2000);
+        setTimeout(() => navigate('/login'), 2000);
       } else {
         setStatusMessage({ type: 'error', text: data.message || "Registration failed." });
       }
@@ -102,106 +104,277 @@ export default function EmployerRegister() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50 p-4 py-8 relative">
-      <div className="w-full max-w-xl p-6 bg-white rounded-lg shadow-md border-t-4 border-blue-600">
-        
-        <h1 className="text-2xl font-bold text-gray-800 mb-1 text-center">
-          Employer Registration
-        </h1>
-        <p className="text-sm text-gray-500 mb-6 text-center">
-          Create your company profile to start posting inclusive jobs.
-        </p>
-
-        {statusMessage.text && (
-          <div role="alert" className={`p-3 mb-5 rounded text-sm font-medium text-center border ${statusMessage.type === 'success' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
-            {statusMessage.text}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-8">
-          
-          {/* Section 1: Credentials */}
-          <div className="flex flex-col gap-4">
-            <h2 className="text-lg font-semibold text-gray-800 border-b pb-2">1. Company & Account Credentials</h2>
-            
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-gray-700">Company Name</label>
-              <input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required className="w-full p-2.5 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:outline-none" />
+    <main className="h-screen flex flex-col bg-[#f4f4f4] overflow-hidden">
+      {/* ===== HEADER ===== */}
+      <header className="w-full bg-[#f4f4f4] border-b border-[#03045E]/10 fixed top-0 left-0 z-50">
+        <div className="w-full h-16 pl-4 pr-4 md:pr-8 flex items-center justify-between">
+          <div className="flex items-center gap-8">
+            <div className="flex items-center flex-shrink-0">
+              <img src={headerLogo} alt="AbleWork Logo" className="h-20 w-auto object-contain max-h-full" />
             </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-gray-700">Industry Type</label>
-              <input type="text" value={industry} onChange={(e) => setIndustry(e.target.value)} placeholder="e.g. Technology" required className="w-full p-2.5 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:outline-none" />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-gray-700">Work Email</label>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full p-2.5 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:outline-none" />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-gray-700">Telephone Number</label>
-              <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required className="w-full p-2.5 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:outline-none" />
-            </div>
-            
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-gray-700">Password</label>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full p-2.5 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:outline-none" />
-            </div>
-          </div>
-
-          {/* Section 2: Account Details & Location */}
-          <div className="flex flex-col gap-4">
-            <h2 className="text-lg font-semibold text-gray-800 border-b pb-2">2. Job Profile & Location</h2>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-gray-700">Primary Job Role / Title</label>
-              <input type="text" value={jobRole} onChange={(e) => setJobRole(e.target.value)} placeholder="e.g. Hiring Manager" required className="w-full p-2.5 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:outline-none" />
-            </div>
-
-            {/* Location & Map Trigger */}
-            <div className="flex flex-col gap-3 p-4 mt-2 border border-blue-100 rounded-md bg-blue-50/30">
-              <div>
-                <label className="text-sm font-semibold text-blue-900">Workplace Location (Geofencing)</label>
-                <p className="text-xs text-blue-700 mt-0.5">Pinpoint your exact office location to match with nearby applicants later.</p>
-              </div>
-              
-              <button type="button" onClick={handleDetectLocation} className="w-full bg-blue-600 text-white px-4 py-2.5 rounded text-sm font-medium hover:bg-blue-700 transition-colors">
-                🗺️ Open Map & Detect Location
+            <nav className="hidden md:flex items-center gap-6 text-[15px] font-medium text-[#03045E]">
+              <Link to="/" className="hover:text-[#2C7FFF] transition">Home</Link>
+              <Link to="/about" className="hover:text-[#2C7FFF] transition">About Us</Link>
+              <Link to="/policy" className="hover:text-[#2C7FFF] transition">Policy</Link>
+              <button className="flex items-center gap-1 hover:text-[#2C7FFF] transition">
+                Careers
+                <svg className="w-3.5 h-3.5 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
               </button>
-              
-              <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Physical Address" required className="w-full p-2.5 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:outline-none" />
+            </nav>
+          </div>
+          <div className="hidden md:flex items-center">
+            <Link
+              to="/login"
+              className="px-5 py-2 rounded-full bg-white text-[#03045E] text-sm font-medium border border-[#03045E] hover:bg-[#2C7FFF] hover:text-white hover:border-[#2C7FFF] transition"
+            >
+              Log In
+            </Link>
+          </div>
+          <button
+            className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg bg-[#2C7FFF] text-[#f4f4f4]"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            {isOpen ? (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
+        </div>
+        <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+          <div className="w-full bg-[#f4f4f4] border-t border-[#03045E]/10">
+            <nav className="flex flex-col px-6 py-5 gap-5 text-[16px] font-medium text-[#03045E]">
+              <Link to="/" className="hover:text-[#2C7FFF] transition" onClick={() => setIsOpen(false)}>Home</Link>
+              <Link to="/about" className="hover:text-[#2C7FFF] transition" onClick={() => setIsOpen(false)}>About Us</Link>
+              <Link to="/policy" className="hover:text-[#2C7FFF] transition" onClick={() => setIsOpen(false)}>Policy</Link>
+              <button className="flex items-center gap-1 hover:text-[#2C7FFF] transition text-left">
+                Careers
+                <svg className="w-3.5 h-3.5 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <Link
+                to="/login"
+                className="mt-2 px-5 py-2.5 rounded-full bg-white text-[#03045E] text-sm font-medium border border-[#03045E] hover:bg-[#2C7FFF] hover:text-white hover:border-[#2C7FFF] transition w-fit"
+                onClick={() => setIsOpen(false)}
+              >
+                Log In
+              </Link>
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      {/* ===== POPUP OVERLAY ===== */}
+      <div
+        className="fixed inset-0 z-40 flex items-center justify-center p-4 pt-20 pb-6 bg-black/40 backdrop-blur-sm"
+        style={{
+          backgroundImage: `linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url(${backgroundImg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        {/* ===== POPUP CONTAINER ===== */}
+        <div className="w-full max-w-xl max-h-[85vh] flex flex-col bg-white/95 rounded-3xl shadow-2xl border border-[#03045E]/10 overflow-hidden">
+          
+          {/* Sticky Header of Popup */}
+          <div className="flex-shrink-0 px-6 pt-6 pb-4 border-b border-[#03045E]/10 bg-white/90">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-xl sm:text-2xl font-extrabold tracking-tighter text-[#03045E]">
+                  Employer Registration
+                </h1>
+                <p className="text-sm text-[#03045E]/70 mt-0.5">
+                  Create your company profile to start posting inclusive jobs
+                </p>
+              </div>
+              <Link
+                to="/register-select"
+                className="w-9 h-9 flex items-center justify-center rounded-full bg-[#f4f4f4] text-[#03045E] hover:bg-[#03045E] hover:text-white transition"
+                aria-label="Close and go back"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </Link>
             </div>
           </div>
 
-          <button type="submit" disabled={isLoading} className="w-full py-3 mt-2 bg-blue-600 text-white text-base font-semibold rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors">
-            {isLoading ? 'Submitting...' : 'Complete Employer Registration'}
-          </button>
-        </form>
+          {/* Scrollable Form Area */}
+          <div className="flex-1 overflow-y-auto px-6 py-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            {statusMessage.text && (
+              <div
+                role="alert"
+                className={`p-4 mb-6 rounded-xl font-bold text-center border-2 ${
+                  statusMessage.type === 'success'
+                    ? 'bg-green-100 text-green-800 border-green-400'
+                    : 'bg-red-100 text-red-800 border-red-400'
+                }`}
+              >
+                {statusMessage.text}
+              </div>
+            )}
 
-        <p className="mt-6 text-center text-sm">
-          <Link to="/register-select" className="text-blue-600 font-medium hover:underline">← Back to Role Selection</Link>
-        </p>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-7" autoComplete="off">
+              
+              {/* Section 1: Credentials */}
+              <div className="flex flex-col gap-4">
+                <h2 className="text-sm font-bold text-[#03045E] border-b border-[#03045E]/10 pb-2">
+                  1. Company & Account Credentials
+                </h2>
+                
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-semibold text-[#03045E]">Company Name</label>
+                  <input
+                    type="text"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    required
+                    className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-semibold text-[#03045E]">Industry Type</label>
+                  <input
+                    type="text"
+                    value={industry}
+                    onChange={(e) => setIndustry(e.target.value)}
+                    placeholder="e.g. Technology"
+                    required
+                    className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-semibold text-[#03045E]">Work Email</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    autoComplete="off"
+                    className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-semibold text-[#03045E]">Telephone Number</label>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    required
+                    className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
+                  />
+                </div>
+                
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-semibold text-[#03045E]">Password</label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    autoComplete="new-password"
+                    className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
+                  />
+                </div>
+              </div>
+
+              {/* Section 2: Job Profile & Location */}
+              <div className="flex flex-col gap-4">
+                <h2 className="text-sm font-bold text-[#03045E] border-b border-[#03045E]/10 pb-2">
+                  2. Job Profile & Location
+                </h2>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-semibold text-[#03045E]">Primary Job Role / Title</label>
+                  <input
+                    type="text"
+                    value={jobRole}
+                    onChange={(e) => setJobRole(e.target.value)}
+                    placeholder="e.g. Hiring Manager"
+                    required
+                    className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
+                  />
+                </div>
+
+                {/* Location */}
+                <div className="flex flex-col gap-3 p-4 border border-[#2C7FFF]/30 rounded-2xl bg-[#2C7FFF]/5">
+                  <div>
+                    <label className="text-sm font-bold text-[#03045E]">Workplace Location</label>
+                    <p className="text-xs text-[#03045E]/70 mt-0.5">
+                      Pinpoint your office location to match with nearby applicants.
+                    </p>
+                  </div>
+                  
+                  <button
+                    type="button"
+                    onClick={handleDetectLocation}
+                    className="w-full bg-[#2C7FFF] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#03045E] transition"
+                  >
+                    Open Map & Detect Location
+                  </button>
+                  
+                  <input
+                    type="text"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="Physical Address"
+                    required
+                    className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3.5 bg-[#03045E] hover:bg-[#2C7FFF] text-white text-base font-semibold rounded-full shadow-md transition disabled:opacity-50"
+              >
+                {isLoading ? 'Submitting...' : 'Complete Employer Registration'}
+              </button>
+            </form>
+
+            <p className="mt-6 text-center text-sm text-[#03045E]/80">
+              <Link to="/register-select" className="font-bold text-[#2C7FFF] hover:underline">
+                ← Back to Role Selection
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* --- POP-UP MAP MODAL --- */}
       {isMapModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg w-full max-w-xl overflow-hidden shadow-xl flex flex-col">
+          <div className="bg-white rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col">
             
-            <div className="bg-blue-600 text-white p-3.5 flex justify-between items-center">
+            <div className="bg-[#03045E] text-white p-4 flex justify-between items-center">
               <h3 className="font-semibold text-base">Workplace Location</h3>
-              <button onClick={() => setIsMapModalOpen(false)} className="text-white text-xl hover:text-gray-200 leading-none">✕</button>
+              <button
+                onClick={() => setIsMapModalOpen(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition"
+              >
+                ✕
+              </button>
             </div>
 
             <div className="p-5 flex flex-col gap-4">
               {isDetecting ? (
-                <div className="h-60 flex items-center justify-center bg-gray-50 rounded border border-gray-200">
+                <div className="h-60 flex items-center justify-center bg-gray-50 rounded-xl border border-gray-200">
                   <p className="text-sm font-medium text-gray-500 animate-pulse">Detecting your location...</p>
                 </div>
               ) : lat && lng ? (
                 <>
-                  <div className="h-60 rounded overflow-hidden border border-gray-300">
+                  <div className="h-60 rounded-xl overflow-hidden border border-gray-300">
                     <iframe 
                       width="100%" 
                       height="100%" 
@@ -212,17 +385,21 @@ export default function EmployerRegister() {
                       src={`https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.005},${lat - 0.005},${lng + 0.005},${lat + 0.005}&layer=mapnik&marker=${lat},${lng}`}
                     ></iframe>
                   </div>
-                  <p className="text-sm font-medium text-gray-700 bg-gray-50 p-2.5 rounded border border-gray-200">
-                    Detected Address: <br/><span className="font-normal text-blue-600">{address}</span>
+                  <p className="text-sm font-medium text-[#03045E] bg-[#f4f4f4] p-3 rounded-xl border border-[#03045E]/10">
+                    Detected Address: <br/>
+                    <span className="font-normal text-[#2C7FFF]">{address}</span>
                   </p>
                 </>
               ) : (
-                <div className="h-60 flex items-center justify-center bg-gray-50 rounded border border-gray-200">
+                <div className="h-60 flex items-center justify-center bg-gray-50 rounded-xl border border-gray-200">
                   <p className="text-sm font-medium text-red-500">Location access failed. Please try again.</p>
                 </div>
               )}
 
-              <button onClick={() => setIsMapModalOpen(false)} className="w-full bg-blue-600 text-white py-2.5 rounded text-sm font-medium hover:bg-blue-700 transition-colors">
+              <button
+                onClick={() => setIsMapModalOpen(false)}
+                className="w-full bg-[#03045E] hover:bg-[#2C7FFF] text-white py-3 rounded-full text-sm font-semibold transition"
+              >
                 Confirm & Close Map
               </button>
             </div>
