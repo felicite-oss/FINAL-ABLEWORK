@@ -1,33 +1,69 @@
 import { useContext, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // 1. Imported useNavigate
+import { Link, useNavigate } from 'react-router-dom';
 import { AccessibilityContext } from '../context/AccessibilityContext';
 import headerLogo from '../assets/Final.png';
 import backgroundImg from '../assets/Final background.png';
 
 export default function Login() {
   const { mode } = useContext(AccessibilityContext);
-  const navigate = useNavigate(); // 2. Initialized navigate
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   
-  // 3. Added states for loading and error handling
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const isAssist = mode === 'Assist';
+  // Support A / A+ / A++ (and Assist)
+  const isAPlusPlus = mode === 'A++' || mode === 'Assist' || mode === 'a++' || mode === 'assist';
+  const isAPlus = mode === 'A+' || mode === 'a+';
+  const isAssist = isAPlusPlus; // keep for container sizing
 
-  const tapTargetSize = isAssist ? 'py-5 px-6 text-xl' : 'py-2.5 px-4';
-  const inputSize = isAssist ? 'p-5 text-xl' : 'p-3';
-  const labelSize = isAssist ? 'text-lg' : 'text-sm';
-  const titleSize = isAssist ? 'text-3xl sm:text-4xl md:text-5xl' : 'text-2xl sm:text-3xl md:text-4xl';
-  const subtitleSize = isAssist ? 'text-lg sm:text-xl' : 'text-sm sm:text-base';
-  const containerPadding = isAssist ? 'pt-8 px-6 pb-10 sm:pt-12 sm:px-10 sm:pb-14' : 'pt-6 px-5 pb-8 sm:pt-10 sm:px-8 sm:pb-12';
+  // All text sizes for A, A+, A++
+  const tapTargetSize = isAPlusPlus
+    ? 'py-5 px-6 text-xl'
+    : isAPlus
+      ? 'py-3.5 px-5 text-base'
+      : 'py-3 px-4 text-sm';
+
+  const inputSize = isAPlusPlus
+    ? 'p-5 text-xl'
+    : isAPlus
+      ? 'p-4 text-base'
+      : 'p-3.5 text-sm';
+
+  const labelSize = isAPlusPlus
+    ? 'text-lg'
+    : isAPlus
+      ? 'text-base'
+      : 'text-sm';
+
+  const titleSize = isAPlusPlus
+    ? 'text-3xl sm:text-4xl md:text-5xl'
+    : isAPlus
+      ? 'text-2xl sm:text-3xl md:text-4xl'
+      : 'text-xl sm:text-2xl md:text-3xl';
+
+  const subtitleSize = isAPlusPlus
+    ? 'text-lg sm:text-xl'
+    : isAPlus
+      ? 'text-base sm:text-lg'
+      : 'text-sm sm:text-base';
+
+  const footerLinkSize = isAPlusPlus
+    ? 'text-base'
+    : isAPlus
+      ? 'text-sm'
+      : 'text-sm';
+
+  // Container padding
+  const containerPadding = isAssist 
+    ? 'pt-10 px-5 pb-12 sm:pt-12 sm:px-8 sm:pb-16 lg:pt-14 lg:px-10 lg:pb-20' 
+    : 'pt-6 px-5 pb-8 sm:pt-8 sm:px-8 sm:pb-12 lg:pt-12 lg:px-10 lg:pb-16';
   const containerGap = isAssist ? 'gap-7 sm:gap-8' : 'gap-5 sm:gap-6';
   const formGap = isAssist ? 'gap-6' : 'gap-4 sm:gap-5';
 
-  // 4. Fully updated handleLogin function to talk to the backend
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMessage('');
@@ -43,15 +79,13 @@ export default function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        // Success! Redirect based on user role
         if (data.user.role === 'employer') {
-          navigate('/employer-dashboard'); // We will need to create this route later!
+          navigate('/employer-dashboard');
         } else {
           navigate('/applicant-dashboard');
           localStorage.setItem('user', JSON.stringify(data.user));
         }
       } else {
-        // Backend rejected login (wrong email/password)
         setErrorMessage(data.error || 'Login failed. Please try again.');
       }
     } catch (error) {
@@ -63,7 +97,7 @@ export default function Login() {
   };
 
   return (
-    <main className="h-screen flex flex-col bg-[#f4f4f4] overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+    <main className="min-h-screen flex flex-col bg-[#f4f4f4] overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
       {/* ===== HEADER (Fixed to Top) ===== */}
       <header className="w-full bg-[#f4f4f4] border-b border-[#03045E]/10 fixed top-0 left-0 z-50">
         <div className="w-full h-16 pl-4 pr-4 md:pr-8 flex items-center justify-between">
@@ -77,15 +111,9 @@ export default function Login() {
               />
             </div>
             <nav className="hidden md:flex items-center gap-6 text-[15px] font-medium text-[#03045E]">
-              <Link to="/" className="hover:text-[#2C7FFF] transition">Home</Link>
+              <span className="text-[#2C7FFF] font-semibold border-b-2 border-[#2C7FFF] pb-0.5 cursor-default">Home</span>
               <Link to="/about" className="hover:text-[#2C7FFF] transition">About Us</Link>
               <Link to="/policy" className="hover:text-[#2C7FFF] transition">Policy</Link>
-              <button className="flex items-center gap-1 hover:text-[#2C7FFF] transition">
-                Careers
-                <svg className="w-3.5 h-3.5 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
             </nav>
           </div>
 
@@ -123,15 +151,9 @@ export default function Login() {
         >
           <div className="w-full bg-[#f4f4f4] border-t border-[#03045E]/10">
             <nav className="flex flex-col px-6 py-5 gap-5 text-[16px] font-medium text-[#03045E]">
-              <Link to="/" className="hover:text-[#2C7FFF] transition" onClick={() => setIsOpen(false)}>Home</Link>
+              <span className="text-[#2C7FFF] font-semibold pl-2 border-l-4 border-[#2C7FFF] cursor-default">Home</span>
               <Link to="/about" className="hover:text-[#2C7FFF] transition" onClick={() => setIsOpen(false)}>About Us</Link>
               <Link to="/policy" className="hover:text-[#2C7FFF] transition" onClick={() => setIsOpen(false)}>Policy</Link>
-              <button className="flex items-center gap-1 hover:text-[#2C7FFF] transition text-left">
-                Careers
-                <svg className="w-3.5 h-3.5 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
               {/* Mobile Log In - not clickable on Login page */}
               <span
                 className="mt-2 px-5 py-2.5 rounded-full bg-[#2C7FFF] text-white text-sm font-medium border border-[#2C7FFF] w-fit cursor-default"
@@ -145,18 +167,18 @@ export default function Login() {
 
       {/* ===== CONTENT ===== */}
       <div
-        className="min-h-screen pt-16 flex flex-col items-center md:items-end justify-center p-4 sm:p-6 md:p-12 relative bg-no-repeat bg-cover bg-center md:bg-[size:1100px_auto] md:bg-left"
+        className="flex-grow pt-24 pb-12 flex flex-col items-center md:items-end justify-center p-4 sm:p-6 md:p-12 relative bg-no-repeat bg-cover bg-center md:bg-[size:1100px_auto] md:bg-left"
         style={{
           backgroundImage: `url(${backgroundImg})`,
         }}
       >
         {/* ===== LOGIN CONTAINER ===== */}
-        <div className={`w-full max-w-[340px] sm:max-w-md ${isAssist ? 'sm:max-w-lg' : ''} flex flex-col items-center justify-center ${containerGap} relative z-10
-                        bg-white/60 rounded-3xl shadow-xl border border-[#03045E]/10
-                        ${containerPadding}
-                        min-h-[400px] sm:min-h-[450px]`}>
+        <div className={`w-full ${isAssist ? 'max-w-[420px] sm:max-w-xl' : 'max-w-[340px] sm:max-w-md'} flex flex-col items-center justify-start ${containerGap} relative z-10
+              bg-white/60 rounded-3xl shadow-xl border border-[#03045E]/10
+              ${containerPadding}
+              ${isAssist ? 'min-h-[560px] sm:min-h-[640px]' : 'min-h-[500px] sm:min-h-[590px]'} md:mt-16`}>
          
-          <div className="text-center w-full">
+          <div className="text-center w-full -mt-2 sm:-mt-3">
             <h1 className={`${titleSize} font-extrabold tracking-tighter text-[#03045E] mb-2`}>
               Sign In to AbleWork
             </h1>
@@ -165,7 +187,6 @@ export default function Login() {
             </p>
           </div>
 
-          {/* 5. Added Error Message Display UI */}
           {errorMessage && (
             <div role="alert" className="w-full p-3 text-sm font-bold text-center text-red-800 bg-red-100 border border-red-400 rounded-lg">
               {errorMessage}
@@ -217,7 +238,7 @@ export default function Login() {
             </button>
           </form>
 
-          <p className={`text-center text-[#03045E]/80 ${isAssist ? 'text-base' : 'text-sm'}`}>
+          <p className={`text-center text-[#03045E]/80 ${footerLinkSize}`}>
             Don't have an account?{' '}
             <Link
               to="/register-select"
@@ -230,8 +251,8 @@ export default function Login() {
         </div>
       </div>
 
-      {/* ===== FOOTER ===== */}
-      <footer className="w-full bg-[#03045E] text-[#f4f4f4] py-8 px-4 md:px-8 relative z-20">
+      {/* ===== FOOTER WITH NAVIGATION LINKS ===== */}
+      <footer className="w-full bg-[#03045E] text-[#f4f4f4] py-8 px-4 md:px-8 relative z-20 mt-auto">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col items-center md:items-start gap-1 text-center md:text-left">
             <span className="font-bold text-lg text-white">AbleWork</span>
@@ -240,7 +261,6 @@ export default function Login() {
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-6 text-sm text-[#f4f4f4]/90 font-medium">
-            <Link to="/" className="hover:text-[#2C7FFF] transition">Home</Link>
             <Link to="/about" className="hover:text-[#2C7FFF] transition">About Us</Link>
             <Link to="/policy" className="hover:text-[#2C7FFF] transition">Privacy Policy</Link>
             <Link to="/terms" className="hover:text-[#2C7FFF] transition">Terms of Service</Link>

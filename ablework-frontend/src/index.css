@@ -1,27 +1,32 @@
 @import "tailwindcss";
 
-/* 1. Default (Standard) Theme */
+/* 1. Default (Standard) Theme — matches system: #03045E, #2C7FFF, #f4f4f4 */
 :root {
-  --bg-primary: #f3f4f6;
+  --bg-primary: #f4f4f4;
   --bg-card: #ffffff;
-  --text-primary: #1f2937;
-  --text-secondary: #4b5563;
-  --border-accent: #3b82f6;
-  --btn-bg: #e5e7eb;
-  --btn-text: #1f2937;
-  --focus-ring: 2px solid #93c5fd;
+  --text-primary: #03045E;
+  --text-secondary: #03045E;
+  --border-accent: #2C7FFF;
+  --btn-bg: #2C7FFF;
+  --btn-text: #ffffff;
+  --focus-ring: 2px solid #2C7FFF;
+  --accent: #2C7FFF;
+  --navy: #03045E;
 }
 
-/* 2. High Contrast Theme */
-.theme-High-Contrast {
+/* 2. High Contrast Theme — no yellow, only system colors */
+.theme-High-Contrast,
+html.high-contrast {
   --bg-primary: #000000;
-  --bg-card: #111111;
-  --text-primary: #ffff00;
+  --bg-card: #0a0a12;
+  --text-primary: #f4f4f4;
   --text-secondary: #ffffff;
-  --border-accent: #ffff00;
-  --btn-bg: #ffff00;
-  --btn-text: #000000;
-  --focus-ring: 4px solid #ffff00;
+  --border-accent: #2C7FFF;
+  --btn-bg: #2C7FFF;
+  --btn-text: #ffffff;
+  --focus-ring: 4px solid #2C7FFF;
+  --accent: #2C7FFF;
+  --navy: #f4f4f4;
 }
 
 /* 3. Assist Mode Theme */
@@ -34,6 +39,12 @@
   --btn-bg: #bae6fd;
   --btn-text: #0369a1;
   --focus-ring: 6px solid #b91c1c;
+}
+
+/* Apply theme variables globally so Contrast updates all screens */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 /* Apply the focus ring globally to all buttons and inputs when navigating with a keyboard/switch */
@@ -49,4 +60,105 @@ html.font-large {
 
 html.font-xlarge {
   font-size: 135%;
+}
+
+/* ===== High Contrast overrides for your system colors ===== */
+
+/* Links */
+html.high-contrast a,
+.theme-High-Contrast a {
+  color: #2C7FFF;
+}
+
+html.high-contrast a:hover,
+.theme-High-Contrast a:hover {
+  color: #f4f4f4;
+}
+
+/* Page / header backgrounds (#f4f4f4) */
+html.high-contrast .bg-\[\#f4f4f4\],
+.theme-High-Contrast .bg-\[\#f4f4f4\] {
+  background-color: #000000 !important;
+}
+
+/* Navy text (#03045E) → light */
+html.high-contrast .text-\[\#03045E\],
+html.high-contrast .text-\[\#03045E\]\/80,
+html.high-contrast .text-\[\#03045E\]\/70,
+.theme-High-Contrast .text-\[\#03045E\],
+.theme-High-Contrast .text-\[\#03045E\]\/80,
+.theme-High-Contrast .text-\[\#03045E\]\/70 {
+  color: #f4f4f4 !important;
+}
+
+/* Navy backgrounds (#03045E) → brand blue button (no yellow) */
+html.high-contrast .bg-\[\#03045E\],
+.theme-High-Contrast .bg-\[\#03045E\] {
+  background-color: #2C7FFF !important;
+  color: #ffffff !important;
+}
+
+/* Accent blue (#2C7FFF) — keep as accent */
+html.high-contrast .bg-\[\#2C7FFF\],
+.theme-High-Contrast .bg-\[\#2C7FFF\] {
+  background-color: #2C7FFF !important;
+  color: #ffffff !important;
+}
+
+html.high-contrast .text-\[\#2C7FFF\],
+.theme-High-Contrast .text-\[\#2C7FFF\] {
+  color: #2C7FFF !important;
+}
+
+html.high-contrast .border-\[\#03045E\],
+html.high-contrast .border-\[\#03045E\]\/10,
+html.high-contrast .border-\[\#03045E\]\/20,
+.theme-High-Contrast .border-\[\#03045E\],
+.theme-High-Contrast .border-\[\#03045E\]\/10,
+.theme-High-Contrast .border-\[\#03045E\]\/20 {
+  border-color: #2C7FFF !important;
+}
+
+/* Cards / white surfaces */
+html.high-contrast .bg-white,
+html.high-contrast [class*="bg-white"],
+.theme-High-Contrast .bg-white,
+.theme-High-Contrast [class*="bg-white"] {
+  background-color: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Semi-transparent white cards (e.g. bg-white/60) → semi-transparent dark */
+html.high-contrast [class*="bg-white\/"],
+.theme-High-Contrast [class*="bg-white\/"] {
+  background-color: rgba(10, 10, 18, 0.75) !important;
+  color: #f4f4f4 !important;
+  border-color: #2C7FFF !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Form fields */
+html.high-contrast input,
+html.high-contrast textarea,
+html.high-contrast select,
+.theme-High-Contrast input,
+.theme-High-Contrast textarea,
+.theme-High-Contrast select {
+  background-color: #000000 !important;
+  color: #f4f4f4 !important;
+  border-color: #2C7FFF !important;
+}
+
+html.high-contrast input::placeholder,
+.theme-High-Contrast input::placeholder {
+  color: #a3a3a3 !important;
+}
+
+/* Footer (navy bar) */
+html.high-contrast footer,
+.theme-High-Contrast footer {
+  background-color: #000000 !important;
+  color: #f4f4f4 !important;
+  border-top: 2px solid #2C7FFF;
 }

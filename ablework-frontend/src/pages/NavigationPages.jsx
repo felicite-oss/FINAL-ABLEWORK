@@ -1,5 +1,152 @@
+import { createContext, useState, useEffect } from 'react';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
+import headerLogo from '../assets/Final.png';
+
+export const AccessibilityContext = createContext();
+
+export function AccessibilityProvider({ children }) {
+  const [mode, setMode] = useState(() => {
+    return localStorage.getItem('ui_preference') || 'Standard';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('ui_preference', mode);
+    const root = document.documentElement;
+    root.classList.remove('theme-Standard', 'theme-High-Contrast', 'theme-Assist');
+    root.classList.add(`theme-${mode.replace(' ', '-')}`);
+  }, [mode]);
+
+  return (
+    <AccessibilityContext.Provider value={{ mode, setMode }}>
+      {children}
+    </AccessibilityContext.Provider>
+  );
+}
+
+// ======================================================
+// SITE HEADER (Shared Header Component matching register style alignment)
+// ======================================================
+function SiteHeader() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <header className="w-full bg-[var(--bg-primary, #f4f4f4)] text-[var(--text-primary, #03045E)] border-b border-current/10 sticky top-0 left-0 z-50">
+      <div className="w-full h-16 pl-4 pr-4 md:pr-8 flex items-center justify-between">
+
+        {/* Left side: Logo + Desktop Navigation */}
+        <div className="flex items-center gap-8">
+          {/* Logo */}
+          <div className="flex items-center flex-shrink-0">
+            <img
+              src={headerLogo}
+              alt="AbleWork Logo"
+              className="h-20 w-auto object-contain max-h-full"
+            />
+          </div>
+          <nav className="hidden md:flex items-center gap-6 text-[15px] font-medium">
+            <NavLink 
+              to="/" 
+              className={({ isActive }) => 
+                `transition-colors duration-200 hover:opacity-80 hover:scale-105 transform ${isActive ? 'font-semibold border-b-2 border-current pb-0.5' : ''}`
+              }
+            >
+              Home
+            </NavLink>
+            <NavLink 
+              to="/about" 
+              className={({ isActive }) => 
+                `transition-colors duration-200 hover:opacity-80 hover:scale-105 transform ${isActive ? 'font-semibold border-b-2 border-current pb-0.5' : ''}`
+              }
+            >
+              About Us
+            </NavLink>
+            <NavLink 
+              to="/policy" 
+              className={({ isActive }) => 
+                `transition-colors duration-200 hover:opacity-80 hover:scale-105 transform ${isActive ? 'font-semibold border-b-2 border-current pb-0.5' : ''}`
+              }
+            >
+              Policy
+            </NavLink>
+          </nav>
+        </div>
+
+        {/* Desktop Log In */}
+        <div className="hidden md:flex items-center">
+          <Link
+            to="/login"
+            className="px-5 py-2 rounded-full bg-transparent text-current text-sm font-medium border border-current hover:opacity-80 hover:scale-105 transform duration-200 transition"
+          >
+            Log In
+          </Link>
+        </div>
+
+        {/* Mobile Hamburger Button */}
+        <button
+          className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg bg-[var(--accent, #2C7FFF)] text-white"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {isOpen ? (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          )}
+        </button>
+      </div>
+
+      {/* Mobile Menu - smooth slide */}
+      <div
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+          isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="w-full bg-[var(--bg-primary, #f4f4f4)] border-t border-current/10">
+          <nav className="flex flex-col px-6 py-5 gap-5 text-[16px] font-medium">
+            <NavLink 
+              to="/" 
+              className={({ isActive }) => 
+                `transition-colors duration-200 hover:opacity-80 hover:scale-105 transform ${isActive ? 'font-semibold pl-2 border-l-4 border-current' : ''}`
+              } 
+              onClick={() => setIsOpen(false)}
+            >
+              Home
+            </NavLink>
+            <NavLink 
+              to="/about" 
+              className={({ isActive }) => 
+                `transition-colors duration-200 hover:opacity-80 hover:scale-105 transform ${isActive ? 'font-semibold pl-2 border-l-4 border-current' : ''}`
+              } 
+              onClick={() => setIsOpen(false)}
+            >
+              About Us
+            </NavLink>
+            <NavLink 
+              to="/policy" 
+              className={({ isActive }) => 
+                `transition-colors duration-200 hover:opacity-80 hover:scale-105 transform ${isActive ? 'font-semibold pl-2 border-l-4 border-current' : ''}`
+              } 
+              onClick={() => setIsOpen(false)}
+            >
+              Policy
+            </NavLink>
+            <Link
+              to="/login"
+              className="mt-2 px-5 py-2.5 rounded-full bg-transparent text-current text-sm font-medium border border-current hover:opacity-80 hover:scale-105 transform duration-200 transition w-fit"
+              onClick={() => setIsOpen(false)}
+            >
+              Log In
+            </Link>
+          </nav>
+        </div>
+      </div>
+    </header>
+  );
+}
 
 
 // ======================================================
@@ -7,53 +154,20 @@ import { Link } from 'react-router-dom';
 // ======================================================
 export function Home() {
   return (
-    <div className="min-h-screen bg-[#f4f4f4] text-[#03045E]">
+    <div className="min-h-screen flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)]">
 
       {/* HEADER */}
-      <header className="bg-white border-b border-[#03045E]/10">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-
-          <Link
-            to="/"
-            className="text-2xl font-extrabold"
-          >
-            AbleWork
-          </Link>
-
-          <nav className="hidden md:flex gap-6 font-medium">
-            <Link to="/" className="text-[#2C7FFF]">
-              Home
-            </Link>
-
-            <Link to="/about" className="hover:text-[#2C7FFF]">
-              About Us
-            </Link>
-
-            <Link to="/policy" className="hover:text-[#2C7FFF]">
-              Policy
-            </Link>
-
-            <Link to="/careers" className="hover:text-[#2C7FFF]">
-              Careers
-            </Link>
-
-            <Link to="/login" className="hover:text-[#2C7FFF]">
-              Log In
-            </Link>
-          </nav>
-
-        </div>
-      </header>
+      <SiteHeader />
 
 
       {/* HERO */}
-      <section className="max-w-7xl mx-auto px-6 py-20">
+      <section className="flex-grow max-w-7xl mx-auto px-6 py-20">
 
         <div className="grid md:grid-cols-2 gap-12 items-center">
 
           <div>
 
-            <p className="text-[#2C7FFF] font-bold mb-3">
+            <p className="text-[var(--accent, #2C7FFF)] font-bold mb-3">
               WELCOME TO ABLEWORK
             </p>
 
@@ -61,7 +175,7 @@ export function Home() {
               Building an Inclusive Workforce for Everyone
             </h1>
 
-            <p className="text-lg text-[#03045E]/70 leading-7 mb-8">
+            <p className="text-lg opacity-80 leading-7 mb-8">
               AbleWork helps persons with disabilities find suitable
               employment opportunities based on their skills,
               qualifications, and location.
@@ -71,14 +185,14 @@ export function Home() {
 
               <Link
                 to="/register-select"
-                className="bg-[#03045E] text-white px-7 py-3 rounded-full font-semibold hover:bg-[#2C7FFF] transition"
+                className="bg-[var(--text-primary, #03045E)] text-[var(--bg-primary, #ffffff)] px-7 py-3 rounded-full font-semibold hover:opacity-80 transition border border-current"
               >
                 Get Started
               </Link>
 
               <Link
                 to="/about"
-                className="border-2 border-[#03045E] px-7 py-3 rounded-full font-semibold hover:bg-[#03045E] hover:text-white transition"
+                className="border-2 border-current px-7 py-3 rounded-full font-semibold hover:opacity-80 transition"
               >
                 Learn More
               </Link>
@@ -89,7 +203,7 @@ export function Home() {
 
 
           {/* RIGHT SIDE */}
-          <div className="bg-white rounded-3xl shadow-xl p-8 md:p-10">
+          <div className="bg-[var(--bg-secondary, #ffffff)] text-[var(--text-secondary, #03045E)] rounded-3xl shadow-xl p-8 md:p-10 border border-current/10">
 
             <h2 className="text-2xl font-bold mb-6">
               Why Choose AbleWork?
@@ -143,19 +257,19 @@ export function About() {
 
       <div className="grid md:grid-cols-2 gap-8">
 
-        <div className="bg-white rounded-3xl shadow-lg p-8">
+        <div className="bg-[var(--bg-secondary, #ffffff)] text-[var(--text-secondary, #03045E)] rounded-3xl shadow-lg p-8 border border-current/10">
 
           <h2 className="text-2xl font-bold mb-5">
             About AbleWork
           </h2>
 
-          <p className="text-[#03045E]/70 leading-7">
+          <p className="opacity-80 leading-7">
             AbleWork is a web-based employment assistance system
             designed to help persons with disabilities find
             appropriate employment opportunities.
           </p>
 
-          <p className="text-[#03045E]/70 leading-7 mt-5">
+          <p className="opacity-80 leading-7 mt-5">
             The system connects applicants and employers while
             helping employers find qualified candidates based on
             skills, qualifications, and location.
@@ -164,13 +278,13 @@ export function About() {
         </div>
 
 
-        <div className="bg-white rounded-3xl shadow-lg p-8">
+        <div className="bg-[var(--bg-secondary, #ffffff)] text-[var(--text-secondary, #03045E)] rounded-3xl shadow-lg p-8 border border-current/10">
 
           <h2 className="text-2xl font-bold mb-5">
             What We Do
           </h2>
 
-          <ul className="space-y-4 text-[#03045E]/70">
+          <ul className="space-y-4 opacity-80">
 
             <li>
               ✓ Connect applicants with employers
@@ -230,14 +344,14 @@ export function Policy() {
   return (
     <PageLayout title="Privacy Policy">
 
-      <div className="bg-white rounded-3xl shadow-lg p-8 md:p-12 space-y-8">
+      <div className="bg-[var(--bg-secondary, #ffffff)] text-[var(--text-secondary, #03045E)] rounded-3xl shadow-lg p-8 md:p-12 space-y-8 border border-current/10">
 
         <section>
           <h2 className="text-2xl font-bold mb-3">
             Information We Collect
           </h2>
 
-          <p className="text-[#03045E]/70 leading-7">
+          <p className="opacity-80 leading-7">
             AbleWork may collect information such as your name,
             email address, contact information, skills,
             qualifications, and employment information.
@@ -250,7 +364,7 @@ export function Policy() {
             How We Use Your Information
           </h2>
 
-          <p className="text-[#03045E]/70 leading-7">
+          <p className="opacity-80 leading-7">
             The information may be used to provide job matching,
             job applications, notifications, and communication
             between applicants and employers.
@@ -263,7 +377,7 @@ export function Policy() {
             Data Protection
           </h2>
 
-          <p className="text-[#03045E]/70 leading-7">
+          <p className="opacity-80 leading-7">
             AbleWork aims to protect user information and use
             collected information only for purposes related to
             the system.
@@ -276,98 +390,11 @@ export function Policy() {
             User Privacy
           </h2>
 
-          <p className="text-[#03045E]/70 leading-7">
+          <p className="opacity-80 leading-7">
             Users should provide accurate information and keep
             their account credentials secure.
           </p>
         </section>
-
-      </div>
-
-    </PageLayout>
-  );
-}
-
-
-// ======================================================
-// CAREERS PAGE
-// ======================================================
-export function Careers() {
-
-  const jobs = [
-    {
-      title: "Web Developer",
-      type: "Full Time",
-      location: "Bacolod City"
-    },
-
-    {
-      title: "UI/UX Designer",
-      type: "Full Time",
-      location: "Remote"
-    },
-
-    {
-      title: "Data Entry Assistant",
-      type: "Part Time",
-      location: "Bacolod City"
-    },
-
-    {
-      title: "Customer Support",
-      type: "Full Time",
-      location: "Remote"
-    }
-  ];
-
-
-  return (
-    <PageLayout title="Careers">
-
-      <p className="text-center text-[#03045E]/70 mb-10">
-        Explore employment opportunities available through AbleWork.
-      </p>
-
-
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-
-        {jobs.map((job, index) => (
-
-          <div
-            key={index}
-            className="bg-white rounded-2xl shadow-lg p-6 hover:-translate-y-1 transition"
-          >
-
-            <div className="w-12 h-12 rounded-xl bg-[#2C7FFF]/10 flex items-center justify-center mb-5">
-              <span className="text-[#2C7FFF] font-bold text-xl">
-                J
-              </span>
-            </div>
-
-
-            <h2 className="text-xl font-bold mb-3">
-              {job.title}
-            </h2>
-
-            <p className="text-sm text-[#03045E]/60">
-              {job.type}
-            </p>
-
-            <p className="text-sm text-[#03045E]/60 mb-5">
-              {job.location}
-            </p>
-
-
-            <button
-              type="button"
-              className="w-full bg-[#03045E] text-white py-3 rounded-full font-semibold hover:bg-[#2C7FFF] transition"
-            >
-              View Job
-            </button>
-
-          </div>
-
-        ))}
 
       </div>
 
@@ -383,7 +410,7 @@ export function Terms() {
   return (
     <PageLayout title="Terms of Service">
 
-      <div className="bg-white rounded-3xl shadow-lg p-8 md:p-12 space-y-8">
+      <div className="bg-[var(--bg-secondary, #ffffff)] text-[var(--text-secondary, #03045E)] rounded-3xl shadow-lg p-8 md:p-12 space-y-8 border border-current/10">
 
         <section>
 
@@ -391,7 +418,7 @@ export function Terms() {
             1. Use of AbleWork
           </h2>
 
-          <p className="text-[#03045E]/70 leading-7">
+          <p className="opacity-80 leading-7">
             Users should use AbleWork only for legitimate
             employment-related activities.
           </p>
@@ -405,7 +432,7 @@ export function Terms() {
             2. User Responsibilities
           </h2>
 
-          <p className="text-[#03045E]/70 leading-7">
+          <p className="opacity-80 leading-7">
             Users are responsible for providing accurate
             information and keeping their account information
             secure.
@@ -420,7 +447,7 @@ export function Terms() {
             3. Account Usage
           </h2>
 
-          <p className="text-[#03045E]/70 leading-7">
+          <p className="opacity-80 leading-7">
             Accounts should not be used for fraudulent,
             harmful, or unauthorized activities.
           </p>
@@ -434,7 +461,7 @@ export function Terms() {
             4. Employment Information
           </h2>
 
-          <p className="text-[#03045E]/70 leading-7">
+          <p className="opacity-80 leading-7">
             Users should provide truthful information when
             creating profiles, posting jobs, or applying for
             employment opportunities.
@@ -459,7 +486,7 @@ export function Contact() {
       <div className="grid md:grid-cols-2 gap-8">
 
         {/* CONTACT INFORMATION */}
-        <div className="bg-white rounded-3xl shadow-lg p-8">
+        <div className="bg-[var(--bg-secondary, #ffffff)] text-[var(--text-secondary, #03045E)] rounded-3xl shadow-lg p-8 border border-current/10">
 
           <h2 className="text-2xl font-bold mb-6">
             Get in Touch
@@ -473,7 +500,7 @@ export function Contact() {
                 Email
               </h3>
 
-              <p className="text-[#03045E]/70">
+              <p className="opacity-80">
                 support@ablework.com
               </p>
             </div>
@@ -484,7 +511,7 @@ export function Contact() {
                 Phone
               </h3>
 
-              <p className="text-[#03045E]/70">
+              <p className="opacity-80">
                 +63 900 000 0000
               </p>
             </div>
@@ -495,7 +522,7 @@ export function Contact() {
                 Address
               </h3>
 
-              <p className="text-[#03045E]/70">
+              <p className="opacity-80">
                 Bacolod City, Philippines
               </p>
             </div>
@@ -506,7 +533,7 @@ export function Contact() {
 
 
         {/* CONTACT FORM */}
-        <div className="bg-white rounded-3xl shadow-lg p-8">
+        <div className="bg-[var(--bg-secondary, #ffffff)] text-[var(--text-secondary, #03045E)] rounded-3xl shadow-lg p-8 border border-current/10">
 
           <h2 className="text-2xl font-bold mb-6">
             Send Us a Message
@@ -518,27 +545,27 @@ export function Contact() {
             <input
               type="text"
               placeholder="Your Name"
-              className="w-full p-3 border border-[#03045E]/20 rounded-xl focus:outline-none focus:border-[#2C7FFF]"
+              className="w-full p-3 bg-transparent border border-current/20 rounded-xl focus:outline-none focus:border-[var(--accent, #2C7FFF)]"
             />
 
 
             <input
               type="email"
               placeholder="Your Email"
-              className="w-full p-3 border border-[#03045E]/20 rounded-xl focus:outline-none focus:border-[#2C7FFF]"
+              className="w-full p-3 bg-transparent border border-current/20 rounded-xl focus:outline-none focus:border-[var(--accent, #2C7FFF)]"
             />
 
 
             <textarea
               rows="5"
               placeholder="Your Message"
-              className="w-full p-3 border border-[#03045E]/20 rounded-xl focus:outline-none focus:border-[#2C7FFF]"
+              className="w-full p-3 bg-transparent border border-current/20 rounded-xl focus:outline-none focus:border-[var(--accent, #2C7FFF)]"
             />
 
 
             <button
               type="button"
-              className="w-full bg-[#03045E] text-white py-3 rounded-full font-semibold hover:bg-[#2C7FFF] transition"
+              className="w-full bg-[var(--text-primary, #03045E)] text-[var(--bg-primary, #ffffff)] py-3 rounded-full font-semibold hover:opacity-80 transition border border-current"
             >
               Send Message
             </button>
@@ -560,67 +587,14 @@ export function Contact() {
 function PageLayout({ title, children }) {
 
   return (
-    <div className="min-h-screen bg-[#f4f4f4] text-[#03045E]">
+    <div className="min-h-screen flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)]">
 
       {/* HEADER */}
-      <header className="bg-white border-b border-[#03045E]/10">
-
-        <div className="max-w-7xl mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
-
-          <Link
-            to="/"
-            className="text-2xl font-extrabold"
-          >
-            AbleWork
-          </Link>
-
-
-          <nav className="flex flex-wrap gap-5 text-sm font-medium">
-
-            <Link
-              to="/"
-              className="hover:text-[#2C7FFF]"
-            >
-              Home
-            </Link>
-
-            <Link
-              to="/about"
-              className="hover:text-[#2C7FFF]"
-            >
-              About Us
-            </Link>
-
-            <Link
-              to="/policy"
-              className="hover:text-[#2C7FFF]"
-            >
-              Policy
-            </Link>
-
-            <Link
-              to="/careers"
-              className="hover:text-[#2C7FFF]"
-            >
-              Careers
-            </Link>
-
-            <Link
-              to="/login"
-              className="bg-[#2C7FFF] text-white px-5 py-2 rounded-full"
-            >
-              Log In
-            </Link>
-
-          </nav>
-
-        </div>
-
-      </header>
+      <SiteHeader />
 
 
       {/* CONTENT */}
-      <main className="max-w-7xl mx-auto px-6 py-16">
+      <main className="flex-grow max-w-7xl mx-auto px-6 py-16 w-full">
 
         <h1 className="text-4xl md:text-5xl font-extrabold text-center mb-12">
           {title}
@@ -640,12 +614,12 @@ function PageLayout({ title, children }) {
 
 
 // ======================================================
-// FOOTER
+// FOOTER (Unified using dynamic theme styling variables matching the standard look)
 // ======================================================
 function SimpleFooter() {
 
   return (
-    <footer className="bg-[#03045E] text-white py-8 px-6">
+    <footer className="bg-[var(--bg-primary, #f4f4f4)] text-[var(--text-primary, #03045E)] py-8 px-6 mt-auto border-t border-current/10">
 
       <div className="max-w-7xl mx-auto text-center">
 
@@ -653,7 +627,7 @@ function SimpleFooter() {
           AbleWork
         </p>
 
-        <p className="text-sm text-white/70">
+        <p className="text-sm opacity-80">
           Building an inclusive workforce for everyone.
         </p>
 
@@ -662,35 +636,35 @@ function SimpleFooter() {
 
           <Link
             to="/"
-            className="hover:text-[#2C7FFF]"
+            className="hover:underline opacity-90 hover:opacity-100"
           >
             Home
           </Link>
 
           <Link
             to="/about"
-            className="hover:text-[#2C7FFF]"
+            className="hover:underline opacity-90 hover:opacity-100"
           >
             About Us
           </Link>
 
           <Link
             to="/policy"
-            className="hover:text-[#2C7FFF]"
+            className="hover:underline opacity-90 hover:opacity-100"
           >
             Privacy Policy
           </Link>
 
           <Link
             to="/terms"
-            className="hover:text-[#2C7FFF]"
+            className="hover:underline opacity-90 hover:opacity-100"
           >
             Terms of Service
           </Link>
 
           <Link
             to="/contact"
-            className="hover:text-[#2C7FFF]"
+            className="hover:underline opacity-90 hover:opacity-100"
           >
             Contact Us
           </Link>
@@ -716,7 +690,7 @@ function Feature({ title, text }) {
         {title}
       </h3>
 
-      <p className="text-sm text-[#03045E]/70">
+      <p className="text-sm opacity-80">
         {text}
       </p>
 
@@ -731,13 +705,13 @@ function Feature({ title, text }) {
 function InfoCard({ title, text }) {
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-7">
+    <div className="bg-[var(--bg-secondary, #ffffff)] text-[var(--text-secondary, #03045E)] rounded-2xl shadow-lg p-7 border border-current/10">
 
       <h3 className="text-xl font-bold mb-3">
         {title}
       </h3>
 
-      <p className="text-[#03045E]/70 leading-6">
+      <p className="opacity-80 leading-6">
         {text}
       </p>
 

@@ -1,10 +1,21 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { AccessibilityContext } from '../context/AccessibilityContext';
 
 export default function AccessibilityToolbar() {
   const { mode, setMode } = useContext(AccessibilityContext);
   const [isOpen, setIsOpen] = useState(false);
   const [fontSize, setFontSize] = useState('normal'); // 'normal', 'large', 'xlarge'
+
+  // Apply High Contrast / Standard to the whole app (all screens)
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove('high-contrast', 'standard');
+    if (mode === 'High Contrast') {
+      root.classList.add('high-contrast');
+    } else {
+      root.classList.add('standard');
+    }
+  }, [mode]);
 
   // Apply font size class to the document root
   const handleFontSizeChange = (size) => {
@@ -14,13 +25,17 @@ export default function AccessibilityToolbar() {
     root.classList.add(`font-${size}`);
   };
 
+  const handleThemeChange = (newMode) => {
+    setMode(newMode);
+  };
+
   return (
-    <div className="fixed bottom-6 left-6 z-[9999] flex flex-col items-start">
+    <div className="fixed bottom-6 left-4 sm:left-6 z-[9999] flex flex-col items-start">
       
       {/* Expanded Control Panel */}
       {isOpen && (
         <div 
-          className="mb-3 w-72 bg-white dark:bg-gray-900 border-2 border-blue-500 rounded-2xl shadow-2xl p-4 flex flex-col gap-4 text-gray-800 dark:text-gray-100"
+          className="mb-3 w-[calc(100vw-2rem)] max-w-72 sm:w-72 bg-white dark:bg-gray-900 border-2 border-blue-500 rounded-2xl shadow-2xl p-4 flex flex-col gap-4 text-gray-800 dark:text-gray-100"
           role="region"
           aria-label="Accessibility Control Panel"
         >
@@ -40,7 +55,7 @@ export default function AccessibilityToolbar() {
             <span className="text-xs font-semibold text-gray-500">Display Theme</span>
             <div className="grid grid-cols-2 gap-2">
               <button
-                onClick={() => setMode('Standard')}
+                onClick={() => handleThemeChange('Standard')}
                 className={`py-2 text-xs font-bold rounded border cursor-pointer ${
                   mode === 'Standard' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-800 border-gray-300'
                 }`}
@@ -49,9 +64,9 @@ export default function AccessibilityToolbar() {
                 Standard
               </button>
               <button
-                onClick={() => setMode('High Contrast')}
+                onClick={() => handleThemeChange('High Contrast')}
                 className={`py-2 text-xs font-bold rounded border cursor-pointer ${
-                  mode === 'High Contrast' ? 'bg-yellow-400 text-black border-black' : 'bg-black text-yellow-400 border-yellow-400'
+                  mode === 'High Contrast' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-800 border-gray-300'
                 }`}
                 aria-label="High Contrast Mode"
               >
@@ -84,7 +99,7 @@ export default function AccessibilityToolbar() {
               </button>
               <button
                 onClick={() => handleFontSizeChange('xlarge')}
-                className={`py-1.5 text-base font-bold rounded border cursor-pointer ${
+                className={`py-1.5 px-1 text-sm font-bold rounded border cursor-pointer flex items-center justify-center whitespace-nowrap ${
                   fontSize === 'xlarge' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-800 border-gray-300'
                 }`}
                 aria-label="Extra Large Font Size"
