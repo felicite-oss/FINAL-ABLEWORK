@@ -53,44 +53,35 @@ app.get('/api/jobs', async (req, res) => {
 });
 
 // ---------------------------------------------------------
-// ROUTE: User Login 
+// ROUTE: LOGIN ALL USERS (Strict Role-Based)
 // ---------------------------------------------------------
 app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body;
 
     try {
+        // 1. Find the user in the main table
         const [users] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
-        
-        if (users.length === 0) {
-            return res.status(401).json({ error: "Invalid email or password." });
-        }
-
+        if (users.length === 0) return res.status(401).json({ error: "Invalid credentials." });
         const user = users[0];
 
+        // 2. Verify password
         const isMatch = await bcrypt.compare(password, user.password_hash);
-        if (!isMatch) {
-            return res.status(401).json({ error: "Invalid email or password." });
-        }
+        if (!isMatch) return res.status(401).json({ error: "Invalid credentials." });
 
-        // --- DETERMINE USER ROLE & FETCH PROFILE ---
-        const [employerCheck] = await db.execute('SELECT user_id FROM employer_profiles WHERE user_id = ?', [user.id]);
-        
-        let userRole = 'applicant';
-        if (employerCheck.length > 0) {
-            userRole = 'employer';
-        }
-
-        res.status(200).json({
-            message: "Login successful",
-            user: {
-                id: user.id,
-                email: user.email,
+        // 3. Send the successful response WITH the strict DB role
+        res.status(200).json({ 
+            message: "Login successful", 
+            user: { 
+                id: user.id, 
+                email: user.email, 
+                ui_preference: user.ui_preference,
                 verification_status: user.verification_status,
-                role: userRole 
-            }
+                role: user.role // Directly from the new database column!
+            } 
         });
+
     } catch (error) {
-        console.error("Login error:", error.message);
+        console.error("Login Error:", error.message);
         res.status(500).json({ error: "Server error during login." });
     }
 });
@@ -177,11 +168,11 @@ app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (re
         await connection.beginTransaction();
 
         try {
-            // STEP A: Insert core authentication data into `users`
+            // STEP A: Insert core data into `users`
             const [userResult] = await connection.execute(
-                `INSERT INTO users (email, phone, password_hash, ui_preference, verification_status) 
-                 VALUES (?, ?, ?, ?, ?)`,
-                [email, phone, hashedPassword, 'default', 'Pending']
+                `INSERT INTO users (email, phone, password_hash, ui_preference, verification_status, role) 
+                 VALUES (?, ?, ?, ?, ?, ?)`,
+                [email, phone, hashedPassword, uiPreference || 'default', 'Pending', 'applicant']
             );
 
             const newUserId = userResult.insertId;
@@ -236,9 +227,10 @@ app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (re
 app.post('/api/auth/register/employer', async (req, res) => {
     console.log("--- INCOMING EMPLOYER REGISTRATION ---");
     
+    // Notice we added documentName here!
     const { 
-        companyName, email, phone, password, industry, 
-        jobRole, address, latitude, longitude
+        companyName, companyDescription, email, phone, password, industry, 
+        jobRole, address, latitude, longitude, documentName 
     } = req.body;
 
     try {
@@ -252,21 +244,24 @@ app.post('/api/auth/register/employer', async (req, res) => {
         await connection.beginTransaction();
 
         try {
-            // STEP A: Insert ONLY core data into `users` (Fixed: Removed firstname/lastname)
+            // STEP A: Insert core data into `users` 
             const [userResult] = await connection.execute(
-                `INSERT INTO users (email, phone, password_hash, ui_preference, verification_status) 
-                 VALUES (?, ?, ?, ?, ?)`,
-                [email, phone, hashedPassword, 'default', 'Pending']
+                `INSERT INTO users (email, phone, password_hash, ui_preference, verification_status, role) 
+                 VALUES (?, ?, ?, ?, ?, ?)`,
+                [email, phone, hashedPassword, 'default', 'Pending', 'employer']
             );
 
             const newUserId = userResult.insertId;
 
-            // STEP B: Insert into `employer_profiles`
+            // STEP B: Insert into `employer_profiles` including the document column
             await connection.execute(
                 `INSERT INTO employer_profiles 
-                (user_id, company_name, industry, job_role, workplace_address, latitude, longitude) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)`,
-                [newUserId, companyName, industry, jobRole, address, latitude || null, longitude || null]
+                (user_id, company_name, company_description, industry, job_role, workplace_address, latitude, longitude, verification_document) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    newUserId, companyName, companyDescription, industry, jobRole, 
+                    address, latitude || null, longitude || null, documentName || null
+                ]
             );
 
             await connection.commit();
@@ -465,7 +460,7 @@ app.get('/api/employer/:id/profile', async (req, res) => {
     try {
         const [rows] = await db.execute(`
             SELECT u.email, u.phone, u.verification_status, 
-                   e.company_name, e.industry, e.job_role, e.workplace_address
+                   e.company_name, e.company_description, e.industry, e.job_role, e.workplace_address
             FROM users u
             JOIN employer_profiles e ON u.id = e.user_id
             WHERE u.id = ?

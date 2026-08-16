@@ -79,11 +79,14 @@ export default function Login() {
       const data = await response.json();
 
       if (response.ok) {
+        // FIXED: Save the user data first for BOTH applicants and employers
+        localStorage.setItem('user', JSON.stringify(data.user));
+
+        // Then route them to the correct dashboard
         if (data.user.role === 'employer') {
           navigate('/employer-dashboard');
         } else {
           navigate('/applicant-dashboard');
-          localStorage.setItem('user', JSON.stringify(data.user));
         }
       } else {
         setErrorMessage(data.error || 'Login failed. Please try again.');

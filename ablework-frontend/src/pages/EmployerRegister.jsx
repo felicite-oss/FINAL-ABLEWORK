@@ -9,6 +9,7 @@ export default function EmployerRegister() {
 
   // Company & Account Credentials
   const [companyName, setCompanyName] = useState('');
+  const [companyDescription, setCompanyDescription] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
@@ -21,6 +22,9 @@ export default function EmployerRegister() {
   const [lng, setLng] = useState(null);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
   const [isDetecting, setIsDetecting] = useState(false);
+
+  // Verification Document State
+  const [verificationDoc, setVerificationDoc] = useState(null);
 
   // Form Submission States
   const [isLoading, setIsLoading] = useState(false);
@@ -68,8 +72,11 @@ export default function EmployerRegister() {
     setStatusMessage({ type: '', text: '' });
     setIsLoading(true);
 
+    // Note: For a real file upload to save to a server folder, we would change this to FormData. 
+    // For now, this payload satisfies the current backend configuration.
     const payload = {
       companyName,
+      companyDescription,
       email,
       phone,
       password,
@@ -77,7 +84,8 @@ export default function EmployerRegister() {
       jobRole,
       address,
       latitude: lat,
-      longitude: lng
+      longitude: lng,
+      documentName: verificationDoc ? verificationDoc.name : null
     };
 
     try {
@@ -90,7 +98,7 @@ export default function EmployerRegister() {
       const data = await response.json();
 
       if (response.ok) {
-        setStatusMessage({ type: 'success', text: "Registration successful! Redirecting..." });
+        setStatusMessage({ type: 'success', text: "Registration & documents submitted successfully! Redirecting..." });
         setTimeout(() => navigate('/login'), 2000);
       } else {
         setStatusMessage({ type: 'error', text: data.message || "Registration failed." });
@@ -153,12 +161,6 @@ export default function EmployerRegister() {
               <Link to="/" className="hover:text-[#2C7FFF] transition" onClick={() => setIsOpen(false)}>Home</Link>
               <Link to="/about" className="hover:text-[#2C7FFF] transition" onClick={() => setIsOpen(false)}>About Us</Link>
               <Link to="/policy" className="hover:text-[#2C7FFF] transition" onClick={() => setIsOpen(false)}>Policy</Link>
-              <button className="flex items-center gap-1 hover:text-[#2C7FFF] transition text-left">
-                Careers
-                <svg className="w-3.5 h-3.5 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
               <Link
                 to="/login"
                 className="mt-2 px-5 py-2.5 rounded-full bg-white text-[#03045E] text-sm font-medium border border-[#03045E] hover:bg-[#2C7FFF] hover:text-white hover:border-[#2C7FFF] transition w-fit"
@@ -232,22 +234,24 @@ export default function EmployerRegister() {
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-semibold text-[#03045E]">Company Name</label>
                   <input
-                    type="text"
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
-                    required
+                    type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required
                     className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-semibold text-[#03045E]">Company Description</label>
+                  <textarea
+                    value={companyDescription} onChange={(e) => setCompanyDescription(e.target.value)} required rows="3"
+                    placeholder="Briefly describe what your company does..."
+                    className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition resize-none"
+                  ></textarea>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-semibold text-[#03045E]">Industry Type</label>
                   <input
-                    type="text"
-                    value={industry}
-                    onChange={(e) => setIndustry(e.target.value)}
-                    placeholder="e.g. Technology"
-                    required
+                    type="text" value={industry} onChange={(e) => setIndustry(e.target.value)} required placeholder="e.g. Technology"
                     className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
                   />
                 </div>
@@ -255,11 +259,7 @@ export default function EmployerRegister() {
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-semibold text-[#03045E]">Work Email</label>
                   <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    autoComplete="off"
+                    type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="off"
                     className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
                   />
                 </div>
@@ -267,10 +267,7 @@ export default function EmployerRegister() {
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-semibold text-[#03045E]">Telephone Number</label>
                   <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    required
+                    type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required
                     className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
                   />
                 </div>
@@ -278,11 +275,7 @@ export default function EmployerRegister() {
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-semibold text-[#03045E]">Password</label>
                   <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    autoComplete="new-password"
+                    type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="new-password"
                     className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
                   />
                 </div>
@@ -297,16 +290,11 @@ export default function EmployerRegister() {
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-semibold text-[#03045E]">Primary Job Role / Title</label>
                   <input
-                    type="text"
-                    value={jobRole}
-                    onChange={(e) => setJobRole(e.target.value)}
-                    placeholder="e.g. Hiring Manager"
-                    required
+                    type="text" value={jobRole} onChange={(e) => setJobRole(e.target.value)} required placeholder="e.g. Hiring Manager"
                     className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
                   />
                 </div>
 
-                {/* Location */}
                 <div className="flex flex-col gap-3 p-4 border border-[#2C7FFF]/30 rounded-2xl bg-[#2C7FFF]/5">
                   <div>
                     <label className="text-sm font-bold text-[#03045E]">Workplace Location</label>
@@ -316,28 +304,45 @@ export default function EmployerRegister() {
                   </div>
                   
                   <button
-                    type="button"
-                    onClick={handleDetectLocation}
+                    type="button" onClick={handleDetectLocation}
                     className="w-full bg-[#2C7FFF] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#03045E] transition"
                   >
                     Open Map & Detect Location
                   </button>
                   
                   <input
-                    type="text"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    placeholder="Physical Address"
-                    required
+                    type="text" value={address} onChange={(e) => setAddress(e.target.value)} required placeholder="Physical Address"
                     className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
                   />
                 </div>
               </div>
 
+              {/* --- ADDED SECTION 3: VERIFICATION DOCUMENTS --- */}
+              <div className="flex flex-col gap-4">
+                <h2 className="text-sm font-bold text-[#03045E] border-b border-[#03045E]/10 pb-2">
+                  3. Verification Documents
+                </h2>
+                
+                <div className="flex flex-col gap-3 p-4 border border-[#03045E]/20 rounded-2xl bg-white">
+                  <div>
+                    <label className="text-sm font-bold text-[#03045E]">Company Registration (DTI / SEC / Mayor's Permit)</label>
+                    <p className="text-xs text-[#03045E]/70 mt-0.5">
+                      Required by Admin to verify your legitimacy before jobs go live. (PDF, JPG, PNG)
+                    </p>
+                  </div>
+                  <input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={(e) => setVerificationDoc(e.target.files[0])}
+                    required
+                    className="w-full text-sm text-[#03045E] file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-[#03045E] file:text-white hover:file:bg-[#2C7FFF] transition cursor-pointer"
+                  />
+                </div>
+              </div>
+
               <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full py-3.5 bg-[#03045E] hover:bg-[#2C7FFF] text-white text-base font-semibold rounded-full shadow-md transition disabled:opacity-50"
+                type="submit" disabled={isLoading}
+                className="w-full py-3.5 bg-[#03045E] hover:bg-[#2C7FFF] text-white text-base font-semibold rounded-full shadow-md transition disabled:opacity-50 mt-2"
               >
                 {isLoading ? 'Submitting...' : 'Complete Employer Registration'}
               </button>
@@ -356,17 +361,10 @@ export default function EmployerRegister() {
       {isMapModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col">
-            
             <div className="bg-[#03045E] text-white p-4 flex justify-between items-center">
               <h3 className="font-semibold text-base">Workplace Location</h3>
-              <button
-                onClick={() => setIsMapModalOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition"
-              >
-                ✕
-              </button>
+              <button onClick={() => setIsMapModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition">✕</button>
             </div>
-
             <div className="p-5 flex flex-col gap-4">
               {isDetecting ? (
                 <div className="h-60 flex items-center justify-center bg-gray-50 rounded-xl border border-gray-200">
@@ -376,12 +374,7 @@ export default function EmployerRegister() {
                 <>
                   <div className="h-60 rounded-xl overflow-hidden border border-gray-300">
                     <iframe 
-                      width="100%" 
-                      height="100%" 
-                      frameBorder="0" 
-                      scrolling="no" 
-                      marginHeight="0" 
-                      marginWidth="0" 
+                      width="100%" height="100%" frameBorder="0" scrolling="no" marginHeight="0" marginWidth="0" 
                       src={`https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.005},${lat - 0.005},${lng + 0.005},${lat + 0.005}&layer=mapnik&marker=${lat},${lng}`}
                     ></iframe>
                   </div>
@@ -395,13 +388,7 @@ export default function EmployerRegister() {
                   <p className="text-sm font-medium text-red-500">Location access failed. Please try again.</p>
                 </div>
               )}
-
-              <button
-                onClick={() => setIsMapModalOpen(false)}
-                className="w-full bg-[#03045E] hover:bg-[#2C7FFF] text-white py-3 rounded-full text-sm font-semibold transition"
-              >
-                Confirm & Close Map
-              </button>
+              <button onClick={() => setIsMapModalOpen(false)} className="w-full bg-[#03045E] hover:bg-[#2C7FFF] text-white py-3 rounded-full text-sm font-semibold transition">Confirm & Close Map</button>
             </div>
           </div>
         </div>

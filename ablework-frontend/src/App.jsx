@@ -5,6 +5,7 @@ import ApplicantRegister from './pages/ApplicantRegister';
 import EmployerRegister from './pages/EmployerRegister';
 import AccessibilityToolbar from './components/AccessibilityToolbar';
 import ApplicantDashboard from './pages/ApplicantDashboard';
+import EmployerDashboard from './pages/EmployerDashboard';
 import AbbyChatbot from './components/AbbyChatbot';
 
 // NEW: Navigation Pages & Home (Added Home import to fix the root route)
@@ -34,6 +35,7 @@ function App() {
             <Route path="/register/applicant" element={<ApplicantRegister />} />
             <Route path="/register/employer" element={<EmployerRegister />} />
             <Route path="/applicant-dashboard" element={<ApplicantDashboard />} />
+            <Route path="/employer-dashboard" element={<EmployerDashboard />} />
 
             {/* NEW NAVIGATION ROUTES */}
             <Route path="/about" element={<About />} />
