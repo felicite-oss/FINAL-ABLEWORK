@@ -480,7 +480,7 @@ app.get('/api/employer/:id/profile', async (req, res) => {
         const [rows] = await db.execute(`
             SELECT u.email, u.phone, u.verification_status, 
                    e.company_name, e.industry, e.job_role, e.workplace_address,
-                   e.company_description, e.latitude, e.longitude 
+                   e.company_description, e.latitude, e.longitude, e.company_logo 
             FROM users u
             JOIN employer_profiles e ON u.id = e.user_id
             WHERE u.id = ?
