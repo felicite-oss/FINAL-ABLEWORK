@@ -1,22 +1,49 @@
 import React, { useState } from 'react';
 
+// SAFE PARSER: Prevents the screen from crashing if database entries are poorly formatted
+const safeParse = (data) => {
+  if (!data) return [];
+  try { return JSON.parse(data); } 
+  catch (e) { return []; }
+};
+
 export default function ApplicantSmartMatches({ profile, matches, refreshData }) {
   const [applyingTo, setApplyingTo] = useState(null);
+  const [selectedJob, setSelectedJob] = useState(null);
+  
+  // States for the Application Flow
+  const [modalView, setModalView] = useState('details'); // 'details' or 'form'
+  const [resumeFile, setResumeFile] = useState(null);
+  const [coverLetter, setCoverLetter] = useState('');
 
-  const handleApply = async (jobId) => {
-    setApplyingTo(jobId);
+  // Updated Apply Handler using FormData for file upload
+  const submitApplication = async (e) => {
+    e.preventDefault();
+    if (!resumeFile) {
+        alert("Please upload your resume.");
+        return;
+    }
+
+    setApplyingTo(selectedJob.id);
+
+    // Build the form data package
+    const formData = new FormData();
+    formData.append('applicant_id', profile.user_id);
+    formData.append('job_id', selectedJob.id);
+    formData.append('resume', resumeFile);
+    formData.append('cover_letter', coverLetter);
+
     try {
       const res = await fetch('http://localhost:5001/api/applications/apply', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ applicant_id: profile.user_id, job_id: jobId })
+        body: formData 
       });
-
+      
       const data = await res.json();
-
       if (res.ok) {
         alert("Application submitted successfully!");
-        refreshData(); // Refresh to update data across the dashboard
+        refreshData(); 
+        closeModal();
       } else {
         alert(data.message || "Failed to apply.");
       }
@@ -27,15 +54,35 @@ export default function ApplicantSmartMatches({ profile, matches, refreshData })
     }
   };
 
-  // Helper to color-code the match percentage badge
   const getMatchColor = (percentage) => {
     if (percentage >= 80) return 'bg-green-100 text-green-800 border-green-200';
     if (percentage >= 50) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
     return 'bg-orange-100 text-orange-800 border-orange-200';
   };
 
+  const openModal = (job) => {
+    setSelectedJob(job);
+    setModalView('details');
+    setResumeFile(null);
+    setCoverLetter('');
+  };
+
+  const openApplyModal = (job) => {
+    setSelectedJob(job);
+    setModalView('form'); // Jumps straight to the application form
+    setResumeFile(null);
+    setCoverLetter('');
+  };
+
+  const closeModal = () => {
+    setSelectedJob(null);
+    setModalView('details');
+    setResumeFile(null);
+    setCoverLetter('');
+  };
+
   return (
-    <div className="animate-fadeIn max-w-5xl">
+    <div className="animate-fadeIn max-w-5xl relative pb-10">
       <div className="mb-8 border-b border-[#03045E]/10 pb-4">
         <h1 className="text-3xl font-extrabold text-[#03045E]">Smart Matches</h1>
         <p className="opacity-70 font-medium text-[#03045E] mt-1">
@@ -43,86 +90,41 @@ export default function ApplicantSmartMatches({ profile, matches, refreshData })
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6">
+      {/* COMPACT SMART FEED */}
+      <div className="flex flex-col gap-4">
         {matches && matches.length > 0 ? (
           matches.map(job => (
-            <div key={job.id} className="bg-white p-8 rounded-3xl shadow-md border border-[#03045E]/10 transition hover:shadow-lg flex flex-col md:flex-row gap-8 relative overflow-hidden">
+            <div key={job.id} className="bg-white p-6 rounded-2xl shadow-sm border border-[#03045E]/10 transition hover:shadow-md hover:border-[#2C7FFF]/30 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
               
-              {/* Left Content Area */}
               <div className="flex-1">
-                <div className="flex flex-wrap gap-3 mb-3">
-                  <span className={`px-3 py-1 text-xs font-extrabold rounded-full border ${getMatchColor(job.match_percentage)}`}>
-                    🎯 {job.match_percentage}% Skill Match
+                <div className="flex flex-wrap gap-2 mb-2">
+                  <span className={`px-3 py-1 text-[10px] font-extrabold rounded-full border uppercase ${getMatchColor(job.match_percentage)}`}>
+                    🎯 {job.match_percentage}% OVERALL MATCH
                   </span>
-                  <span className="px-3 py-1 bg-blue-50 text-blue-800 border border-blue-200 text-xs font-bold rounded-full">
-                    📍 {job.distance_km} km away
-                  </span>
+                  {job.distance_km && (
+                    <span className="px-3 py-1 bg-blue-50 text-blue-800 border border-blue-200 text-[10px] font-extrabold uppercase rounded-full">
+                      📍 {job.distance_km} km away
+                    </span>
+                  )}
                 </div>
-
-                <h2 className="text-2xl font-bold text-[#03045E]">{job.job_title}</h2>
-                <p className="text-lg font-semibold text-[#2C7FFF] mb-4">{job.company_name}</p>
-                
-                <p className="text-gray-700 mb-6 text-sm whitespace-pre-wrap">{job.job_description}</p>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Skills Display */}
-                  <div>
-                    <h4 className="text-xs font-bold text-[#03045E]/60 uppercase mb-2">Required Skills</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {job.required_skills && JSON.parse(job.required_skills).map((skill, i) => {
-                        // Highlight skills the applicant actually has vs ones they are missing
-                        const applicantSkills = profile.skills ? (typeof profile.skills === 'string' ? JSON.parse(profile.skills) : profile.skills) : [];
-                        const hasSkill = applicantSkills.includes(skill);
-                        
-                        return (
-                          <span key={i} className={`px-3 py-1 text-xs font-bold rounded-lg border ${
-                            hasSkill ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-100 text-gray-500 border-gray-200'
-                          }`}>
-                            {hasSkill ? '✓ ' : ''}{skill}
-                          </span>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Accommodations Display */}
-                  <div>
-                    <h4 className="text-xs font-bold text-[#03045E]/60 uppercase mb-2">Verified Accommodations</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {job.provided_accommodations && JSON.parse(job.provided_accommodations).map((acc, i) => (
-                        <span key={i} className="px-3 py-1 bg-purple-50 text-purple-800 text-xs font-bold rounded-lg border border-purple-200">
-                          {acc}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                <h2 className="text-xl font-bold text-[#03045E]">{job.job_title}</h2>
+                <p className="text-sm font-semibold text-[#2C7FFF] mb-2">{job.company_name}</p>
+                <p className="text-gray-600 text-sm line-clamp-2">{job.job_description}</p>
               </div>
 
-              {/* Right Action Sidebar */}
-              <div className="md:w-64 shrink-0 flex flex-col gap-4 border-t md:border-t-0 md:border-l border-gray-200 pt-6 md:pt-0 md:pl-6 bg-gray-50/50 p-6 -m-8 md:m-0 rounded-b-3xl md:rounded-none md:rounded-r-3xl">
-                <div>
-                  <h4 className="text-xs font-bold text-[#03045E]/60 uppercase mb-1">Salary Range</h4>
-                  <p className="font-semibold text-gray-800 text-sm">{job.salary_range || 'Not specified'}</p>
-                </div>
-                
-                <div className="flex-1">
-                  <h4 className="text-xs font-bold text-[#03045E]/60 uppercase mb-1">Benefits</h4>
-                  <p className="text-sm text-gray-700">{job.benefits ? JSON.parse(job.benefits).join(', ') : 'Not specified'}</p>
-                </div>
-
-                <div className="mt-auto">
-                    <button 
-                    onClick={() => handleApply(job.id)}
-                    disabled={applyingTo === job.id}
-                    className="py-4 px-6 bg-[#03045E] text-white font-bold rounded-xl hover:bg-[#2C7FFF] transition w-full disabled:bg-gray-400 shadow-md flex items-center justify-center gap-2"
-                    >
-                    {applyingTo === job.id ? 'Submitting...' : 'Apply Now'}
-                    </button>
-                    <p className="text-[10px] text-center text-gray-400 mt-2 font-medium uppercase">
-                        Application is sent directly to employer
-                    </p>
-                </div>
+              <div className="shrink-0 w-full md:w-auto flex flex-col sm:flex-row gap-3 mt-2 md:mt-0">
+                <button 
+                  onClick={() => openModal(job)}
+                  className="px-6 py-3 bg-[#f4f4f4] text-[#03045E] font-bold rounded-xl hover:bg-[#2C7FFF]/20 transition w-full md:w-auto"
+                >
+                  View Details
+                </button>
+                <button 
+                  onClick={() => openApplyModal(job)}
+                  className="px-6 py-3 bg-[#03045E] text-white font-bold rounded-xl hover:bg-[#2C7FFF] transition w-full md:w-auto shadow-md"
+                >
+                  Apply Now
+                </button>
               </div>
 
             </div>
@@ -132,11 +134,150 @@ export default function ApplicantSmartMatches({ profile, matches, refreshData })
             <span className="text-4xl mb-4 opacity-50">🧭</span>
             <h3 className="text-lg font-bold text-[#03045E] mb-2">No exact matches right now</h3>
             <p className="text-sm font-medium text-gray-500 max-w-md">
-              Try expanding your Travel Radius in your profile settings, or visit the "Explore All Jobs" tab to view postings outside your immediate smart parameters.
+              Try expanding your Travel Radius in your profile settings, or visit the "Explore All Jobs" tab.
             </p>
           </div>
         )}
       </div>
+
+      {/* VIEW DETAILS / APPLY MODAL */}
+      {selectedJob && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white p-8 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl">
+            
+            <button onClick={closeModal} className="absolute top-6 right-6 w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-200 hover:text-gray-800 transition">
+              ✖
+            </button>
+
+            {modalView === 'details' ? (
+              // --- VIEW 1: JOB DETAILS ---
+              <div className="animate-fadeIn">
+                <div className="pr-12 mb-6">
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    <span className={`px-3 py-1 text-xs font-extrabold rounded-full border uppercase ${getMatchColor(selectedJob.match_percentage)}`}>
+                      🎯 {selectedJob.match_percentage}% OVERALL MATCH
+                    </span>
+                    {selectedJob.distance_km && (
+                      <span className="px-3 py-1 bg-blue-50 text-blue-800 border border-blue-200 text-xs font-extrabold uppercase rounded-full">
+                        📍 {selectedJob.distance_km} km away
+                      </span>
+                    )}
+                  </div>
+                  <h2 className="text-3xl font-extrabold text-[#03045E]">{selectedJob.job_title}</h2>
+                  <p className="text-xl font-semibold text-[#2C7FFF] mt-1 border-b border-gray-200 pb-6">{selectedJob.company_name}</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div className="md:col-span-2 flex flex-col gap-8">
+                    <div>
+                      <h3 className="text-sm font-bold text-[#03045E]/60 uppercase mb-3">Job Description</h3>
+                      <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{selectedJob.job_description}</p>
+                    </div>
+                    
+                    <div>
+                      <h3 className="text-sm font-bold text-[#03045E]/60 uppercase mb-3">Skill Comparison</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {safeParse(selectedJob.required_skills).map((skill, i) => {
+                          const applicantSkills = profile.skills ? (typeof profile.skills === 'string' ? safeParse(profile.skills) : profile.skills) : [];
+                          const hasSkill = applicantSkills.includes(skill);
+                          return (
+                            <span key={i} className={`px-3 py-1.5 text-sm font-bold rounded-lg border ${hasSkill ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-100 text-gray-500 border-gray-200'}`}>
+                              {hasSkill ? '✓ ' : '× '}{skill}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-sm font-bold text-[#03045E]/60 uppercase mb-3">Verified Accommodations</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {safeParse(selectedJob.provided_accommodations).map((acc, i) => (
+                          <span key={i} className="px-3 py-1.5 bg-purple-50 text-purple-800 text-sm font-bold rounded-lg border border-purple-200">
+                            {acc}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-6 bg-[#f4f4f4]/50 p-6 rounded-2xl border border-gray-200 h-fit">
+                    <div>
+                      <h3 className="text-xs font-bold text-[#03045E]/60 uppercase mb-1">Salary Range</h3>
+                      <p className="font-semibold text-[#03045E] text-lg">{selectedJob.salary_range || 'Not specified'}</p>
+                    </div>
+                    
+                    <div>
+                      <h3 className="text-xs font-bold text-[#03045E]/60 uppercase mb-1">Benefits</h3>
+                      <p className="text-sm text-gray-700 font-medium leading-relaxed">
+                        {safeParse(selectedJob.benefits).join(' • ') || 'Not specified'}
+                      </p>
+                    </div>
+
+                    <div className="mt-4 pt-6 border-t border-gray-300">
+                      <button 
+                        onClick={() => setModalView('form')}
+                        className="py-4 px-6 bg-[#03045E] text-white font-bold rounded-xl hover:bg-[#2C7FFF] transition w-full shadow-md"
+                      >
+                        Apply Now
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              // --- VIEW 2: APPLICATION UPLOAD FORM ---
+              <div className="animate-fadeIn max-w-2xl mx-auto">
+                <button onClick={() => setModalView('details')} className="text-sm font-bold text-[#2C7FFF] hover:underline mb-6 block">
+                  ← Back to Job Details
+                </button>
+                
+                <h2 className="text-3xl font-extrabold text-[#03045E] mb-2">Submit Application</h2>
+                <p className="text-gray-600 mb-8 font-medium">Applying for <span className="font-bold text-[#2C7FFF]">{selectedJob.job_title}</span> at {selectedJob.company_name}</p>
+
+                <form onSubmit={submitApplication} className="flex flex-col gap-6">
+                  
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-bold text-[#03045E]">Upload Resume / CV <span className="text-red-500">*</span></label>
+                    <div className="border-2 border-dashed border-gray-300 p-6 rounded-2xl bg-gray-50 flex flex-col items-center justify-center text-center">
+                      <span className="text-3xl mb-2">📄</span>
+                      <input 
+                        type="file" 
+                        accept=".pdf,.doc,.docx"
+                        required
+                        onChange={(e) => setResumeFile(e.target.files[0])}
+                        className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#2C7FFF]/10 file:text-[#2C7FFF] hover:file:bg-[#2C7FFF]/20 cursor-pointer"
+                      />
+                      <p className="text-xs text-gray-400 mt-3">Supported formats: PDF, DOCX (Max 5MB)</p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-bold text-[#03045E]">Pitch / Cover Letter <span className="text-gray-400 font-normal">(Optional)</span></label>
+                    <textarea 
+                      rows="4" 
+                      value={coverLetter}
+                      onChange={(e) => setCoverLetter(e.target.value)}
+                      placeholder="Briefly explain why you are a great fit for this role, or note any specific accommodations you might want to discuss..."
+                      className="p-4 border border-gray-300 rounded-2xl focus:border-[#2C7FFF] outline-none resize-none"
+                    ></textarea>
+                  </div>
+
+                  <div className="mt-4 pt-6 border-t border-gray-200">
+                    <button 
+                      type="submit"
+                      disabled={applyingTo === selectedJob.id}
+                      className="py-4 px-6 bg-[#03045E] text-white font-bold rounded-xl hover:bg-[#2C7FFF] transition w-full shadow-md disabled:bg-gray-400"
+                    >
+                      {applyingTo === selectedJob.id ? 'Uploading & Submitting...' : 'Submit Application'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

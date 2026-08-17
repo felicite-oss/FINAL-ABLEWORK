@@ -63,9 +63,10 @@ app.post('/api/chat', async (req, res) => {
 // ---------------------------------------------------------
 app.get('/api/jobs', async (req, res) => {
     try {
-        const [jobs] = await db.execute("SELECT * FROM jobs WHERE status = 'Active'");
+        const [jobs] = await db.execute("SELECT * FROM job_postings WHERE status = 'Active' ORDER BY created_at DESC");
         res.status(200).json(jobs);
     } catch (error) {
+        console.error("Fetch All Jobs Error:", error.message);
         res.status(500).json({ error: "Failed to fetch jobs." });
     }
 });
@@ -320,7 +321,7 @@ function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
 }
 
 // ---------------------------------------------------------
-// ROUTE: SMART MATCHING ENGINE (Rule-Based Algorithm)
+// ROUTE: SMART MATCHING ENGINE (Weighted Overall Score)
 // ---------------------------------------------------------
 app.get('/api/applicant/:id/matches', async (req, res) => {
     const userId = req.params.id;
@@ -336,41 +337,46 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
         if (applicantRows.length === 0) return res.status(404).json({ message: "Applicant not found." });
         const applicant = applicantRows[0];
 
-        // Parse their JSON arrays safely
+        // Parse JSON arrays safely and ensure radius is a strict Number
         const appSkills = JSON.parse(applicant.skills || '[]');
         const appAccommodations = JSON.parse(applicant.accommodations_needed || '[]');
+        const maxRadius = Number(applicant.travel_radius_km) || 5; 
 
         // 2. Fetch all active job postings
         const [jobs] = await db.execute(`
-            SELECT id, employer_id, job_title, company_name, job_description, required_skills, provided_accommodations, latitude, longitude 
+            SELECT id, employer_id, job_title, company_name, job_description, required_skills, provided_accommodations, salary_range, benefits, latitude, longitude 
             FROM job_postings 
             WHERE status = 'Active'
         `);
 
         let matchedJobs = [];
 
-        // 3. RUN THE RULE-BASED ALGORITHM
+        // 3. RUN THE WEIGHTED ALGORITHM
         for (let job of jobs) {
-            // A. Geofencing Check
+            
+            // A. Geofencing & Distance Score (Max 40 points)
             let distance = 0;
+            let distanceScore = 40; // Default to perfect distance score for Remote jobs
+
             if (applicant.latitude && applicant.longitude && job.latitude && job.longitude) {
                 distance = getDistanceFromLatLonInKm(
                     applicant.latitude, applicant.longitude, 
                     job.latitude, job.longitude
                 );
                 
-                // Rule: If job is further than their travel radius, discard it
-                if (distance > applicant.travel_radius_km) continue;
+                // Dealbreaker: If job is further than their travel radius, discard it
+                if (distance > maxRadius) continue;
+
+                // Calculate Distance Score: Closer to 0km = 40 pts, Closer to maxRadius = 0 pts
+                distanceScore = Math.max(0, 40 - ((distance / maxRadius) * 40));
             }
 
-            // B. Accommodation Strict Match Check
+            // B. Accommodation Strict Match Check (Dealbreaker)
             const jobAccommodations = JSON.parse(job.provided_accommodations || '[]');
-            
-            // Rule: Every accommodation the applicant NEEDS must be provided by the job
             const meetsAllNeeds = appAccommodations.every(need => jobAccommodations.includes(need));
-            if (!meetsAllNeeds) continue; // Discard job if it's not accessible for this specific user
+            if (!meetsAllNeeds) continue; // Discard job if it is not accessible
 
-            // C. Skill Scoring
+            // C. Skill Scoring (Max 60 points)
             const jobSkills = JSON.parse(job.required_skills || '[]');
             let matchingSkillsCount = 0;
             
@@ -378,22 +384,24 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
                 if (jobSkills.includes(skill)) matchingSkillsCount++;
             });
 
-            // Calculate a percentage (e.g., 100% Match)
-            const matchPercentage = jobSkills.length > 0 
-                ? Math.round((matchingSkillsCount / jobSkills.length) * 100) 
-                : 100;
+            const skillScore = jobSkills.length > 0 
+                ? (matchingSkillsCount / jobSkills.length) * 60 
+                : 60; // Give full 60 points if the job requires no specific skills
+
+            // Calculate the final Combined Overall Score
+            const overallMatchPercentage = Math.round(skillScore + distanceScore);
 
             // D. Push successful match to the array
             matchedJobs.push({
                 ...job,
-                distance_km: distance.toFixed(1),
+                distance_km: distance ? distance.toFixed(1) : null,
                 matching_skills_count: matchingSkillsCount,
-                match_percentage: matchPercentage,
+                match_percentage: overallMatchPercentage,
                 total_required_skills: jobSkills.length
             });
         }
 
-        // 4. Sort matches by highest percentage first, then by closest distance
+        // 4. Sort matches by highest overall percentage first, then by closest distance
         matchedJobs.sort((a, b) => {
             if (b.match_percentage !== a.match_percentage) {
                 return b.match_percentage - a.match_percentage; 
@@ -411,13 +419,22 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
 
 
 // ---------------------------------------------------------
-// ROUTE: SUBMIT A JOB APPLICATION
+// ROUTE: SUBMIT A JOB APPLICATION (With Resume Upload)
 // ---------------------------------------------------------
-app.post('/api/applications/apply', async (req, res) => {
-    const { applicant_id, job_id } = req.body;
+// Note: We added upload.single('resume') here!
+app.post('/api/applications/apply', upload.single('resume'), async (req, res) => {
+    // Because we use FormData on the frontend, data is in req.body
+    const { applicant_id, job_id, cover_letter } = req.body;
+    
+    // Multer saves the file and provides the path
+    const resumePath = req.file ? `/uploads/${req.file.filename}` : null;
 
     if (!applicant_id || !job_id) {
         return res.status(400).json({ message: "Missing applicant or job ID." });
+    }
+
+    if (!resumePath) {
+        return res.status(400).json({ message: "A resume file is required to apply." });
     }
 
     try {
@@ -431,10 +448,10 @@ app.post('/api/applications/apply', async (req, res) => {
             return res.status(400).json({ message: "You have already applied for this job." });
         }
 
-        // Insert the application
+        // Insert the application with the resume path and cover letter
         await db.execute(
-            'INSERT INTO applications (applicant_id, job_id, status) VALUES (?, ?, ?)',
-            [applicant_id, job_id, 'Under Review']
+            'INSERT INTO applications (applicant_id, job_id, status, resume_path, cover_letter) VALUES (?, ?, ?, ?, ?)',
+            [applicant_id, job_id, 'Under Review', resumePath, cover_letter || null]
         );
 
         res.status(201).json({ message: "Application submitted successfully!" });
@@ -735,6 +752,41 @@ app.put('/api/employer/:id/settings', upload.single('company_logo'), async (req,
         res.status(200).json({ message: "Profile updated successfully", logo_url: company_logo });
     } catch (error) {
         console.error("Settings Update Error:", error.message);
+        res.status(500).json({ message: "Server error updating profile." });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: UPDATE APPLICANT PROFILE
+// ---------------------------------------------------------
+app.put('/api/applicant/:id/profile', async (req, res) => {
+    const userId = req.params.id;
+    const { 
+        residential_address, latitude, longitude, travel_radius_km, 
+        workplace_independence, accommodations_needed, skills, disability_type 
+    } = req.body;
+
+    try {
+        await db.execute(
+            `UPDATE applicant_profiles 
+             SET residential_address = ?, latitude = ?, longitude = ?, travel_radius_km = ?, 
+                 workplace_independence = ?, accommodations_needed = ?, skills = ?, disability_type = ? 
+             WHERE user_id = ?`,
+            [
+                residential_address, 
+                latitude || null, 
+                longitude || null, 
+                travel_radius_km, 
+                workplace_independence, 
+                JSON.stringify(accommodations_needed), 
+                JSON.stringify(skills),
+                disability_type,
+                userId
+            ]
+        );
+        res.status(200).json({ message: "Profile updated successfully." });
+    } catch (error) {
+        console.error("Profile Update Error:", error.message);
         res.status(500).json({ message: "Server error updating profile." });
     }
 });
