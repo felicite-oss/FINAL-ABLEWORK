@@ -3,6 +3,8 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const db = require('./config/db');
 const multer = require('multer'); 
+const path = require('path'); 
+const helmet = require('helmet');
 require('dotenv').config();
 
 const { OpenAI } = require('openai');
@@ -14,13 +16,29 @@ const openai = new OpenAI({
 
 const app = express();
 
+// Add this line to allow images to be loaded cross-origin
+app.use(
+  helmet.crossOriginResourcePolicy({ policy: "cross-origin" })
+);
+
 // 1. Open CORS for development
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 2. Configure Multer to save uploaded files into the 'uploads' folder
-const upload = multer({ dest: 'uploads/' });
+// 2. Configure Multer to save uploaded files WITH their file extensions (.jpg, .png)
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage: storage });
+
+// 3. Tell Express to serve the 'uploads' folder publicly so React can display the images
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ---------------------------------------------------------
 // ROUTE: Abby AI Chatbot Engine
@@ -458,9 +476,11 @@ app.get('/api/employer/:id/profile', async (req, res) => {
     const userId = req.params.id;
 
     try {
+        // Look at the SELECT below. We MUST include e.latitude and e.longitude!
         const [rows] = await db.execute(`
             SELECT u.email, u.phone, u.verification_status, 
-                   e.company_name, e.company_description, e.industry, e.job_role, e.workplace_address
+                   e.company_name, e.industry, e.job_role, e.workplace_address,
+                   e.company_description, e.latitude, e.longitude 
             FROM users u
             JOIN employer_profiles e ON u.id = e.user_id
             WHERE u.id = ?
@@ -474,6 +494,57 @@ app.get('/api/employer/:id/profile', async (req, res) => {
     } catch (error) {
         console.error("Employer Profile Error:", error.message);
         res.status(500).json({ message: "Server error fetching profile." });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: FETCH EMPLOYER DASHBOARD STATS
+// ---------------------------------------------------------
+app.get('/api/employer/:id/dashboard-stats', async (req, res) => {
+    const employerId = req.params.id;
+
+    try {
+        // 1. Get Active Jobs (Strictly 'Active' so archived jobs disappear from UI)
+        const [activeJobs] = await db.execute(
+            `SELECT COUNT(*) as count FROM job_postings WHERE employer_id = ? AND status = 'Active'`, 
+            [employerId]
+        );
+
+        // 2. Get Application Stats (Checking for both 'Pending' and 'Under Review')
+        const [appStats] = await db.execute(
+            `SELECT 
+                SUM(CASE WHEN a.status IN ('Pending', 'Under Review') THEN 1 ELSE 0 END) as pending_count,
+                SUM(CASE WHEN a.status = 'Shortlisted' THEN 1 ELSE 0 END) as shortlisted_count
+             FROM applications a
+             JOIN job_postings j ON a.job_id = j.id
+             WHERE j.employer_id = ?`,
+             [employerId]
+        );
+
+        // 3. Get Recent Activity 
+        // We use ap.firstname and ap.lastname to match your database!
+        const [recentActivity] = await db.execute(
+            `SELECT a.id, a.applied_at AS created_at, a.status, j.job_title, 
+                    ap.firstname AS first_name, ap.lastname AS last_name
+             FROM applications a
+             JOIN job_postings j ON a.job_id = j.id
+             JOIN applicant_profiles ap ON a.applicant_id = ap.user_id
+             WHERE j.employer_id = ?
+             ORDER BY a.applied_at DESC
+             LIMIT 5`,
+             [employerId]
+        );
+
+        res.status(200).json({
+            activeJobs: activeJobs[0].count || 0,
+            pendingApps: appStats[0].pending_count || 0,
+            shortlistedApps: appStats[0].shortlisted_count || 0,
+            recentActivity: recentActivity
+        });
+
+    } catch (error) {
+        console.error("Dashboard Stats Error:", error.message);
+        res.status(500).json({ message: "Server error fetching stats." });
     }
 });
 
@@ -496,27 +567,175 @@ app.get('/api/employer/:id/jobs', async (req, res) => {
 });
 
 // ---------------------------------------------------------
-// ROUTE: CREATE A NEW JOB POSTING
+// ROUTE: CREATE A JOB (Secured & Restricted)
 // ---------------------------------------------------------
 app.post('/api/jobs/create', async (req, res) => {
-    const { employer_id, job_title, company_name, job_description, required_skills, provided_accommodations, latitude, longitude } = req.body;
+    // 1. We added salary_range and benefits to the req.body destructuring here
+    const { 
+        employer_id, job_title, company_name, job_description, 
+        required_skills, provided_accommodations, salary_range, benefits, 
+        latitude, longitude 
+    } = req.body;
 
     try {
-        await db.execute(`
-            INSERT INTO job_postings 
-            (employer_id, job_title, company_name, job_description, required_skills, provided_accommodations, latitude, longitude, status) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Active')
-        `, [
-            employer_id, job_title, company_name, job_description, 
-            JSON.stringify(required_skills || []), 
-            JSON.stringify(provided_accommodations || []), 
-            latitude || null, longitude || null
-        ]);
+        // SECURITY CHECK: Ensure employer is Verified/Approved
+        const [users] = await db.execute('SELECT verification_status FROM users WHERE id = ?', [employer_id]);
+        
+        if (users.length === 0 || users[0].verification_status !== 'Approved') {
+            return res.status(403).json({ message: "You must be an approved employer to post jobs." });
+        }
 
-        res.status(201).json({ message: "Job posted successfully!" });
+        // 2. INSERT JOB: Added the new columns to the query and the array below
+        await db.execute(
+            `INSERT INTO job_postings 
+             (employer_id, job_title, company_name, job_description, required_skills, provided_accommodations, salary_range, benefits, latitude, longitude, status) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active')`,
+            [
+                employer_id ?? null, 
+                job_title ?? null, 
+                company_name ?? null, 
+                job_description ?? null, 
+                required_skills ? JSON.stringify(required_skills) : null, 
+                provided_accommodations ? JSON.stringify(provided_accommodations) : null, 
+                salary_range ?? null,                       // <-- NEW: Salary
+                benefits ? JSON.stringify(benefits) : null, // <-- NEW: Benefits
+                latitude ?? null, 
+                longitude ?? null
+            ]
+        );
+        res.status(201).json({ message: "Job posted successfully." });
     } catch (error) {
         console.error("Job Creation Error:", error.message);
-        res.status(500).json({ message: "Failed to create job posting." });
+        res.status(500).json({ message: "Server error posting job." });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: EDIT A JOB
+// ---------------------------------------------------------
+app.put('/api/jobs/:id', async (req, res) => {
+    const jobId = req.params.id;
+    // 1. Added salary_range and benefits here
+    const { job_title, job_description, required_skills, provided_accommodations, salary_range, benefits } = req.body;
+
+    try {
+        // 2. Updated the SQL query to save the new fields
+        await db.execute(
+            `UPDATE job_postings 
+             SET job_title = ?, job_description = ?, required_skills = ?, provided_accommodations = ?, salary_range = ?, benefits = ? 
+             WHERE id = ?`,
+            [
+                job_title, 
+                job_description, 
+                JSON.stringify(required_skills), 
+                JSON.stringify(provided_accommodations), 
+                salary_range ?? null,
+                benefits ? JSON.stringify(benefits) : null,
+                jobId
+            ]
+        );
+        res.status(200).json({ message: "Job updated successfully." });
+    } catch (error) {
+        console.error("Job Update Error:", error.message);
+        res.status(500).json({ message: "Server error updating job." });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: ARCHIVE A JOB (Soft Delete)
+// ---------------------------------------------------------
+app.put('/api/jobs/:id/archive', async (req, res) => {
+    const jobId = req.params.id;
+    try {
+        await db.execute(`UPDATE job_postings SET status = 'Archived' WHERE id = ?`, [jobId]);
+        res.status(200).json({ message: "Job archived successfully." });
+    } catch (error) {
+        console.error("Archive Error:", error.message);
+        res.status(500).json({ message: "Server error archiving job." });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: FETCH ALL APPLICATIONS FOR AN EMPLOYER
+// ---------------------------------------------------------
+app.get('/api/employer/:id/applications', async (req, res) => {
+    const employerId = req.params.id;
+
+    try {
+        const [applications] = await db.execute(`
+            SELECT a.id as application_id, a.status as application_status, a.applied_at,
+                   j.job_title, j.id as job_id,
+                   ap.firstname, ap.lastname, ap.skills, ap.accommodations_needed, ap.disability_type,
+                   u.email, u.phone
+            FROM applications a
+            JOIN job_postings j ON a.job_id = j.id
+            JOIN applicant_profiles ap ON a.applicant_id = ap.user_id
+            JOIN users u ON ap.user_id = u.id
+            WHERE j.employer_id = ?
+            ORDER BY a.applied_at DESC
+        `, [employerId]);
+
+        res.status(200).json(applications);
+    } catch (error) {
+        console.error("Fetch Applications Error:", error.message);
+        res.status(500).json({ message: "Server error fetching applications." });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: UPDATE APPLICATION STATUS
+// ---------------------------------------------------------
+app.put('/api/applications/:id/status', async (req, res) => {
+    const applicationId = req.params.id;
+    const { status } = req.body;
+
+    try {
+        await db.execute(
+            `UPDATE applications SET status = ? WHERE id = ?`,
+            [status, applicationId]
+        );
+        res.status(200).json({ message: `Applicant marked as ${status}.` });
+    } catch (error) {
+        console.error("Update Status Error:", error.message);
+        res.status(500).json({ message: "Server error updating status." });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: UPDATE EMPLOYER PROFILE & LOGO
+// ---------------------------------------------------------
+app.put('/api/employer/:id/settings', upload.single('company_logo'), async (req, res) => {
+    const userId = req.params.id;
+    const { company_name, company_description, industry, email, latitude, longitude } = req.body;
+    
+    // If a new image was uploaded, we save its new path. Otherwise, we keep it undefined to ignore it in the SQL.
+    const company_logo = req.file ? `/uploads/${req.file.filename}` : null;
+
+    try {
+        // 1. Update the users table (for email)
+        await db.execute(`UPDATE users SET email = ? WHERE id = ?`, [email, userId]);
+
+        // 2. Update the employer_profiles table
+        if (company_logo) {
+            await db.execute(
+                `UPDATE employer_profiles 
+                 SET company_name = ?, company_description = ?, industry = ?, latitude = ?, longitude = ?, company_logo = ? 
+                 WHERE user_id = ?`,
+                [company_name, company_description, industry, latitude, longitude, company_logo, userId]
+            );
+        } else {
+            await db.execute(
+                `UPDATE employer_profiles 
+                 SET company_name = ?, company_description = ?, industry = ?, latitude = ?, longitude = ? 
+                 WHERE user_id = ?`,
+                [company_name, company_description, industry, latitude, longitude, userId]
+            );
+        }
+
+        res.status(200).json({ message: "Profile updated successfully", logo_url: company_logo });
+    } catch (error) {
+        console.error("Settings Update Error:", error.message);
+        res.status(500).json({ message: "Server error updating profile." });
     }
 });
 
