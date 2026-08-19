@@ -30,7 +30,7 @@ export default function ApplicantJobTracker({ applications }) {
   });
 
   return (
-    <div className="animate-fadeIn max-w-5xl">
+    <div className="animate-fadeIn max-w-5xl [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
       <div className="mb-8 border-b border-[#03045E]/10 pb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-[#03045E]">My Job Tracker</h1>
@@ -99,7 +99,9 @@ export default function ApplicantJobTracker({ applications }) {
           ))
         ) : (
           <div className="p-10 text-center border-2 border-dashed border-gray-300 rounded-3xl flex flex-col items-center justify-center bg-white h-64">
-            <span className="text-4xl mb-4 opacity-50">📂</span>
+            <svg className="w-12 h-12 text-gray-400 mb-4 opacity-50" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+            </svg>
             <h3 className="text-lg font-bold text-[#03045E] mb-2">No {filter.toLowerCase()} applications found</h3>
             <p className="text-sm font-medium text-gray-500 max-w-md">
               {filter === 'All' 

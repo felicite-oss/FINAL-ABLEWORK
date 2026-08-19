@@ -48,13 +48,22 @@ app.post('/api/chat', async (req, res) => {
     console.log("Received message for Abby:", message);
 
     try {
-        setTimeout(() => {
-            res.status(200).json({ 
-                reply: "I am currently in testing mode and not connected to OpenAI yet, but your message went through perfectly!" 
-            });
-        }, 1500);
+        const completion = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [
+                { 
+                    role: "system", 
+                    content: "You are Abby, a helpful, empathetic, and professional AI career assistant specialized in supporting Persons with Disabilities (PWD) in finding accessible employment opportunities." 
+                },
+                { role: "user", content: message }
+            ],
+        });
+
+        const reply = completion.choices[0].message.content;
+        res.status(200).json({ reply });
     } catch (error) {
-        res.status(500).json({ error: "Server error." });
+        console.error("OpenAI Error:", error.message);
+        res.status(500).json({ error: "Server error connecting to Abby AI." });
     }
 });
 

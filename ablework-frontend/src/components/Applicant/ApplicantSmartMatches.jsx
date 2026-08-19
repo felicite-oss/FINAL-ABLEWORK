@@ -35,7 +35,7 @@ export default function ApplicantSmartMatches({ profile, matches, refreshData })
   };
 
   return (
-    <div className="animate-fadeIn max-w-5xl">
+    <div className="animate-fadeIn max-w-5xl [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
       <div className="mb-8 border-b border-[#03045E]/10 pb-4">
         <h1 className="text-3xl font-extrabold text-[#03045E]">Smart Matches</h1>
         <p className="opacity-70 font-medium text-[#03045E] mt-1">
@@ -51,11 +51,20 @@ export default function ApplicantSmartMatches({ profile, matches, refreshData })
               {/* Left Content Area */}
               <div className="flex-1">
                 <div className="flex flex-wrap gap-3 mb-3">
-                  <span className={`px-3 py-1 text-xs font-extrabold rounded-full border ${getMatchColor(job.match_percentage)}`}>
-                    🎯 {job.match_percentage}% Skill Match
+                  <span className={`px-3 py-1 text-xs font-extrabold rounded-full border flex items-center gap-1.5 ${getMatchColor(job.match_percentage)}`}>
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
+                      <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="2" fill="none"/>
+                      <circle cx="12" cy="12" r="2" fill="currentColor"/>
+                    </svg>
+                    {job.match_percentage}% Skill Match
                   </span>
-                  <span className="px-3 py-1 bg-blue-50 text-blue-800 border border-blue-200 text-xs font-bold rounded-full">
-                    📍 {job.distance_km} km away
+                  <span className="px-3 py-1 bg-blue-50 text-blue-800 border border-blue-200 text-xs font-bold rounded-full flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    {job.distance_km} km away
                   </span>
                 </div>
 
@@ -75,10 +84,15 @@ export default function ApplicantSmartMatches({ profile, matches, refreshData })
                         const hasSkill = applicantSkills.includes(skill);
                         
                         return (
-                          <span key={i} className={`px-3 py-1 text-xs font-bold rounded-lg border ${
+                          <span key={i} className={`px-3 py-1 text-xs font-bold rounded-lg border flex items-center gap-1 ${
                             hasSkill ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-100 text-gray-500 border-gray-200'
                           }`}>
-                            {hasSkill ? '✓ ' : ''}{skill}
+                            {hasSkill && (
+                              <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path>
+                              </svg>
+                            )}
+                            {skill}
                           </span>
                         );
                       })}
@@ -129,7 +143,9 @@ export default function ApplicantSmartMatches({ profile, matches, refreshData })
           ))
         ) : (
           <div className="p-10 text-center border-2 border-dashed border-gray-300 rounded-3xl flex flex-col items-center justify-center bg-white h-64">
-            <span className="text-4xl mb-4 opacity-50">🧭</span>
+            <svg className="w-12 h-12 text-gray-400 mb-4 opacity-60" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 2v20m10-10H2m15.364-6.364l-14.728 14.728m0-14.728l14.728 14.728"></path>
+            </svg>
             <h3 className="text-lg font-bold text-[#03045E] mb-2">No exact matches right now</h3>
             <p className="text-sm font-medium text-gray-500 max-w-md">
               Try expanding your Travel Radius in your profile settings, or visit the "Explore All Jobs" tab to view postings outside your immediate smart parameters.

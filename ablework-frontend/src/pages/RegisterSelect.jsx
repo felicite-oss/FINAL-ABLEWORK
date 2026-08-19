@@ -15,44 +15,44 @@ export default function RegisterSelect() {
 
   // Title / subtitle sizes (same as Login)
   const titleSize = isAPlusPlus
-    ? 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl'
+    ? 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl'
     : isAPlus
-      ? 'text-xl sm:text-2xl md:text-3xl lg:text-4xl'
-      : 'text-lg sm:text-xl md:text-2xl lg:text-3xl';
+      ? 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl'
+      : 'text-xl sm:text-2xl md:text-3xl lg:text-4xl';
 
   const subtitleSize = isAPlusPlus
+    ? 'text-lg sm:text-xl md:text-2xl'
+    : isAPlus
+      ? 'text-base sm:text-lg md:text-xl'
+      : 'text-sm sm:text-base md:text-lg';
+
+  // Card title & description sizes
+  const cardTitleSize = isAPlusPlus
+    ? 'text-2xl sm:text-3xl md:text-4xl'
+    : isAPlus
+      ? 'text-xl sm:text-2xl md:text-3xl'
+      : 'text-lg sm:text-xl md:text-2xl';
+
+  const cardDescSize = isAPlusPlus
     ? 'text-base sm:text-lg md:text-xl'
     : isAPlus
       ? 'text-sm sm:text-base md:text-lg'
       : 'text-xs sm:text-sm md:text-base';
 
-  // Card title & description sizes
-  const cardTitleSize = isAPlusPlus
-    ? 'text-xl sm:text-2xl md:text-3xl'
-    : isAPlus
-      ? 'text-lg sm:text-xl md:text-2xl'
-      : 'text-base sm:text-lg md:text-xl';
-
-  const cardDescSize = isAPlusPlus
-    ? 'text-sm sm:text-base'
-    : isAPlus
-      ? 'text-xs sm:text-sm'
-      : 'text-xs';
-
   // Container sizing - better mobile + A++ adjustment
   const containerPadding = isAssist
-    ? 'pt-6 px-3 pb-8 sm:pt-8 sm:px-5 sm:pb-12 md:pt-10 md:px-8 md:pb-14 lg:pt-12 lg:px-10 lg:pb-16'
-    : 'pt-5 px-3 pb-7 sm:pt-7 sm:px-5 sm:pb-10 md:pt-9 md:px-7 md:pb-12 lg:pt-12 lg:px-10 lg:pb-16';
+    ? 'pt-8 px-5 pb-10 sm:pt-10 sm:px-8 sm:pb-14 md:pt-12 md:px-12 md:pb-16 lg:pt-16 lg:px-14 lg:pb-20'
+    : 'pt-6 px-4 pb-8 sm:pt-8 sm:px-6 sm:pb-12 md:pt-10 md:px-10 md:pb-14 lg:pt-14 lg:px-12 lg:pb-18';
 
-  const containerGap = isAssist ? 'gap-4 sm:gap-6' : 'gap-3 sm:gap-5';
+  const containerGap = isAssist ? 'gap-6 sm:gap-8' : 'gap-4 sm:gap-6';
   
   const containerMaxWidth = isAssist
-    ? 'max-w-[94%] sm:max-w-lg md:max-w-2xl lg:max-w-3xl'
-    : 'max-w-[94%] sm:max-w-md md:max-w-xl lg:max-w-2xl';
+    ? 'max-w-[96%] sm:max-w-xl md:max-w-3xl lg:max-w-4xl'
+    : 'max-w-[96%] sm:max-w-lg md:max-w-2xl lg:max-w-3xl';
 
   const containerMinHeight = isAssist
-    ? 'min-h-[auto] sm:min-h-[480px] md:min-h-[540px]'
-    : 'min-h-[auto] sm:min-h-[420px] md:min-h-[480px]';
+    ? 'min-h-[auto] sm:min-h-[540px] md:min-h-[620px]'
+    : 'min-h-[auto] sm:min-h-[480px] md:min-h-[560px]';
 
   return (
     <main className="flex flex-col bg-[#f4f4f4] overflow-x-hidden md:overflow-y-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
@@ -62,8 +62,8 @@ export default function RegisterSelect() {
 
           {/* Left side: Logo + Desktop Navigation */}
           <div className="flex items-center gap-8">
-            {/* Logo - no link, so it won't navigate */}
-            <div className="flex items-center flex-shrink-0">
+            {/* Logo - Vertically centered with flex items-center */}
+            <div className="flex items-center flex-shrink-0 py-1">
               <img
                 src={headerLogo}
                 alt="AbleWork Logo"
@@ -101,7 +101,7 @@ export default function RegisterSelect() {
           {/* Desktop Log In */}
           <div className="hidden md:flex items-center">
             <NavLink
-              to="/"
+              to="/login"
               className={({ isActive }) => 
                 `px-5 py-2 rounded-full text-sm font-medium border transition duration-200 transform hover:scale-105 ${
                   isActive 
@@ -167,7 +167,7 @@ export default function RegisterSelect() {
                 Policy
               </NavLink>
               <NavLink
-                to="/"
+                to="/login"
                 className={({ isActive }) => 
                   `mt-2 px-5 py-2.5 rounded-full text-sm font-medium border transition duration-200 transform hover:scale-105 w-fit ${
                     isActive 
@@ -198,8 +198,8 @@ export default function RegisterSelect() {
                     ${containerPadding}
                     ${containerMinHeight} mb-10 md:mb-0 md:mt-8`}>
           
-          <div className="text-center w-full max-w-lg px-1">
-            <h1 className={`${titleSize} font-extrabold tracking-tighter text-[#03045E] mb-2 sm:mb-3`}>
+          <div className="text-center w-full max-w-xl px-1">
+            <h1 className={`${titleSize} font-extrabold tracking-tighter text-[#03045E] mb-3 sm:mb-4`}>
               Join AbleWork
             </h1>
             <p className={`${subtitleSize} text-[#03045E]/80 leading-relaxed`}>
@@ -207,20 +207,20 @@ export default function RegisterSelect() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 w-full">
     
             {/* Applicant Card */}
             <Link
               to="/register/applicant"
-              className="p-3.5 sm:p-5 md:p-6 bg-[#f4f4f4] rounded-2xl shadow-lg md:shadow-xl border border-[#03045E]/20 hover:border-[#2C7FFF] hover:shadow-2xl flex flex-col items-center text-center transition-all cursor-pointer group"
+              className="p-5 sm:p-7 md:p-8 bg-[#f4f4f4] rounded-2xl shadow-lg md:shadow-xl border border-[#03045E]/20 hover:border-[#2C7FFF] hover:shadow-2xl flex flex-col items-center text-center transition-all cursor-pointer group"
             >
-              <div className="mb-2.5 sm:mb-3.5 text-[#03045E] group-hover:text-[#2C7FFF] transition-colors">
-                <svg className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="mb-3.5 sm:mb-5 text-[#03045E] group-hover:text-[#2C7FFF] transition-colors">
+                <svg className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                 </svg>
               </div>
 
-              <h2 className={`${cardTitleSize} font-bold text-[#03045E] mb-1 sm:mb-2 group-hover:text-[#2C7FFF]`}>
+              <h2 className={`${cardTitleSize} font-bold text-[#03045E] mb-2 sm:mb-3 group-hover:text-[#2C7FFF]`}>
                 I am a Job Seeker
               </h2>
 
@@ -232,15 +232,15 @@ export default function RegisterSelect() {
             {/* Employer Card */}
             <Link
               to="/register/employer"
-              className="p-3.5 sm:p-5 md:p-6 bg-[#f4f4f4] rounded-2xl shadow-lg sm:shadow-xl border border-[#03045E]/20 hover:border-[#2C7FFF] hover:shadow-2xl flex flex-col items-center text-center transition-all cursor-pointer group"
+              className="p-5 sm:p-7 md:p-8 bg-[#f4f4f4] rounded-2xl shadow-lg sm:shadow-xl border border-[#03045E]/20 hover:border-[#2C7FFF] hover:shadow-2xl flex flex-col items-center text-center transition-all cursor-pointer group"
             >
-              <div className="mb-2.5 sm:mb-3.5 text-[#03045E] group-hover:text-[#2C7FFF] transition-colors">
-                <svg className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="mb-3.5 sm:mb-5 text-[#03045E] group-hover:text-[#2C7FFF] transition-colors">
+                <svg className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125 1.125 1.125 1.125V21" />
                 </svg>
               </div>
 
-              <h2 className={`${cardTitleSize} font-bold text-[#03045E] mb-1 sm:mb-2 group-hover:text-[#2C7FFF]`}>
+              <h2 className={`${cardTitleSize} font-bold text-[#03045E] mb-2 sm:mb-3 group-hover:text-[#2C7FFF]`}>
                 I am an Employer
               </h2>
 
