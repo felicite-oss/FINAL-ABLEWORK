@@ -6,8 +6,6 @@ export default function ApplicantJobTracker({ applications }) {
   // Helper to color-code the status badge
   const getStatusStyle = (status) => {
     switch (status) {
-      case 'Pending':
-        return 'bg-gray-100 text-gray-700 border-gray-200';
       case 'Under Review':
         return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'Shortlisted':
@@ -21,47 +19,60 @@ export default function ApplicantJobTracker({ applications }) {
     }
   };
 
+  // The specific tabs required for a complete ATS Job Tracker (Pending removed)
+  const trackingTabs = ['All', 'Under Review', 'Shortlisted', 'Hired', 'Rejected'];
+
   // Filter the applications based on the selected tab
   const filteredApps = applications.filter(app => {
     if (filter === 'All') return true;
-    if (filter === 'Active') return ['Pending', 'Under Review', 'Shortlisted'].includes(app.status);
-    if (filter === 'Closed') return ['Hired', 'Rejected'].includes(app.status);
-    return true;
+    return app.status === filter;
   });
+
+  // Helper to count how many apps are in each tab
+  const getTabCount = (tabName) => {
+    if (tabName === 'All') return applications.length;
+    return applications.filter(app => app.status === tabName).length;
+  };
 
   return (
     <div className="animate-fadeIn max-w-5xl [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
-      <div className="mb-8 border-b border-[#03045E]/10 pb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-[#03045E]">My Job Tracker</h1>
-          <p className="opacity-70 font-medium text-[#03045E] mt-1">
-            Monitor the status of your applications in real-time.
-          </p>
-        </div>
+      
+      {/* HEADER & TABS SECTION */}
+      <div className="mb-8 border-b border-[#03045E]/10 pb-6">
+        <h1 className="text-3xl font-extrabold text-[#03045E]">My Job Tracker</h1>
+        <p className="opacity-70 font-medium text-[#03045E] mt-1">
+          Monitor the status of your applications in real-time.
+        </p>
         
-        {/* Filter Tabs */}
-        <div className="flex gap-2 bg-gray-200 p-1 rounded-xl">
-            <button 
-                onClick={() => setFilter('All')}
-                className={`px-5 py-2 rounded-lg font-bold text-sm transition ${filter === 'All' ? 'bg-[#03045E] text-white shadow' : 'text-gray-600 hover:bg-gray-300'}`}
-            >
-                All
-            </button>
-            <button 
-                onClick={() => setFilter('Active')}
-                className={`px-5 py-2 rounded-lg font-bold text-sm transition ${filter === 'Active' ? 'bg-[#03045E] text-white shadow' : 'text-gray-600 hover:bg-gray-300'}`}
-            >
-                Active
-            </button>
-            <button 
-                onClick={() => setFilter('Closed')}
-                className={`px-5 py-2 rounded-lg font-bold text-sm transition ${filter === 'Closed' ? 'bg-[#03045E] text-white shadow' : 'text-gray-600 hover:bg-gray-300'}`}
-            >
-                Closed
-            </button>
+        {/* Scrollable Tabs row placed below the title */}
+        <div className="mt-6 flex overflow-x-auto gap-2 bg-gray-100 p-1.5 rounded-2xl w-fit max-w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+          {trackingTabs.map(tab => {
+            const count = getTabCount(tab);
+            return (
+              <button 
+                key={tab}
+                onClick={() => setFilter(tab)}
+                className={`px-5 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all flex items-center gap-2 ${
+                  filter === tab 
+                    ? 'bg-[#03045E] text-white shadow-md' 
+                    : 'text-gray-600 hover:bg-gray-200 hover:text-[#03045E]'
+                }`}
+              >
+                {tab}
+                {count > 0 && (
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] ${
+                    filter === tab ? 'bg-white/20 text-white' : 'bg-gray-300 text-gray-700'
+                  }`}>
+                    {count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 
+      {/* FEED SECTION */}
       <div className="flex flex-col gap-4">
         {filteredApps.length > 0 ? (
           filteredApps.map(app => (
@@ -93,6 +104,11 @@ export default function ApplicantJobTracker({ applications }) {
                     Employer is viewing your profile
                   </p>
                 )}
+                {app.status === 'Hired' && (
+                  <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">
+                    Congratulations on the new job!
+                  </p>
+                )}
               </div>
 
             </div>
@@ -106,7 +122,7 @@ export default function ApplicantJobTracker({ applications }) {
             <p className="text-sm font-medium text-gray-500 max-w-md">
               {filter === 'All' 
                 ? "You haven't submitted any job applications yet. Head over to the Smart Matches or Explore Jobs tab to get started!"
-                : `You don't have any applications currently in the ${filter} state.`}
+                : `You don't have any applications currently in the "${filter}" state.`}
             </p>
           </div>
         )}
