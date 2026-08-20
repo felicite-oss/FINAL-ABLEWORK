@@ -10,6 +10,101 @@ import EmployerProfile from '../components/Employer/EmployerProfile';
 import EmployerAccountSettings from '../components/Employer/EmployerAccountSettings';
 import FinalLogo from '../assets/Final.png';
 
+// 2. Footer Sub-Pages & Footer Component
+function EmployerPolicy({ onBack }) {
+  return (
+    <div className="max-w-4xl mx-auto bg-white p-6 sm:p-10 rounded-3xl border border-[#03045E]/10 shadow-sm animate-in fade-in duration-300">
+      <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#03045E]/10">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#03045E]">Employer Privacy Policy</h2>
+        <button 
+          onClick={onBack}
+          className="px-4 py-2 bg-[#03045E]/5 text-[#03045E] hover:bg-[#2C7FFF] hover:text-white rounded-xl text-sm font-bold transition-all cursor-pointer"
+        >
+          Back to Overview
+        </button>
+      </div>
+      <div className="space-y-4 text-[#03045E]/80 text-sm sm:text-base leading-relaxed">
+        <p>Your privacy is paramount to AbleWork. This policy outlines how we handle corporate data, recruiter details, and applicant communication records securely and transparently.</p>
+        <p>We utilize advanced encryption protocols to safeguard your company data and ensure compliance with standard data protection regulations.</p>
+      </div>
+    </div>
+  );
+}
+
+function EmployerTerms({ onBack }) {
+  return (
+    <div className="max-w-4xl mx-auto bg-white p-6 sm:p-10 rounded-3xl border border-[#03045E]/10 shadow-sm animate-in fade-in duration-300">
+      <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#03045E]/10">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#03045E]">Employer Terms of Service</h2>
+        <button 
+          onClick={onBack}
+          className="px-4 py-2 bg-[#03045E]/5 text-[#03045E] hover:bg-[#2C7FFF] hover:text-white rounded-xl text-sm font-bold transition-all cursor-pointer"
+        >
+          Back to Overview
+        </button>
+      </div>
+      <div className="space-y-4 text-[#03045E]/80 text-sm sm:text-base leading-relaxed">
+        <p>By posting jobs on AbleWork, employers agree to maintain fair, non-discriminatory hiring practices and provide accurate company profile details.</p>
+        <p>Violation of community standards or discriminatory behavior against applicants may result in the suspension of corporate posting privileges.</p>
+      </div>
+    </div>
+  );
+}
+
+function EmployerContact({ onBack }) {
+  return (
+    <div className="max-w-4xl mx-auto bg-white p-6 sm:p-10 rounded-3xl border border-[#03045E]/10 shadow-sm animate-in fade-in duration-300">
+      <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#03045E]/10">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#03045E]">Employer Support & Contact</h2>
+        <button 
+          onClick={onBack}
+          className="px-4 py-2 bg-[#03045E]/5 text-[#03045E] hover:bg-[#2C7FFF] hover:text-white rounded-xl text-sm font-bold transition-all cursor-pointer"
+        >
+          Back to Overview
+        </button>
+      </div>
+      <div className="space-y-4 text-[#03045E]/80 text-sm sm:text-base leading-relaxed">
+        <p>Need assistance with your job listings or candidate screening? Our support team is here to help you.</p>
+        <div className="p-4 bg-[#f4f4f4] rounded-2xl border border-[#03045E]/10 space-y-2 text-[#03045E]">
+          <p><strong>Email Support:</strong> employers@ablework.com</p>
+          <p><strong>Partner Helpline:</strong> +1 (800) 555-ABLE</p>
+          <p><strong>Hours:</strong> Monday – Friday, 9:00 AM – 6:00 PM EST</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EmployerFooter({ activeTab, setActiveTab }) {
+  return (
+    <footer className="w-full bg-white border-t border-[#03045E]/10 py-6 px-4 sm:px-10 mt-auto flex-shrink-0">
+      <div className="max-w-[1700px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-[#03045E]/70">
+        <p>© {new Date().getFullYear()} AbleWork Inc. Employer Portal. All rights reserved.</p>
+        <div className="flex flex-wrap items-center gap-6 font-bold">
+          <button 
+            onClick={() => setActiveTab('employer-contact')} 
+            className={`transition-colors cursor-pointer ${activeTab === 'employer-contact' ? 'text-[#2C7FFF]' : 'hover:text-[#2C7FFF]'}`}
+          >
+            Contact Support
+          </button>
+          <button 
+            onClick={() => setActiveTab('employer-policy')} 
+            className={`transition-colors cursor-pointer ${activeTab === 'employer-policy' ? 'text-[#2C7FFF]' : 'hover:text-[#2C7FFF]'}`}
+          >
+            Privacy Policy
+          </button>
+          <button 
+            onClick={() => setActiveTab('employer-terms')} 
+            className={`transition-colors cursor-pointer ${activeTab === 'employer-terms' ? 'text-[#2C7FFF]' : 'hover:text-[#2C7FFF]'}`}
+          >
+            Terms of Service
+          </button>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
 export default function EmployerDashboard() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
@@ -86,12 +181,12 @@ export default function EmployerDashboard() {
     }, 2000);
   };
 
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center font-bold text-[#03045E]">Loading Employer Workspace...</div>;
-  if (error) return <div className="min-h-screen flex items-center justify-center font-bold text-red-500">{error}</div>;
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center font-bold bg-[#f4f4f4] text-[#03045E]">Loading Employer Workspace...</div>;
+  if (error) return <div className="min-h-screen flex items-center justify-center font-bold bg-[#f4f4f4] text-red-500">{error}</div>;
 
   if (isLoggingOut) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F4F4F4]">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f4f4f4]">
         <div className="w-16 h-16 border-4 border-[#2C7FFF] border-t-transparent rounded-full animate-spin mb-4"></div>
         <p className="font-bold text-[#03045E] text-lg">Logging out...</p>
       </div>
@@ -99,10 +194,10 @@ export default function EmployerDashboard() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F4F4F4]">
+    <div className="min-h-screen flex flex-col bg-[#f4f4f4] text-[#03045E] w-full overflow-x-hidden">
       
       {/* HEADER SECTION */}
-      <header className="w-full bg-white border-b border-[#03045E]/10 px-6 py-4 flex items-center justify-between shadow-sm z-20">
+      <header className="w-full bg-[#f4f4f4] border-b border-[#03045E]/10 px-6 py-4 flex items-center justify-between shadow-sm sticky top-0 z-30 flex-shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-white border border-[#03045E]/10 flex items-center justify-center overflow-hidden shadow-md shadow-[#03045E]/10">
             <img src={FinalLogo} alt="AbleWork Logo" className="w-full h-full object-contain p-1" />
@@ -118,7 +213,7 @@ export default function EmployerDashboard() {
           {/* Notification SVG Icon (Always visible) */}
           <button 
             type="button" 
-            className="p-2 rounded-xl text-[#03045E] hover:bg-[#2C7FFF]/10 hover:text-[#2C7FFF] transition-colors relative"
+            className="p-2 rounded-xl text-[#03045E] bg-white border border-[#03045E]/10 hover:bg-[#2C7FFF]/10 hover:text-[#2C7FFF] transition-colors relative"
             aria-label="Notifications"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -131,16 +226,16 @@ export default function EmployerDashboard() {
           <div className="hidden md:block relative">
             <div 
               onClick={() => setShowProfileDropdown(!showProfileDropdown)} 
-              className="flex items-center gap-3 cursor-pointer p-1.5 rounded-xl hover:bg-[#2C7FFF]/10 transition-all"
+              className="flex items-center gap-3 cursor-pointer p-1.5 rounded-xl bg-white border border-[#03045E]/10 hover:bg-[#2C7FFF]/10 transition-all"
             >
-              <div className="w-10 h-10 rounded-xl bg-[#03045E] text-white flex items-center justify-center font-bold overflow-hidden shadow-md shadow-[#03045E]/20">
+              <div className="w-10 h-10 rounded-xl bg-[#03045E] text-[#f4f4f4] flex items-center justify-center font-bold overflow-hidden shadow-md shadow-[#03045E]/20">
                 {profile?.company_logo ? (
                   <img src={profile.company_logo} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
                   <span>{profile?.company_name ? profile.company_name.charAt(0).toUpperCase() : 'E'}</span>
                 )}
               </div>
-              <div className="text-left">
+              <div className="text-left pr-2">
                 <p className="text-sm font-extrabold text-[#03045E] leading-tight">
                   {profile?.company_name || profile?.contact_person || 'Employer'}
                 </p>
@@ -150,7 +245,7 @@ export default function EmployerDashboard() {
 
             {/* Desktop Dropdown Menu */}
             {showProfileDropdown && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-[#03045E]/10 py-2 z-50">
+              <div className="absolute right-0 mt-2 w-48 bg-[#f4f4f4] rounded-2xl shadow-xl border border-[#03045E]/10 py-2 z-50">
                 <button
                   onClick={() => {
                     setActiveTab('profile');
@@ -181,7 +276,7 @@ export default function EmployerDashboard() {
             <button
               onClick={() => setShowMobileMenu(!showMobileMenu)}
               aria-label="Toggle Menu"
-              className="p-2.5 rounded-2xl bg-[#03045E] text-white hover:bg-[#2C7FFF] transition-all shadow-md shadow-[#03045E]/20 flex items-center justify-center"
+              className="p-2.5 rounded-2xl bg-[#03045E] text-[#f4f4f4] hover:bg-[#2C7FFF] transition-all shadow-md shadow-[#03045E]/20 flex items-center justify-center"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 {showMobileMenu ? (
@@ -202,9 +297,9 @@ export default function EmployerDashboard() {
                     setActiveTab('profile');
                     setShowMobileMenu(false);
                   }}
-                  className="flex items-center gap-3 p-3 rounded-2xl bg-[#F4F4F4] cursor-pointer hover:bg-[#2C7FFF]/10 transition-all border border-[#03045E]/5"
+                  className="flex items-center gap-3 p-3 rounded-2xl bg-[#f4f4f4] cursor-pointer hover:bg-[#2C7FFF]/10 transition-all border border-[#03045E]/10"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-[#03045E] text-white flex items-center justify-center font-bold overflow-hidden shadow-md flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-[#03045E] text-[#f4f4f4] flex items-center justify-center font-bold overflow-hidden shadow-md flex-shrink-0">
                     {profile?.company_logo ? (
                       <img src={profile.company_logo} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
@@ -213,14 +308,14 @@ export default function EmployerDashboard() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-extrabold text-[#03045E] truncate">
-                  	  {profile?.company_name || profile?.contact_person || 'Employer'}
+                      {profile?.company_name || profile?.contact_person || 'Employer'}
                     </p>
                     <p className="text-xs text-[#2C7FFF] font-semibold">View & Edit Profile</p>
                   </div>
                 </div>
 
-                {/* Sidebar Navigation Tabs Inside Hamburger */}
-                <div className="flex flex-col gap-1.5 max-h-[50vh] overflow-y-auto pr-1">
+                {/* Sidebar Navigation Tabs Inside Hamburger (Added 1px solid border and light shadow) */}
+                <div className="flex flex-col space-y-3 max-h-[50vh] overflow-y-auto pr-1">
                   {[
                     { id: 'overview', label: 'Analytics Dashboard', icon: (
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -254,21 +349,24 @@ export default function EmployerDashboard() {
                       <button 
                         key={tabItem.id} 
                         onClick={() => {
-                          setActiveTab(tabItem.id);
-                          setShowMobileMenu(false);
+                            setActiveTab(tabItem.id);
+                            setShowMobileMenu(false);
                         }} 
-                        className={`flex items-center gap-3.5 p-3.5 rounded-2xl font-bold transition-all text-sm w-full ${
-                          isActive 
-                            ? 'bg-[#03045E] text-white shadow-md shadow-[#03045E]/20' 
-                            : 'text-[#03045E] hover:bg-[#2C7FFF]/10 hover:text-[#2C7FFF]'
+                        className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold transition-all text-sm w-full relative group border border-[#03045E]/30 shadow-sm ${
+                            isActive 
+                              ? 'bg-gradient-to-r from-[#03045E] to-[#07098c] text-white shadow-lg shadow-[#03045E]/25' 
+                              : 'bg-white text-[#03045E]/80 hover:bg-[#2C7FFF]/10 hover:text-[#2C7FFF]'
                         }`}
                       >
-                        <div className={`p-2 rounded-xl flex-shrink-0 ${
-                          isActive ? 'bg-[#2C7FFF] text-white' : 'bg-[#F4F4F4] text-[#03045E]'
+                        <div className={`p-2 rounded-xl transition-all ${
+                            isActive ? 'bg-[#2C7FFF] text-white shadow' : 'bg-[#f4f4f4] text-[#03045E] group-hover:bg-[#2C7FFF] group-hover:text-white'
                         }`}>
                           {tabItem.icon}
                         </div>
                         <span className="flex-1 text-left truncate">{tabItem.label}</span>
+                        {isActive && (
+                            <span className="w-1.5 h-6 bg-[#2C7FFF] rounded-full absolute right-2"></span>
+                        )}
                       </button>
                     );
                   })}
@@ -277,12 +375,12 @@ export default function EmployerDashboard() {
                 {/* Logout Button Inside Hamburger */}
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center justify-center gap-2 p-3.5 rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 font-extrabold text-sm transition-colors border border-red-200"
+                  className="w-full flex items-center justify-center gap-2 p-3.5 rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 font-extrabold text-sm transition-colors border border-red-200 shadow-sm"
                 >
-                  <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                  Logout Account
+                    <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Logout Account
                 </button>
 
               </div>
@@ -291,11 +389,14 @@ export default function EmployerDashboard() {
         </div>
       </header>
 
-      <div className="min-h-[calc(100vh-73px)] flex flex-col md:flex-row">
+      {/* PAGE BODY CONTAINER WRAPPING SIDEBAR & CONTENT */}
+      {/* Added min-h-screen right here below to push the footer all the way down! */}
+      <div className="flex flex-col md:flex-row flex-1 min-h-screen">
         
-        {/* DESKTOP SIDEBAR NAVIGATION (Hidden on mobile) */}
-        <aside className="hidden md:flex w-72 flex-col shadow-xl z-10 bg-white border-r border-[#03045E]/10">
-          <nav className="flex-1 p-4 flex flex-col gap-2">
+        {/* REDESIGNED DESKTOP SIDEBAR NAVIGATION */}
+        <aside className="hidden md:flex w-72 flex-col z-10 bg-white border-r border-[#03045E]/10 p-4 justify-between shadow-sm flex-shrink-0">
+          <nav className="flex flex-col space-y-3 w-full">
+
             {[
               { id: 'overview', label: 'Analytics Dashboard', icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -323,43 +424,51 @@ export default function EmployerDashboard() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               )}
-          ].map((tabItem) => {
-            const isActive = activeTab === tabItem.id;
-            return (
-              <button 
-                key={tabItem.id} 
-                onClick={() => setActiveTab(tabItem.id)} 
-                className={`flex items-center gap-3.5 p-4 rounded-2xl font-bold transition-all duration-300 text-sm group relative ${
-                  isActive 
-                    ? 'bg-[#03045E] text-white shadow-lg shadow-[#03045E]/25 scale-[1.02]' 
-                    : 'text-[#03045E] hover:bg-[#2C7FFF]/10 hover:text-[#2C7FFF]'
-                }`}
-              >
-                <div className={`p-2 rounded-xl transition-colors ${
-                  isActive ? 'bg-[#2C7FFF] text-white' : 'bg-[#F4F4F4] text-[#03045E] group-hover:bg-[#2C7FFF] group-hover:text-white'
-                }`}>
-                  {tabItem.icon}
-                </div>
-                <span className="tracking-wide flex-1 text-left">{tabItem.label}</span>
-                {isActive && (
-                  <div className="w-1.5 h-6 bg-[#2C7FFF] rounded-full absolute right-2"></div>
-                )}
-              </button>
-            );
-          })}
-        </nav>
+            ].map((tabItem) => {
+              const isActive = activeTab === tabItem.id;
+              return (
+                <button 
+                  key={tabItem.id} 
+                  onClick={() => setActiveTab(tabItem.id)} 
+                  className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl font-bold transition-all duration-200 text-sm group relative cursor-pointer border border-[#03045E]/30 shadow-sm ${
+                    isActive 
+                      ? 'bg-gradient-to-r from-[#03045E] to-[#07098c] text-white shadow-md shadow-[#03045E]/20' 
+                      : 'bg-white text-[#03045E]/80 hover:bg-[#2C7FFF]/10 hover:text-[#2C7FFF]'
+                  }`}
+                >
+                  <div className={`p-2 rounded-xl transition-all ${
+                    isActive ? 'bg-[#2C7FFF] text-white shadow' : 'bg-[#f4f4f4] text-[#03045E] group-hover:bg-[#2C7FFF] group-hover:text-white'
+                  }`}>
+                    {tabItem.icon}
+                  </div>
+                  <span className="tracking-wide flex-1 text-left">{tabItem.label}</span>
+                  {isActive && (
+                    <div className="w-1.5 h-6 bg-[#2C7FFF] rounded-full absolute right-2"></div>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
         </aside>
 
         {/* MAIN CONTENT AREA */}
-        <main className="flex-1 p-6 md:p-10 overflow-y-auto relative">
+        <main className="flex-1 p-6 md:p-10 relative bg-[#f4f4f4] text-[#03045E]">
           {activeTab === 'overview' && profile && <EmployerOverview profile={profile} stats={stats} setActiveTab={setActiveTab} />}
           {activeTab === 'post-job' && <EmployerPostJob profile={profile} refreshData={refreshJobsAndStats} setActiveTab={setActiveTab} />}
           {activeTab === 'jobs' && <EmployerMyJobs jobs={jobs} refreshData={refreshJobsAndStats} />}
           {activeTab === 'applications' && profile && <EmployerApplications profile={profile} refreshStats={refreshJobsAndStats} />}
           {activeTab === 'profile' && profile && <EmployerProfile profile={profile} refreshData={refreshJobsAndStats} />}
           {activeTab === 'settings' && profile && <EmployerAccountSettings profile={profile} />}
+          
+          {/* Footer View Sub-pages */}
+          {activeTab === 'employer-policy' && <EmployerPolicy onBack={() => setActiveTab('overview')} />}
+          {activeTab === 'employer-terms' && <EmployerTerms onBack={() => setActiveTab('overview')} />}
+          {activeTab === 'employer-contact' && <EmployerContact onBack={() => setActiveTab('overview')} />}
         </main>
       </div>
+
+      {/* FOOTER BAR PLACED CLEANLY AT THE VERY BOTTOM */}
+      <EmployerFooter activeTab={activeTab} setActiveTab={setActiveTab} />
       
     </div>
   );

@@ -8,6 +8,7 @@ import ApplicantJobTracker from '../components/Applicant/ApplicantJobTracker';
 import ApplicantProfile from '../components/Applicant/ApplicantProfile';
 import ApplicantAccountSettings from '../components/Applicant/ApplicantAccountSettings';
 import ApplicantExploreJobs from '../components/Applicant/ApplicantExploreJobs';
+import { ApplicantPolicy, ApplicantTerms, ApplicantContact, ApplicantFooter } from '../components/Applicant/ApplicantFooterPages';
 
 // Import Logo for Header
 import headerLogo from '../assets/Final.png';
@@ -285,20 +286,22 @@ export default function ApplicantDashboard() {
               <div className="h-px bg-[#03045E]/10 my-1"></div>
 
               {/* Navigation Tabs for Mobile */}
-              {['overview', 'matches', 'explore-jobs', 'tracker', 'settings'].map((tab) => (
+              {[
+                { id: 'overview', label: 'Overview' },
+                { id: 'matches', label: 'Smart Matches' },
+                { id: 'explore-jobs', label: 'Explore Jobs' },
+                { id: 'tracker', label: 'Job Tracker' },
+                { id: 'settings', label: 'Settings' }
+              ].map((item) => (
                 <button 
-                  key={tab} 
-                  onClick={() => { setActiveTab(tab); setIsOpen(false); }} 
+                  key={item.id} 
+                  onClick={() => { setActiveTab(item.id); setIsOpen(false); }} 
                   className={`flex items-center gap-3 text-left px-3.5 sm:px-4 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-bold transition-all capitalize cursor-pointer ${
-                    activeTab === tab ? 'bg-gradient-to-r from-[#03045E] to-[#04068A] text-white shadow-[0_4px_15px_rgba(3,4,94,0.25)] translate-x-1' : 'text-[#03045E] hover:bg-[#2C7FFF]/10 hover:translate-x-1'
+                    activeTab === item.id ? 'bg-gradient-to-r from-[#03045E] to-[#04068A] text-white shadow-[0_4px_15px_rgba(3,4,94,0.25)] translate-x-1' : 'text-[#03045E] hover:bg-[#2C7FFF]/10 hover:translate-x-1'
                   }`}
                 >
                   <span className="text-xs sm:text-sm truncate tracking-wide">
-                    {tab === 'overview' && 'Dashboard Overview'}
-                    {tab === 'matches' && 'Smart Matches'}
-                    {tab === 'explore-jobs' && 'Explore All Jobs'}
-                    {tab === 'tracker' && 'My Job Tracker'}
-                    {tab === 'settings' && 'Account Settings'}
+                    {item.label}
                   </span>
                 </button>
               ))}
@@ -328,100 +331,123 @@ export default function ApplicantDashboard() {
         </div>
       </header>
       
-      <div className="flex flex-col md:flex-row flex-1 pt-20 relative max-w-[1700px] w-full mx-auto min-w-0 box-border">
-        {/* SIDEBAR NAVIGATION (Hidden on mobile via hidden md:flex) - UPDATED SIZE */}
-        <aside className="hidden md:flex shrink-0 flex-col z-10 bg-white/70 backdrop-blur-xl border-r border-[#03045E]/10 w-80 sticky top-20 h-[calc(100vh-5rem)] shadow-[4px_0_24px_rgba(3,4,94,0.02)]">
-          <div className="w-full flex flex-col h-full min-w-0">
-            <nav className="flex-1 px-5 py-8 flex flex-col gap-3.5 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-              {['overview', 'matches', 'explore-jobs', 'tracker', 'settings'].map((tab) => (
-                <button 
-                  key={tab} 
-                  onClick={() => setActiveTab(tab)} 
-                  className={`group relative flex items-center gap-4 text-left px-5 py-4 rounded-2xl font-bold transition-all duration-300 capitalize cursor-pointer overflow-hidden ${
-                    activeTab === tab 
-                      ? 'bg-gradient-to-r from-[#03045E] to-[#0a0c78] text-white shadow-[0_6px_20px_rgba(3,4,94,0.25)] scale-[1.01]' 
-                      : 'text-[#03045E]/80 hover:bg-white hover:text-[#03045E] hover:shadow-[0_4px_12px_rgba(3,4,94,0.05)] hover:scale-[1.01]'
-                  }`}
-                >
-                  {/* Subtle active indicator accent bar */}
-                  {activeTab === tab && (
-                    <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#2C7FFF] rounded-r-full shadow-[0_0_8px_#2C7FFF]"></div>
-                  )}
+      {/* ===== MIDDLE CONTAINER - fills full screen so footer stays below the fold ===== */}
+      <div className="flex flex-col w-full max-w-[1700px] mx-auto min-w-0 box-border pt-20 min-h-screen">
+        <div className="flex flex-col md:flex-row flex-1 w-full min-w-0">
+          
+          {/* SIDEBAR NAVIGATION (Hidden on mobile via hidden md:flex) */}
+          <aside className="hidden md:flex shrink-0 flex-col z-10 bg-white/70 backdrop-blur-xl border-r border-[#03045E]/10 w-80 shadow-[4px_0_24px_rgba(3,4,94,0.02)]">
+            <div className="w-full flex flex-col h-full min-w-0">
+              <nav className="flex-1 px-5 py-8 flex flex-col gap-3.5 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                {[
+                  { id: 'overview', label: 'Overview' },
+                  { id: 'matches', label: 'Smart Matches' },
+                  { id: 'explore-jobs', label: 'Explore Jobs' },
+                  { id: 'tracker', label: 'Job Tracker' },
+                  { id: 'settings', label: 'Settings' }
+                ].map((item) => (
+                  <button 
+                    key={item.id} 
+                    onClick={() => setActiveTab(item.id)} 
+                    className={`group relative flex items-center gap-4 text-left px-5 py-4 rounded-2xl font-bold transition-all duration-300 capitalize cursor-pointer overflow-hidden border border-solid ${
+                      activeTab === item.id 
+                        ? 'bg-gradient-to-r from-[#03045E] to-[#0a0c78] text-white border-[#03045E]/20 shadow-[0_4px_14px_rgba(3,4,94,0.18)] scale-[1.01]' 
+                        : 'text-[#03045E]/80 border-[#03045E]/10 shadow-[0_2px_8px_rgba(3,4,94,0.06)] hover:bg-white hover:text-[#03045E] hover:border-[#2C7FFF]/30 hover:shadow-[0_4px_12px_rgba(3,4,94,0.1)] hover:scale-[1.01]'
+                    }`}
+                  >
+                    {/* Subtle active indicator accent bar */}
+                    {activeTab === item.id && (
+                      <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#2C7FFF] rounded-r-full shadow-[0_0_8px_#2C7FFF]"></div>
+                    )}
 
-                  <div className={`p-2.5 rounded-xl transition-colors duration-200 shrink-0 ${
-                    activeTab === tab ? 'bg-white/10 text-[#2C7FFF]' : 'bg-[#03045E]/5 text-[#03045E] group-hover:bg-[#2C7FFF]/10 group-hover:text-[#2C7FFF]'
-                  }`}>
-                    {tab === 'overview' && (
-                      <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                      </svg>
-                    )}
-                    {tab === 'matches' && (
-                      <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                      </svg>
-                    )}
-                    {tab === 'explore-jobs' && (
-                      <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                    )}
-                    {tab === 'tracker' && (
-                      <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
-                      </svg>
-                    )}
-                    {tab === 'settings' && (
-                      <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                      </svg>
-                    )}
-                  </div>
-                  <span className="text-base tracking-wide font-semibold truncate">
-                    {tab === 'overview' && 'Dashboard Overview'}
-                    {tab === 'matches' && 'Smart Matches'}
-                    {tab === 'explore-jobs' && 'Explore All Jobs'}
-                    {tab === 'tracker' && 'My Job Tracker'}
-                    {tab === 'settings' && 'Account Settings'}
-                  </span>
-                </button>
-              ))}
-            </nav>
-          </div>
-        </aside>
-
-        {/* MAIN CONTENT AREA */}
-        <main className="flex-1 p-3 sm:p-6 md:p-10 overflow-y-auto relative w-full min-w-0 transition-all duration-300 flex flex-col justify-between box-border [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          <div className="flex items-start gap-4 w-full min-w-0">
-            <div className="w-full flex-1 min-w-0 overflow-x-hidden">
-              {activeTab === 'overview' && profile && (
-                <ApplicantOverview profile={profile} matchesCount={matches.length} applications={applications} setActiveTab={setActiveTab} />
-              )}
-              
-              {activeTab === 'matches' && profile && (
-                <ApplicantSmartMatches profile={profile} matches={matches} refreshData={refreshData} />
-              )}
-
-              {activeTab === 'explore-jobs' && profile && (
-                <ApplicantExploreJobs profile={profile} jobs={allJobs} refreshData={refreshData} />
-              )}
-              
-              {activeTab === 'tracker' && (
-                <ApplicantJobTracker applications={applications} />
-              )}
-              
-              {activeTab === 'profile' && profile && (
-                <ApplicantProfile profile={profile} refreshData={refreshData} />
-              )}
-              
-              {activeTab === 'settings' && profile && (
-                <ApplicantAccountSettings profile={profile} />
-              )}
+                    <div className={`p-2.5 rounded-xl transition-colors duration-200 shrink-0 ${
+                      activeTab === item.id ? 'bg-white/10 text-[#2C7FFF]' : 'bg-[#03045E]/5 text-[#03045E] group-hover:bg-[#2C7FFF]/10 group-hover:text-[#2C7FFF]'
+                    }`}>
+                      {item.id === 'overview' && (
+                        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                      )}
+                      {item.id === 'matches' && (
+                        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                      )}
+                      {item.id === 'explore-jobs' && (
+                        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                      )}
+                      {item.id === 'tracker' && (
+                        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                      )}
+                      {item.id === 'settings' && (
+                        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                      )}
+                    </div>
+                    <span className="text-base tracking-wide font-semibold truncate">
+                      {item.label}
+                    </span>
+                  </button>
+                ))}
+              </nav>
             </div>
-          </div>
-        </main>
+          </aside>
+
+          {/* MAIN CONTENT AREA */}
+          <main className="flex-1 p-3 sm:p-6 md:p-10 relative w-full min-w-0 transition-all duration-300 flex flex-col box-border">
+            <div className="flex items-start gap-4 w-full min-w-0">
+              <div className="w-full flex-1 min-w-0 overflow-x-hidden">
+                {activeTab === 'overview' && profile && (
+                  <ApplicantOverview profile={profile} matchesCount={matches.length} applications={applications} setActiveTab={setActiveTab} />
+                )}
+                
+                {activeTab === 'matches' && profile && (
+                  <ApplicantSmartMatches profile={profile} matches={matches} refreshData={refreshData} />
+                )}
+
+                {activeTab === 'explore-jobs' && profile && (
+                  <ApplicantExploreJobs profile={profile} jobs={allJobs} refreshData={refreshData} />
+                )}
+                
+                {activeTab === 'tracker' && (
+                  <ApplicantJobTracker applications={applications} />
+                )}
+                
+                {activeTab === 'profile' && profile && (
+                  <ApplicantProfile profile={profile} refreshData={refreshData} />
+                )}
+                
+                {activeTab === 'settings' && profile && (
+                  <ApplicantAccountSettings profile={profile} />
+                )}
+
+                {activeTab === 'applicant-policy' && (
+                  <ApplicantPolicy onBack={() => setActiveTab('overview')} />
+                )}
+
+                {activeTab === 'applicant-terms' && (
+                  <ApplicantTerms onBack={() => setActiveTab('overview')} />
+                )}
+
+                {activeTab === 'applicant-contact' && (
+                  <ApplicantContact onBack={() => setActiveTab('overview')} />
+                )}
+              </div>
+            </div>
+          </main>
+        </div>
       </div>
-  </div>
+
+      {/* ===== FOOTER - only visible after scrolling ===== */}
+      <div className="w-full">
+        <ApplicantFooter activeTab={activeTab} setActiveTab={setActiveTab} />
+      </div>
+    </div>
   );
 }

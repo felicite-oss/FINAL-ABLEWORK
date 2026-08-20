@@ -1,7 +1,7 @@
-import { useContext, useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { AccessibilityContext } from '../context/AccessibilityContext';
 
-export default function AccessibilityToolbar() {
+export function AccessibilityToolbar() {
   const { mode, setMode } = useContext(AccessibilityContext);
   const [isOpen, setIsOpen] = useState(false);
   const [fontSize, setFontSize] = useState('normal'); // 'normal', 'large', 'xlarge'
@@ -128,3 +128,5 @@ export default function AccessibilityToolbar() {
     </div>
   );
 }
+
+export default AccessibilityToolbar;

@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { AccessibilityContext } from '../context/AccessibilityContext';
 import headerLogo from '../assets/Final.png';
 import backgroundImg from '../assets/Final background.png';
@@ -170,7 +170,7 @@ export default function Login() {
 
       {/* ===== CONTENT ===== */}
       <div
-        className="flex-grow pt-24 pb-12 flex flex-col items-center md:items-end justify-center p-4 sm:p-6 md:p-12 relative bg-no-repeat bg-cover bg-center md:bg-[size:1100px_auto] md:bg-left"
+        className="flex-grow pt-24 pb-12 flex flex-col items-center md:items-end justify-center p-4 sm:p-6 md:p-12 relative bg-no-repeat bg-cover bg-center md:bg-[size:1100px_auto] md:bg-left min-h-[100svh] md:min-h-0"
         style={{
           backgroundImage: `url(${backgroundImg})`,
         }}
@@ -254,23 +254,67 @@ export default function Login() {
         </div>
       </div>
 
-      {/* ===== FOOTER WITH NAVIGATION LINKS ===== */}
-      <footer className="w-full bg-[#03045E] text-[#f4f4f4] py-8 px-4 md:px-8 relative z-20 mt-auto">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex flex-col items-center md:items-start gap-1 text-center md:text-left">
-            <span className="font-bold text-lg text-white">AbleWork</span>
-            <p className="text-xs text-[#f4f4f4]/70">
-              © {new Date().getFullYear()} AbleWork. All rights reserved.
-            </p>
-          </div>
-          <div className="flex flex-wrap justify-center gap-6 text-sm text-[#f4f4f4]/90 font-medium">
-            <Link to="/about" className="hover:text-[#2C7FFF] transition">About Us</Link>
-            <Link to="/policy" className="hover:text-[#2C7FFF] transition">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-[#2C7FFF] transition">Terms of Service</Link>
-            <Link to="/contact" className="hover:text-[#2C7FFF] transition">Contact Us</Link>
-          </div>
-          <div className="text-xs text-[#f4f4f4]/60 text-center md:text-right">
-            Building an inclusive workforce for everyone.
+      {/* ===== UNIQUE FOOTER (left brand / right nav — compact, locked for Standard & Contrast) ===== */}
+      <footer
+        className="w-full relative z-20 overflow-hidden mt-auto"
+        style={{
+          background: 'linear-gradient(135deg, #03045E 0%, #04068A 55%, #0a1a6e 100%)',
+          color: '#f4f4f4',
+          filter: 'none',
+          WebkitFilter: 'none',
+          forcedColorAdjust: 'none',
+        }}
+      >
+        {/* Top accent line */}
+        <div
+          className="h-0.5 w-full"
+          style={{ background: 'linear-gradient(90deg, #2C7FFF 0%, #5BA3FF 50%, #2C7FFF 100%)' }}
+        />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 sm:py-6">
+          <div className="flex flex-col md:flex-row items-center md:items-center justify-between gap-4 md:gap-6">
+
+            {/* Left: Brand + tagline + copyright */}
+            <div className="text-center md:text-left shrink-0">
+              <p className="font-extrabold tracking-tight" style={{ fontSize: '16px', color: '#ffffff' }}>
+                AbleWork
+              </p>
+              <p className="mt-0.5" style={{ fontSize: '12px', color: 'rgba(244,244,244,0.7)' }}>
+                Building an inclusive workforce for everyone.
+              </p>
+              <p className="mt-1.5" style={{ fontSize: '11px', color: 'rgba(244,244,244,0.5)' }}>
+                © {new Date().getFullYear()} AbleWork. All rights reserved.
+              </p>
+            </div>
+
+            {/* Right: Nav Links */}
+            <nav
+              className="flex flex-wrap justify-center md:justify-end items-center gap-2"
+              aria-label="Footer navigation"
+            >
+              {[
+                { to: '/', label: 'Home' },
+                { to: '/about', label: 'About Us' },
+                { to: '/policy', label: 'Privacy Policy' },
+                { to: '/terms', label: 'Terms of Service' },
+                { to: '/contact', label: 'Contact Us' },
+              ].map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) =>
+                    `px-3 py-1.5 rounded-full font-semibold transition-all duration-200 border ${
+                      isActive
+                        ? 'bg-[#2C7FFF] border-[#2C7FFF] text-white shadow-md'
+                        : 'bg-white/5 border-white/15 text-[#f4f4f4] hover:bg-[#2C7FFF]/20 hover:border-[#2C7FFF]/50 hover:text-white'
+                    }`
+                  }
+                  style={{ fontSize: '12px' }}
+                >
+                  {item.label}
+                </NavLink>
+              ))}
+            </nav>
           </div>
         </div>
       </footer>

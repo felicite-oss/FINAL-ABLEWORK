@@ -31,7 +31,7 @@ function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="w-full bg-[var(--bg-primary, #f4f4f4)] text-[var(--text-primary, #03045E)] border-b border-current/10 sticky top-0 left-0 z-50">
+    <header className="w-full bg-[var(--bg-primary, #f4f4f4)] text-[var(--text-primary, #03045E)] border-b border-current/10 shrink-0 z-50">
       <div className="w-full h-16 pl-4 pr-4 md:pr-8 flex items-center justify-between">
 
         {/* Left side: Logo + Desktop Navigation */}
@@ -154,94 +154,98 @@ function SiteHeader() {
 // ======================================================
 export function Home() {
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)]">
+    <div className="h-svh flex flex-col overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)]">
 
       {/* HEADER */}
       <SiteHeader />
 
+      {/* SCROLLABLE CONTENT (stays below header) */}
+      <div className="flex-1 overflow-y-auto flex flex-col">
 
-      {/* HERO */}
-      <section className="flex-grow max-w-7xl mx-auto px-6 py-20">
+        {/* HERO */}
+        <section className="flex-grow min-h-full max-w-7xl mx-auto px-6 py-20 w-full">
 
-        <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
 
-          <div>
+            <div>
 
-            <p className="text-[var(--accent, #2C7FFF)] font-bold mb-3">
-              WELCOME TO ABLEWORK
-            </p>
+              <p className="text-[var(--accent, #2C7FFF)] font-bold mb-3">
+                WELCOME TO ABLEWORK
+              </p>
 
-            <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6">
-              Building an Inclusive Workforce for Everyone
-            </h1>
+              <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6">
+                Building an Inclusive Workforce for Everyone
+              </h1>
 
-            <p className="text-lg opacity-80 leading-7 mb-8">
-              AbleWork helps persons with disabilities find suitable
-              employment opportunities based on their skills,
-              qualifications, and location.
-            </p>
+              <p className="text-lg opacity-80 leading-7 mb-8">
+                AbleWork helps persons with disabilities find suitable
+                employment opportunities based on their skills,
+                qualifications, and location.
+              </p>
 
-            <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-4">
 
-              <Link
-                to="/register-select"
-                className="bg-[var(--text-primary, #03045E)] text-[var(--bg-primary, #ffffff)] px-7 py-3 rounded-full font-semibold hover:opacity-80 transition border border-current"
-              >
-                Get Started
-              </Link>
+                <Link
+                  to="/register-select"
+                  className="bg-[var(--text-primary, #03045E)] text-[var(--bg-primary, #ffffff)] px-7 py-3 rounded-full font-semibold hover:opacity-80 transition border border-current"
+                >
+                  Get Started
+                </Link>
 
-              <Link
-                to="/about"
-                className="border-2 border-current px-7 py-3 rounded-full font-semibold hover:opacity-80 transition"
-              >
-                Learn More
-              </Link>
+                <Link
+                  to="/about"
+                  className="border-2 border-current px-7 py-3 rounded-full font-semibold hover:opacity-80 transition"
+                >
+                  Learn More
+                </Link>
+
+              </div>
+
+            </div>
+
+
+            {/* RIGHT SIDE */}
+            <div className="bg-[var(--bg-secondary, #ffffff)] text-[var(--text-secondary, #03045E)] rounded-3xl shadow-xl p-8 md:p-10 border border-current/10">
+
+              <h2 className="text-2xl font-bold mb-6">
+                Why Choose AbleWork?
+              </h2>
+
+              <div className="space-y-6">
+
+                <Feature
+                  title="Job Matching"
+                  text="Find employment opportunities that match your skills."
+                />
+
+                <Feature
+                  title="Inclusive Employment"
+                  text="Connect persons with disabilities with inclusive employers."
+                />
+
+                <Feature
+                  title="Easy Application"
+                  text="Search and apply for available jobs through one platform."
+                />
+
+                <Feature
+                  title="Employer Connection"
+                  text="Help employers discover qualified applicants."
+                />
+
+              </div>
 
             </div>
 
           </div>
 
-
-          {/* RIGHT SIDE */}
-          <div className="bg-[var(--bg-secondary, #ffffff)] text-[var(--text-secondary, #03045E)] rounded-3xl shadow-xl p-8 md:p-10 border border-current/10">
-
-            <h2 className="text-2xl font-bold mb-6">
-              Why Choose AbleWork?
-            </h2>
-
-            <div className="space-y-6">
-
-              <Feature
-                title="Job Matching"
-                text="Find employment opportunities that match your skills."
-              />
-
-              <Feature
-                title="Inclusive Employment"
-                text="Connect persons with disabilities with inclusive employers."
-              />
-
-              <Feature
-                title="Easy Application"
-                text="Search and apply for available jobs through one platform."
-              />
-
-              <Feature
-                title="Employer Connection"
-                text="Help employers discover qualified applicants."
-              />
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
+        </section>
 
 
-      {/* FOOTER */}
-      <SimpleFooter />
+        {/* FOOTER */}
+        <SimpleFooter />
+
+      </div>
 
     </div>
   );
@@ -587,26 +591,30 @@ export function Contact() {
 function PageLayout({ title, children }) {
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)]">
+    <div className="h-svh flex flex-col overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)]">
 
       {/* HEADER */}
       <SiteHeader />
 
+      {/* SCROLLABLE CONTENT (stays below header) */}
+      <div className="flex-1 overflow-y-auto flex flex-col">
 
-      {/* CONTENT */}
-      <main className="flex-grow max-w-7xl mx-auto px-6 py-16 w-full">
+        {/* CONTENT */}
+        <main className="flex-grow min-h-full max-w-7xl mx-auto px-6 py-16 w-full">
 
-        <h1 className="text-4xl md:text-5xl font-extrabold text-center mb-12">
-          {title}
-        </h1>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-center mb-12">
+            {title}
+          </h1>
 
-        {children}
+          {children}
 
-      </main>
+        </main>
 
 
-      {/* FOOTER */}
-      <SimpleFooter />
+        {/* FOOTER */}
+        <SimpleFooter />
+
+      </div>
 
     </div>
   );
