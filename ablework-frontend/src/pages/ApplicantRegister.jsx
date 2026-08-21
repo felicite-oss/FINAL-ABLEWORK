@@ -41,20 +41,35 @@ export default function ApplicantRegister() {
     }
   };
 
-  // 1. Disability Details
-  const availableDisabilities = ['Visual Impairment', 'Hearing Impairment', 'Mobility / Motor', 'Cognitive / Learning', 'Speech Impairment'];
+  // 1. Physical and Sensory Disabilities
+  const availableDisabilities = [
+    'Visual Impairment', 
+    'Hearing Impairment', 
+    'Mobility / Motor', 
+    'Low Vision', 
+    'Deaf / Hard of Hearing', 
+    'Orthopedic Impairment'
+  ];
   const [selectedDisabilities, setSelectedDisabilities] = useState([]);
-  const [showOtherDisability, setShowOtherDisability] = useState(false);
-  const [otherDisability, setOtherDisability] = useState('');
 
   // 2. Accommodations / Aids
   const availableAccommodations = ['Screen Reader', 'Wheelchair Access', 'Sign Language Interpreter', 'Flexible Hours', 'Quiet Workspace'];
+  const extendedAccommodations = [
+    'Ergonomic Setup', 'Noise-Cancelling Headphones', 'Screen Magnifier', 'Braille Keyboard', 
+    'Captioning Services', 'Remote Work', 'Frequent Breaks', 'Service Animal',
+    'Adjustable Desk', 'Voice-to-Text Software', 'Large Print Documents', 'Step-Free Access'
+  ];
   const [selectedAccommodations, setSelectedAccommodations] = useState([]);
   const [showOtherAccommodation, setShowOtherAccommodation] = useState(false);
   const [otherAccommodation, setOtherAccommodation] = useState('');
 
   // 3. Skills
   const availableSkills = ['React', 'JavaScript', 'UI/UX Design', 'Customer Support', 'Data Entry', 'Writing'];
+  const extendedSkills = [
+    'Node.js', 'Figma', 'Project Management', 'Copywriting', 'SEO', 'Marketing', 'HTML/CSS', 
+    'MySQL', 'Firebase', 'React Native', 'Data Analysis', 'Excel / Spreadsheets', 'Communication',
+    'Problem Solving', 'Time Management', 'Research', 'Administrative Support', 'Graphic Design'
+  ];
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [showOtherSkill, setShowOtherSkill] = useState(false);
   const [otherSkill, setOtherSkill] = useState('');
@@ -109,9 +124,7 @@ export default function ApplicantRegister() {
       return;
     }
     setIsLoading(true);
-    const finalDisabilities = [...selectedDisabilities, ...(showOtherDisability && otherDisability ? [otherDisability] : [])];
-    const finalAccommodations = [...selectedAccommodations, ...(showOtherAccommodation && otherAccommodation ? [otherAccommodation] : [])];
-    const finalSkills = [...selectedSkills, ...(showOtherSkill && otherSkill ? [otherSkill] : [])];
+    
     const formData = new FormData();
     formData.append('firstName', firstName);
     formData.append('middleName', middleName);
@@ -125,10 +138,11 @@ export default function ApplicantRegister() {
     formData.append('longitude', lng);
     formData.append('radius', radius);
     formData.append('independence', independence);
-    formData.append('disabilities', JSON.stringify(finalDisabilities));
-    formData.append('accommodations', JSON.stringify(finalAccommodations));
-    formData.append('skills', JSON.stringify(finalSkills));
+    formData.append('disabilities', JSON.stringify(selectedDisabilities));
+    formData.append('accommodations', JSON.stringify([...selectedAccommodations, ...(showOtherAccommodation && otherAccommodation ? [otherAccommodation] : [])]));
+    formData.append('skills', JSON.stringify([...selectedSkills, ...(showOtherSkill && otherSkill ? [otherSkill] : [])]));
     formData.append('pwdDocument', pwdFile);
+
     try {
       const response = await fetch('http://localhost:5001/api/auth/register/applicant', {
         method: 'POST',
@@ -162,12 +176,6 @@ export default function ApplicantRegister() {
               <Link to="/" className="hover:text-[#2C7FFF] transition">Home</Link>
               <Link to="/about" className="hover:text-[#2C7FFF] transition">About Us</Link>
               <Link to="/policy" className="hover:text-[#2C7FFF] transition">Policy</Link>
-              <button className="flex items-center gap-1 hover:text-[#2C7FFF] transition">
-                Careers
-                <svg className="w-3.5 h-3.5 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
             </nav>
           </div>
           <div className="hidden md:flex items-center">
@@ -182,38 +190,8 @@ export default function ApplicantRegister() {
             className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg bg-[#2C7FFF] text-[#f4f4f4]"
             onClick={() => setIsOpen(!isOpen)}
           >
-            {isOpen ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            )}
+            {isOpen ? 'Close' : 'Menu'}
           </button>
-        </div>
-        <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-          <div className="w-full bg-[#f4f4f4] border-t border-[#03045E]/10">
-            <nav className="flex flex-col px-6 py-5 gap-5 text-[16px] font-medium text-[#03045E]">
-              <Link to="/" className="hover:text-[#2C7FFF] transition" onClick={() => setIsOpen(false)}>Home</Link>
-              <Link to="/about" className="hover:text-[#2C7FFF] transition" onClick={() => setIsOpen(false)}>About Us</Link>
-              <Link to="/policy" className="hover:text-[#2C7FFF] transition" onClick={() => setIsOpen(false)}>Policy</Link>
-              <button className="flex items-center gap-1 hover:text-[#2C7FFF] transition text-left">
-                Careers
-                <svg className="w-3.5 h-3.5 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <Link
-                to="/login"
-                className="mt-2 px-5 py-2.5 rounded-full bg-white text-[#03045E] text-sm font-medium border border-[#03045E] hover:bg-[#2C7FFF] hover:text-white hover:border-[#2C7FFF] transition w-fit"
-                onClick={() => setIsOpen(false)}
-              >
-                Log In
-              </Link>
-            </nav>
-          </div>
         </div>
       </header>
 
@@ -226,10 +204,8 @@ export default function ApplicantRegister() {
           backgroundPosition: 'center',
         }}
       >
-        {/* ===== POPUP CONTAINER ===== */}
         <div className="w-full max-w-2xl max-h-[85vh] flex flex-col bg-white/95 rounded-3xl shadow-2xl border border-[#03045E]/10 overflow-hidden">
           
-          {/* Sticky Header of Popup */}
           <div className="flex-shrink-0 px-6 pt-6 pb-4 border-b border-[#03045E]/10 bg-white/90">
             <div className="flex items-center justify-between">
               <div>
@@ -243,16 +219,12 @@ export default function ApplicantRegister() {
               <Link
                 to="/register-select"
                 className="w-9 h-9 flex items-center justify-center rounded-full bg-[#f4f4f4] text-[#03045E] hover:bg-[#03045E] hover:text-white transition"
-                aria-label="Close and go back"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                ✕
               </Link>
             </div>
           </div>
 
-          {/* Scrollable Form Area */}
           <div className="flex-1 overflow-y-auto px-6 py-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {statusMessage.text && (
               <div
@@ -268,7 +240,7 @@ export default function ApplicantRegister() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-7" aria-label="Applicant Registration Form" autoComplete="off">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-7" autoComplete="off">
              
               {/* Personal Info */}
               <div className="flex flex-col gap-4">
@@ -290,27 +262,11 @@ export default function ApplicantRegister() {
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="email" className="text-sm font-semibold text-[#03045E]">Email Address</label>
-                  <input 
-                    id="email" 
-                    type="email" 
-                    value={email} 
-                    onChange={(e) => setEmail(e.target.value)} 
-                    required 
-                    autoComplete="off"
-                    className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" 
-                  />
+                  <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="password" className="text-sm font-semibold text-[#03045E]">Password</label>
-                  <input 
-                    id="password" 
-                    type="password" 
-                    value={password} 
-                    onChange={(e) => setPassword(e.target.value)} 
-                    required 
-                    autoComplete="new-password"
-                    className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" 
-                  />
+                  <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="birthdate" className="text-sm font-semibold text-[#03045E]">Birthdate (Must be 18+)</label>
@@ -323,26 +279,10 @@ export default function ApplicantRegister() {
               {/* Address */}
               <div className="flex flex-col gap-3 p-4 border border-[#2C7FFF]/30 rounded-2xl bg-[#2C7FFF]/5">
                 <label htmlFor="address" className="text-sm font-bold text-[#03045E]">Residential Address</label>
-                <p className="text-xs text-[#03045E]/70">Detect your location or type it manually.</p>
-               
-                <button
-                  type="button"
-                  onClick={handleDetectLocation}
-                  disabled={isDetecting}
-                  className="bg-[#2C7FFF] text-white px-5 py-2.5 rounded-full text-sm font-semibold shadow-md hover:bg-[#03045E] cursor-pointer disabled:opacity-50 transition"
-                >
+                <button type="button" onClick={handleDetectLocation} disabled={isDetecting} className="bg-[#2C7FFF] text-white px-5 py-2.5 rounded-full text-sm font-semibold shadow-md hover:bg-[#03045E] transition">
                   {isDetecting ? 'Detecting...' : 'Detect Location'}
                 </button>
-               
-                <input
-                  id="address"
-                  type="text"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="e.g. Block 4, Main Street, Manila"
-                  required
-                  className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
-                />
+                <input id="address" type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="e.g. Block 4, Main Street, Manila" required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E]" />
               </div>
 
               <div className="flex flex-col gap-2">
@@ -354,9 +294,10 @@ export default function ApplicantRegister() {
 
               <hr className="border-[#03045E]/10" />
 
-              {/* Disability Chips */}
+              {/* Physical & Sensory Disability Chips Only */}
               <fieldset className="flex flex-col gap-3">
-                <legend className="text-sm font-bold text-[#03045E]">Disability Details</legend>
+                <legend className="text-sm font-bold text-[#03045E]">Physical & Sensory Profile (Work-Enabled)</legend>
+                <p className="text-xs text-gray-500">Select applicable physical or sensory categories for tailored job accommodation matching.</p>
                 <div className="flex flex-wrap gap-2">
                   {availableDisabilities.map((disability) => (
                     <button
@@ -372,28 +313,7 @@ export default function ApplicantRegister() {
                       {disability} {selectedDisabilities.includes(disability) ? '✓' : '+'}
                     </button>
                   ))}
-                  <button
-                    type="button"
-                    onClick={() => setShowOtherDisability(!showOtherDisability)}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold border transition ${
-                      showOtherDisability
-                        ? 'bg-[#03045E] text-white border-[#03045E]'
-                        : 'bg-white text-[#03045E] border-[#03045E]/30 hover:border-[#2C7FFF]'
-                    }`}
-                  >
-                    Other {showOtherDisability ? '✓' : '+'}
-                  </button>
                 </div>
-                {showOtherDisability && (
-                  <input
-                    type="text"
-                    value={otherDisability}
-                    onChange={(e) => setOtherDisability(e.target.value)}
-                    placeholder="Please specify..."
-                    className="mt-1 w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
-                    required={showOtherDisability}
-                  />
-                )}
               </fieldset>
 
               {/* Independence */}
@@ -447,15 +367,37 @@ export default function ApplicantRegister() {
                     Other {showOtherAccommodation ? '✓' : '+'}
                   </button>
                 </div>
+
                 {showOtherAccommodation && (
-                  <input
-                    type="text"
-                    value={otherAccommodation}
-                    onChange={(e) => setOtherAccommodation(e.target.value)}
-                    placeholder="Please specify..."
-                    className="mt-1 w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
-                    required={showOtherAccommodation}
-                  />
+                  <div className="flex flex-col gap-2 mt-1">
+                    <input
+                      type="text"
+                      value={otherAccommodation}
+                      onChange={(e) => setOtherAccommodation(e.target.value)}
+                      placeholder="Type to search other accommodations..."
+                      className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E]"
+                    />
+                    {otherAccommodation.length > 0 && (
+                      <div className="flex flex-wrap gap-2 animate-fadeIn">
+                        {extendedAccommodations
+                          .filter(a => a.toLowerCase().includes(otherAccommodation.toLowerCase()) && !selectedAccommodations.includes(a))
+                          .slice(0, 6)
+                          .map(suggestion => (
+                            <button
+                              key={suggestion}
+                              type="button"
+                              onClick={() => {
+                                toggleSelection(suggestion, selectedAccommodations, setSelectedAccommodations);
+                                setOtherAccommodation(''); 
+                              }}
+                              className="px-3 py-1.5 bg-[#2C7FFF]/10 text-[#2C7FFF] text-xs font-bold rounded-full hover:bg-[#2C7FFF] hover:text-white transition-colors border border-[#2C7FFF]/20"
+                            >
+                              + {suggestion}
+                            </button>
+                          ))}
+                      </div>
+                    )}
+                  </div>
                 )}
               </fieldset>
 
@@ -489,15 +431,37 @@ export default function ApplicantRegister() {
                     Other {showOtherSkill ? '✓' : '+'}
                   </button>
                 </div>
+
                 {showOtherSkill && (
-                  <input
-                    type="text"
-                    value={otherSkill}
-                    onChange={(e) => setOtherSkill(e.target.value)}
-                    placeholder="Enter custom skills..."
-                    className="mt-1 w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
-                    required={showOtherSkill}
-                  />
+                  <div className="flex flex-col gap-2 mt-1">
+                    <input
+                      type="text"
+                      value={otherSkill}
+                      onChange={(e) => setOtherSkill(e.target.value)}
+                      placeholder="Type to search general skills..."
+                      className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E]"
+                    />
+                    {otherSkill.length > 0 && (
+                      <div className="flex flex-wrap gap-2 animate-fadeIn">
+                        {extendedSkills
+                          .filter(s => s.toLowerCase().includes(otherSkill.toLowerCase()) && !selectedSkills.includes(s))
+                          .slice(0, 6)
+                          .map(suggestion => (
+                            <button
+                              key={suggestion}
+                              type="button"
+                              onClick={() => {
+                                toggleSelection(suggestion, selectedSkills, setSelectedSkills);
+                                setOtherSkill(''); 
+                              }}
+                              className="px-3 py-1.5 bg-[#2C7FFF]/10 text-[#2C7FFF] text-xs font-bold rounded-full hover:bg-[#2C7FFF] hover:text-white transition-colors border border-[#2C7FFF]/20"
+                            >
+                              + {suggestion}
+                            </button>
+                          ))}
+                      </div>
+                    )}
+                  </div>
                 )}
               </fieldset>
 
@@ -506,12 +470,11 @@ export default function ApplicantRegister() {
               {/* File Upload */}
               <div className="p-4 rounded-2xl border-2 border-dashed border-[#03045E]/20 bg-[#f4f4f4]/50">
                 <label htmlFor="pwdId" className="block text-sm font-bold text-[#03045E] mb-1">Upload PWD ID / Certificates</label>
-                <p className="text-xs text-[#03045E]/60 mb-3">Attach a valid ID or certification.</p>
                 <input
                   id="pwdId"
                   type="file"
                   onChange={(e) => setPwdFile(e.target.files[0])}
-                  className="w-full text-sm text-[#03045E] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-[#03045E] file:text-white file:font-semibold hover:file:bg-[#2C7FFF] cursor-pointer"
+                  className="w-full text-sm text-[#03045E] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-[#03045E] file:text-white file:font-semibold cursor-pointer"
                   required
                 />
               </div>

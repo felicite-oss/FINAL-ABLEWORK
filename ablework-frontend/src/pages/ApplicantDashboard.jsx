@@ -174,24 +174,26 @@ export default function ApplicantDashboard() {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className={`w-10 h-10 rounded-full overflow-hidden bg-white text-[#03045E] border transition-all duration-200 cursor-pointer shadow-[0_2px_10px_rgba(3,4,94,0.04)] hover:shadow-[0_4px_20px_rgba(44,127,255,0.15)] hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center shrink-0 ${
-                  profileDropdownOpen || activeTab === 'profile' ? 'border-[#2C7FFF] ring-2 ring-[#2C7FFF]/20' : 'border-[#03045E]/10 hover:border-[#2C7FFF]/60'
+                className={`w-10 h-10 rounded-full overflow-hidden bg-white text-[#03045E] border transition-all duration-200 cursor-pointer shadow-[0_2px_10px_rgba(3,4,94,0.04)] hover:shadow-[0_4px_20px_rgba(44,127,255,0.15)] hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center shrink-0 p-0 ${
+                  profileDropdownOpen || activeTab === 'profile' ? 'border-[#2C7FFF] ring-2 ring-[#2C7FFF]/20' : 'border-transparent'
                 }`}
                 title="Profile Menu"
               >
-                <div className="w-full h-full overflow-hidden bg-gradient-to-br from-[#2C7FFF]/10 to-[#03045E]/5 flex items-center justify-center shrink-0">
-                  {profile?.profile_picture_path || profile?.avatar ? (
-                    <img
-                      src={profile.profile_picture_path || profile.avatar}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <svg className="w-4 h-4 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  )}
-                </div>
+                {profile?.profile_picture || profile?.avatar_url ? (
+                  <img 
+                    src={
+                      (profile?.profile_picture || profile?.avatar_url).startsWith('http') || (profile?.profile_picture || profile?.avatar_url).startsWith('blob')
+                        ? (profile?.profile_picture || profile?.avatar_url)
+                        : `http://localhost:5001${profile?.profile_picture || profile?.avatar_url}`
+                    } 
+                    alt="Profile" 
+                    className="w-full h-full object-cover" 
+                  />
+                ) : (
+                  <div className="w-full h-full bg-[#03045E]/10 text-[#03045E] flex items-center justify-center font-bold text-sm">
+                    {profile?.firstname?.[0] || profile?.full_name?.[0] || 'U'}
+                  </div>
+                )}
               </button>
 
               {/* Desktop Profile Dropdown Menu */}
@@ -267,17 +269,21 @@ export default function ApplicantDashboard() {
                   activeTab === 'profile' ? 'border-[#2C7FFF] bg-[#2C7FFF]/5' : 'border-[#03045E]/10 hover:border-[#2C7FFF]'
                 }`}
               >
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden bg-[#2C7FFF]/10 border border-[#03045E]/10 flex items-center justify-center shrink-0">
-                  {profile?.profile_picture_path || profile?.avatar ? (
-                    <img
-                      src={profile.profile_picture_path || profile.avatar}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
+                <div className="shrink-0 flex items-center justify-center border-none w-6 h-6 rounded-full overflow-hidden">
+                  {profile?.profile_picture || profile?.avatar_url ? (
+                    <img 
+                      src={
+                        (profile?.profile_picture || profile?.avatar_url).startsWith('http') || (profile?.profile_picture || profile?.avatar_url).startsWith('blob')
+                          ? (profile?.profile_picture || profile?.avatar_url)
+                          : `http://localhost:5001${profile?.profile_picture || profile?.avatar_url}`
+                      } 
+                      alt="Profile" 
+                      className="w-full h-full object-cover" 
                     />
                   ) : (
-                    <svg className="w-4 h-4 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+                    <div className="w-full h-full bg-[#03045E]/10 text-[#03045E] flex items-center justify-center font-bold text-xs">
+                      {profile?.firstname?.[0] || profile?.full_name?.[0] || 'U'}
+                    </div>
                   )}
                 </div>
                 <span className="truncate">Profile</span>
@@ -420,7 +426,7 @@ export default function ApplicantDashboard() {
                 )}
                 
                 {activeTab === 'profile' && profile && (
-                  <ApplicantProfile profile={profile} refreshData={refreshData} />
+                  <ApplicantProfile profile={profile} refreshData={refreshData} setProfile={setProfile} />
                 )}
                 
                 {activeTab === 'settings' && profile && (
