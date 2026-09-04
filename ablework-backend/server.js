@@ -9,10 +9,10 @@ require('dotenv').config();
 
 const { OpenAI } = require('openai');
 
-// Initialize OpenAI using your secret key
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-});
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+
+// Initialize Gemini using your secret key from Google AI Studio
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const app = express();
 
@@ -40,24 +40,161 @@ const upload = multer({ storage: storage });
 // 3. Tell Express to serve the 'uploads' folder publicly so React can display the images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+
 // ---------------------------------------------------------
-// ROUTE: Abby AI Chatbot Engine
+// HELPER: Fetch Live User Context for ABBY
 // ---------------------------------------------------------
-app.post('/api/chat', async (req, res) => {
-    const { message } = req.body;
-    console.log("Received message for Abby:", message);
+async function getUserLiveContext(userId, role) {
+    let contextSummary = { role };
 
     try {
-        setTimeout(() => {
-            res.status(200).json({ 
-                reply: "I am currently in testing mode and not connected to OpenAI yet, but your message went through perfectly!" 
-            });
-        }, 1500);
+        if (role === 'employer') {
+            // 1. Fetch Employer Profile & Job Stats
+            const [profile] = await db.execute(
+                `SELECT company_name, industry FROM employer_profiles WHERE user_id = ?`,
+                [userId]
+            );
+            const [jobs] = await db.execute(
+                `SELECT id, job_title, status, created_at FROM job_postings WHERE employer_id = ?`,
+                [userId]
+            );
+            // Note: Your table is named `applications`
+            const [apps] = await db.execute(
+                `SELECT a.status, COUNT(*) as count 
+                 FROM applications a 
+                 JOIN job_postings j ON a.job_id = j.id 
+                 WHERE j.employer_id = ? 
+                 GROUP BY a.status`,
+                [userId]
+            );
+
+            const activeJobs = jobs.filter(j => j.status === 'Active');
+            contextSummary.company = profile[0]?.company_name || 'Your Company';
+            contextSummary.totalJobs = jobs.length;
+            contextSummary.activeJobsCount = activeJobs.length;
+            contextSummary.activeJobTitles = activeJobs.map(j => j.job_title);
+            contextSummary.applicationPipeline = apps;
+
+        } else if (role === 'applicant') {
+            // 2. Fetch Applicant Profile & Application History
+            const [profile] = await db.execute(
+                `SELECT a.firstname, a.lastname, a.skills, a.accommodations_needed, u.verification_status, u.rejection_reason 
+                 FROM applicant_profiles a 
+                 JOIN users u ON a.user_id = u.id 
+                 WHERE a.user_id = ?`,
+                [userId]
+            );
+            const [apps] = await db.execute(
+                `SELECT j.job_title, j.company_name, a.status, a.applied_at 
+                 FROM applications a 
+                 JOIN job_postings j ON a.job_id = j.id 
+                 WHERE a.applicant_id = ? 
+                 ORDER BY a.applied_at DESC LIMIT 5`,
+                [userId]
+            );
+
+            contextSummary.name = profile[0]?.firstname || 'Job Seeker';
+            contextSummary.skills = JSON.parse(profile[0]?.skills || '[]');
+            contextSummary.accommodations = JSON.parse(profile[0]?.accommodations_needed || '[]');
+            contextSummary.verificationStatus = profile[0]?.verification_status;
+            contextSummary.rejectionReason = profile[0]?.rejection_reason;
+            contextSummary.recentApplications = apps;
+        }
+    } catch (err) {
+        console.error("Error fetching live context for ABBY:", err.message);
+    }
+
+    return contextSummary;
+}
+
+
+// ---------------------------------------------------------
+// ROUTE: Abby AI Chatbot Engine (Powered by Gemini + RAG)
+// ---------------------------------------------------------
+app.post('/api/chat', async (req, res) => {
+    // We now expect the frontend to send the user's ID, role, and chat history!
+    const { message, userId, role, conversationHistory = [] } = req.body;
+    console.log(`Received message for Abby from ${role || 'Guest'} ${userId || ''}:`, message);
+
+    try {
+        // 1. Retrieve real-time database state if the user is logged in
+        let liveContext = {};
+        if (userId && role) {
+            liveContext = await getUserLiveContext(userId, role);
+        }
+
+        // 2. Inject this live data directly into ABBY's brain
+        const systemInstruction = `
+        You are Abby, the official AI assistant for AbleWork, a job application platform connecting Persons with Disabilities (PWD) to inclusive employers. 
+        
+        TONE: Your tone must be highly encouraging and warm. Always offer words of affirmation to boost the user's confidence. Keep answers direct, concise, and to the point. Do not ramble.
+        
+        CURRENT LIVE DATABASE STATE FOR THIS USER:
+        ${JSON.stringify(liveContext, null, 2)}
+        
+        CRITICAL INSTRUCTIONS ON PLATFORM PROCESSES (Use this to explain how the app works):
+
+        1. REGISTRATION & VERIFICATION:
+        - Applicants must upload a valid PWD ID. Employers must upload Business Registration (DTI/SEC/Permit).
+        - After registration, accounts are 'Pending'. An Admin must review and approve the documents.
+        - Users cannot apply for jobs or post jobs until their account is 'Approved'.
+
+        2. VERIFICATION REJECTIONS & SECURITY COOLDOWNS:
+        - If an Admin rejects a verification document (e.g., blurry ID, expired permit), the user's account is locked.
+        - A strict 7-day security cooldown is enforced. The user cannot resubmit a new document until the 7 days expire.
+        - Once the countdown reaches 0, they can upload a new document from their profile, returning their status to 'Pending'.
+
+        3. THE SMART MATCHING ENGINE (How Jobs are Matched):
+        - Distance (Geofencing): Applicants set a max travel radius. If an employer's office is outside this radius, the job is completely hidden from the applicant.
+        - Accommodations (Dealbreaker): Employers must guarantee ALL the accommodations an applicant requires (e.g., Wheelchair Access, Screen Reader). If even one is missing, the job is not matched.
+        - Accepted Disabilities (Dealbreaker): Employers explicitly select which disabilities they are equipped to support (e.g., Deafness, Amputation, Wheelchair User). The applicant's disability must be on this list to match.
+        - Skills (Scoring): The system calculates a match percentage based on how many of the applicant's skills match the employer's required skills.
+
+        4. JOB POSTING (For Employers):
+        - Employers type required skills, input guaranteed accommodations (comma-separated), and select specific disability categories they can support.
+        - If an employer archives a job, it completely disappears from the active UI for applicants.
+
+        5. APPLYING & TRACKING (For Applicants):
+        - To apply, the applicant must click on a job from their 'Smart Matches' or 'Explore Jobs' tab, upload their resume, and submit.
+        - Applications start as 'Under Review'. Employers can change the status to 'Shortlisted' or 'Rejected' and leave custom feedback messages for the applicant to read in their Job Tracker.
+
+        6. PLATFORM ACCESSIBILITY FEATURES:
+        - If a user struggles to read the screen, tell them to use the Accessibility Toolbar (the floating blue icon at the bottom left).
+        - They can switch the Display Theme to 'High Contrast' mode and adjust the Font Size up to 'A++' for maximum readability.
+
+        RULES FOR ANSWERING:
+        1. Use the LIVE DATABASE STATE above to accurately answer questions about their account, active jobs, applications, or profile.
+        2. If they ask about an active count or specific status (e.g. "How many active jobs do I have?"), give the exact numbers from the data immediately in the first sentence.
+        3. If they ask about something not present in their data, state that clearly without guessing.
+        4. Applying & Uploading Resumes: To upload a resume, the user MUST click on the specific job they want to apply for.
+        5. Archived Jobs: If an employer archives a job, it completely disappears from the active UI.`;
+
+        // 3. Initialize the model (switched to 1.5-flash as it is highly stable for RAG)
+        const model = genAI.getGenerativeModel({ 
+            model: "gemini-3-flash-preview", 
+            systemInstruction 
+        });
+
+        // 4. Format previous conversation history so ABBY remembers context
+        const formattedHistory = conversationHistory.map(turn => ({
+            role: turn.sender === 'user' ? 'user' : 'model',
+            parts: [{ text: turn.text }]
+        }));
+
+        // 5. Start the chat with history and send the new message
+        const chat = model.startChat({
+            history: formattedHistory,
+        });
+
+        const result = await chat.sendMessage(message);
+        const responseText = result.response.text();
+
+        res.status(200).json({ reply: responseText });
     } catch (error) {
-        res.status(500).json({ error: "Server error." });
+        console.error("Gemini API Error:", error.message);
+        res.status(500).json({ reply: "I'm having trouble connecting right now. Please check my API connection." });
     }
 });
-
 // ---------------------------------------------------------
 // ROUTE: Fetch Active Jobs
 // ---------------------------------------------------------
@@ -115,10 +252,24 @@ app.get('/api/applicant/:id/profile', async (req, res) => {
         // Use a JOIN to grab data from both the users table and applicant_profiles table
         const [rows] = await db.execute(`
             SELECT 
-                u.email, u.phone, u.verification_status, 
-                a.firstname, a.middlename, a.lastname, a.birthdate, a.disability_type, 
-                a.residential_address, a.latitude, a.longitude, a.travel_radius_km, 
-                a.workplace_independence, a.accommodations_needed, a.skills, a.pwd_document_path
+                u.email, 
+                u.phone, 
+                u.verification_status, 
+                u.rejection_reason,
+                u.rejection_timestamp,
+                a.firstname, 
+                a.middlename, 
+                a.lastname, 
+                a.birthdate, 
+                a.disability_type, 
+                a.residential_address,
+                a.latitude, 
+                a.longitude, 
+                a.travel_radius_km, 
+                a.workplace_independence, 
+                a.accommodations_needed, 
+                a.skills, 
+                a.pwd_document_path
             FROM users u
             JOIN applicant_profiles a ON u.id = a.user_id
             WHERE u.id = ?
@@ -191,7 +342,14 @@ app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (re
             const [userResult] = await connection.execute(
                 `INSERT INTO users (email, phone, password_hash, ui_preference, verification_status, role) 
                  VALUES (?, ?, ?, ?, ?, ?)`,
-                [email, phone, hashedPassword, uiPreference || 'default', 'Pending', 'applicant']
+                [
+                    email, 
+                    phone, 
+                    hashedPassword, 
+                    'default', // <-- FIXED: Removed 'uiPreference' and just hardcoded 'default'
+                    'Pending', 
+                    'applicant'
+                ]
             );
 
             const newUserId = userResult.insertId;
@@ -217,9 +375,9 @@ app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (re
                     longitude || null, 
                     radius || 5, 
                     independence, 
-                    accommodations || '[]', // This is already a stringified JSON array from frontend
-                    skills || '[]',         // This is already a stringified JSON array from frontend
-                    pwdDocumentPath         // The file path saved by Multer
+                    accommodations || '[]', 
+                    skills || '[]',         
+                    pwdDocumentPath         
                 ]
             );
 
@@ -243,14 +401,18 @@ app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (re
 // ---------------------------------------------------------
 // ROUTE: FULL EMPLOYER REGISTRATION 
 // ---------------------------------------------------------
-app.post('/api/auth/register/employer', async (req, res) => {
+// 1. ADDED: upload.single('verificationDocument')
+app.post('/api/auth/register/employer', upload.single('verificationDocument'), async (req, res) => {
     console.log("--- INCOMING EMPLOYER REGISTRATION ---");
     
-    // Notice we added documentName here!
+    // 2. REMOVED: documentName (we don't need the string, we need the actual file)
     const { 
         companyName, companyDescription, email, phone, password, industry, 
-        jobRole, address, latitude, longitude, documentName 
+        jobRole, address, latitude, longitude 
     } = req.body;
+
+    // 3. ADDED: Grab the newly saved file's name from Multer
+    const documentFilename = req.file ? req.file.filename : null;
 
     try {
         const [existing] = await db.execute('SELECT id FROM users WHERE email = ?', [email]);
@@ -272,14 +434,14 @@ app.post('/api/auth/register/employer', async (req, res) => {
 
             const newUserId = userResult.insertId;
 
-            // STEP B: Insert into `employer_profiles` including the document column
+            // STEP B: Insert into `employer_profiles` using the real filename
             await connection.execute(
                 `INSERT INTO employer_profiles 
                 (user_id, company_name, company_description, industry, job_role, workplace_address, latitude, longitude, verification_document) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
                     newUserId, companyName, companyDescription, industry, jobRole, 
-                    address, latitude || null, longitude || null, documentName || null
+                    address, latitude || null, longitude || null, documentFilename 
                 ]
             );
 
@@ -328,8 +490,9 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
 
     try {
         // 1. Fetch the Applicant's exact needs and location
+        // --- NEW 1: Added 'disabilities' to the SELECT query ---
         const [applicantRows] = await db.execute(`
-            SELECT latitude, longitude, travel_radius_km, accommodations_needed, skills 
+            SELECT latitude, longitude, travel_radius_km, accommodations_needed, skills, disability_type 
             FROM applicant_profiles 
             WHERE user_id = ?
         `, [userId]);
@@ -340,11 +503,13 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
         // Parse JSON arrays safely and ensure radius is a strict Number
         const appSkills = JSON.parse(applicant.skills || '[]');
         const appAccommodations = JSON.parse(applicant.accommodations_needed || '[]');
+        const appDisabilities = JSON.parse(applicant.disabilities || '[]'); // --- NEW 1 (Part B) ---
         const maxRadius = Number(applicant.travel_radius_km) || 5; 
 
         // 2. Fetch all active job postings
+        // --- NEW 2: Added 'accepted_disabilities' to the SELECT query ---
         const [jobs] = await db.execute(`
-            SELECT id, employer_id, job_title, company_name, job_description, required_skills, provided_accommodations, salary_range, benefits, latitude, longitude 
+            SELECT id, employer_id, job_title, company_name, job_description, required_skills, provided_accommodations, accepted_disabilities, salary_range, benefits, latitude, longitude 
             FROM job_postings 
             WHERE status = 'Active'
         `);
@@ -375,6 +540,18 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
             const jobAccommodations = JSON.parse(job.provided_accommodations || '[]');
             const meetsAllNeeds = appAccommodations.every(need => jobAccommodations.includes(need));
             if (!meetsAllNeeds) continue; // Discard job if it is not accessible
+
+            // --- NEW 3: Disability Match Check (Dealbreaker) ---
+            const jobAcceptedDisabilities = JSON.parse(job.accepted_disabilities || '[]');
+            
+            // Checks if AT LEAST ONE of the applicant's disabilities is in the employer's accepted list
+            const isDisabilitySupported = appDisabilities.some(disability => 
+                jobAcceptedDisabilities.includes(disability)
+            );
+
+            // If the employer strictly specified accepted disabilities, and there's no match, discard it.
+            if (jobAcceptedDisabilities.length > 0 && !isDisabilitySupported) continue;
+            // ----------------------------------------------------
 
             // C. Skill Scoring (Max 60 points)
             const jobSkills = JSON.parse(job.required_skills || '[]');
@@ -468,10 +645,10 @@ app.get('/api/applicant/:id/applications', async (req, res) => {
     const userId = req.params.id;
 
     try {
-        // Use a JOIN to get the job title and company name alongside the application status
+        // Use a JOIN to get the job title, company name, AND employer message
         const [applications] = await db.execute(`
             SELECT 
-                a.id as application_id, a.status, a.applied_at,
+                a.id as application_id, a.status, a.applied_at, a.employer_message, 
                 j.job_title, j.company_name
             FROM applications a
             JOIN job_postings j ON a.job_id = j.id
@@ -495,7 +672,11 @@ app.get('/api/employer/:id/profile', async (req, res) => {
     try {
         // Look at the SELECT below. We MUST include e.latitude and e.longitude!
         const [rows] = await db.execute(`
-            SELECT u.email, u.phone, u.verification_status, 
+            SELECT u.email, 
+                    u.phone, 
+                    u.verification_status, 
+                    u.rejection_reason,
+                    u.rejection_timestamp,
                    e.company_name, e.industry, e.job_role, e.workplace_address,
                    e.company_description, e.latitude, e.longitude, e.company_logo 
             FROM users u
@@ -552,11 +733,48 @@ app.get('/api/employer/:id/dashboard-stats', async (req, res) => {
              [employerId]
         );
 
+        // --- NEW: 4. Generate Last 7 Days Application Data for Recharts ---
+        
+        // A. Fetch all applications from the last 7 days
+        const [recentApps] = await db.execute(
+            `SELECT a.applied_at 
+             FROM applications a
+             JOIN job_postings j ON a.job_id = j.id
+             WHERE j.employer_id = ? 
+               AND a.applied_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)`,
+             [employerId]
+        );
+
+        // B. Dynamically build the 7-day array to ensure empty days equal 0
+        const chartData = [];
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        
+        // Loop backwards from 6 days ago to today (0)
+        for (let i = 6; i >= 0; i--) {
+            const targetDate = new Date();
+            targetDate.setDate(targetDate.getDate() - i);
+            
+            // Count how many applications in the SQL results match this specific day
+            const dailyCount = recentApps.filter(row => {
+                const rowDate = new Date(row.applied_at);
+                return rowDate.getDate() === targetDate.getDate() && 
+                       rowDate.getMonth() === targetDate.getMonth() &&
+                       rowDate.getFullYear() === targetDate.getFullYear();
+            }).length;
+
+            chartData.push({
+                name: dayNames[targetDate.getDay()], // Converts day number to 'Mon', 'Tue', etc.
+                applications: dailyCount
+            });
+        }
+
+        // 5. Send everything to the frontend
         res.status(200).json({
             activeJobs: activeJobs[0].count || 0,
             pendingApps: appStats[0].pending_count || 0,
             shortlistedApps: appStats[0].shortlisted_count || 0,
-            recentActivity: recentActivity
+            recentActivity: recentActivity,
+            chartData: chartData // <-- The new analytics array is now sent to React!
         });
 
     } catch (error) {
@@ -681,6 +899,7 @@ app.get('/api/employer/:id/applications', async (req, res) => {
     try {
         const [applications] = await db.execute(`
             SELECT a.id as application_id, a.status as application_status, a.applied_at,
+                   a.resume_path, a.cover_letter, /* <-- ADDED THESE TWO LINES */
                    j.job_title, j.id as job_id,
                    ap.firstname, ap.lastname, ap.skills, ap.accommodations_needed, ap.disability_type,
                    u.email, u.phone
@@ -699,17 +918,16 @@ app.get('/api/employer/:id/applications', async (req, res) => {
     }
 });
 
-// ---------------------------------------------------------
-// ROUTE: UPDATE APPLICATION STATUS
-// ---------------------------------------------------------
+// ROUTE: UPDATE APPLICATION STATUS & ADD NEXT STEPS
 app.put('/api/applications/:id/status', async (req, res) => {
     const applicationId = req.params.id;
-    const { status } = req.body;
+    // Extract the new message along with the status
+    const { status, employer_message } = req.body; 
 
     try {
         await db.execute(
-            `UPDATE applications SET status = ? WHERE id = ?`,
-            [status, applicationId]
+            `UPDATE applications SET status = ?, employer_message = ? WHERE id = ?`,
+            [status, employer_message || null, applicationId]
         );
         res.status(200).json({ message: `Applicant marked as ${status}.` });
     } catch (error) {
@@ -788,6 +1006,249 @@ app.put('/api/applicant/:id/profile', async (req, res) => {
     } catch (error) {
         console.error("Profile Update Error:", error.message);
         res.status(500).json({ message: "Server error updating profile." });
+    }
+});
+
+// =========================================================
+//                  ADMIN PANEL ROUTES
+// =========================================================
+
+// 1. Fetch High-Level Platform Statistics (Updated to count pending applicants)
+app.get('/api/admin/stats', async (req, res) => {
+    try {
+        const [applicantCount] = await db.execute(`SELECT COUNT(*) as count FROM users WHERE role = 'applicant'`);
+        const [employerCount] = await db.execute(`SELECT COUNT(*) as count FROM users WHERE role = 'employer'`);
+        const [activeJobs] = await db.execute(`SELECT COUNT(*) as count FROM job_postings WHERE status = 'Active'`);
+        const [pendingEmpVerifications] = await db.execute(`SELECT COUNT(*) as count FROM users WHERE role = 'employer' AND verification_status = 'Pending'`);
+        const [pendingAppVerifications] = await db.execute(`SELECT COUNT(*) as count FROM users WHERE role = 'applicant' AND verification_status = 'Pending'`);
+
+        res.status(200).json({
+            totalApplicants: applicantCount[0].count,
+            totalEmployers: employerCount[0].count,
+            activeJobs: activeJobs[0].count,
+            pendingEmployers: pendingEmpVerifications[0].count,
+            pendingApplicants: pendingAppVerifications[0].count
+        });
+    } catch (error) {
+        console.error("Admin Stats Error:", error.message);
+        res.status(500).json({ message: "Failed to fetch admin statistics." });
+    }
+});
+
+// 2. Fetch ALL Employers (Pending, Approved, Rejected, Disabled)
+app.get('/api/admin/employers/all', async (req, res) => {
+    try {
+        const [employers] = await db.execute(`
+            SELECT u.id as user_id, u.email, u.created_at, u.verification_status, IFNULL(u.account_status, 'Active') as account_status,
+                   e.company_name, e.industry, e.verification_document
+            FROM users u
+            JOIN employer_profiles e ON u.id = e.user_id
+            WHERE u.role = 'employer'
+            ORDER BY u.created_at DESC
+        `);
+        res.status(200).json(employers);
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch employers." });
+    }
+});
+
+// 3. Fetch ALL Applicants (Pending, Approved, Rejected, Disabled)
+app.get('/api/admin/applicants/all', async (req, res) => {
+    try {
+        const [applicants] = await db.execute(`
+            SELECT u.id as user_id, u.email, u.created_at, u.verification_status, IFNULL(u.account_status, 'Active') as account_status,
+                   a.firstname, a.lastname, a.disability_type, a.pwd_document_path
+            FROM users u
+            JOIN applicant_profiles a ON u.id = a.user_id
+            WHERE u.role = 'applicant'
+            ORDER BY u.created_at DESC
+        `);
+        res.status(200).json(applicants);
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch applicants." });
+    }
+});
+
+// 4. Approve/Reject ANY User (Applicant or Employer)
+app.put('/api/admin/users/:id/verify', async (req, res) => {
+    const { id } = req.params;
+    const { status, rejection_reason } = req.body; 
+
+    try {
+        if (status === 'Rejected') {
+            // Apply rejection reason and set the cooldown timestamp
+            await db.execute(
+                `UPDATE users SET verification_status = ?, rejection_reason = ?, rejection_timestamp = NOW() WHERE id = ?`,
+                [status, rejection_reason, id]
+            );
+        } else {
+            // If approved, clear out any previous rejection data
+            await db.execute(
+                `UPDATE users SET verification_status = ?, rejection_reason = NULL, rejection_timestamp = NULL WHERE id = ?`,
+                [status, id]
+            );
+        }
+        
+        res.status(200).json({ message: `User status updated to ${status}.` });
+    } catch (error) {
+        console.error("Verification Error:", error.message);
+        res.status(500).json({ message: "Error updating user status." });
+    }
+});
+
+// 5. Disable/Enable ANY Account
+app.put('/api/admin/users/:id/account-status', async (req, res) => {
+    const userId = req.params.id;
+    const { account_status } = req.body;
+    try {
+        await db.execute(`UPDATE users SET account_status = ? WHERE id = ?`, [account_status, userId]);
+        res.status(200).json({ message: `Account is now ${account_status}.` });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to update account status." });
+    }
+});
+//---------------------------------------------------------
+// ROUTE: Create Admin Account
+// ---------------------------------------------------------
+app.get('/api/setup-admin', async (req, res) => {
+    try {
+        const adminEmail = "admin@ablework.com";
+        const adminPassword = "admin123"; 
+        
+       
+        const [existing] = await db.execute('SELECT id FROM users WHERE email = ?', [adminEmail]);
+        if (existing.length > 0) {
+            return res.status(200).json({ message: "Admin already exists!" });
+        }
+
+   
+        const hashedPassword = await bcrypt.hash(adminPassword, 10);
+        
+    
+        await db.execute(
+            `INSERT INTO users (email, phone, password_hash, ui_preference, verification_status, role) 
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [adminEmail, '000-000-0000', hashedPassword, 'default', 'Approved', 'admin']
+        );
+
+        res.status(201).json({ message: "Admin account created successfully!" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to create admin" });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: ADMIN ANNUAL ANALYTICS (Users Only)
+// ---------------------------------------------------------
+app.get('/api/admin/analytics/annual', async (req, res) => {
+    try {
+        // Fetch User Growth by Month (Current Year)
+        const [userGrowth] = await db.execute(`
+            SELECT MONTH(created_at) as month, COUNT(*) as total 
+            FROM users 
+            WHERE YEAR(created_at) = YEAR(CURDATE())
+            GROUP BY MONTH(created_at)
+            ORDER BY month
+        `);
+
+        // Format data for Recharts [ { name: 'Jan', users: 10 }, ... ]
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const formattedData = months.map((month, index) => {
+            const userStat = userGrowth.find(u => u.month === index + 1);
+            return {
+                name: month,
+                users: userStat ? userStat.total : 0
+            };
+        });
+
+        res.status(200).json(formattedData);
+    } catch (error) {
+        console.error("Analytics Error:", error.message);
+        res.status(500).json({ message: "Error fetching analytics." });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: GET POPULAR SKILLS FROM EMPLOYER POSTINGS
+// ---------------------------------------------------------
+app.get('/api/skills/popular', async (req, res) => {
+    try {
+       
+        const [jobs] = await db.execute(`
+            SELECT required_skills 
+            FROM job_postings 
+            WHERE status = 'Active'
+        `);
+        
+        let skillCounts = {};
+        
+        
+        jobs.forEach(job => {
+            const skills = JSON.parse(job.required_skills || '[]');
+            skills.forEach(skill => {
+                skillCounts[skill] = (skillCounts[skill] || 0) + 1;
+            });
+        });
+
+   
+        const sortedSkills = Object.keys(skillCounts).sort((a, b) => skillCounts[b] - skillCounts[a]);
+
+        res.status(200).json(sortedSkills);
+    } catch (error) {
+        console.error("Fetch Skills Error:", error.message);
+        res.status(500).json({ message: "Error fetching popular skills." });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: USER RESUBMIT VERIFICATION DOCUMENT
+// ---------------------------------------------------------
+app.post('/api/users/:id/resubmit', upload.single('document'), async (req, res) => {
+    const userId = req.params.id;
+
+    try {
+        // 1. Fetch the user's current status and rejection timestamp
+        const [userRows] = await db.execute(`
+            SELECT verification_status, rejection_timestamp 
+            FROM users 
+            WHERE id = ?
+        `, [userId]);
+
+        if (userRows.length === 0) return res.status(404).json({ message: "User not found." });
+        const user = userRows[0];
+
+        // 2. ENFORCE THE 7-DAY COOLDOWN
+        if (user.verification_status === 'Rejected' && user.rejection_timestamp) {
+            const rejectionDate = new Date(user.rejection_timestamp);
+            const currentDate = new Date();
+            
+            // Calculate difference in milliseconds, then convert to days
+            const diffTime = Math.abs(currentDate - rejectionDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+            if (diffDays <= 7) {
+                const daysLeft = 8 - diffDays; // Calculates remaining days
+                return res.status(403).json({ 
+                    message: `Security Lock: You must wait ${daysLeft} more day(s) before resubmitting your document.` 
+                });
+            }
+        }
+
+        // 3. If they pass the check, process the file and set them back to 'Pending'
+        const filePath = req.file.path; 
+        
+        await db.execute(`
+            UPDATE users 
+            SET verification_document = ?, verification_status = 'Pending', rejection_reason = NULL, rejection_timestamp = NULL 
+            WHERE id = ?
+        `, [filePath, userId]);
+
+        res.status(200).json({ message: "Document resubmitted successfully. Your account is back under review." });
+
+    } catch (error) {
+        console.error("Resubmit Error:", error.message);
+        res.status(500).json({ message: "Error processing document." });
     }
 });
 

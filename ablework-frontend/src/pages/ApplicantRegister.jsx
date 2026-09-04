@@ -1,7 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { MapContainer, TileLayer, Marker, Circle, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 import headerLogo from '../assets/Final.png';
 import backgroundImg from '../assets/Final background.png';
+
+// Fix for default Leaflet marker icons not loading in React
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+let DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
+// Helper component to smoothly re-center the map when coordinates change
+function MapRecenter({ lat, lng }) {
+  const map = useMap();
+  useEffect(() => {
+    if (lat && lng) {
+      map.setView([lat, lng], map.getZoom());
+    }
+  }, [lat, lng, map]);
+  return null;
+}
 
 export default function ApplicantRegister() {
   const navigate = useNavigate();
@@ -16,14 +41,15 @@ export default function ApplicantRegister() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [birthdate, setBirthdate] = useState('');
  
   // Location States
   const [address, setAddress] = useState('');
-  const [lat, setLat] = useState('');
-  const [lng, setLng] = useState('');
+  const [lat, setLat] = useState(null);
+  const [lng, setLng] = useState(null);
   const [isDetecting, setIsDetecting] = useState(false);
-  const [radius, setRadius] = useState('10');
+  const [radius, setRadius] = useState(10); // Kept as number for map math
  
   // Workplace Independence
   const [independence, setIndependence] = useState('');
@@ -43,14 +69,27 @@ export default function ApplicantRegister() {
 
   // 1. Physical and Sensory Disabilities
   const availableDisabilities = [
-    'Visual Impairment', 
-    'Hearing Impairment', 
-    'Mobility / Motor', 
-    'Low Vision', 
-    'Deaf / Hard of Hearing', 
-    'Orthopedic Impairment'
+    'Deafness', 'Blindness', 'Low Vision', 'Hard of Hearing', 'Color Blindness',
+    'Paraplegia (Lower Body)', 'Hemiplegia (One Side)', 'Upper Limb Amputation',
+    'Lower Limb Amputation', 'Cerebral Palsy', 'Limited Fine Motor Skills', 'Wheelchair User'
+  ];
+  const extendedDisabilities = [
+    'Speech Impairment', 'Neurodivergent', 'Chronic Pain', 'Multiple Sclerosis', 
+    'Muscular Dystrophy', 'Spina Bifida', 'Dwarfism', 'Autism Spectrum', 'ADHD'
   ];
   const [selectedDisabilities, setSelectedDisabilities] = useState([]);
+  const [showOtherDisability, setShowOtherDisability] = useState(false);
+  const [otherDisability, setOtherDisability] = useState('');
+
+  const handleCustomDisabilityKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (otherDisability.trim() && !selectedDisabilities.includes(otherDisability.trim())) {
+        setSelectedDisabilities([...selectedDisabilities, otherDisability.trim()]);
+        setOtherDisability('');
+      }
+    }
+  };
 
   // 2. Accommodations / Aids
   const availableAccommodations = ['Screen Reader', 'Wheelchair Access', 'Sign Language Interpreter', 'Flexible Hours', 'Quiet Workspace'];
@@ -64,15 +103,67 @@ export default function ApplicantRegister() {
   const [otherAccommodation, setOtherAccommodation] = useState('');
 
   // 3. Skills
-  const availableSkills = ['React', 'JavaScript', 'UI/UX Design', 'Customer Support', 'Data Entry', 'Writing'];
-  const extendedSkills = [
-    'Node.js', 'Figma', 'Project Management', 'Copywriting', 'SEO', 'Marketing', 'HTML/CSS', 
-    'MySQL', 'Firebase', 'React Native', 'Data Analysis', 'Excel / Spreadsheets', 'Communication',
-    'Problem Solving', 'Time Management', 'Research', 'Administrative Support', 'Graphic Design'
+  const defaultAvailable = [
+    'Customer Service', 
+    'Data Entry', 
+    'Communication', 
+    'Time Management', 
+    'Microsoft Office', 
+    'Teamwork'
   ];
+  
+  const defaultExtended = [
+    'Virtual Assistance', 
+    'Social Media Management', 
+    'Problem Solving', 
+    'Writing', 
+    'Inventory Management', 
+    'Graphic Design', 
+    'Scheduling', 
+    'Project Management', 
+    'Retail Sales',
+    'Copywriting'
+  ];
+  const [availableSkills, setAvailableSkills] = useState(defaultAvailable);
+  const [extendedSkills, setExtendedSkills] = useState(defaultExtended);
+  
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [showOtherSkill, setShowOtherSkill] = useState(false);
   const [otherSkill, setOtherSkill] = useState('');
+
+  useEffect(() => {
+    const fetchPopularSkills = async () => {
+      try {
+        const response = await fetch('http://localhost:5001/api/skills/popular');
+        if (response.ok) {
+          const popularSkills = await response.json();
+          
+          // Combine fetched employer skills with our common defaults, removing any duplicates using Set
+          const combinedSkills = Array.from(new Set([...popularSkills, ...defaultAvailable, ...defaultExtended]));
+          
+          // Always take the top 6 (prioritizing employer demand, falling back to defaults) for main chips
+          setAvailableSkills(combinedSkills.slice(0, 6));
+          
+          // Put the rest into the extended autocomplete list
+          setExtendedSkills(combinedSkills.slice(6));
+        }
+      } catch (error) {
+        console.error("Failed to fetch popular skills:", error);
+      }
+    };
+
+    fetchPopularSkills();
+  }, []);
+
+  const handleCustomSkillKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (otherSkill.trim() && !selectedSkills.includes(otherSkill.trim())) {
+        setSelectedSkills([...selectedSkills, otherSkill.trim()]);
+        setOtherSkill('');
+      }
+    }
+  };
 
   const handleDetectLocation = () => {
     if (!navigator.geolocation) {
@@ -113,6 +204,11 @@ export default function ApplicantRegister() {
     e.preventDefault();
     setStatusMessage({ type: '', text: '' });
    
+    if (password !== confirmPassword) {
+      setStatusMessage({ type: 'error', text: "Passwords do not match. Please check and try again." });
+      return;
+    }
+
     const birthYear = new Date(birthdate).getFullYear();
     const currentYear = new Date().getFullYear();
     if (currentYear - birthYear < 18) {
@@ -139,8 +235,8 @@ export default function ApplicantRegister() {
     formData.append('radius', radius);
     formData.append('independence', independence);
     formData.append('disabilities', JSON.stringify(selectedDisabilities));
-    formData.append('accommodations', JSON.stringify([...selectedAccommodations, ...(showOtherAccommodation && otherAccommodation ? [otherAccommodation] : [])]));
-    formData.append('skills', JSON.stringify([...selectedSkills, ...(showOtherSkill && otherSkill ? [otherSkill] : [])]));
+    formData.append('accommodations', JSON.stringify(selectedAccommodations));
+    formData.append('skills', JSON.stringify(selectedSkills));
     formData.append('pwdDocument', pwdFile);
 
     try {
@@ -245,7 +341,7 @@ export default function ApplicantRegister() {
               {/* Personal Info */}
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="firstName" className="text-sm font-semibold text-[#03045E]">First Name</label>
+                  <label htmlFor="firstName" className="text-sm font-semibold text-[#03045E]">First Name <span className="text-red-500">*</span></label>
                   <input id="firstName" type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -253,51 +349,103 @@ export default function ApplicantRegister() {
                   <input id="middleName" type="text" value={middleName} onChange={(e) => setMiddleName(e.target.value)} className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="lastName" className="text-sm font-semibold text-[#03045E]">Last Name</label>
+                  <label htmlFor="lastName" className="text-sm font-semibold text-[#03045E]">Last Name <span className="text-red-500">*</span></label>
                   <input id="lastName" type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="phone" className="text-sm font-semibold text-[#03045E]">Phone Number</label>
+                  <label htmlFor="phone" className="text-sm font-semibold text-[#03045E]">Phone Number <span className="text-red-500">*</span></label>
                   <input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="email" className="text-sm font-semibold text-[#03045E]">Email Address</label>
+                  <label htmlFor="email" className="text-sm font-semibold text-[#03045E]">Email Address <span className="text-red-500">*</span></label>
                   <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="password" className="text-sm font-semibold text-[#03045E]">Password</label>
+                  <label htmlFor="password" className="text-sm font-semibold text-[#03045E]">Password <span className="text-red-500">*</span></label>
                   <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="birthdate" className="text-sm font-semibold text-[#03045E]">Birthdate (Must be 18+)</label>
+                  <label htmlFor="confirmPassword" className="text-sm font-semibold text-[#03045E]">Confirm Password <span className="text-red-500">*</span></label>
+                  <input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="birthdate" className="text-sm font-semibold text-[#03045E]">Birthdate (Must be 18+) <span className="text-red-500">*</span></label>
                   <input id="birthdate" type="date" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
                 </div>
               </div>
 
               <hr className="border-[#03045E]/10" />
 
-              {/* Address */}
-              <div className="flex flex-col gap-3 p-4 border border-[#2C7FFF]/30 rounded-2xl bg-[#2C7FFF]/5">
-                <label htmlFor="address" className="text-sm font-bold text-[#03045E]">Residential Address</label>
+              {/* Address & Live Map Visualizer */}
+              <div className="flex flex-col gap-3 p-5 border border-[#2C7FFF]/30 rounded-2xl bg-[#2C7FFF]/5">
+                <label htmlFor="address" className="text-sm font-bold text-[#03045E]">Residential Address <span className="text-red-500">*</span></label>
                 <button type="button" onClick={handleDetectLocation} disabled={isDetecting} className="bg-[#2C7FFF] text-white px-5 py-2.5 rounded-full text-sm font-semibold shadow-md hover:bg-[#03045E] transition">
-                  {isDetecting ? 'Detecting...' : 'Detect Location'}
+                  {isDetecting ? 'Detecting Location...' : '📍 Detect My Location'}
                 </button>
                 <input id="address" type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="e.g. Block 4, Main Street, Manila" required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E]" />
-              </div>
+                
+                <div className="mt-4 flex flex-col gap-2">
+                  <div className="flex justify-between items-center">
+                    <label htmlFor="radius" className="text-sm font-semibold text-[#03045E]">
+                      Max Travel Radius:
+                    </label>
+                    <span className="text-[#2C7FFF] font-black text-lg bg-white px-3 py-1 rounded-lg border border-[#2C7FFF]/20 shadow-sm">{radius} km</span>
+                  </div>
+                  <input 
+                    id="radius" type="range" min="1" max="50" 
+                    value={radius} onChange={(e) => setRadius(Number(e.target.value))} 
+                    className="w-full h-2 accent-[#2C7FFF] cursor-pointer" 
+                  />
+                  <p className="text-xs text-gray-500">Jobs beyond this distance will be filtered out automatically.</p>
+                </div>
 
-              <div className="flex flex-col gap-2">
-                <label htmlFor="radius" className="text-sm font-semibold text-[#03045E]">
-                  Max Travel Radius: <span className="text-[#2C7FFF] font-bold">{radius} km</span>
-                </label>
-                <input id="radius" type="range" min="1" max="50" value={radius} onChange={(e) => setRadius(e.target.value)} className="w-full h-2 accent-[#2C7FFF] cursor-pointer" />
+                {/* --- LIVE RADIUS MAP --- */}
+                {lat && lng ? (
+                  <div className="h-64 w-full mt-4 rounded-xl overflow-hidden border border-[#03045E]/20 z-0 relative shadow-inner">
+                    <MapContainer center={[lat, lng]} zoom={11} scrollWheelZoom={false} style={{ height: '100%', width: '100%', zIndex: 0 }}>
+                      <TileLayer
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      />
+                      <Marker position={[lat, lng]} />
+                      {/* Circle radius is in meters, so we multiply km by 1000 */}
+                      <Circle center={[lat, lng]} radius={radius * 1000} pathOptions={{ color: '#2C7FFF', fillColor: '#2C7FFF', fillOpacity: 0.2, weight: 2 }} />
+                      <MapRecenter lat={lat} lng={lng} />
+                    </MapContainer>
+                  </div>
+                ) : (
+                  <div className="h-40 w-full mt-4 rounded-xl border-2 border-dashed border-[#03045E]/20 bg-white/50 flex flex-col items-center justify-center text-[#03045E]/50">
+                    <svg className="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <span className="text-sm font-semibold">Click 'Detect My Location' to view your travel zone.</span>
+                  </div>
+                )}
               </div>
 
               <hr className="border-[#03045E]/10" />
 
-              {/* Physical & Sensory Disability Chips Only */}
+              {/* Physical & Sensory Disability Chips & Custom Input */}
               <fieldset className="flex flex-col gap-3">
-                <legend className="text-sm font-bold text-[#03045E]">Physical & Sensory Profile (Work-Enabled)</legend>
+                <legend className="text-sm font-bold text-[#03045E]">Physical & Sensory Profile (Work-Enabled) <span className="text-red-500">*</span></legend>
                 <p className="text-xs text-gray-500">Select applicable physical or sensory categories for tailored job accommodation matching.</p>
+                
+                {selectedDisabilities.length > 0 && (
+                  <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                    <span className="w-full text-xs font-bold text-gray-500 uppercase tracking-wider">Selected Profile:</span>
+                    {selectedDisabilities.map(disability => (
+                      <span key={disability} className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#03045E] text-white text-xs font-bold rounded-full shadow-sm">
+                        {disability}
+                        <button 
+                          type="button" 
+                          onClick={() => setSelectedDisabilities(selectedDisabilities.filter(d => d !== disability))}
+                          className="hover:text-red-300 font-bold ml-0.5"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
                 <div className="flex flex-wrap gap-2">
                   {availableDisabilities.map((disability) => (
                     <button
@@ -313,12 +461,56 @@ export default function ApplicantRegister() {
                       {disability} {selectedDisabilities.includes(disability) ? '✓' : '+'}
                     </button>
                   ))}
+                  <button
+                    type="button"
+                    onClick={() => setShowOtherDisability(!showOtherDisability)}
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold border transition ${
+                      showOtherDisability
+                        ? 'bg-[#03045E] text-white border-[#03045E]'
+                        : 'bg-white text-[#03045E] border-[#03045E]/30 hover:border-[#2C7FFF]'
+                    }`}
+                  >
+                    Other {showOtherDisability ? '✓' : '+'}
+                  </button>
                 </div>
+
+                {showOtherDisability && (
+                  <div className="flex flex-col gap-2 mt-1">
+                    <input
+                      type="text"
+                      value={otherDisability}
+                      onChange={(e) => setOtherDisability(e.target.value)}
+                      onKeyDown={handleCustomDisabilityKeyDown}
+                      placeholder="Type custom condition and press Enter (or pick below)..."
+                      className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E]"
+                    />
+                    {otherDisability.length > 0 && (
+                      <div className="flex flex-wrap gap-2 animate-fadeIn">
+                        {extendedDisabilities
+                          .filter(d => d.toLowerCase().includes(otherDisability.toLowerCase()) && !selectedDisabilities.includes(d))
+                          .slice(0, 6)
+                          .map(suggestion => (
+                            <button
+                              key={suggestion}
+                              type="button"
+                              onClick={() => {
+                                toggleSelection(suggestion, selectedDisabilities, setSelectedDisabilities);
+                                setOtherDisability(''); 
+                              }}
+                              className="px-3 py-1.5 bg-[#2C7FFF]/10 text-[#2C7FFF] text-xs font-bold rounded-full hover:bg-[#2C7FFF] hover:text-white transition-colors border border-[#2C7FFF]/20"
+                            >
+                              + {suggestion}
+                            </button>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </fieldset>
 
               {/* Independence */}
               <fieldset className="flex flex-col gap-3">
-                <legend className="text-sm font-bold text-[#03045E]">Workplace Independence</legend>
+                <legend className="text-sm font-bold text-[#03045E]">Workplace Independence <span className="text-red-500">*</span></legend>
                 <div className="flex flex-wrap gap-2">
                   {['Independent', 'Requires Assistance'].map((option) => (
                     <button
@@ -337,9 +529,9 @@ export default function ApplicantRegister() {
                 </div>
               </fieldset>
 
-              {/* Accommodations */}
+              {/* Accommodations - OPTIONAL */}
               <fieldset className="flex flex-col gap-3">
-                <legend className="text-sm font-bold text-[#03045E]">Required Accommodations</legend>
+                <legend className="text-sm font-bold text-[#03045E]">Required Accommodations <span className="text-gray-400 font-normal ml-1">(Optional)</span></legend>
                 <div className="flex flex-wrap gap-2">
                   {availableAccommodations.map((acc) => (
                     <button
@@ -374,7 +566,7 @@ export default function ApplicantRegister() {
                       type="text"
                       value={otherAccommodation}
                       onChange={(e) => setOtherAccommodation(e.target.value)}
-                      placeholder="Type to search other accommodations..."
+                      placeholder="Type custom accommodation and press Enter..."
                       className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E]"
                     />
                     {otherAccommodation.length > 0 && (
@@ -403,7 +595,26 @@ export default function ApplicantRegister() {
 
               {/* Skills */}
               <fieldset className="flex flex-col gap-3">
-                <legend className="text-sm font-bold text-[#03045E]">Your Skills</legend>
+                <legend className="text-sm font-bold text-[#03045E]">Your Skills <span className="text-red-500">*</span></legend>
+                
+                {selectedSkills.length > 0 && (
+                  <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                    <span className="w-full text-xs font-bold text-gray-500 uppercase tracking-wider">Selected Skills:</span>
+                    {selectedSkills.map(skill => (
+                      <span key={skill} className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#03045E] text-white text-xs font-bold rounded-full shadow-sm">
+                        {skill}
+                        <button 
+                          type="button" 
+                          onClick={() => setSelectedSkills(selectedSkills.filter(s => s !== skill))}
+                          className="hover:text-red-300 font-bold ml-0.5"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
                 <div className="flex flex-wrap gap-2">
                   {availableSkills.map((skill) => (
                     <button
@@ -438,7 +649,8 @@ export default function ApplicantRegister() {
                       type="text"
                       value={otherSkill}
                       onChange={(e) => setOtherSkill(e.target.value)}
-                      placeholder="Type to search general skills..."
+                      onKeyDown={handleCustomSkillKeyDown}
+                      placeholder="Type custom skill and press Enter (or pick below)..."
                       className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E]"
                     />
                     {otherSkill.length > 0 && (
@@ -469,7 +681,7 @@ export default function ApplicantRegister() {
 
               {/* File Upload */}
               <div className="p-4 rounded-2xl border-2 border-dashed border-[#03045E]/20 bg-[#f4f4f4]/50">
-                <label htmlFor="pwdId" className="block text-sm font-bold text-[#03045E] mb-1">Upload PWD ID / Certificates</label>
+                <label htmlFor="pwdId" className="block text-sm font-bold text-[#03045E] mb-1">Upload PWD ID / Certificates <span className="text-red-500">*</span></label>
                 <input
                   id="pwdId"
                   type="file"

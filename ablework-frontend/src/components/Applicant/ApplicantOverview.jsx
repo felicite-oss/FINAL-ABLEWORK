@@ -1,10 +1,44 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 
-export default function ApplicantOverview({ profile, matchesCount, applications, setActiveTab }) {
+// Fix for default Leaflet marker icons not loading in React
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+let DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
+// Custom blue dot icon for Job Postings
+const JobIcon = L.divIcon({
+  className: 'custom-job-icon',
+  html: `<div style="background-color: #2C7FFF; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
+  iconSize: [20, 20],
+  iconAnchor: [10, 10]
+});
+
+// Helper component to smoothly re-center the map
+function MapRecenter({ lat, lng }) {
+  const map = useMap();
+  useEffect(() => {
+    if (lat && lng) {
+      map.setView([lat, lng], map.getZoom());
+    }
+  }, [lat, lng, map]);
+  return null;
+}
+
+// NOTE: Added `matches` to the props array to pull the exact job coordinates
+export default function ApplicantOverview({ profile, matchesCount, matches = [], applications, setActiveTab }) {
   
   // Dynamically calculate profile strength based on completed fields
   const calculateProfileStrength = () => {
-    let score = 50; // Base score for completing basic registration
+    let score = 50; 
     if (profile.skills && profile.skills.length > 0) score += 20;
     if (profile.accommodations && profile.accommodations.length > 0) score += 15;
     if (profile.pwd_document_path) score += 15;
@@ -16,8 +50,13 @@ export default function ApplicantOverview({ profile, matchesCount, applications,
   // Grab only the 4 most recent applications for the feed
   const recentApps = applications.slice(0, 4);
 
+  // Parse radius safely, default to 10km if not set
+  const radiusKm = profile.radius ? Number(profile.radius) : 10;
+  const userLat = profile.latitude ? Number(profile.latitude) : null;
+  const userLng = profile.longitude ? Number(profile.longitude) : null;
+
   return (
-    <div className="animate-fadeIn w-full space-y-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+    <div className="animate-fadeIn w-full space-y-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] pb-10">
       
       {/* --- HEADER ROW --- */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -86,6 +125,87 @@ export default function ApplicantOverview({ profile, matchesCount, applications,
           </div>
         </div>
 
+      </div>
+
+      {/* --- JOB DISCOVERY MAP ROW --- */}
+      <div className="p-6 sm:p-8 rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 flex flex-col">
+        <div className="flex justify-between items-end mb-6">
+          <div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="bg-[#2C7FFF]/15 text-[#2C7FFF] text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider border border-[#2C7FFF]/30 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#2C7FFF] animate-ping"></span> Live Radar
+              </span>
+            </div>
+            <h3 className="text-xl font-extrabold text-[#03045E]">Job Discovery Map</h3>
+            <p className="text-sm font-semibold text-[#03045E] mt-1">
+              Active job opportunities within your <span className="font-extrabold text-[#2C7FFF]">{radiusKm}km</span> safe travel radius.
+            </p>
+          </div>
+        </div>
+
+        {userLat && userLng ? (
+          <div className="h-[400px] w-full rounded-[1.5rem] overflow-hidden border border-[#03045E]/20 z-0 relative shadow-inner">
+            <MapContainer center={[userLat, userLng]} zoom={12} scrollWheelZoom={true} style={{ height: '100%', width: '100%', zIndex: 0 }}>
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              
+              {/* Applicant Home Marker */}
+              <Marker position={[userLat, userLng]}>
+                <Popup className="font-bold text-[#03045E]">
+                  Your Home Location
+                </Popup>
+              </Marker>
+
+              {/* Applicant Travel Radius Circle */}
+              <Circle 
+                center={[userLat, userLng]} 
+                radius={radiusKm * 1000} 
+                pathOptions={{ color: '#03045E', fillColor: '#03045E', fillOpacity: 0.05, weight: 1.5, dashArray: '5, 5' }} 
+              />
+
+              {/* Job Posting Markers */}
+              {matches.map((job) => {
+                if (!job.latitude || !job.longitude) return null;
+                return (
+                  <Marker 
+                    key={job.id} 
+                    position={[Number(job.latitude), Number(job.longitude)]}
+                    icon={JobIcon}
+                  >
+                    <Popup>
+                      <div className="flex flex-col gap-1 min-w-[150px]">
+                        <p className="font-extrabold text-[#03045E] text-sm leading-tight m-0">{job.job_title}</p>
+                        <p className="text-xs font-semibold text-gray-500 m-0">{job.company_name}</p>
+                        <button 
+                          onClick={() => setActiveTab('matches')} 
+                          className="mt-2 w-full py-1.5 bg-[#2C7FFF] text-white text-xs font-bold rounded-lg hover:bg-[#03045E] transition-colors"
+                        >
+                          View Job
+                        </button>
+                      </div>
+                    </Popup>
+                  </Marker>
+                );
+              })}
+              <MapRecenter lat={userLat} lng={userLng} />
+            </MapContainer>
+          </div>
+        ) : (
+          <div className="h-[400px] w-full rounded-[1.5rem] border-2 border-dashed border-[#03045E]/30 bg-[#f4f4f4] flex flex-col items-center justify-center text-center p-6">
+            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4 border border-[#03045E]/20 text-[#2C7FFF]">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </div>
+            <p className="text-lg font-extrabold text-[#03045E]">Map Unavailable</p>
+            <p className="text-sm font-semibold text-[#03045E]/70 mt-1 max-w-sm">
+              Please update your home address in your profile settings to enable the Job Discovery Map.
+            </p>
+            <button onClick={() => setActiveTab('settings')} className="mt-4 px-5 py-2.5 bg-[#2C7FFF] text-white font-bold text-sm rounded-xl hover:bg-[#03045E] transition-colors shadow-sm">
+              Update Location
+            </button>
+          </div>
+        )}
       </div>
 
       {/* --- VISUALIZATIONS ROW --- */}

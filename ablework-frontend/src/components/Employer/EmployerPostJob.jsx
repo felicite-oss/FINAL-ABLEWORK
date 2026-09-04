@@ -2,221 +2,303 @@ import React, { useState } from 'react';
 
 export default function EmployerPostJob({ profile, refreshData, setActiveTab }) {
   const [jobTitle, setJobTitle] = useState('');
-  const [jobDesc, setJobDesc] = useState('');
-  const [reqSkills, setReqSkills] = useState('');
-  const [provAccoms, setProvAccoms] = useState('');
-  const [salary, setSalary] = useState('');
-  const [benefits, setBenefits] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [jobDescription, setJobDescription] = useState('');
+  
+  // Skill & Accommodation States
+  const [selectedSkills, setSelectedSkills] = useState([]);
+  const [currentSkill, setCurrentSkill] = useState('');
+  const [accommodationsText, setAccommodationsText] = useState('');
+  const [selectedDisabilities, setSelectedDisabilities] = useState([]);
 
-  const handlePostJob = async (e) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
+
+  // EXACT List requested
+  const availableDisabilities = [
+    'Deafness', 
+    'Blindness', 
+    'Low Vision', 
+    'Hard of Hearing', 
+    'Color Blindness', 
+    'Paralysis', 
+    'Amputation', 
+    'Cerebral Palsy',
+    'Limited Fine Motor Skills',
+    'Wheelchair User'
+  ];
+
+  const skillSuggestions = [
+    'Customer Service', 'Data Entry', 'Communication', 'Time Management', 'Microsoft Office', 
+    'Teamwork', 'Virtual Assistance', 'Problem Solving', 'Writing', 'Graphic Design', 
+    'Project Management', 'Copywriting', 'Python', 'React', 'Node.js', 'UI/UX Design'
+  ];
+
+  const accommodationSuggestions = [
+    'Wheelchair Access', 'Screen Reader', 'Sign Language Interpreter', 'Flexible Hours', 
+    'Quiet Workspace', 'Ergonomic Setup', 'Step-Free Access', 'Noise-Cancelling Headphones',
+    'Captioning Services', 'Remote Work'
+  ];
+
+  const toggleSelection = (item, selectedArray, setSelectedArray) => {
+    if (selectedArray.includes(item)) {
+      setSelectedArray(selectedArray.filter(i => i !== item));
+    } else {
+      setSelectedArray([...selectedArray, item]);
+    }
+  };
+
+  // --- SKILL AUTOCOMPLETE LOGIC ---
+  const handleSkillKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addSkill(currentSkill);
+    }
+  };
+
+  const addSkill = (skill) => {
+    const trimmedSkill = skill.trim();
+    if (trimmedSkill && !selectedSkills.some(s => s.toLowerCase() === trimmedSkill.toLowerCase())) {
+      setSelectedSkills([...selectedSkills, trimmedSkill]);
+      setCurrentSkill('');
+    }
+  };
+
+  const removeSkill = (skillToRemove) => {
+    setSelectedSkills(selectedSkills.filter(skill => skill !== skillToRemove));
+  };
+
+  const activeSkillQuery = currentSkill.trim().toLowerCase();
+  const filteredSkills = activeSkillQuery === '' ? [] : skillSuggestions.filter(s => 
+    s.toLowerCase().includes(activeSkillQuery) && !selectedSkills.some(selected => selected.toLowerCase() === s.toLowerCase())
+  );
+
+  // --- ACCOMMODATION AUTOCOMPLETE LOGIC ---
+  const accommodationsArray = accommodationsText.split(',');
+  const activeAccTerm = accommodationsArray[accommodationsArray.length - 1].trim().toLowerCase();
+  const existingAccs = accommodationsArray.map(a => a.trim().toLowerCase());
+
+  const filteredAccommodations = activeAccTerm === '' ? [] : accommodationSuggestions.filter(a => 
+    a.toLowerCase().includes(activeAccTerm) && !existingAccs.includes(a.toLowerCase())
+  );
+
+  const addAccommodationChip = (acc) => {
+    const parts = accommodationsText.split(',');
+    parts.pop(); 
+    const prefix = parts.length > 0 ? parts.join(',').trim() + ', ' : '';
+    setAccommodationsText(prefix + acc + ', '); 
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    setStatusMessage({ type: '', text: '' });
+
+    if (selectedDisabilities.length === 0) {
+      setStatusMessage({ type: 'error', text: 'Please select at least one accepted disability.' });
+      return;
+    }
+    
+    if (selectedSkills.length === 0) {
+      setStatusMessage({ type: 'error', text: 'Please add at least one required skill.' });
+      return;
+    }
+
+    setIsLoading(true);
+
+    const finalAccommodationsArray = accommodationsText
+      .split(',')
+      .map(item => item.trim())
+      .filter(item => item !== '');
 
     const payload = {
       employer_id: profile.user_id,
       job_title: jobTitle,
-      company_name: profile.company_name,
-      job_description: jobDesc,
-      required_skills: reqSkills.split(',').map(s => s.trim()).filter(s => s), 
-      provided_accommodations: provAccoms.split(',').map(s => s.trim()).filter(s => s),
-      salary_range: salary,
-      benefits: benefits.split(',').map(s => s.trim()).filter(s => s),
-      latitude: profile.latitude,
-      longitude: profile.longitude
+      job_description: jobDescription,
+      required_skills: JSON.stringify(selectedSkills),
+      provided_accommodations: JSON.stringify(finalAccommodationsArray), 
+      accepted_disabilities: JSON.stringify(selectedDisabilities), 
+      status: 'Active'
     };
 
     try {
-      const res = await fetch('http://localhost:5001/api/jobs/create', {
+      const response = await fetch('http://localhost:5001/api/jobs/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
-      if (res.ok) {
-        alert("Job posted successfully!");
-        setJobTitle(''); setJobDesc(''); setReqSkills(''); setProvAccoms('');
-        refreshData();
-        setActiveTab('jobs'); 
+      const data = await response.json();
+
+      if (response.ok) {
+        setStatusMessage({ type: 'success', text: 'Job posted successfully! Redirecting to dashboard...' });
+        setJobTitle('');
+        setJobDescription('');
+        setSelectedSkills([]);
+        setCurrentSkill('');
+        setAccommodationsText('');
+        setSelectedDisabilities([]);
+        
+        await refreshData();
+        setTimeout(() => setActiveTab('overview'), 2000);
       } else {
-        const errData = await res.json();
-        alert(errData.message || "Failed to post job.");
+        setStatusMessage({ type: 'error', text: data.message || 'Failed to post job.' });
       }
-    } catch (err) {
-      alert("Error posting job.");
+    } catch (error) {
+      console.error("Server Error:", error);
+      setStatusMessage({ type: 'error', text: 'Cannot connect to the server.' });
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="animate-fadeIn max-w-4xl mr-auto pb-10">
+    <div className="animate-fadeIn max-w-4xl mx-auto pb-10">
       
-      {/* --- HEADER ROW --- */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-[#f4f4f4]/90 [.high-contrast_&]:bg-black [.high-contrast_&]:border-white backdrop-blur-md p-6 rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border border-[#03045E]/20">
-        <div className="text-left">
-          <div className="flex items-center justify-start gap-2 mb-1.5">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-white p-6 rounded-[2rem] shadow-sm border border-[#03045E]/10">
+        <div>
+          <div className="flex items-center gap-2 mb-1.5">
             <span className="bg-[#2C7FFF]/15 text-[#2C7FFF] text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider border border-[#2C7FFF]/30">Job Management</span>
-            <span className="text-xs font-bold text-[#03045E] [.high-contrast_&]:text-white bg-[#f4f4f4] [.high-contrast_&]:bg-black [.high-contrast_&]:border-white px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-[#03045E]/20">
-              <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-pulse"></span> Recruitment Engine
+            <span className="text-xs font-bold text-[#03045E] bg-[#f4f4f4] px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-[#03045E]/20">
+              <span className="w-2 h-2 rounded-full bg-[#2C7FFF]"></span> Smart Engine Enabled
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#03045E] [.high-contrast_&]:text-white">Create a Job Posting</h1>
-          <p className="text-sm font-semibold text-[#03045E]/80 [.high-contrast_&]:text-gray-300 mt-0.5">Publish targeted opportunities with guaranteed accommodations for <span className="font-bold text-[#03045E] [.high-contrast_&]:text-white">{profile.company_name}</span>.</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#03045E]">Create a Job Posting</h1>
+          <p className="text-sm font-semibold text-[#03045E]/80 mt-0.5">Publish targeted opportunities with guaranteed accommodations for <span className="font-bold text-[#03045E]">{profile.company_name}</span>.</p>
         </div>
       </div>
-      
-      {profile.verification_status !== 'Approved' ? (
-        <div className="relative overflow-hidden p-8 rounded-3xl bg-[#f4f4f4] [.high-contrast_&]:bg-black [.high-contrast_&]:border-white border border-[#03045E]/20 shadow-[0_10px_30px_rgba(3,4,94,0.06)] text-left">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#2C7FFF]/10 to-transparent rounded-bl-full pointer-events-none"></div>
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#2C7FFF]/15 to-[#2C7FFF]/25 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] mb-4 shadow-sm">
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-          </div>
-          <h3 className="text-xl font-extrabold text-[#03045E] [.high-contrast_&]:text-white mb-2">Verification Pending</h3>
-          <p className="text-[#03045E]/80 [.high-contrast_&]:text-gray-300 font-semibold max-w-lg text-sm leading-relaxed">
-            Your business documents are currently under review by the AbleWork administration team. You will be able to post active job listings as soon as your account is approved.
-          </p>
-        </div>
-      ) : (
-        <form onSubmit={handlePostJob} className="p-6 sm:p-8 rounded-3xl bg-[#f4f4f4] [.high-contrast_&]:bg-black [.high-contrast_&]:border-white shadow-[0_10px_30px_rgba(3,4,94,0.06)] border border-[#03045E]/20 flex flex-col gap-6 relative overflow-hidden text-left">
-          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-[#2C7FFF]/10 to-transparent rounded-bl-full pointer-events-none"></div>
 
-          {/* Job Title */}
-          <div className="flex flex-col gap-2 relative z-10 text-left">
-            <label className="text-xs font-extrabold text-[#03045E] [.high-contrast_&]:text-white uppercase tracking-wider flex items-center justify-start gap-1.5">
-              <svg className="w-4 h-4 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              Job Title
+      {statusMessage.text && (
+        <div className={`p-4 mb-6 rounded-2xl font-bold text-center border-2 ${statusMessage.type === 'success' ? 'bg-green-50 text-green-800 border-green-200' : 'bg-red-50 text-red-800 border-red-200'}`}>
+          {statusMessage.text}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-[2rem] shadow-sm border border-[#03045E]/10 flex flex-col gap-8">
+        
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-extrabold text-[#03045E] flex items-center gap-2 uppercase tracking-wider">
+              <svg className="w-4 h-4 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+              Job Title <span className="text-red-500">*</span>
             </label>
             <input 
-              type="text" 
-              required 
-              value={jobTitle} 
-              onChange={e => setJobTitle(e.target.value)}
-              className="p-3.5 bg-white [.high-contrast_&]:bg-gray-900 [.high-contrast_&]:text-white [.high-contrast_&]:border-white border border-[#03045E]/15 rounded-2xl focus:border-[#2C7FFF] focus:ring-2 focus:ring-[#2C7FFF]/20 outline-none text-[#03045E] font-medium transition-all shadow-sm text-left" 
-              placeholder="e.g. Remote Data Specialist" 
+              type="text" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} required
+              placeholder="e.g. Remote Data Specialist"
+              className="w-full p-4 border border-[#03045E]/20 rounded-2xl bg-[#f4f4f4] text-[#03045E] font-semibold focus:outline-none focus:border-[#2C7FFF] focus:bg-white transition-all"
             />
           </div>
 
-          {/* Full Job Description */}
-          <div className="flex flex-col gap-2 relative z-10 text-left">
-            <label className="text-xs font-extrabold text-[#03045E] [.high-contrast_&]:text-white uppercase tracking-wider flex items-center justify-start gap-1.5">
-              <svg className="w-4 h-4 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h7" />
-              </svg>
-              Full Job Description
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-extrabold text-[#03045E] flex items-center gap-2 uppercase tracking-wider">
+              <svg className="w-4 h-4 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+              Full Job Description <span className="text-red-500">*</span>
             </label>
             <textarea 
-              required 
-              rows="5" 
-              value={jobDesc} 
-              onChange={e => setJobDesc(e.target.value)}
-              className="p-3.5 bg-white [.high-contrast_&]:bg-gray-900 [.high-contrast_&]:text-white [.high-contrast_&]:border-white border border-[#03045E]/15 rounded-2xl focus:border-[#2C7FFF] focus:ring-2 focus:ring-[#2C7FFF]/20 outline-none resize-none text-[#03045E] font-medium transition-all shadow-sm text-left [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#03045E]/10 [&::-webkit-scrollbar-thumb]:rounded-full" 
+              value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} required rows="5"
               placeholder="Describe the role responsibilities and expectations..."
+              className="w-full p-4 border border-[#03045E]/20 rounded-2xl bg-[#f4f4f4] text-[#03045E] font-semibold focus:outline-none focus:border-[#2C7FFF] focus:bg-white transition-all resize-none"
             ></textarea>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10 text-left">
-            {/* Required Skills */}
-            <div className="flex flex-col gap-2 text-left">
-              <label className="text-xs font-extrabold text-[#03045E] [.high-contrast_&]:text-white uppercase tracking-wider flex items-center justify-start gap-1.5">
-                <svg className="w-4 h-4 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-                Required Skills (Comma separated)
-              </label>
-              <input 
-                type="text" 
-                required 
-                value={reqSkills} 
-                onChange={e => setReqSkills(e.target.value)}
-                className="p-3.5 bg-white [.high-contrast_&]:bg-gray-900 [.high-contrast_&]:text-white [.high-contrast_&]:border-white border border-[#03045E]/15 rounded-2xl focus:border-[#2C7FFF] focus:ring-2 focus:ring-[#2C7FFF]/20 outline-none text-[#03045E] font-medium transition-all shadow-sm text-left" 
-                placeholder="e.g. Data Entry, Customer Service" 
-              />
-            </div>
+        <hr className="border-[#03045E]/10" />
 
-            {/* Guaranteed Accommodations */}
-            <div className="flex flex-col gap-2 text-left">
-              <label className="text-xs font-extrabold text-[#03045E] [.high-contrast_&]:text-white uppercase tracking-wider flex items-center justify-start gap-1.5">
-                <svg className="w-4 h-4 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-9.05.273-1.05.822L7.5 5.5m7 4.5h-4m4 0V21m-4-11V5a2 2 0 00-2-2h-.095c-.5 0-.905.273-1.05.822L7.5 5.5" />
-                </svg>
-                Guaranteed Accommodations (Comma separated)
-              </label>
-              <input 
-                type="text" 
-                required 
-                value={provAccoms} 
-                onChange={e => setProvAccoms(e.target.value)}
-                className="p-3.5 bg-white [.high-contrast_&]:bg-gray-900 [.high-contrast_&]:text-white [.high-contrast_&]:border-white border border-[#03045E]/15 rounded-2xl focus:border-[#2C7FFF] focus:ring-2 focus:ring-[#2C7FFF]/20 outline-none text-[#03045E] font-medium transition-all shadow-sm text-left" 
-                placeholder="e.g. Wheelchair Accessible, Screen Reader" 
-              />
-            </div>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          
+          <div className="flex flex-col gap-3">
+            <label className="text-sm font-extrabold text-[#03045E] flex items-center gap-2 uppercase tracking-wider">
+              Required Skills <span className="text-red-500">*</span>
+            </label>
+            <p className="text-xs font-semibold text-[#03045E]/70 mb-1">Type a skill and press <strong>Enter</strong> to add it.</p>
+            
+            <input
+              type="text" value={currentSkill} onChange={(e) => setCurrentSkill(e.target.value)} onKeyDown={handleSkillKeyDown}
+              placeholder="e.g. Python, Graphic Design..."
+              className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-[#f4f4f4] text-[#03045E] font-semibold focus:outline-none focus:border-[#2C7FFF] focus:bg-white transition-all"
+            />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10 text-left">
-            {/* Salary Range */}
-            <div className="flex flex-col gap-2 text-left">
-              <label className="text-xs font-extrabold text-[#03045E] [.high-contrast_&]:text-white uppercase tracking-wider flex items-center justify-start gap-1.5">
-                <svg className="w-4 h-4 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Salary Range
-              </label>
-              <input 
-                type="text" 
-                value={salary} 
-                onChange={e => setSalary(e.target.value)}
-                className="p-3.5 bg-white [.high-contrast_&]:bg-gray-900 [.high-contrast_&]:text-white [.high-contrast_&]:border-white border border-[#03045E]/15 rounded-2xl focus:border-[#2C7FFF] focus:ring-2 focus:ring-[#2C7FFF]/20 outline-none text-[#03045E] font-medium transition-all shadow-sm text-left" 
-                placeholder="e.g. ₱20,000 - ₱30,000 / month" 
-              />
-            </div>
-
-            {/* Company Benefits */}
-            <div className="flex flex-col gap-2 text-left">
-              <label className="text-xs font-extrabold text-[#03045E] [.high-contrast_&]:text-white uppercase tracking-wider flex items-center justify-start gap-1.5">
-                <svg className="w-4 h-4 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                </svg>
-                Company Benefits (Comma separated)
-              </label>
-              <input 
-                type="text" 
-                value={benefits} 
-                onChange={e => setBenefits(e.target.value)}
-                className="p-3.5 bg-white [.high-contrast_&]:bg-gray-900 [.high-contrast_&]:text-white [.high-contrast_&]:border-white border border-[#03045E]/15 rounded-2xl focus:border-[#2C7FFF] focus:ring-2 focus:ring-[#2C7FFF]/20 outline-none text-[#03045E] font-medium transition-all shadow-sm text-left" 
-                placeholder="e.g. HMO, 13th Month Pay, Internet Allowance" 
-              />
-            </div>
-          </div>
-
-          <button 
-            type="submit" 
-            disabled={isSubmitting} 
-            className="w-full py-4 mt-2 bg-[#03045E] [.high-contrast_&]:bg-white [.high-contrast_&]:text-black hover:bg-[#2C7FFF] text-white font-extrabold rounded-2xl transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer relative z-10"
-          >
-            {isSubmitting ? (
-              <>
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white [.high-contrast_&]:text-black" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Publishing Posting...
-              </>
-            ) : (
-              <>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                </svg>
-                Publish Job Posting
-              </>
+            {filteredSkills.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-1">
+                {filteredSkills.map(suggestion => (
+                  <button key={suggestion} type="button" onClick={() => addSkill(suggestion)} className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-lg border border-blue-200 hover:bg-blue-600 hover:text-white transition-colors">
+                    + {suggestion}
+                  </button>
+                ))}
+              </div>
             )}
-          </button>
-        </form>
-      )}
+
+            {selectedSkills.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                {selectedSkills.map(skill => (
+                  <span key={skill} className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#03045E] text-white text-xs font-bold rounded-full shadow-sm">
+                    {skill} <button type="button" onClick={() => removeSkill(skill)} className="hover:text-red-300 font-bold ml-0.5">✕</button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <label className="text-sm font-extrabold text-[#03045E] flex items-center gap-2 uppercase tracking-wider">
+              Guaranteed Accommodations
+            </label>
+            <p className="text-xs font-semibold text-[#03045E]/70 mb-1">Enter accommodations separated by commas.</p>
+            
+            <input
+              type="text" value={accommodationsText} onChange={(e) => setAccommodationsText(e.target.value)}
+              placeholder="e.g. Wheelchair Access, Screen Reader..."
+              className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-[#f4f4f4] text-[#03045E] font-semibold focus:outline-none focus:border-[#2C7FFF] focus:bg-white transition-all"
+            />
+
+            {filteredAccommodations.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-1">
+                {filteredAccommodations.map(suggestion => (
+                  <button key={suggestion} type="button" onClick={() => addAccommodationChip(suggestion)} className="px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-lg border border-green-200 hover:bg-green-600 hover:text-white transition-colors">
+                    + {suggestion}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <hr className="border-[#03045E]/10" />
+
+        {/* UPDATED: EXACT DISABILITY LIST CHIPS */}
+        <div className="flex flex-col gap-4 p-5 rounded-2xl bg-[#2C7FFF]/5 border border-[#2C7FFF]/20">
+          <div>
+            <label className="text-sm font-extrabold text-[#03045E] flex items-center gap-2 uppercase tracking-wider">
+              <svg className="w-5 h-5 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              Accepted Disabilities <span className="text-red-500">*</span>
+            </label>
+            <p className="text-xs font-semibold text-[#03045E]/70 mt-1">Select the specific conditions this workplace is fully equipped and prepared to support.</p>
+          </div>
+          
+          <div className="flex flex-wrap gap-3 mt-2">
+            {availableDisabilities.map((disability) => (
+              <button
+                type="button" key={disability}
+                onClick={() => toggleSelection(disability, selectedDisabilities, setSelectedDisabilities)}
+                className={`px-4 py-2 rounded-xl text-sm font-bold border transition-colors shadow-sm ${
+                  selectedDisabilities.includes(disability)
+                    ? 'bg-[#2C7FFF] text-white border-[#2C7FFF]'
+                    : 'bg-white text-[#03045E] border-[#03045E]/20 hover:border-[#2C7FFF]'
+                }`}
+              >
+                {disability} {selectedDisabilities.includes(disability) ? '✓' : '+'}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <button
+          type="submit" disabled={isLoading}
+          className="w-full py-4 bg-[#03045E] hover:bg-[#2C7FFF] text-white text-base font-extrabold rounded-2xl shadow-md transition-all disabled:opacity-50 mt-2 flex justify-center items-center gap-2"
+        >
+          {isLoading ? 'Publishing Job...' : 'Publish Job Posting'}
+          {!isLoading && <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>}
+        </button>
+      </form>
     </div>
   );
 }

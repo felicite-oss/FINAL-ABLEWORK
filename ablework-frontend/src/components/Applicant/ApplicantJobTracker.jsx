@@ -19,7 +19,7 @@ export default function ApplicantJobTracker({ applications }) {
     }
   };
 
-  // The specific tabs required for a complete ATS Job Tracker (Pending removed)
+  // The specific tabs required for a complete ATS Job Tracker
   const trackingTabs = ['All', 'Under Review', 'Shortlisted', 'Hired', 'Rejected'];
 
   // Filter the applications based on the selected tab
@@ -78,38 +78,56 @@ export default function ApplicantJobTracker({ applications }) {
           filteredApps.map(app => (
             <div 
               key={app.application_id} 
-              className={`bg-white p-6 rounded-2xl shadow-sm border border-[#03045E]/10 transition hover:shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4 ${app.status === 'Rejected' ? 'opacity-70' : ''}`}
+              className={`bg-white p-6 rounded-2xl shadow-sm border border-[#03045E]/10 transition hover:shadow-md flex flex-col gap-5 ${app.status === 'Rejected' ? 'opacity-70' : ''}`}
             >
               
-              <div className="flex-1">
-                <h3 className="text-xl font-bold text-[#03045E]">{app.job_title}</h3>
-                <p className="text-sm font-semibold text-[#2C7FFF] mb-1">{app.company_name}</p>
-                <p className="text-xs font-medium text-gray-500">
-                  Applied on {new Date(app.applied_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                </p>
+              {/* TOP ROW: Job Info & Status */}
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-[#03045E]">{app.job_title}</h3>
+                  <p className="text-sm font-semibold text-[#2C7FFF] mb-1">{app.company_name}</p>
+                  <p className="text-xs font-medium text-gray-500">
+                    Applied on {new Date(app.applied_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                  </p>
+                </div>
+
+                <div className="flex flex-col items-start md:items-end gap-2 min-w-[150px]">
+                  <span className={`px-4 py-2 text-sm font-bold rounded-full border ${getStatusStyle(app.status)}`}>
+                    {app.status}
+                  </span>
+                  
+                  {app.status === 'Shortlisted' && !app.employer_message && (
+                    <p className="text-[10px] font-bold text-green-700 uppercase tracking-wider">
+                      Employer may contact you soon
+                    </p>
+                  )}
+                  {app.status === 'Under Review' && (
+                    <p className="text-[10px] font-bold text-blue-700 uppercase tracking-wider">
+                      Employer is viewing your profile
+                    </p>
+                  )}
+                  {app.status === 'Hired' && !app.employer_message && (
+                    <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">
+                      Congratulations on the new job!
+                    </p>
+                  )}
+                </div>
               </div>
 
-              <div className="flex flex-col items-start md:items-end gap-2 min-w-[150px]">
-                <span className={`px-4 py-2 text-sm font-bold rounded-full border ${getStatusStyle(app.status)}`}>
-                  {app.status}
-                </span>
-                
-                {app.status === 'Shortlisted' && (
-                  <p className="text-[10px] font-bold text-green-700 uppercase tracking-wider">
-                    Employer may contact you soon
+              {/* BOTTOM ROW: Dynamic Employer Message */}
+              {app.employer_message && (
+                <div className="mt-2 bg-blue-50/50 p-5 rounded-xl border border-blue-100 flex flex-col gap-2">
+                  <h4 className="text-xs font-extrabold text-[#2C7FFF] uppercase tracking-wider flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                    </svg>
+                    Message from Employer
+                  </h4>
+                  <p className="text-sm text-[#03045E] font-medium whitespace-pre-wrap leading-relaxed">
+                    {app.employer_message}
                   </p>
-                )}
-                {app.status === 'Under Review' && (
-                  <p className="text-[10px] font-bold text-blue-700 uppercase tracking-wider">
-                    Employer is viewing your profile
-                  </p>
-                )}
-                {app.status === 'Hired' && (
-                  <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">
-                    Congratulations on the new job!
-                  </p>
-                )}
-              </div>
+                </div>
+              )}
 
             </div>
           ))

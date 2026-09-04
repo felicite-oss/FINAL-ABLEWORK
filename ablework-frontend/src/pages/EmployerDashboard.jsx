@@ -193,6 +193,21 @@ export default function EmployerDashboard() {
     );
   }
 
+  const isRejected = profile?.verification_status === 'Rejected';
+  
+  let daysLeft = 0;
+  let canResubmit = false;
+
+  if (isRejected && profile?.rejection_timestamp) {
+    const rejectDate = new Date(profile.rejection_timestamp);
+    const today = new Date();
+    const diffTime = Math.abs(today - rejectDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    daysLeft = 8 - diffDays;
+    canResubmit = daysLeft <= 0;
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#f4f4f4] text-[#03045E] w-full overflow-x-hidden">
       
@@ -229,8 +244,9 @@ export default function EmployerDashboard() {
               className="flex items-center gap-3 cursor-pointer p-1.5 rounded-xl bg-white border border-[#03045E]/10 hover:bg-[#2C7FFF]/10 transition-all"
             >
               <div className="w-10 h-10 rounded-xl bg-[#03045E] text-[#f4f4f4] flex items-center justify-center font-bold overflow-hidden shadow-md shadow-[#03045E]/20">
+                {/* --- FIXED: Fetches Real Company Logo for Desktop --- */}
                 {profile?.company_logo ? (
-                  <img src={profile.company_logo} alt="Profile" className="w-full h-full object-cover" />
+                  <img src={`http://localhost:5001${profile.company_logo}`} alt="Company Logo" className="w-full h-full object-cover" />
                 ) : (
                   <span>{profile?.company_name ? profile.company_name.charAt(0).toUpperCase() : 'E'}</span>
                 )}
@@ -287,7 +303,7 @@ export default function EmployerDashboard() {
               </svg>
             </button>
 
-            {/* Unique Mobile Hamburger Drawer/Dropdown - Sized and Aligned Correctly */}
+            {/* Unique Mobile Hamburger Drawer/Dropdown */}
             {showMobileMenu && (
               <div className="absolute right-0 mt-3 w-[calc(100vw-3rem)] max-w-sm bg-white rounded-3xl shadow-2xl border border-[#03045E]/10 p-5 z-50 flex flex-col gap-4 animate-in fade-in slide-in-from-top-4 duration-200">
                 
@@ -300,8 +316,9 @@ export default function EmployerDashboard() {
                   className="flex items-center gap-3 p-3 rounded-2xl bg-[#f4f4f4] cursor-pointer hover:bg-[#2C7FFF]/10 transition-all border border-[#03045E]/10"
                 >
                   <div className="w-12 h-12 rounded-xl bg-[#03045E] text-[#f4f4f4] flex items-center justify-center font-bold overflow-hidden shadow-md flex-shrink-0">
+                    {/* --- FIXED: Fetches Real Company Logo for Mobile --- */}
                     {profile?.company_logo ? (
-                      <img src={profile.company_logo} alt="Profile" className="w-full h-full object-cover" />
+                      <img src={`http://localhost:5001${profile.company_logo}`} alt="Company Logo" className="w-full h-full object-cover" />
                     ) : (
                       <span>{profile?.company_name ? profile.company_name.charAt(0).toUpperCase() : 'E'}</span>
                     )}
@@ -314,7 +331,7 @@ export default function EmployerDashboard() {
                   </div>
                 </div>
 
-                {/* Sidebar Navigation Tabs Inside Hamburger (Added 1px solid border and light shadow) */}
+                {/* Sidebar Navigation Tabs Inside Hamburger */}
                 <div className="flex flex-col space-y-3 max-h-[50vh] overflow-y-auto pr-1">
                   {[
                     { id: 'overview', label: 'Analytics Dashboard', icon: (
@@ -390,7 +407,6 @@ export default function EmployerDashboard() {
       </header>
 
       {/* PAGE BODY CONTAINER WRAPPING SIDEBAR & CONTENT */}
-      {/* Added min-h-screen right here below to push the footer all the way down! */}
       <div className="flex flex-col md:flex-row flex-1 min-h-screen">
         
         {/* REDESIGNED DESKTOP SIDEBAR NAVIGATION */}
@@ -410,7 +426,7 @@ export default function EmployerDashboard() {
               )},
               { id: 'jobs', label: 'My Job Listings', icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
               )},
               { id: 'applications', label: 'Review Applicants', icon: (
@@ -453,6 +469,44 @@ export default function EmployerDashboard() {
 
         {/* MAIN CONTENT AREA */}
         <main className="flex-1 p-6 md:p-10 relative bg-[#f4f4f4] text-[#03045E]">
+
+          {isRejected && (
+            <div className="mb-8 p-6 sm:p-8 bg-red-50 border-2 border-red-200 rounded-[2rem] shadow-sm flex flex-col gap-5 animate-fadeIn">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600 flex-shrink-0">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </div>
+                <div>
+                  <h2 className="text-xl font-extrabold text-red-800 tracking-tight">Account Verification Failed</h2>
+                  <p className="text-sm font-semibold text-red-700/80 mt-0.5">Your platform access is currently suspended. Please review the admin feedback below.</p>
+                </div>
+              </div>
+              <div className="p-5 bg-white rounded-2xl border border-red-100 shadow-inner">
+                <h3 className="text-xs font-extrabold text-red-400 uppercase tracking-wider mb-2">Admin Feedback</h3>
+                <p className="text-sm font-bold text-[#03045E]">{profile.rejection_reason || "Your verification document did not meet platform standards."}</p>
+              </div>
+              <hr className="border-red-200/50" />
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                  <h3 className="text-sm font-extrabold text-red-800">Ready to try again?</h3>
+                  {!canResubmit ? (
+                    <p className="text-xs font-semibold text-red-600 mt-1">Due to security policies, you must wait <span className="font-black text-red-800">{daysLeft} days</span> before uploading a new document.</p>
+                  ) : (
+                    <p className="text-xs font-semibold text-emerald-600 mt-1">Your cooldown period has ended. You may now resubmit your documents.</p>
+                  )}
+                </div>
+                <button 
+                  disabled={!canResubmit}
+                  onClick={() => setActiveTab('profile')}
+                  className={`px-6 py-3 rounded-xl font-extrabold text-sm transition-all shadow-sm flex items-center gap-2 ${canResubmit ? 'bg-red-600 hover:bg-red-700 text-white cursor-pointer' : 'bg-red-200 text-red-400 cursor-not-allowed opacity-70'}`}
+                >
+                  {!canResubmit && <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>}
+                  {canResubmit ? 'Go to Profile to Resubmit' : `Locked for ${daysLeft} Days`}
+                </button>
+              </div>
+            </div>
+          )}
+          
           {activeTab === 'overview' && profile && <EmployerOverview profile={profile} stats={stats} setActiveTab={setActiveTab} />}
           {activeTab === 'post-job' && <EmployerPostJob profile={profile} refreshData={refreshJobsAndStats} setActiveTab={setActiveTab} />}
           {activeTab === 'jobs' && <EmployerMyJobs jobs={jobs} refreshData={refreshJobsAndStats} />}

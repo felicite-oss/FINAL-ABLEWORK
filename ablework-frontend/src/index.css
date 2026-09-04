@@ -162,3 +162,17 @@ html.high-contrast footer,
   color: #f4f4f4 !important;
   border-top: 2px solid #2C7FFF;
 }
+
+html.line-spacing-active body {
+  line-height: 2.2 !important;
+  letter-spacing: 0.05em !important;
+}
+
+html.highlight-links-active a, 
+html.highlight-links-active button {
+  outline: 3px solid #2C7FFF !important;
+  background-color: rgba(44, 127, 255, 0.1) !important;
+}
+
+
+

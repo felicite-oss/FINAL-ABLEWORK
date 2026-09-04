@@ -125,6 +125,21 @@ export default function ApplicantDashboard() {
 
   if (error) return <div className="min-h-screen flex items-center justify-center font-bold text-red-500 p-4 text-center">{error}</div>;
 
+  const isRejected = profile?.verification_status === 'Rejected';
+  
+  let daysLeft = 0;
+  let canResubmit = false;
+
+  if (isRejected && profile?.rejection_timestamp) {
+    const rejectDate = new Date(profile.rejection_timestamp);
+    const today = new Date();
+    const diffTime = Math.abs(today - rejectDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    daysLeft = 8 - diffDays;
+    canResubmit = daysLeft <= 0;
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#f4f4f4] selection:bg-[#2C7FFF]/20 selection:text-[#03045E] relative overflow-x-hidden w-full max-w-[100vw]">
       
@@ -409,8 +424,46 @@ export default function ApplicantDashboard() {
           <main className="flex-1 p-3 sm:p-6 md:p-10 relative w-full min-w-0 transition-all duration-300 flex flex-col box-border">
             <div className="flex items-start gap-4 w-full min-w-0">
               <div className="w-full flex-1 min-w-0 overflow-x-hidden">
+
+                {isRejected && (
+                  <div className="mb-8 p-6 sm:p-8 bg-red-50 border-2 border-red-200 rounded-[2rem] shadow-sm flex flex-col gap-5 animate-fadeIn">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600 flex-shrink-0">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-extrabold text-red-800 tracking-tight">Account Verification Failed</h2>
+                        <p className="text-sm font-semibold text-red-700/80 mt-0.5">Your platform access is currently suspended. Please review the admin feedback below.</p>
+                      </div>
+                    </div>
+                    <div className="p-5 bg-white rounded-2xl border border-red-100 shadow-inner">
+                      <h3 className="text-xs font-extrabold text-red-400 uppercase tracking-wider mb-2">Admin Feedback</h3>
+                      <p className="text-sm font-bold text-[#03045E]">{profile.rejection_reason || "Your verification document did not meet platform standards."}</p>
+                    </div>
+                    <hr className="border-red-200/50" />
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <div>
+                        <h3 className="text-sm font-extrabold text-red-800">Ready to try again?</h3>
+                        {!canResubmit ? (
+                          <p className="text-xs font-semibold text-red-600 mt-1">Due to security policies, you must wait <span className="font-black text-red-800">{daysLeft} days</span> before uploading a new document.</p>
+                        ) : (
+                          <p className="text-xs font-semibold text-emerald-600 mt-1">Your cooldown period has ended. You may now resubmit your documents.</p>
+                        )}
+                      </div>
+                      <button 
+                        disabled={!canResubmit}
+                        onClick={() => setActiveTab('profile')}
+                        className={`px-6 py-3 rounded-xl font-extrabold text-sm transition-all shadow-sm flex items-center gap-2 ${canResubmit ? 'bg-red-600 hover:bg-red-700 text-white cursor-pointer' : 'bg-red-200 text-red-400 cursor-not-allowed opacity-70'}`}
+                      >
+                        {!canResubmit && <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>}
+                        {canResubmit ? 'Go to Profile to Resubmit' : `Locked for ${daysLeft} Days`}
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
                 {activeTab === 'overview' && profile && (
-                  <ApplicantOverview profile={profile} matchesCount={matches.length} applications={applications} setActiveTab={setActiveTab} />
+                  <ApplicantOverview profile={profile} matches={matches} matchesCount={matches.length} applications={applications} setActiveTab={setActiveTab} />
                 )}
                 
                 {activeTab === 'matches' && profile && (

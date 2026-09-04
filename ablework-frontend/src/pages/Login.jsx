@@ -79,11 +79,12 @@ export default function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        // FIXED: Save the user data first for BOTH applicants and employers
+ 
         localStorage.setItem('user', JSON.stringify(data.user));
 
-        // Then route them to the correct dashboard
-        if (data.user.role === 'employer') {
+        if (data.user.role === 'admin') {
+          navigate('/admin/dashboard');
+        } else if (data.user.role === 'employer') {
           navigate('/employer-dashboard');
         } else {
           navigate('/applicant-dashboard');

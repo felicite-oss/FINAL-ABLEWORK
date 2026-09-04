@@ -13,6 +13,7 @@ export default function EmployerRegister() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState(''); 
   const [industry, setIndustry] = useState('');
   const [jobRole, setJobRole] = useState('');
 
@@ -66,33 +67,43 @@ export default function EmployerRegister() {
     );
   };
 
-  // MAIN SUBMIT HANDLER
+  // MAIN SUBMIT HANDLER - FIXED TO USE FORMDATA
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatusMessage({ type: '', text: '' });
+    
+    // --- ADDED VALIDATION: Check if passwords match ---
+    if (password !== confirmPassword) {
+      setStatusMessage({ type: 'error', text: "Passwords do not match. Please check and try again." });
+      return;
+    }
+
     setIsLoading(true);
 
-    // Note: For a real file upload to save to a server folder, we would change this to FormData. 
-    // For now, this payload satisfies the current backend configuration.
-    const payload = {
-      companyName,
-      companyDescription,
-      email,
-      phone,
-      password,
-      industry,
-      jobRole,
-      address,
-      latitude: lat,
-      longitude: lng,
-      documentName: verificationDoc ? verificationDoc.name : null
-    };
+    // Create a new FormData object to properly handle the file upload
+    const formData = new FormData();
+    formData.append('companyName', companyName);
+    formData.append('companyDescription', companyDescription);
+    formData.append('email', email);
+    formData.append('phone', phone);
+    formData.append('password', password);
+    formData.append('industry', industry);
+    formData.append('jobRole', jobRole);
+    formData.append('address', address);
+    
+    // Append coordinates only if they exist
+    if (lat) formData.append('latitude', lat);
+    if (lng) formData.append('longitude', lng);
+
+    // Append the physical file! The field name MUST match 'verificationDocument'
+    if (verificationDoc) {
+      formData.append('verificationDocument', verificationDoc);
+    }
 
     try {
       const response = await fetch('http://localhost:5001/api/auth/register/employer', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: formData,
       });
 
       const data = await response.json();
@@ -232,7 +243,7 @@ export default function EmployerRegister() {
                 </h2>
                 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-[#03045E]">Company Name</label>
+                  <label className="text-sm font-semibold text-[#03045E]">Company Name <span className="text-red-500">*</span></label>
                   <input
                     type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required
                     className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
@@ -240,7 +251,7 @@ export default function EmployerRegister() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-[#03045E]">Company Description</label>
+                  <label className="text-sm font-semibold text-[#03045E]">Company Description <span className="text-red-500">*</span></label>
                   <textarea
                     value={companyDescription} onChange={(e) => setCompanyDescription(e.target.value)} required rows="3"
                     placeholder="Briefly describe what your company does..."
@@ -249,7 +260,7 @@ export default function EmployerRegister() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-[#03045E]">Industry Type</label>
+                  <label className="text-sm font-semibold text-[#03045E]">Industry Type <span className="text-red-500">*</span></label>
                   <input
                     type="text" value={industry} onChange={(e) => setIndustry(e.target.value)} required placeholder="e.g. Technology"
                     className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
@@ -257,7 +268,7 @@ export default function EmployerRegister() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-[#03045E]">Work Email</label>
+                  <label className="text-sm font-semibold text-[#03045E]">Work Email <span className="text-red-500">*</span></label>
                   <input
                     type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="off"
                     className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
@@ -265,7 +276,7 @@ export default function EmployerRegister() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-[#03045E]">Telephone Number</label>
+                  <label className="text-sm font-semibold text-[#03045E]">Telephone Number <span className="text-red-500">*</span></label>
                   <input
                     type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required
                     className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
@@ -273,12 +284,21 @@ export default function EmployerRegister() {
                 </div>
                 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-[#03045E]">Password</label>
+                  <label className="text-sm font-semibold text-[#03045E]">Password <span className="text-red-500">*</span></label>
                   <input
                     type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="new-password"
                     className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
                   />
                 </div>
+                
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-semibold text-[#03045E]">Confirm Password <span className="text-red-500">*</span></label>
+                  <input
+                    type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required autoComplete="new-password"
+                    className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
+                  />
+                </div>
+
               </div>
 
               {/* Section 2: Job Profile & Location */}
@@ -288,7 +308,7 @@ export default function EmployerRegister() {
                 </h2>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-[#03045E]">Primary Job Role / Title</label>
+                  <label className="text-sm font-semibold text-[#03045E]">Primary Job Role / Title <span className="text-red-500">*</span></label>
                   <input
                     type="text" value={jobRole} onChange={(e) => setJobRole(e.target.value)} required placeholder="e.g. Hiring Manager"
                     className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
@@ -297,7 +317,7 @@ export default function EmployerRegister() {
 
                 <div className="flex flex-col gap-3 p-4 border border-[#2C7FFF]/30 rounded-2xl bg-[#2C7FFF]/5">
                   <div>
-                    <label className="text-sm font-bold text-[#03045E]">Workplace Location</label>
+                    <label className="text-sm font-bold text-[#03045E]">Workplace Location <span className="text-red-500">*</span></label>
                     <p className="text-xs text-[#03045E]/70 mt-0.5">
                       Pinpoint your office location to match with nearby applicants.
                     </p>
@@ -317,7 +337,7 @@ export default function EmployerRegister() {
                 </div>
               </div>
 
-              {/* --- ADDED SECTION 3: VERIFICATION DOCUMENTS --- */}
+              {/* Section 3: Verification Documents */}
               <div className="flex flex-col gap-4">
                 <h2 className="text-sm font-bold text-[#03045E] border-b border-[#03045E]/10 pb-2">
                   3. Verification Documents
@@ -325,7 +345,7 @@ export default function EmployerRegister() {
                 
                 <div className="flex flex-col gap-3 p-4 border border-[#03045E]/20 rounded-2xl bg-white">
                   <div>
-                    <label className="text-sm font-bold text-[#03045E]">Company Registration (DTI / SEC / Mayor's Permit)</label>
+                    <label className="text-sm font-bold text-[#03045E]">Company Registration (DTI / SEC / Mayor's Permit) <span className="text-red-500">*</span></label>
                     <p className="text-xs text-[#03045E]/70 mt-0.5">
                       Required by Admin to verify your legitimacy before jobs go live. (PDF, JPG, PNG)
                     </p>
