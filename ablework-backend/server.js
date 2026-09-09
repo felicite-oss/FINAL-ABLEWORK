@@ -7,6 +7,61 @@ const path = require('path');
 const helmet = require('helmet');
 require('dotenv').config();
 
+const nodemailer = require('nodemailer');
+
+// 1. Configure the Email Transporter
+// NOTE: If using Gmail, you MUST use an "App Password", not your normal password!
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'ableworksys5i@gmail.com',
+    pass: 'dans ixce pffc cykq'    
+  }
+});
+
+
+async function sendNotification(userId, title, message, type) {
+  try {
+    // A. Clean up message for the in-app bell feed (removes the login prompt)
+    let inAppMessage = message.replace(/Please log in to your AbleWork dashboard for more details\./gi, '').trim();
+    if (inAppMessage.endsWith('.')) {
+      inAppMessage = inAppMessage.slice(0, -1); // Remove trailing dot temporarily to append context cleanly
+    }
+    
+    // Customize the in-app text based on notification type
+    if (type === 'match') {
+      inAppMessage += '. Check your Smart Matches tab for details.';
+    } else {
+      inAppMessage += '. Check your Job Tracker for details.';
+    }
+
+    // Insert the clean message into the database for the bell feed
+    await db.execute(
+      "INSERT INTO notifications (user_id, title, message, type) VALUES (?, ?, ?, ?)",
+      [userId ?? null, title ?? null, inAppMessage ?? null, type ?? 'general']
+    );
+
+    // B. Fetch the User's Email from the users table
+    const [users] = await db.execute("SELECT email FROM users WHERE id = ?", [userId ?? null]);
+    
+    if (users.length > 0 && users[0].email) {
+      // C. Send the actual email safely inside its own try/catch block
+      try {
+        await transporter.sendMail({
+          from: '"AbleWork Notifications" <ableworksys5i@gmail.com>',
+          to: users[0].email,
+          subject: title,
+          text: message
+        });
+      } catch (mailError) {
+        console.error("Nodemailer Email Dispatch Error:", mailError.message);
+      }
+    }
+  } catch (error) {
+    console.error("Failed to send notification:", error.message);
+  }
+}
+
 const { OpenAI } = require('openai');
 
 const { GoogleGenerativeAI } = require('@google/generative-ai');
@@ -169,7 +224,7 @@ app.post('/api/chat', async (req, res) => {
         4. Applying & Uploading Resumes: To upload a resume, the user MUST click on the specific job they want to apply for.
         5. Archived Jobs: If an employer archives a job, it completely disappears from the active UI.`;
 
-        // 3. Initialize the model (switched to 1.5-flash as it is highly stable for RAG)
+        // 3. Initialize the model 
         const model = genAI.getGenerativeModel({ 
             model: "gemini-3-flash-preview", 
             systemInstruction 
@@ -195,12 +250,19 @@ app.post('/api/chat', async (req, res) => {
         res.status(500).json({ reply: "I'm having trouble connecting right now. Please check my API connection." });
     }
 });
+
 // ---------------------------------------------------------
-// ROUTE: Fetch Active Jobs
+// ROUTE: Fetch Active Jobs (Explore Tab)
 // ---------------------------------------------------------
 app.get('/api/jobs', async (req, res) => {
     try {
-        const [jobs] = await db.execute("SELECT * FROM job_postings WHERE status = 'Active' ORDER BY created_at DESC");
+        const [jobs] = await db.execute(`
+            SELECT jp.*, u.email AS contact_email, u.phone AS contact_number 
+            FROM job_postings jp
+            LEFT JOIN users u ON jp.employer_id = u.id
+            WHERE jp.status = 'Active' 
+            ORDER BY jp.created_at DESC
+        `);
         res.status(200).json(jobs);
     } catch (error) {
         console.error("Fetch All Jobs Error:", error.message);
@@ -483,14 +545,12 @@ function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
 }
 
 // ---------------------------------------------------------
-// ROUTE: SMART MATCHING ENGINE (Weighted Overall Score)
+// ROUTE: SMART MATCHING ENGINE (Case-Insensitive & Bulletproof)
 // ---------------------------------------------------------
 app.get('/api/applicant/:id/matches', async (req, res) => {
     const userId = req.params.id;
 
     try {
-        // 1. Fetch the Applicant's exact needs and location
-        // --- NEW 1: Added 'disabilities' to the SELECT query ---
         const [applicantRows] = await db.execute(`
             SELECT latitude, longitude, travel_radius_km, accommodations_needed, skills, disability_type 
             FROM applicant_profiles 
@@ -500,75 +560,94 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
         if (applicantRows.length === 0) return res.status(404).json({ message: "Applicant not found." });
         const applicant = applicantRows[0];
 
-        // Parse JSON arrays safely and ensure radius is a strict Number
-        const appSkills = JSON.parse(applicant.skills || '[]');
-        const appAccommodations = JSON.parse(applicant.accommodations_needed || '[]');
-        const appDisabilities = JSON.parse(applicant.disabilities || '[]'); // --- NEW 1 (Part B) ---
+        // --- BULLETPROOF PARSER ---
+        const safeParse = (data) => {
+            if (!data) return [];
+            if (Array.isArray(data)) return data;
+            let parsed = data;
+            while (typeof parsed === 'string' && (parsed.startsWith('[') || parsed.startsWith('"'))) {
+                try { parsed = JSON.parse(parsed); } catch (e) { break; }
+            }
+            if (Array.isArray(parsed)) return parsed;
+            if (typeof parsed === 'string') {
+                const cleaned = parsed.replace(/[\[\]"\\]/g, ''); 
+                return cleaned.split(',').map(item => item.trim()).filter(item => item);
+            }
+            return [];
+        };
+
+        // Convert everything to Lowercase for strict, format-free comparison!
+        const appSkills = safeParse(applicant.skills).map(s => s.toLowerCase());
+        const appAccommodations = safeParse(applicant.accommodations_needed).map(a => a.toLowerCase());
+        const appDisabilities = safeParse(applicant.disability_type).map(d => d.toLowerCase()); 
         const maxRadius = Number(applicant.travel_radius_km) || 5; 
 
-        // 2. Fetch all active job postings
-        // --- NEW 2: Added 'accepted_disabilities' to the SELECT query ---
         const [jobs] = await db.execute(`
-            SELECT id, employer_id, job_title, company_name, job_description, required_skills, provided_accommodations, accepted_disabilities, salary_range, benefits, latitude, longitude 
-            FROM job_postings 
-            WHERE status = 'Active'
+            SELECT jp.id, jp.employer_id, jp.job_title, jp.company_name, jp.job_description, 
+                   jp.required_skills, jp.provided_accommodations, jp.accepted_disabilities, 
+                   jp.salary_range, jp.benefits, jp.latitude, jp.longitude, 
+                   u.email AS contact_email, u.phone AS contact_number 
+            FROM job_postings jp
+            LEFT JOIN users u ON jp.employer_id = u.id
+            WHERE jp.status = 'Active'
         `);
 
         let matchedJobs = [];
 
-        // 3. RUN THE WEIGHTED ALGORITHM
         for (let job of jobs) {
             
-            // A. Geofencing & Distance Score (Max 40 points)
+            // A. Geofencing & Distance Score
             let distance = 0;
-            let distanceScore = 40; // Default to perfect distance score for Remote jobs
+            let distanceScore = 40; 
 
             if (applicant.latitude && applicant.longitude && job.latitude && job.longitude) {
-                distance = getDistanceFromLatLonInKm(
-                    applicant.latitude, applicant.longitude, 
-                    job.latitude, job.longitude
-                );
+                const R = 6371; 
+                const dLat = (job.latitude - applicant.latitude) * (Math.PI / 180);
+                const dLon = (job.longitude - applicant.longitude) * (Math.PI / 180);
+                const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                          Math.cos(applicant.latitude * (Math.PI / 180)) * Math.cos(job.latitude * (Math.PI / 180)) * 
+                          Math.sin(dLon / 2) * Math.sin(dLon / 2); 
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); 
+                distance = R * c;
                 
-                // Dealbreaker: If job is further than their travel radius, discard it
-                if (distance > maxRadius) continue;
+                if (distance > maxRadius) continue; 
 
-                // Calculate Distance Score: Closer to 0km = 40 pts, Closer to maxRadius = 0 pts
                 distanceScore = Math.max(0, 40 - ((distance / maxRadius) * 40));
             }
 
-            // B. Accommodation Strict Match Check (Dealbreaker)
-            const jobAccommodations = JSON.parse(job.provided_accommodations || '[]');
-            const meetsAllNeeds = appAccommodations.every(need => jobAccommodations.includes(need));
-            if (!meetsAllNeeds) continue; // Discard job if it is not accessible
-
-            // --- NEW 3: Disability Match Check (Dealbreaker) ---
-            const jobAcceptedDisabilities = JSON.parse(job.accepted_disabilities || '[]');
+// B. Accommodation Scoring (Instead of a strict dealbreaker)
+            const jobAccommodations = safeParse(job.provided_accommodations).map(a => a.toLowerCase());
+            let matchingAccomsCount = 0;
             
-            // Checks if AT LEAST ONE of the applicant's disabilities is in the employer's accepted list
+            appAccommodations.forEach(need => {
+                if (jobAccommodations.includes(need)) matchingAccomsCount++;
+            });
+
+            // If applicant has requested accommodations, calculate score component. Default to full points if none needed.
+            const accomScoreWeight = 30; // Weight of accommodations in the total score
+            const accomScore = appAccommodations.length > 0 
+                ? (matchingAccomsCount / appAccommodations.length) * accomScoreWeight 
+                : accomScoreWeight;
+
+            // C. Disability Match Check (Case-Insensitive Dealbreaker)
+            const jobAcceptedDisabilities = safeParse(job.accepted_disabilities).map(d => d.toLowerCase());
             const isDisabilitySupported = appDisabilities.some(disability => 
                 jobAcceptedDisabilities.includes(disability)
             );
-
-            // If the employer strictly specified accepted disabilities, and there's no match, discard it.
             if (jobAcceptedDisabilities.length > 0 && !isDisabilitySupported) continue;
-            // ----------------------------------------------------
 
-            // C. Skill Scoring (Max 60 points)
-            const jobSkills = JSON.parse(job.required_skills || '[]');
+            // D. Skill Scoring
+            const jobSkills = safeParse(job.required_skills).map(s => s.toLowerCase());
             let matchingSkillsCount = 0;
             
             appSkills.forEach(skill => {
                 if (jobSkills.includes(skill)) matchingSkillsCount++;
             });
 
-            const skillScore = jobSkills.length > 0 
-                ? (matchingSkillsCount / jobSkills.length) * 60 
-                : 60; // Give full 60 points if the job requires no specific skills
-
-            // Calculate the final Combined Overall Score
+            const skillScore = jobSkills.length > 0 ? (matchingSkillsCount / jobSkills.length) * 60 : 60; 
             const overallMatchPercentage = Math.round(skillScore + distanceScore);
 
-            // D. Push successful match to the array
+            if (overallMatchPercentage < 50) continue;
             matchedJobs.push({
                 ...job,
                 distance_km: distance ? distance.toFixed(1) : null,
@@ -578,11 +657,8 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
             });
         }
 
-        // 4. Sort matches by highest overall percentage first, then by closest distance
         matchedJobs.sort((a, b) => {
-            if (b.match_percentage !== a.match_percentage) {
-                return b.match_percentage - a.match_percentage; 
-            }
+            if (b.match_percentage !== a.match_percentage) return b.match_percentage - a.match_percentage; 
             return a.distance_km - b.distance_km;
         });
 
@@ -593,7 +669,6 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
         res.status(500).json({ message: "Error running matching algorithm." });
     }
 });
-
 
 // ---------------------------------------------------------
 // ROUTE: SUBMIT A JOB APPLICATION (With Resume Upload)
@@ -630,7 +705,30 @@ app.post('/api/applications/apply', upload.single('resume'), async (req, res) =>
             'INSERT INTO applications (applicant_id, job_id, status, resume_path, cover_letter) VALUES (?, ?, ?, ?, ?)',
             [applicant_id, job_id, 'Under Review', resumePath, cover_letter || null]
         );
+        // 1. Get the Job Title and Employer ID
+        const [jobRows] = await db.execute(
+            "SELECT employer_id, job_title FROM job_postings WHERE id = ?", 
+            [job_id] 
+        );
+        
+        if (jobRows.length > 0) {
+            const employerId = jobRows[0].employer_id;
+            const jobTitle = jobRows[0].job_title;
 
+            // 2. Get the Applicant's Name
+            const [appRows] = await db.execute(
+                "SELECT firstname, lastname FROM applicant_profiles WHERE user_id = ?", 
+                [applicant_id] 
+            );
+            const applicantName = appRows.length > 0 ? `${appRows[0].firstname} ${appRows[0].lastname}` : "A new candidate";
+
+            // 3. Trigger the Notification & Email to the EMPLOYER!
+            const alertTitle = `New Application: ${jobTitle}`;
+            const alertMessage = `${applicantName} has just applied for your open ${jobTitle} role! Log in to your AbleWork dashboard to review their resume and pitch.`;
+
+            await sendNotification(employerId, alertTitle, alertMessage, 'application');
+        }
+        
         res.status(201).json({ message: "Application submitted successfully!" });
     } catch (error) {
         console.error("Application Submission Error:", error.message);
@@ -805,39 +903,129 @@ app.get('/api/employer/:id/jobs', async (req, res) => {
 // ROUTE: CREATE A JOB (Secured & Restricted)
 // ---------------------------------------------------------
 app.post('/api/jobs/create', async (req, res) => {
-    // 1. We added salary_range and benefits to the req.body destructuring here
+
     const { 
         employer_id, job_title, company_name, job_description, 
-        required_skills, provided_accommodations, salary_range, benefits, 
-        latitude, longitude 
+        required_skills, provided_accommodations, accepted_disabilities,
+        salary_range, benefits, latitude, longitude 
     } = req.body;
 
     try {
-        // SECURITY CHECK: Ensure employer is Verified/Approved
+
         const [users] = await db.execute('SELECT verification_status FROM users WHERE id = ?', [employer_id]);
         
         if (users.length === 0 || users[0].verification_status !== 'Approved') {
             return res.status(403).json({ message: "You must be an approved employer to post jobs." });
         }
 
-        // 2. INSERT JOB: Added the new columns to the query and the array below
-        await db.execute(
+
+        const [result] = await db.execute(
             `INSERT INTO job_postings 
-             (employer_id, job_title, company_name, job_description, required_skills, provided_accommodations, salary_range, benefits, latitude, longitude, status) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active')`,
+             (employer_id, job_title, company_name, job_description, required_skills, provided_accommodations, accepted_disabilities, salary_range, benefits, latitude, longitude, status) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active')`,
             [
                 employer_id ?? null, 
                 job_title ?? null, 
                 company_name ?? null, 
                 job_description ?? null, 
-                required_skills ? JSON.stringify(required_skills) : null, 
-                provided_accommodations ? JSON.stringify(provided_accommodations) : null, 
-                salary_range ?? null,                       // <-- NEW: Salary
-                benefits ? JSON.stringify(benefits) : null, // <-- NEW: Benefits
+                required_skills ? JSON.stringify(required_skills) : '[]', 
+                provided_accommodations ? JSON.stringify(provided_accommodations) : '[]', 
+                accepted_disabilities ? JSON.stringify(accepted_disabilities) : '[]', 
+                salary_range ?? null,                       
+                benefits ? JSON.stringify(benefits) : '[]', 
                 latitude ?? null, 
                 longitude ?? null
             ]
         );
+
+        const newJobId = result.insertId;
+
+        try {
+            const [newJobRows] = await db.execute("SELECT * FROM job_postings WHERE id = ?", [newJobId]);
+            if (newJobRows.length > 0) {
+                const job = newJobRows[0];
+
+                const [applicants] = await db.execute(`
+                    SELECT ap.*, u.id as user_id 
+                    FROM applicant_profiles ap 
+                    JOIN users u ON ap.user_id = u.id 
+                    WHERE u.verification_status = 'Approved'
+                `);
+
+                const safeParse = (data) => {
+                    if (!data) return [];
+                    if (Array.isArray(data)) return data;
+                    let parsed = data;
+                    while (typeof parsed === 'string' && (parsed.startsWith('[') || parsed.startsWith('"'))) {
+                        try { parsed = JSON.parse(parsed); } catch (e) { break; }
+                    }
+                    if (Array.isArray(parsed)) return parsed;
+                    if (typeof parsed === 'string') {
+                        const cleaned = parsed.replace(/[\[\]"\\]/g, ''); 
+                        return cleaned.split(',').map(item => item.trim()).filter(item => item);
+                    }
+                    return [];
+                };
+
+                const jobAccommodations = safeParse(job.provided_accommodations).map(a => a.toLowerCase());
+                const jobAcceptedDisabilities = safeParse(job.accepted_disabilities).map(d => d.toLowerCase());
+                const jobSkills = safeParse(job.required_skills).map(s => s.toLowerCase());
+
+for (let applicant of applicants) {
+                    const appRadius = Number(applicant.travel_radius_km) || 5;
+                    const appAccommodations = safeParse(applicant.accommodations_needed).map(a => a.toLowerCase());
+                    
+                    // FIXED: Properly handle string-based disability_type from applicant_profiles
+                    const applicantDisabilityStr = (applicant.disability_type || "").toLowerCase();
+                    
+                    const appSkills = safeParse(applicant.skills).map(s => s.toLowerCase());
+
+                    let distance = 0;
+                    let distanceScore = 40;
+                    if (applicant.latitude && applicant.longitude && job.latitude && job.longitude) {
+                        const R = 6371;
+                        const dLat = (job.latitude - applicant.latitude) * (Math.PI / 180);
+                        const dLon = (job.longitude - applicant.longitude) * (Math.PI / 180);
+                        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                                  Math.cos(applicant.latitude * (Math.PI / 180)) * Math.cos(job.latitude * (Math.PI / 180)) * 
+                                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                        distance = R * c;
+
+                        if (distance > appRadius) continue;
+                        distanceScore = Math.max(0, 40 - ((distance / appRadius) * 40));
+                    }
+
+                    // A. Accommodations Dealbreaker Check
+                    const meetsAllNeeds = appAccommodations.every(need => jobAccommodations.includes(need));
+                    if (!meetsAllNeeds) continue;
+
+                    // B. Disability Check (Ensures the applicant's disability type matches one accepted by the job)
+                    const isDisabilitySupported = jobAcceptedDisabilities.length === 0 || jobAcceptedDisabilities.some(d => applicantDisabilityStr.includes(d));
+                    if (!isDisabilitySupported) continue;
+
+                    // C. Skill Scoring
+                    let matchingSkillsCount = 0;
+                    appSkills.forEach(skill => {
+                        if (jobSkills.includes(skill)) matchingSkillsCount++;
+                    });
+                    const skillScore = jobSkills.length > 0 ? (matchingSkillsCount / jobSkills.length) * 60 : 60;
+                    const overallMatchPercentage = Math.round(skillScore + distanceScore);
+
+                    // D. Fire notification if score is >= 50%
+                    if (overallMatchPercentage >= 50) {
+                        const alertTitle = `New Smart Match: ${job.job_title}`;
+                        const alertMessage = `Great news! A new opening for ${job.job_title} at ${job.company_name} matches your profile with a ${overallMatchPercentage}% score.`;
+                        
+                        await sendNotification(applicant.user_id, alertTitle, alertMessage, 'match');
+                    }
+                }
+            }
+        } catch (matchError) {
+            console.error("Smart Match Notification Error:", matchError.message);
+        }
+     
+
         res.status(201).json({ message: "Job posted successfully." });
     } catch (error) {
         console.error("Job Creation Error:", error.message);
@@ -850,22 +1038,25 @@ app.post('/api/jobs/create', async (req, res) => {
 // ---------------------------------------------------------
 app.put('/api/jobs/:id', async (req, res) => {
     const jobId = req.params.id;
-    // 1. Added salary_range and benefits here
-    const { job_title, job_description, required_skills, provided_accommodations, salary_range, benefits } = req.body;
+    const { 
+        job_title, job_description, required_skills, 
+        provided_accommodations, accepted_disabilities, 
+        salary_range, benefits 
+    } = req.body;
 
     try {
-        // 2. Updated the SQL query to save the new fields
         await db.execute(
             `UPDATE job_postings 
-             SET job_title = ?, job_description = ?, required_skills = ?, provided_accommodations = ?, salary_range = ?, benefits = ? 
+             SET job_title = ?, job_description = ?, required_skills = ?, provided_accommodations = ?, accepted_disabilities = ?, salary_range = ?, benefits = ? 
              WHERE id = ?`,
             [
                 job_title, 
                 job_description, 
-                JSON.stringify(required_skills), 
-                JSON.stringify(provided_accommodations), 
+                JSON.stringify(required_skills || []), 
+                JSON.stringify(provided_accommodations || []), 
+                JSON.stringify(accepted_disabilities || []), // <-- Added to update query
                 salary_range ?? null,
-                benefits ? JSON.stringify(benefits) : null,
+                JSON.stringify(benefits || []),
                 jobId
             ]
         );
@@ -875,7 +1066,6 @@ app.put('/api/jobs/:id', async (req, res) => {
         res.status(500).json({ message: "Server error updating job." });
     }
 });
-
 // ---------------------------------------------------------
 // ROUTE: ARCHIVE A JOB (Soft Delete)
 // ---------------------------------------------------------
@@ -898,8 +1088,8 @@ app.get('/api/employer/:id/applications', async (req, res) => {
 
     try {
         const [applications] = await db.execute(`
-            SELECT a.id as application_id, a.status as application_status, a.applied_at,
-                   a.resume_path, a.cover_letter, /* <-- ADDED THESE TWO LINES */
+            SELECT a.id as application_id, a.applicant_id, a.status as application_status, a.applied_at,
+                   a.resume_path, a.cover_letter, 
                    j.job_title, j.id as job_id,
                    ap.firstname, ap.lastname, ap.skills, ap.accommodations_needed, ap.disability_type,
                    u.email, u.phone
@@ -918,21 +1108,27 @@ app.get('/api/employer/:id/applications', async (req, res) => {
     }
 });
 
+// ---------------------------------------------------------
 // ROUTE: UPDATE APPLICATION STATUS & ADD NEXT STEPS
+// ---------------------------------------------------------
 app.put('/api/applications/:id/status', async (req, res) => {
     const applicationId = req.params.id;
-    // Extract the new message along with the status
-    const { status, employer_message } = req.body; 
+    const { status, applicant_id, job_title, company_name } = req.body; 
 
     try {
-        await db.execute(
-            `UPDATE applications SET status = ?, employer_message = ? WHERE id = ?`,
-            [status, employer_message || null, applicationId]
-        );
-        res.status(200).json({ message: `Applicant marked as ${status}.` });
+        // 1. Update status in database
+        await db.execute("UPDATE applications SET status = ? WHERE id = ?", [status, applicationId]);
+
+        // 2. Trigger the notification & email
+        const alertTitle = `Application Status Update: ${status}`;
+        const alertMessage = `Hello! Your application for the ${job_title} role at ${company_name} has been marked as ${status}. Please log in to your AbleWork dashboard for more details.`;
+        
+        await sendNotification(applicant_id, alertTitle, alertMessage, 'update');
+
+        res.status(200).json({ message: "Status updated and applicant notified!" });
     } catch (error) {
-        console.error("Update Status Error:", error.message);
-        res.status(500).json({ message: "Server error updating status." });
+        console.error("Status Update Error:", error.message);
+        res.status(500).json({ error: "Failed to update status." });
     }
 });
 
@@ -1174,24 +1370,42 @@ app.get('/api/admin/analytics/annual', async (req, res) => {
 // ---------------------------------------------------------
 app.get('/api/skills/popular', async (req, res) => {
     try {
-       
         const [jobs] = await db.execute(`
             SELECT required_skills 
             FROM job_postings 
             WHERE status = 'Active'
         `);
         
+        // --- ADD THE BULLETPROOF PARSER HERE ---
+        const safeParse = (data) => {
+            if (!data) return [];
+            if (Array.isArray(data)) return data;
+            let parsed = data;
+            while (typeof parsed === 'string' && (parsed.startsWith('[') || parsed.startsWith('"'))) {
+                try { parsed = JSON.parse(parsed); } catch (e) { break; }
+            }
+            if (Array.isArray(parsed)) return parsed;
+            if (typeof parsed === 'string') {
+                const cleaned = parsed.replace(/[\[\]"\\]/g, ''); 
+                return cleaned.split(',').map(item => item.trim()).filter(item => item);
+            }
+            return [];
+        };
+
         let skillCounts = {};
         
-        
         jobs.forEach(job => {
-            const skills = JSON.parse(job.required_skills || '[]');
+            // USE SAFEPARSE INSTEAD OF JSON.PARSE
+            const skills = safeParse(job.required_skills);
+            
+            // Now .forEach() will always work because safeParse ALWAYS returns an array!
             skills.forEach(skill => {
-                skillCounts[skill] = (skillCounts[skill] || 0) + 1;
+                if (skill) {
+                    skillCounts[skill] = (skillCounts[skill] || 0) + 1;
+                }
             });
         });
 
-   
         const sortedSkills = Object.keys(skillCounts).sort((a, b) => skillCounts[b] - skillCounts[a]);
 
         res.status(200).json(sortedSkills);
@@ -1206,9 +1420,28 @@ app.get('/api/skills/popular', async (req, res) => {
 // ---------------------------------------------------------
 app.post('/api/users/:id/resubmit', upload.single('document'), async (req, res) => {
     const userId = req.params.id;
+    
+    // 1. CAPTURE CLIENT IP
+    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
     try {
-        // 1. Fetch the user's current status and rejection timestamp
+        // 2. IP RATE LIMITING (Max 3 reverification attempts per IP)
+        // We sum all reverification attempts made from this specific IP address
+        if (clientIp) {
+            const [ipCheck] = await db.execute(
+                'SELECT SUM(reverification_attempts) as total_attempts FROM users WHERE ip_address = ?', 
+                [clientIp]
+            );
+            
+            const attempts = ipCheck[0].total_attempts || 0;
+            if (attempts >= 3) {
+                return res.status(403).json({ 
+                    message: "Security Lock: Maximum reverification attempts (3) reached for your network. Please contact support." 
+                });
+            }
+        }
+
+        // 3. Fetch the user's current status and rejection timestamp
         const [userRows] = await db.execute(`
             SELECT verification_status, rejection_timestamp 
             FROM users 
@@ -1218,37 +1451,258 @@ app.post('/api/users/:id/resubmit', upload.single('document'), async (req, res) 
         if (userRows.length === 0) return res.status(404).json({ message: "User not found." });
         const user = userRows[0];
 
-        // 2. ENFORCE THE 7-DAY COOLDOWN
+        // 4. ENFORCE THE 7-DAY COOLDOWN
         if (user.verification_status === 'Rejected' && user.rejection_timestamp) {
             const rejectionDate = new Date(user.rejection_timestamp);
             const currentDate = new Date();
             
-            // Calculate difference in milliseconds, then convert to days
             const diffTime = Math.abs(currentDate - rejectionDate);
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
             if (diffDays <= 7) {
-                const daysLeft = 8 - diffDays; // Calculates remaining days
+                const daysLeft = 8 - diffDays; 
                 return res.status(403).json({ 
                     message: `Security Lock: You must wait ${daysLeft} more day(s) before resubmitting your document.` 
                 });
             }
         }
 
-        // 3. If they pass the check, process the file and set them back to 'Pending'
+        // 5. If they pass all checks, process the file and update the database
         const filePath = req.file.path; 
         
+        // We increment the attempt counter, record the IP used, and clear the rejection status
         await db.execute(`
             UPDATE users 
-            SET verification_document = ?, verification_status = 'Pending', rejection_reason = NULL, rejection_timestamp = NULL 
+            SET verification_document = ?, 
+                verification_status = 'Pending', 
+                rejection_reason = NULL, 
+                rejection_timestamp = NULL,
+                ip_address = ?,
+                reverification_attempts = reverification_attempts + 1
             WHERE id = ?
-        `, [filePath, userId]);
+        `, [filePath, clientIp, userId]);
 
         res.status(200).json({ message: "Document resubmitted successfully. Your account is back under review." });
 
     } catch (error) {
         console.error("Resubmit Error:", error.message);
         res.status(500).json({ message: "Error processing document." });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: UPDATE APPLICANT CREDENTIALS & SECURITY
+// ---------------------------------------------------------
+app.put('/api/applicant/:id/credentials', async (req, res) => {
+    const userId = req.params.id;
+    const { email, currentPassword, newPassword } = req.body;
+
+    try {
+        const [users] = await db.execute('SELECT password_hash FROM users WHERE id = ?', [userId]);
+        if (users.length === 0) return res.status(404).json({ message: "User not found." });
+        const user = users[0];
+
+        // ACTION A: Update Password
+        if (newPassword) {
+            if (!currentPassword) {
+                return res.status(400).json({ message: "Current password is required to set a new password." });
+            }
+            const isMatch = await bcrypt.compare(currentPassword, user.password_hash);
+            if (!isMatch) {
+                return res.status(401).json({ message: "Incorrect current password." });
+            }
+            
+            const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+            await db.execute('UPDATE users SET password_hash = ? WHERE id = ?', [hashedNewPassword, userId]);
+            return res.status(200).json({ message: "Password updated successfully." });
+        } 
+        
+        // ACTION B: Update Email Only
+        if (email && !newPassword) {
+            await db.execute('UPDATE users SET email = ? WHERE id = ?', [email, userId]);
+            return res.status(200).json({ message: "Email updated successfully." });
+        }
+
+        res.status(400).json({ message: "No valid updates provided." });
+    } catch (error) {
+        console.error("Credentials Update Error:", error.message);
+        res.status(500).json({ message: "Server error updating credentials." });
+    }
+});
+
+
+// ---------------------------------------------------------
+// ROUTE: UPDATE EMPLOYER CREDENTIALS & SECURITY
+// ---------------------------------------------------------
+app.put('/api/employer/:id/credentials', async (req, res) => {
+    const userId = req.params.id;
+    const { email, currentPassword, newPassword } = req.body;
+
+    try {
+        const [users] = await db.execute('SELECT password_hash FROM users WHERE id = ?', [userId]);
+        if (users.length === 0) return res.status(404).json({ message: "User not found." });
+        const user = users[0];
+
+        // ACTION A: Update Password
+        if (newPassword) {
+            if (!currentPassword) {
+                return res.status(400).json({ message: "Current password is required to set a new password." });
+            }
+            const isMatch = await bcrypt.compare(currentPassword, user.password_hash);
+            if (!isMatch) {
+                return res.status(401).json({ message: "Incorrect current password." });
+            }
+            
+            const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+            await db.execute('UPDATE users SET password_hash = ? WHERE id = ?', [hashedNewPassword, userId]);
+            return res.status(200).json({ message: "Password updated successfully." });
+        } 
+        
+        // ACTION B: Update Email Only
+        if (email && !newPassword) {
+            await db.execute('UPDATE users SET email = ? WHERE id = ?', [email, userId]);
+            return res.status(200).json({ message: "Email updated successfully." });
+        }
+
+        res.status(400).json({ message: "No valid updates provided." });
+    } catch (error) {
+        console.error("Credentials Update Error:", error.message);
+        res.status(500).json({ message: "Server error updating credentials." });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: DEACTIVATE ACCOUNT (Soft Disable)
+// ---------------------------------------------------------
+app.put('/api/users/:id/deactivate', async (req, res) => {
+    const userId = req.params.id;
+    try {
+        await db.execute(`UPDATE users SET account_status = 'Disabled' WHERE id = ?`, [userId]);
+        res.status(200).json({ message: "Account has been deactivated." });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to deactivate account." });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: DELETE ACCOUNT (Strict Permanent Deletion)
+// ---------------------------------------------------------
+app.delete('/api/users/:id', async (req, res) => {
+    const userId = req.params.id;
+    const { password } = req.body;
+
+    try {
+        const [users] = await db.execute('SELECT password_hash FROM users WHERE id = ?', [userId]);
+        if (users.length === 0) return res.status(404).json({ message: "User not found." });
+
+        const isMatch = await bcrypt.compare(password, users[0].password_hash);
+        if (!isMatch) return res.status(401).json({ message: "Incorrect password. Deletion aborted." });
+
+        // Delete from both profile tables just to be safe (if a row doesn't exist, it just skips it)
+        await db.execute('DELETE FROM applicant_profiles WHERE user_id = ?', [userId]);
+        await db.execute('DELETE FROM employer_profiles WHERE user_id = ?', [userId]);
+        // Note: Make sure your `applications` and `job_postings` tables use ON DELETE CASCADE, 
+        // otherwise you'll need to manually delete those records here first!
+        await db.execute('DELETE FROM users WHERE id = ?', [userId]);
+
+        res.status(200).json({ message: "Account permanently deleted." });
+    } catch (error) {
+        console.error("Deletion Error:", error.message);
+        res.status(500).json({ message: "Server error deleting account." });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: Fetch Applicant's Notifications
+// ---------------------------------------------------------
+app.get('/api/users/:id/notifications', async (req, res) => {
+    try {
+        const [notifications] = await db.execute(
+            "SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC", 
+            [req.params.id]
+        );
+        res.status(200).json(notifications);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch notifications." });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: Mark Notification as Read
+// ---------------------------------------------------------
+app.put('/api/notifications/:id/read', async (req, res) => {
+    try {
+        await db.execute("UPDATE notifications SET is_read = TRUE WHERE id = ?", [req.params.id]);
+        res.status(200).json({ message: "Marked as read." });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to update notification." });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: REQUEST SECURITY OTP
+// ---------------------------------------------------------
+app.post('/api/users/:id/request-otp', async (req, res) => {
+    const userId = req.params.id;
+    const { email, type } = req.body;
+
+    try {
+        // 1. Generate a random 6-digit code
+        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        // 2. Set expiration for 15 minutes from now
+        const expires = new Date(Date.now() + 15 * 60000); 
+
+        // 3. Save OTP to the database for this user
+        await db.execute(
+            "UPDATE users SET otp_code = ?, otp_expires = ? WHERE id = ?",
+            [otpCode, expires, userId]
+        );
+
+        // 4. Send the email using your existing nodemailer transporter
+        const subjectLine = type === 'email' ? 'Verify your new Email Address' : 'Verify your Password Change';
+        const messageBody = `Hello!\n\nYour 6-digit AbleWork verification code is: ${otpCode}\n\nThis code will expire in 15 minutes. If you did not request this change, please ignore this email.`;
+
+        await transporter.sendMail({
+            from: '"AbleWork Security" <ableworksys5i@gmail.com>',
+            to: email, // Sends to the new email if changing email, or current email if changing password
+            subject: subjectLine,
+            text: messageBody
+        });
+
+        res.status(200).json({ message: "Verification code sent successfully." });
+
+    } catch (error) {
+        console.error("Failed to generate OTP:", error.message);
+        res.status(500).json({ message: "Server error sending verification code." });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: TOGGLE ACCOUNT ACTIVATION/DEACTIVATION
+// ---------------------------------------------------------
+app.put('/api/users/:id/toggle-status', async (req, res) => {
+    const userId = req.params.id;
+    const { action } = req.body; // Expects 'activate' or 'deactivate'
+
+    try {
+        // Determine the new status string based on the action
+        const newStatus = action === 'deactivate' ? 'Deactivated' : 'Active';
+
+        // Update the user's status in the database
+        // Note: If your column is named just 'status' instead of 'account_status', change it here!
+        await db.execute(
+            "UPDATE users SET account_status = ? WHERE id = ?",
+            [newStatus, userId]
+        );
+
+        res.status(200).json({ 
+            message: `Account successfully ${newStatus.toLowerCase()}.`,
+            status: newStatus
+        });
+    } catch (error) {
+        console.error("Toggle Status Error:", error.message);
+        res.status(500).json({ message: "Server error toggling account status." });
     }
 });
 

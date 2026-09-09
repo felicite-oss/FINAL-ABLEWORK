@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // 1. Import all child components
@@ -121,6 +121,26 @@ export default function EmployerDashboard() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
+  const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  
+  const dropdownRef = useRef(null);
+  const notifRef = useRef(null);
+
+  // --- ADDED: Close dropdowns when clicking outside ---
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowProfileDropdown(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setNotificationDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   // Initial Data Fetch
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -142,6 +162,10 @@ export default function EmployerDashboard() {
         const statsRes = await fetch(`http://localhost:5001/api/employer/${storedUser.id}/dashboard-stats`);
         const statsData = await statsRes.json();
         if (statsRes.ok) setStats(statsData);
+
+        const notifRes = await fetch(`http://localhost:5001/api/users/${storedUser.id}/notifications`);
+        const notifData = await notifRes.json();
+        if (notifRes.ok) setNotifications(notifData);
 
       } catch (err) {
         setError('Cannot connect to the server.');
@@ -208,6 +232,19 @@ export default function EmployerDashboard() {
     canResubmit = daysLeft <= 0;
   }
 
+  const handleMarkAsRead = async (notifId) => {
+    try {
+      const res = await fetch(`http://localhost:5001/api/notifications/${notifId}/read`, { method: 'PUT' });
+      if (res.ok) {
+        setNotifications(notifications.map(n => n.id === notifId ? { ...n, is_read: 1 } : n));
+      }
+    } catch (err) {
+      console.error("Failed to mark notification as read");
+    }
+  };
+
+  const unreadCount = notifications.filter(n => !n.is_read).length;
+
   return (
     <div className="min-h-screen flex flex-col bg-[#f4f4f4] text-[#03045E] w-full overflow-x-hidden">
       
@@ -225,20 +262,73 @@ export default function EmployerDashboard() {
 
         {/* RIGHT SIDE OF HEADER */}
         <div className="flex items-center gap-4">
-          {/* Notification SVG Icon (Always visible) */}
-          <button 
-            type="button" 
-            className="p-2 rounded-xl text-[#03045E] bg-white border border-[#03045E]/10 hover:bg-[#2C7FFF]/10 hover:text-[#2C7FFF] transition-colors relative"
-            aria-label="Notifications"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#2C7FFF] rounded-full"></span>
-          </button>
+          
+          {/* --- REPLACED: NEW NOTIFICATION BELL & DROPDOWN --- */}
+          <div className="relative" ref={notifRef}>
+            <button
+              onClick={() => setNotificationDropdownOpen(!notificationDropdownOpen)}
+              className={`w-10 h-10 rounded-full bg-white text-[#03045E] border transition-all duration-200 cursor-pointer flex items-center justify-center shrink-0 p-0 shadow-[0_2px_10px_rgba(3,4,94,0.04)] hover:shadow-[0_4px_20px_rgba(44,127,255,0.15)] hover:-translate-y-0.5 active:translate-y-0 ${
+                notificationDropdownOpen ? 'border-[#2C7FFF] ring-2 ring-[#2C7FFF]/20 text-[#2C7FFF]' : 'border-transparent'
+              }`}
+              title="Notifications"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              {/* Unread Badge */}
+              {unreadCount > 0 && (
+                <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></span>
+              )}
+            </button>
+
+            {/* Notification Dropdown Panel */}
+            {notificationDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 max-h-[400px] overflow-y-auto bg-white rounded-2xl shadow-2xl border border-[#03045E]/10 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+                <div className="px-5 py-3 border-b border-[#03045E]/10 flex justify-between items-center sticky top-0 bg-white/90 backdrop-blur-sm z-10">
+                  <h3 className="font-extrabold text-[#03045E] text-base">Notifications</h3>
+                  {unreadCount > 0 && <span className="text-xs font-bold text-[#2C7FFF] bg-[#2C7FFF]/10 px-2.5 py-1 rounded-full">{unreadCount} New</span>}
+                </div>
+                <div className="flex flex-col">
+                  {notifications.length > 0 ? notifications.map(notif => (
+                      <div 
+                        key={notif.id} 
+                        onClick={() => {
+                          if (!notif.is_read) handleMarkAsRead(notif.id);
+                          
+                          // --- DIRECT NAVIGATION LOGIC ---
+                          // Send employers straight to the applications management tab
+                          if (notif.type === 'application') {
+                            setActiveTab('applications');
+                          } else {
+                            setActiveTab('overview');
+                          }
+                          setNotificationDropdownOpen(false);
+                        }} 
+                        className={`p-5 border-b border-[#03045E]/5 transition-colors cursor-pointer ${!notif.is_read ? 'bg-[#2C7FFF]/5 hover:bg-[#2C7FFF]/10' : 'bg-white hover:bg-gray-50'}`}
+                      >
+                        <h4 className={`text-sm font-extrabold ${!notif.is_read ? 'text-[#03045E]' : 'text-gray-500'}`}>{notif.title}</h4>
+                        <p className={`text-xs mt-1.5 leading-relaxed ${!notif.is_read ? 'text-[#03045E]/80 font-semibold' : 'text-gray-500'}`}>{notif.message}</p>
+                        <span className="text-[10px] text-gray-400 mt-2 block font-extrabold tracking-wider uppercase">
+                          {new Date(notif.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                  )) : (
+                      <div className="p-8 text-center flex flex-col items-center justify-center">
+                        <div className="w-12 h-12 bg-[#f4f4f4] rounded-full flex items-center justify-center mb-3 text-gray-400">
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                        </div>
+                        <span className="text-sm font-bold text-[#03045E]">You're all caught up!</span>
+                        <span className="text-xs font-semibold text-gray-500 mt-1">No new notifications at the moment.</span>
+                      </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+          {/* --- END OF REPLACED NOTIFICATION BELL --- */}
 
           {/* Desktop Profile Section with Dropdown Menu */}
-          <div className="hidden md:block relative">
+          <div className="hidden md:block relative" ref={dropdownRef}>
             <div 
               onClick={() => setShowProfileDropdown(!showProfileDropdown)} 
               className="flex items-center gap-3 cursor-pointer p-1.5 rounded-xl bg-white border border-[#03045E]/10 hover:bg-[#2C7FFF]/10 transition-all"

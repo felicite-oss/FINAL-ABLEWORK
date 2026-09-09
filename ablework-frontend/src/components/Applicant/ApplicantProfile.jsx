@@ -1,18 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Circle, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Fix for default Leaflet marker icons in React
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
+// Helper component to smoothly re-center the map when location changes
+function MapUpdater({ lat, lng }) {
+  const map = useMap();
+  useEffect(() => {
+    if (lat && lng) {
+      map.setView([lat, lng], map.getZoom(), { animate: true });
+    }
+  }, [lat, lng, map]);
+  return null;
+}
+
+const SKILL_RECOMMENDATIONS = [
+  "Customer Service", "Microsoft Office", "Virtual Assistance", 
+  "Problem Solving", "Graphic Design", "Node.js", "UI/UX Design", "Data Entry", "Time Management", "Teamwork"
+];
+
+const ACCOMMODATION_RECOMMENDATIONS = [
+  "Wheelchair Access", "Screen Reader", "Sign Language Interpreter", 
+  "Quiet Workspace", "Ergonomic Setup", "Step-Free Access", 
+  "Noise-Cancelling Headphones", "Captioning Services", "Flexible Hours"
+];
+
+const DISABILITY_OPTIONS = [
+  "Deafness", "Blindness", "Low Vision", "Hard of Hearing", 
+  "Color Blindness", "Paralysis", "Amputation", "Cerebral Palsy", 
+  "Limited Fine Motor Skills", "Wheelchair User"
+];
 
 export default function ApplicantProfile({ profile, refreshData, setProfile }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // State for profile picture modal, preview, and actual file object
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || profile?.profile_picture || '');
-  const [tempAvatarUrl, setTempAvatarUrl] = useState('');
-  const [selectedFile, setSelectedFile] = useState(null);
+
+  const parseInitialList = (data) => {
+    if (!data) return [];
+    if (Array.isArray(data)) return data;
+    try {
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed)) return parsed;
+    } catch (e) {}
+    return typeof data === 'string' ? data.split(',').map(s => s.trim()).filter(Boolean) : [];
+  };
+
+  const [skills, setSkills] = useState(parseInitialList(profile?.skills));
+  const [skillInput, setSkillInput] = useState('');
+
+  const [accommodations, setAccommodations] = useState(parseInitialList(profile?.accommodations || profile?.accommodations_needed));
+  const [accomInput, setAccomInput] = useState('');
+
+  const [selectedDisabilities, setSelectedDisabilities] = useState(parseInitialList(profile?.disability_type));
 
   const [formData, setFormData] = useState({
-    skillsString: profile?.skills ? profile.skills.join(', ') : '',
-    accommodationsString: profile?.accommodations ? profile.accommodations.join(', ') : '',
-    disability_type: profile?.disability_type || '',
     workplace_independence: profile?.workplace_independence || '',
     residential_address: profile?.residential_address || '',
     travel_radius_km: profile?.travel_radius_km || 5,
@@ -24,17 +76,58 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle local file selection from device file manager
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      const localPreviewUrl = URL.createObjectURL(file);
-      setTempAvatarUrl(localPreviewUrl);
+  const handleSkillKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const val = skillInput.trim().replace(/,/g, '');
+      if (val && !skills.includes(val)) {
+        setSkills([...skills, val]);
+        setSkillInput('');
+      }
     }
   };
 
-  // Capture New Location via Browser Geolocation API
+  const addSkillChip = (skill) => {
+    if (!skills.includes(skill)) {
+      setSkills([...skills, skill]);
+      setSkillInput('');
+    }
+  };
+
+  const removeSkill = (indexToRemove) => {
+    setSkills(skills.filter((_, index) => index !== indexToRemove));
+  };
+
+  const handleAccomKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const val = accomInput.trim().replace(/,/g, '');
+      if (val && !accommodations.includes(val)) {
+        setAccommodations([...accommodations, val]);
+        setAccomInput('');
+      }
+    }
+  };
+
+  const addAccomChip = (acc) => {
+    if (!accommodations.includes(acc)) {
+      setAccommodations([...accommodations, acc]);
+      setAccomInput('');
+    }
+  };
+
+  const removeAccom = (indexToRemove) => {
+    setAccommodations(accommodations.filter((_, index) => index !== indexToRemove));
+  };
+
+  const toggleDisability = (disability) => {
+    if (selectedDisabilities.includes(disability)) {
+      setSelectedDisabilities(selectedDisabilities.filter(d => d !== disability));
+    } else {
+      setSelectedDisabilities([...selectedDisabilities, disability]);
+    }
+  };
+
   const handleDetectLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -63,10 +156,9 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
       longitude: formData.longitude,
       travel_radius_km: Number(formData.travel_radius_km),
       workplace_independence: formData.workplace_independence,
-      disability_type: formData.disability_type,
-      skills: formData.skillsString.split(',').map(s => s.trim()).filter(s => s),
-      accommodations_needed: formData.accommodationsString.split(',').map(s => s.trim()).filter(s => s),
-      avatar_url: avatarUrl 
+      disability_type: selectedDisabilities.join(', '),
+      skills: skills,
+      accommodations_needed: accommodations
     };
 
     try {
@@ -77,12 +169,11 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
       });
 
       if (res.ok) {
-        // Immediately update parent profile state so header updates instantly
         if (setProfile) {
-          setProfile(prev => ({ ...prev, ...payload, profile_picture: avatarUrl }));
+          setProfile(prev => ({ ...prev, ...payload }));
         }
         alert("Profile updated successfully!");
-        refreshData(); // Refresh to update the Smart Engine Matches
+        refreshData(); 
       } else {
         alert("Failed to update profile.");
       }
@@ -95,24 +186,8 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
 
   return (
     <div className="max-w-6xl relative pb-12 animate-in fade-in duration-300 text-[#03045E]">
-      {/* Header Section */}
       <div className="mb-10 bg-[#f4f4f4] p-8 rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border border-[#03045E]/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="flex items-center gap-5">
-          {/* Circular Profile Picture / Avatar */}
-          <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-[#2C7FFF] shadow-md bg-[#f4f4f4] shrink-0 flex items-center justify-center">
-            {avatarUrl ? (
-              <img 
-                src={avatarUrl} 
-                alt="Profile" 
-                className="w-full h-full object-cover" 
-              />
-            ) : (
-              <svg className="w-10 h-10 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            )}
-          </div>
-          
           <div>
             <h1 className="text-2xl font-extrabold text-[#03045E] tracking-tight">
               {profile?.full_name || profile?.name || 'Applicant Profile'}
@@ -122,86 +197,7 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
             </p>
           </div>
         </div>
-
-        {/* Edit Profile Button opens the center popup modal */}
-        <div className="flex items-center gap-3">
-          <button 
-            type="button" 
-            onClick={() => {
-              setTempAvatarUrl(avatarUrl);
-              setSelectedFile(null);
-              setIsModalOpen(true);
-            }}
-            className="px-5 py-3 bg-[#2C7FFF] text-[#f4f4f4] font-bold rounded-2xl hover:bg-[#03045E] transition-all shadow-md flex items-center gap-2 cursor-pointer"
-          >
-            <svg className="w-4 h-4 text-[#f4f4f4]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-            <span>Edit Profile</span>
-          </button>
-        </div>
       </div>
-
-      {/* POPUP MODAL TO CHANGE PROFILE PICTURE */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#03045E]/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-[#f4f4f4] rounded-3xl p-8 max-w-md w-full shadow-2xl border border-[#03045E]/20 flex flex-col gap-6 text-[#03045E]">
-            <div className="flex items-center justify-between border-b border-[#03045E]/20 pb-4">
-              <h3 className="text-xl font-extrabold text-[#03045E]">Change Profile Picture</h3>
-              <button 
-                onClick={() => setIsModalOpen(false)}
-                className="text-[#03045E] hover:text-[#2C7FFF] font-bold text-lg cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="flex flex-col items-center gap-4">
-              <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-[#2C7FFF] shadow-md bg-[#f4f4f4] flex items-center justify-center">
-                {tempAvatarUrl ? (
-                  <img src={tempAvatarUrl} alt="Preview" className="w-full h-full object-cover" />
-                ) : (
-                  <svg className="w-12 h-12 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                )}
-              </div>
-
-              <div className="flex flex-col gap-2 w-full">
-                <label className="text-sm font-bold text-[#03045E]">Select Image from Device</label>
-                <input 
-                  type="file" 
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="w-full p-3.5 bg-white border border-[#03045E]/20 rounded-2xl focus:border-[#2C7FFF] focus:ring-4 focus:ring-[#2C7FFF]/20 outline-none text-[#03045E] transition-all font-medium text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-[#2C7FFF] file:text-[#f4f4f4] hover:file:bg-[#03045E] cursor-pointer"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 pt-2">
-              <button 
-                type="button"
-                onClick={() => setIsModalOpen(false)}
-                className="flex-1 py-3.5 bg-white text-[#03045E] border border-[#03045E]/20 font-bold rounded-2xl hover:bg-[#2C7FFF]/10 transition-all cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button 
-                type="button"
-                onClick={() => {
-                  if (tempAvatarUrl) {
-                    setAvatarUrl(tempAvatarUrl);
-                  }
-                  setIsModalOpen(false);
-                }}
-                className="flex-1 py-3.5 bg-[#2C7FFF] text-[#f4f4f4] font-bold rounded-2xl hover:bg-[#03045E] transition-all shadow-md cursor-pointer"
-              >
-                Save Picture
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
@@ -216,37 +212,107 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
             <h2 className="text-xl font-bold text-[#03045E]">Professional Profile</h2>
           </div>
 
+          {/* SKILLS INPUT & CONDITIONAL RECO CHIPS */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-bold text-[#03045E]">Skills (Comma separated)</label>
-            <div className="relative">
+            <label className="text-sm font-bold text-[#03045E]">Skills *</label>
+            <div className="p-3 bg-white border border-[#03045E]/20 rounded-2xl flex flex-wrap gap-2 items-center focus-within:border-[#2C7FFF] focus-within:ring-4 focus-within:ring-[#2C7FFF]/20 transition-all">
+              {skills.map((skill, index) => (
+                <span key={index} className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#03045E] text-white text-xs font-bold rounded-xl shadow-sm">
+                  {skill}
+                  <button type="button" onClick={() => removeSkill(index)} className="hover:text-red-300 font-extrabold cursor-pointer ml-1">×</button>
+                </span>
+              ))}
               <input 
-                type="text" name="skillsString" value={formData.skillsString} onChange={handleChange} required 
-                className="w-full p-3.5 pl-4 bg-white border border-[#03045E]/20 rounded-2xl focus:border-[#2C7FFF] focus:ring-4 focus:ring-[#2C7FFF]/20 outline-none text-[#03045E] transition-all font-medium text-sm placeholder:text-[#03045E]/40" 
-                placeholder="e.g. Data Entry, Web Development, Customer Service" 
+                type="text" 
+                value={skillInput} 
+                onChange={(e) => setSkillInput(e.target.value)} 
+                onKeyDown={handleSkillKeyDown}
+                placeholder={skills.length === 0 ? "Type a skill and press Enter..." : "Add more..."}
+                className="flex-1 min-w-[140px] outline-none bg-transparent text-sm font-medium text-[#03045E] placeholder:text-[#03045E]/40 p-1"
               />
             </div>
+            
+            {skillInput.trim().length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2 animate-fadeIn">
+                {SKILL_RECOMMENDATIONS
+                  .filter(s => s.toLowerCase().includes(skillInput.toLowerCase()) && !skills.includes(s))
+                  .map((rec, i) => (
+                    <button
+                      type="button"
+                      key={i}
+                      onClick={() => addSkillChip(rec)}
+                      className="px-3 py-1 bg-white border border-[#2C7FFF]/30 text-[#2C7FFF] hover:bg-[#2C7FFF] hover:text-white text-xs font-bold rounded-full transition-all cursor-pointer shadow-2xs"
+                    >
+                      + {rec}
+                    </button>
+                  ))}
+              </div>
+            )}
             <p className="text-xs text-[#03045E] font-semibold mt-1">These must match employer requirements to trigger a Smart Match.</p>
           </div>
 
+          {/* ACCOMMODATIONS INPUT & CONDITIONAL RECO CHIPS */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-bold text-[#03045E]">Required Accommodations (Comma separated)</label>
-            <div className="relative">
+            <label className="text-sm font-bold text-[#03045E]">Required Accommodations *</label>
+            <div className="p-3 bg-white border border-[#03045E]/20 rounded-2xl flex flex-wrap gap-2 items-center focus-within:border-[#2C7FFF] focus-within:ring-4 focus-within:ring-[#2C7FFF]/20 transition-all">
+              {accommodations.map((acc, index) => (
+                <span key={index} className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#03045E] text-white text-xs font-bold rounded-xl shadow-sm">
+                  {acc}
+                  <button type="button" onClick={() => removeAccom(index)} className="hover:text-red-300 font-extrabold cursor-pointer ml-1">×</button>
+                </span>
+              ))}
               <input 
-                type="text" name="accommodationsString" value={formData.accommodationsString} onChange={handleChange} required 
-                className="w-full p-3.5 pl-4 bg-white border border-[#03045E]/20 rounded-2xl focus:border-[#2C7FFF] focus:ring-4 focus:ring-[#2C7FFF]/20 outline-none text-[#03045E] transition-all font-medium text-sm placeholder:text-[#03045E]/40" 
-                placeholder="e.g. Wheelchair Ramp, Screen Reader, Flexible Hours" 
+                type="text" 
+                value={accomInput} 
+                onChange={(e) => setAccomInput(e.target.value)} 
+                onKeyDown={handleAccomKeyDown}
+                placeholder={accommodations.length === 0 ? "Type an accommodation and press Enter..." : "Add more..."}
+                className="flex-1 min-w-[140px] outline-none bg-transparent text-sm font-medium text-[#03045E] placeholder:text-[#03045E]/40 p-1"
               />
             </div>
+
+            {accomInput.trim().length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2 animate-fadeIn">
+                {ACCOMMODATION_RECOMMENDATIONS
+                  .filter(a => a.toLowerCase().includes(accomInput.toLowerCase()) && !accommodations.includes(a))
+                  .map((rec, i) => (
+                    <button
+                      type="button"
+                      key={i}
+                      onClick={() => addAccomChip(rec)}
+                      className="px-3 py-1 bg-white border border-purple-300 text-purple-700 hover:bg-purple-600 hover:text-white text-xs font-bold rounded-full transition-all cursor-pointer shadow-2xs"
+                    >
+                      + {rec}
+                    </button>
+                  ))}
+              </div>
+            )}
             <p className="text-xs text-[#03045E] font-semibold mt-1">The Smart Engine will only show you jobs that provide these exact accommodations.</p>
           </div>
 
+          {/* DISABILITY SELECTION CHIPS */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-bold text-[#03045E]">Primary Disability Type</label>
-            <input 
-              type="text" name="disability_type" value={formData.disability_type} onChange={handleChange} required 
-              className="w-full p-3.5 pl-4 bg-white border border-[#03045E]/20 rounded-2xl focus:border-[#2C7FFF] focus:ring-4 focus:ring-[#2C7FFF]/20 outline-none text-[#03045E] transition-all font-medium text-sm placeholder:text-[#03045E]/40"
-              placeholder="e.g. Visual, Mobility, Hearing"
-            />
+            <label className="text-sm font-bold text-[#03045E]">Primary Disability Type *</label>
+            <div className="flex flex-wrap gap-2 p-3 bg-white border border-[#03045E]/20 rounded-2xl">
+              {DISABILITY_OPTIONS.map((option, i) => {
+                const isSelected = selectedDisabilities.includes(option);
+                return (
+                  <button
+                    type="button"
+                    key={i}
+                    onClick={() => toggleDisability(option)}
+                    className={`px-3.5 py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 ${
+                      isSelected 
+                        ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] shadow-md' 
+                        : 'bg-white text-[#03045E] border-gray-200 hover:border-[#2C7FFF]'
+                    }`}
+                  >
+                    <span>{option}</span>
+                    <span className="font-extrabold">{isSelected ? '✓' : '+'}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="flex flex-col gap-2">
@@ -316,12 +382,27 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
             Detect Current Location
           </button>
 
+          {/* DYNAMIC REACT-LEAFLET MAP WITH RADIUS CIRCLE */}
           {formData.latitude && formData.longitude && (
-            <div className="rounded-2xl overflow-hidden border border-[#03045E]/20 h-[180px] relative pointer-events-none shadow-inner bg-white">
-              <iframe 
-                width="100%" height="100%" frameBorder="0" scrolling="no" marginHeight="0" marginWidth="0" 
-                src={`https://www.openstreetmap.org/export/embed.html?bbox=${Number(formData.longitude) - 0.05},${Number(formData.latitude) - 0.05},${Number(formData.longitude) + 0.05},${Number(formData.latitude) + 0.05}&layer=mapnik&marker=${formData.latitude},${formData.longitude}`}
-              ></iframe>
+            <div className="rounded-2xl overflow-hidden border border-[#03045E]/20 h-[220px] relative shadow-inner bg-gray-100 z-0">
+              <MapContainer 
+                center={[Number(formData.latitude), Number(formData.longitude)]} 
+                zoom={11} 
+                style={{ height: '100%', width: '100%', zIndex: 0 }}
+                scrollWheelZoom={false}
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; OpenStreetMap contributors'
+                />
+                <Marker position={[Number(formData.latitude), Number(formData.longitude)]} />
+                <Circle 
+                  center={[Number(formData.latitude), Number(formData.longitude)]}
+                  radius={Number(formData.travel_radius_km) * 1000} // Radius expects meters
+                  pathOptions={{ color: '#2C7FFF', fillColor: '#2C7FFF', fillOpacity: 0.15, weight: 2 }}
+                />
+                <MapUpdater lat={Number(formData.latitude)} lng={Number(formData.longitude)} />
+              </MapContainer>
             </div>
           )}
 

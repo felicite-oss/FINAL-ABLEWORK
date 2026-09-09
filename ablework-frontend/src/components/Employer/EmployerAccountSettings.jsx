@@ -1,310 +1,514 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function EmployerAccountSettings({ profile }) {
-  // Navigation State
-  const [activeMenu, setActiveMenu] = useState('security');
+  const navigate = useNavigate();
 
-  // Toggle States
-  const [notifApplies, setNotifApplies] = useState(true);
-  const [notifDigest, setNotifDigest] = useState(true);
-  const [notifMarketing, setNotifMarketing] = useState(false);
-  const [twoFactor, setTwoFactor] = useState(false);
-  const [publicVisible, setPublicVisible] = useState(true);
+  const isRejected = profile?.verification_status === 'Rejected';
+  const [openSection, setOpenSection] = useState(isRejected ? 'verification' : 'email');
 
-  const handlePasswordReset = (e) => {
+  const toggleSection = (section) => {
+    setOpenSection(openSection === section ? null : section);
+  };
+
+  // --- 1. Email State ---
+  const [email, setEmail] = useState(profile?.email || '');
+  const [emailStep, setEmailStep] = useState(1); // 1 = Request, 2 = Verify OTP
+  const [emailOtp, setEmailOtp] = useState('');
+  const [emailStatus, setEmailStatus] = useState({ type: '', msg: '' });
+  const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
+
+  // --- 2. Password State ---
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordStep, setPasswordStep] = useState(1); // 1 = Request, 2 = Verify OTP
+  const [passwordOtp, setPasswordOtp] = useState('');
+  const [passwordStatus, setPasswordStatus] = useState({ type: '', msg: '' });
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+
+  // --- 3. Verification State ---
+  const [verificationDoc, setVerificationDoc] = useState(null);
+  const [verStatus, setVerStatus] = useState({ type: '', msg: '' });
+  const [isResubmitting, setIsResubmitting] = useState(false);
+
+  // --- 4. Danger Zone State ---
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [dangerStatus, setDangerStatus] = useState({ type: '', msg: '' });
+
+  const [isDeactivated, setIsDeactivated] = useState(profile?.status === 'Deactivated' || profile?.account_status === 'Deactivated' || false);
+
+  // --- Cooldown Logic ---
+  let daysLeft = 0;
+  let canResubmit = false;
+
+  if (isRejected && profile?.rejection_timestamp) {
+    const rejectDate = new Date(profile.rejection_timestamp);
+    const today = new Date();
+    const diffTime = Math.abs(today - rejectDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    daysLeft = 8 - diffDays;
+    canResubmit = daysLeft <= 0;
+  }
+
+  // ==========================================
+  // HANDLERS: EMAIL SETTINGS
+  // ==========================================
+  const handleRequestEmailUpdate = async (e) => {
     e.preventDefault();
-    alert("Password updated successfully!");
-  };
+    if (email === profile?.email) {
+      return setEmailStatus({ type: 'error', msg: 'Please enter a different email address.' });
+    }
 
-  const handleSavePreferences = () => {
-    alert("Preferences saved successfully!");
-  };
+    setEmailStatus({ type: '', msg: '' });
 
-  const handleDeactivate = () => {
-    if(window.confirm("Are you absolutely sure you want to deactivate your employer account? This action will hide all active job postings.")) {
-      alert("Account deactivated. You will be logged out.");
+    try {
+      const response = await fetch(`http://localhost:5001/api/users/${profile.user_id}/request-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, type: 'email' })
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        setEmailStatus({ type: 'success', msg: `A 6-digit verification code has been sent to ${email}.` });
+        setEmailStep(2);
+      } else {
+        setEmailStatus({ type: 'error', msg: data.message });
+      }
+    } catch (error) {
+      setEmailStatus({ type: 'error', msg: 'Failed to request code. Check server connection.' });
     }
   };
 
-  return (
-    <div className="animate-fadeIn max-w-6xl mr-auto pb-10">
+  const handleVerifyAndUpdateEmail = async (e) => {
+    e.preventDefault();
+    if (emailOtp.length < 6) {
+      return setEmailStatus({ type: 'error', msg: 'Please enter a valid 6-digit code.' });
+    }
+
+    setEmailStatus({ type: '', msg: '' });
+    setIsUpdatingEmail(true);
+
+    try {
+      const response = await fetch(`http://localhost:5001/api/employer/${profile.user_id}/credentials`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp: emailOtp })
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        setEmailStatus({ type: 'success', msg: 'Email successfully verified and updated!' });
+        setEmailStep(1);
+        setEmailOtp('');
+      } else {
+        setEmailStatus({ type: 'error', msg: data.message || 'Invalid verification code.' });
+      }
+    } catch (error) {
+      setEmailStatus({ type: 'error', msg: 'Server connection error.' });
+    } finally {
+      setIsUpdatingEmail(false);
+    }
+  };
+
+  // ==========================================
+  // HANDLERS: PASSWORD SETTINGS
+  // ==========================================
+  const handleRequestPasswordUpdate = async (e) => {
+    e.preventDefault();
+    setPasswordStatus({ type: '', msg: '' });
+
+    if (newPassword !== confirmPassword) {
+      return setPasswordStatus({ type: 'error', msg: 'New passwords do not match.' });
+    }
+    if (newPassword.length < 6) {
+      return setPasswordStatus({ type: 'error', msg: 'Password must be at least 6 characters long.' });
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5001/api/users/${profile.user_id}/request-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: profile?.email, type: 'password' })
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        setPasswordStatus({ type: 'success', msg: `A 6-digit verification code has been sent to your email.` });
+        setPasswordStep(2);
+      } else {
+        setPasswordStatus({ type: 'error', msg: data.message });
+      }
+    } catch (error) {
+      setPasswordStatus({ type: 'error', msg: 'Failed to request code. Check server connection.' });
+    }
+  };
+
+  const handleVerifyAndUpdatePassword = async (e) => {
+    e.preventDefault();
+    if (passwordOtp.length < 6) {
+      return setPasswordStatus({ type: 'error', msg: 'Please enter a valid 6-digit code.' });
+    }
+
+    setPasswordStatus({ type: '', msg: '' });
+    setIsUpdatingPassword(true);
+
+    try {
+      const response = await fetch(`http://localhost:5001/api/employer/${profile.user_id}/credentials`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword, newPassword, otp: passwordOtp })
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        setPasswordStatus({ type: 'success', msg: data.message || 'Password updated successfully!' });
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        setPasswordStep(1);
+        setPasswordOtp('');
+      } else {
+        setPasswordStatus({ type: 'error', msg: data.message || 'Invalid verification code.' });
+      }
+    } catch (error) {
+      setPasswordStatus({ type: 'error', msg: 'Server connection error.' });
+    } finally {
+      setIsUpdatingPassword(false);
+    }
+  };
+
+  // ==========================================
+  // HANDLERS: VERIFICATION & DANGER ZONE
+  // ==========================================
+  const handleResubmitVerification = async (e) => {
+    e.preventDefault();
+    if (!verificationDoc) return setVerStatus({ type: 'error', msg: 'Please select a file first.' });
+
+    setIsResubmitting(true);
+    setVerStatus({ type: '', msg: '' });
+
+    const formData = new FormData();
+    formData.append('document', verificationDoc);
+
+    try {
+      const response = await fetch(`http://localhost:5001/api/users/${profile.user_id}/resubmit`, {
+        method: 'POST',
+        body: formData
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        setVerStatus({ type: 'success', msg: data.message });
+        setTimeout(() => window.location.reload(), 2000); 
+      } else {
+        setVerStatus({ type: 'error', msg: data.message });
+      }
+    } catch (error) {
+      setVerStatus({ type: 'error', msg: 'Server connection error.' });
+    } finally {
+      setIsResubmitting(false);
+    }
+  };
+
+  const handleToggleDeactivation = async () => {
+    const actionText = isDeactivated ? 'reactivate' : 'deactivate';
+    if (!window.confirm(`Are you sure you want to ${actionText} your corporate account?`)) return;
+    
+    try {
+      const res = await fetch(`http://localhost:5001/api/users/${profile.user_id}/toggle-status`, { 
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: isDeactivated ? 'activate' : 'deactivate' })
+      });
       
-      {/* --- HEADER ROW --- */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-[#f4f4f4]/90 [.high-contrast_&]:bg-black [.high-contrast_&]:border-white backdrop-blur-md p-6 rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border border-[#03045E]/20">
-        <div className="text-left">
-          <div className="flex items-center justify-start gap-2 mb-1.5">
-            <span className="bg-[#2C7FFF]/15 text-[#2C7FFF] text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider border border-[#2C7FFF]/30">Account Management</span>
-            <span className="text-xs font-bold text-[#03045E] [.high-contrast_&]:text-white bg-[#f4f4f4] [.high-contrast_&]:bg-black [.high-contrast_&]:border-white px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-[#03045E]/20">
-              <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-pulse"></span> Secure Workspace
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#03045E] [.high-contrast_&]:text-white">Account Settings</h1>
-          <p className="text-sm font-semibold text-[#03045E]/80 [.high-contrast_&]:text-gray-300 mt-0.5">Manage your security, notifications, and platform preferences.</p>
-        </div>
+      if (res.ok) {
+        setIsDeactivated(!isDeactivated);
+      } else {
+        alert(`Failed to ${actionText} account. Please try again.`);
+      }
+    } catch (error) {
+      alert(`Server error while attempting to ${actionText} account.`);
+    }
+  };
+
+  const handleDelete = async (e) => {
+    e.preventDefault();
+    setDangerStatus({ type: '', msg: '' });
+
+    try {
+      const res = await fetch(`http://localhost:5001/api/users/${profile.user_id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: deletePassword })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        localStorage.removeItem('user');
+        navigate('/');
+      } else {
+        setDangerStatus({ type: 'error', msg: data.message });
+      }
+    } catch (error) {
+      setDangerStatus({ type: 'error', msg: 'Failed to delete account.' });
+    }
+  };
+
+  const ChevronIcon = ({ isOpen }) => (
+    <svg className={`w-5 h-5 text-[#03045E]/60 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"></path></svg>
+  );
+
+  return (
+    <div className="max-w-4xl animate-fadeIn pb-10">
+      
+      <div className="mb-8">
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#03045E]">Account Settings</h1>
+        <p className="text-sm font-semibold text-[#03045E]/80 mt-1">Manage your security credentials and corporate verification documents.</p>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col gap-4">
         
-        {/* SETTINGS INNER SIDEBAR */}
-        <aside className="w-full lg:w-72 flex flex-col gap-3 shrink-0">
-          <button 
-            onClick={() => setActiveMenu('security')}
-            className={`text-left px-5 py-4 rounded-2xl font-bold transition-all duration-300 flex items-center gap-4 group relative overflow-hidden ${activeMenu === 'security' ? 'bg-[#03045E] [.high-contrast_&]:bg-white [.high-contrast_&]:text-black text-white shadow-xl shadow-[#03045E]/20 scale-[1.02]' : 'bg-[#f4f4f4] [.high-contrast_&]:bg-black [.high-contrast_&]:border-white text-[#03045E] [.high-contrast_&]:text-white hover:bg-[#03045E]/5 border border-[#03045E]/20'}`}
-          >
-            <div className={`p-2 rounded-xl transition-colors ${activeMenu === 'security' ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E]/10 [.high-contrast_&]:bg-gray-800 text-[#03045E] [.high-contrast_&]:text-white group-hover:bg-[#2C7FFF]/10 group-hover:text-[#2C7FFF]'}`}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
+        {/* SECTION 1: Verification & Documents */}
+        <div className={`bg-white rounded-3xl border shadow-sm overflow-hidden transition-all duration-300 ${openSection === 'verification' ? 'border-[#2C7FFF]/40 shadow-md' : 'border-[#03045E]/10 hover:border-[#03045E]/30'}`}>
+          <button onClick={() => toggleSection('verification')} className="w-full p-6 sm:p-8 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer">
+            <div className="text-left">
+              <h2 className="text-lg font-bold text-[#03045E]">Verification Status</h2>
+              <p className="text-xs text-gray-500 mt-1 font-medium">Check your corporate standing and manage documents.</p>
             </div>
-            <div className="flex-1">
-              <span className="block text-sm md:text-base">Security & Login</span>
-              <span className={`text-[10px] font-medium block ${activeMenu === 'security' ? 'text-white/75 [.high-contrast_&]:text-black/75' : 'text-[#03045E]/70 [.high-contrast_&]:text-gray-300'}`}>Password & 2FA</span>
-            </div>
+            <ChevronIcon isOpen={openSection === 'verification'} />
           </button>
-          
-          <button 
-            onClick={() => setActiveMenu('notifications')}
-            className={`text-left px-5 py-4 rounded-2xl font-bold transition-all duration-300 flex items-center gap-4 group relative overflow-hidden ${activeMenu === 'notifications' ? 'bg-[#03045E] [.high-contrast_&]:bg-white [.high-contrast_&]:text-black text-white shadow-xl shadow-[#03045E]/20 scale-[1.02]' : 'bg-[#f4f4f4] [.high-contrast_&]:bg-black [.high-contrast_&]:border-white text-[#03045E] [.high-contrast_&]:text-white hover:bg-[#03045E]/5 border border-[#03045E]/20'}`}
-          >
-            <div className={`p-2 rounded-xl transition-colors ${activeMenu === 'notifications' ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E]/10 [.high-contrast_&]:bg-gray-800 text-[#03045E] [.high-contrast_&]:text-white group-hover:bg-[#2C7FFF]/10 group-hover:text-[#2C7FFF]'}`}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <span className="block text-sm md:text-base">Notifications</span>
-              <span className={`text-[10px] font-medium block ${activeMenu === 'notifications' ? 'text-white/75 [.high-contrast_&]:text-black/75' : 'text-[#03045E]/70 [.high-contrast_&]:text-gray-300'}`}>Alerts & digests</span>
-            </div>
-          </button>
-          
-          <button 
-            onClick={() => setActiveMenu('privacy')}
-            className={`text-left px-5 py-4 rounded-2xl font-bold transition-all duration-300 flex items-center gap-4 group relative overflow-hidden ${activeMenu === 'privacy' ? 'bg-[#03045E] [.high-contrast_&]:bg-white [.high-contrast_&]:text-black text-white shadow-xl shadow-[#03045E]/20 scale-[1.02]' : 'bg-[#f4f4f4] [.high-contrast_&]:bg-black [.high-contrast_&]:border-white text-[#03045E] [.high-contrast_&]:text-white hover:bg-[#03045E]/5 border border-[#03045E]/20'}`}
-          >
-            <div className={`p-2 rounded-xl transition-colors ${activeMenu === 'privacy' ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E]/10 [.high-contrast_&]:bg-gray-800 text-[#03045E] [.high-contrast_&]:text-white group-hover:bg-[#2C7FFF]/10 group-hover:text-[#2C7FFF]'}`}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <span className="block text-sm md:text-base">Privacy & Visibility</span>
-              <span className={`text-[10px] font-medium block ${activeMenu === 'privacy' ? 'text-white/75 [.high-contrast_&]:text-black/75' : 'text-[#03045E]/70 [.high-contrast_&]:text-gray-300'}`}>Company profile status</span>
-            </div>
-          </button>
-          
-          <button 
-            onClick={() => setActiveMenu('danger')}
-            className={`text-left px-5 py-4 rounded-2xl font-bold transition-all duration-300 flex items-center gap-4 mt-2 group relative overflow-hidden ${activeMenu === 'danger' ? 'bg-red-600 text-white shadow-xl shadow-red-600/20 scale-[1.02]' : 'bg-[#f4f4f4] [.high-contrast_&]:bg-black [.high-contrast_&]:border-white text-red-600 hover:bg-red-50 border border-red-200'}`}
-          >
-            <div className={`p-2 rounded-xl transition-colors ${activeMenu === 'danger' ? 'bg-white/20 text-white' : 'bg-red-100 text-red-600 group-hover:bg-red-200'}`}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <span className="block text-sm md:text-base">Danger Zone</span>
-              <span className={`text-[10px] font-medium block ${activeMenu === 'danger' ? 'text-white/80' : 'text-red-500'}`}>Deactivate account</span>
-            </div>
-          </button>
-        </aside>
 
-        {/* SETTINGS CONTENT AREA */}
-        <div className="flex-1 bg-[#f4f4f4] [.high-contrast_&]:bg-black [.high-contrast_&]:border-white p-6 md:p-8 rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border border-[#03045E]/20 min-h-[550px] relative overflow-hidden text-left">
-          
-          {/* Subtle background glow effect */}
-          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-[#2C7FFF]/10 to-transparent rounded-bl-full pointer-events-none"></div>
+          {openSection === 'verification' && (
+            <div className="px-6 pb-6 sm:px-8 sm:pb-8 border-t border-[#03045E]/10 pt-6 animate-fadeIn">
+              <div className="flex flex-col sm:flex-row gap-6 items-start">
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-gray-500 mb-1">Current Standing</p>
+                  {profile?.verification_status === 'Approved' && <span className="inline-block px-4 py-1.5 bg-emerald-100 text-emerald-800 font-bold text-sm rounded-lg border border-emerald-200">✅ Approved</span>}
+                  {profile?.verification_status === 'Pending' && <span className="inline-block px-4 py-1.5 bg-yellow-100 text-yellow-800 font-bold text-sm rounded-lg border border-yellow-200">⏳ Pending Review</span>}
+                  {isRejected && <span className="inline-block px-4 py-1.5 bg-red-100 text-red-800 font-bold text-sm rounded-lg border border-red-200">❌ Action Required</span>}
+                  
+                  <div className="mt-4">
+                    <a href={`http://localhost:5001/${profile?.verification_document?.replace(/\\/g, '/')}`} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-[#2C7FFF] hover:underline">📄 View Business Document on File</a>
+                  </div>
+                </div>
 
-          {/* --- SECURITY SECTION --- */}
-          {activeMenu === 'security' && (
-            <div className="animate-fadeIn">
-              <div className="flex items-center gap-3 border-b border-[#03045E]/15 pb-4 mb-8">
-                <div className="p-2.5 bg-[#2C7FFF]/15 border border-[#2C7FFF]/30 rounded-xl text-[#2C7FFF]">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                </div>
-                <div>
-                  <h2 className="text-2xl font-extrabold text-[#03045E] [.high-contrast_&]:text-white">Security & Authentication</h2>
-                  <p className="text-xs font-semibold text-[#03045E]/80 [.high-contrast_&]:text-gray-300">Protect your account with robust credentials and 2FA</p>
-                </div>
+                {isRejected && (
+                  <div className="flex-1 bg-red-50 p-5 rounded-2xl border border-red-100 w-full">
+                    <h3 className="text-sm font-bold text-red-800 mb-2">Re-verify Company</h3>
+                    <p className="text-xs text-red-600 mb-4 font-medium">
+                      {canResubmit ? "Your cooldown has expired. Please upload a clear, valid Business Registration (DTI/SEC)." : `Security lock active. You can upload a new document in ${daysLeft} days.`}
+                    </p>
+                    
+                    {verStatus.msg && (
+                      <div className={`p-3 text-xs font-bold rounded-xl mb-4 ${verStatus.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-800'}`}>{verStatus.msg}</div>
+                    )}
+
+                    <form onSubmit={handleResubmitVerification} className="flex flex-col gap-3">
+                      <input type="file" accept=".jpg,.jpeg,.png,.pdf" disabled={!canResubmit || isResubmitting} onChange={(e) => setVerificationDoc(e.target.files[0])} className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-red-600 file:text-white hover:file:bg-red-700 disabled:opacity-50 cursor-pointer" />
+                      {canResubmit && (
+                        <button type="submit" disabled={isResubmitting || !verificationDoc} className="mt-2 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-xl transition disabled:opacity-50 shadow-sm cursor-pointer">
+                          {isResubmitting ? 'Uploading...' : 'Submit New Document'}
+                        </button>
+                      )}
+                    </form>
+                  </div>
+                )}
               </div>
+            </div>
+          )}
+        </div>
+
+        {/* SECTION 2: EMAIL SETTINGS */}
+        <div className={`bg-white rounded-3xl border shadow-sm overflow-hidden transition-all duration-300 ${openSection === 'email' ? 'border-[#2C7FFF]/40 shadow-md' : 'border-[#03045E]/10 hover:border-[#03045E]/30'}`}>
+          <button onClick={() => toggleSection('email')} className="w-full p-6 sm:p-8 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer">
+            <div className="text-left">
+              <h2 className="text-lg font-bold text-[#03045E]">Work Email Address</h2>
+              <p className="text-xs text-gray-500 mt-1 font-medium">Update your work email with OTP verification.</p>
+            </div>
+            <ChevronIcon isOpen={openSection === 'email'} />
+          </button>
+
+          {openSection === 'email' && (
+            <div className="px-6 pb-6 sm:px-8 sm:pb-8 border-t border-[#03045E]/10 pt-6 animate-fadeIn">
               
-              <div className="flex flex-col gap-8 max-w-xl">
-                <div>
-                  <p className="text-xs font-extrabold text-[#03045E] [.high-contrast_&]:text-white uppercase tracking-wider mb-2.5">Primary Email Address</p>
-                  <div className="flex items-center justify-between bg-white [.high-contrast_&]:bg-gray-900 [.high-contrast_&]:border-white p-4 rounded-2xl border border-[#03045E]/15 shadow-sm">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-[#2C7FFF]/15 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF]">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <p className="font-bold text-[#03045E] [.high-contrast_&]:text-white text-sm md:text-base">{profile?.email}</p>
-                    </div>
-                    <span className="text-xs font-extrabold text-[#2C7FFF] bg-[#2C7FFF]/15 border border-[#2C7FFF]/30 px-3.5 py-1.5 rounded-full flex items-center gap-1.5">
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                      Verified
-                    </span>
-                  </div>
+              {emailStatus.msg && (
+                <div className={`p-4 mb-6 rounded-xl text-sm font-bold border ${emailStatus.type === 'error' ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
+                  {emailStatus.msg}
                 </div>
-                
-                <form onSubmit={handlePasswordReset} className="flex flex-col gap-4">
-                  <p className="text-xs font-extrabold text-[#03045E] [.high-contrast_&]:text-white uppercase tracking-wider mb-0.5">Change Password</p>
-                  <div className="relative">
-                    <input type="password" placeholder="Current Password" required className="w-full p-4 bg-white [.high-contrast_&]:bg-gray-900 [.high-contrast_&]:text-white [.high-contrast_&]:border-white border border-[#03045E]/15 rounded-2xl focus:border-[#2C7FFF] focus:ring-2 focus:ring-[#2C7FFF]/20 transition outline-none font-medium text-[#03045E] placeholder:text-[#03045E]/40 [.high-contrast_&]:placeholder:text-gray-400 shadow-sm" />
+              )}
+
+              {emailStep === 1 ? (
+                <form onSubmit={handleRequestEmailUpdate} className="flex flex-col sm:flex-row gap-4 items-end">
+                  <div className="flex-1 w-full">
+                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="Enter new work email address" className="w-full p-3.5 border border-gray-200 rounded-xl focus:border-[#2C7FFF] outline-none transition font-medium" />
                   </div>
-                  <div className="relative">
-                    <input type="password" placeholder="New Password" required className="w-full p-4 bg-white [.high-contrast_&]:bg-gray-900 [.high-contrast_&]:text-white [.high-contrast_&]:border-white border border-[#03045E]/15 rounded-2xl focus:border-[#2C7FFF] focus:ring-2 focus:ring-[#2C7FFF]/20 transition outline-none font-medium text-[#03045E] placeholder:text-[#03045E]/40 [.high-contrast_&]:placeholder:text-gray-400 shadow-sm" />
-                  </div>
-                  <div className="relative">
-                    <input type="password" placeholder="Confirm New Password" required className="w-full p-4 bg-white [.high-contrast_&]:bg-gray-900 [.high-contrast_&]:text-white [.high-contrast_&]:border-white border border-[#03045E]/15 rounded-2xl focus:border-[#2C7FFF] focus:ring-2 focus:ring-[#2C7FFF]/20 transition outline-none font-medium text-[#03045E] placeholder:text-[#03045E]/40 [.high-contrast_&]:placeholder:text-gray-400 shadow-sm" />
-                  </div>
-                  <button type="submit" className="mt-2 py-4 px-8 bg-[#03045E] [.high-contrast_&]:bg-white [.high-contrast_&]:text-black text-white font-extrabold rounded-2xl hover:bg-[#2C7FFF] transition-all duration-300 shadow-md hover:shadow-lg w-full md:w-fit flex items-center justify-center gap-2 cursor-pointer">
-                    <span>Update Password</span>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
+                  <button type="submit" disabled={email === profile?.email} className="w-full sm:w-auto px-6 py-3.5 bg-[#f4f4f4] border border-[#03045E]/10 text-[#03045E] font-bold rounded-xl shadow-sm hover:bg-[#2C7FFF] hover:text-white hover:border-[#2C7FFF] transition disabled:opacity-50 cursor-pointer">
+                    Send Code
                   </button>
                 </form>
-
-                <hr className="border-[#03045E]/15" />
-
-                <div className="flex items-center justify-between bg-white [.high-contrast_&]:bg-gray-900 [.high-contrast_&]:border-white p-5 rounded-2xl border border-[#03045E]/15 shadow-sm">
-                  <div className="pr-4">
-                    <p className="font-extrabold text-[#03045E] [.high-contrast_&]:text-white text-base">Two-Factor Authentication (2FA)</p>
-                    <p className="text-xs text-[#03045E]/80 [.high-contrast_&]:text-gray-300 font-semibold mt-0.5">Require an extra security code upon login.</p>
+              ) : (
+                <form onSubmit={handleVerifyAndUpdateEmail} className="flex flex-col gap-4">
+                  <div className="flex flex-col sm:flex-row gap-4 items-end">
+                    <div className="flex-1 w-full">
+                      <label className="text-xs font-bold text-gray-500 uppercase mb-1.5 block">New Work Email</label>
+                      <input type="email" value={email} disabled className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-500 outline-none cursor-not-allowed font-medium" />
+                    </div>
+                    <div className="flex-1 w-full">
+                      <label className="text-xs font-bold text-gray-500 uppercase mb-1.5 block">Verification Code</label>
+                      <input type="text" value={emailOtp} onChange={(e) => setEmailOtp(e.target.value)} required placeholder="6-digit code" maxLength="6" className="w-full p-3.5 border border-gray-200 rounded-xl focus:border-[#2C7FFF] outline-none transition tracking-widest font-mono" />
+                    </div>
                   </div>
-                  <button 
-                    onClick={() => setTwoFactor(!twoFactor)}
-                    className={`w-14 h-8 rounded-full transition-all duration-300 relative shrink-0 p-1 shadow-inner cursor-pointer ${twoFactor ? 'bg-[#2C7FFF]' : 'bg-[#03045E]/20 [.high-contrast_&]:bg-gray-700'}`}
-                  >
-                    <div className={`w-6 h-6 bg-white rounded-full shadow-md transition-transform duration-300 transform ${twoFactor ? 'translate-x-6' : 'translate-x-0'}`}></div>
-                  </button>
-                </div>
-              </div>
+                  <div className="flex gap-3 mt-4">
+                    <button type="button" onClick={() => { setEmailStep(1); setEmailStatus({type:'', msg:''}); }} className="px-6 py-3.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition cursor-pointer">Cancel</button>
+                    <button type="submit" disabled={isUpdatingEmail || emailOtp.length < 6} className="px-6 py-3.5 bg-[#03045E] text-white font-bold rounded-xl shadow-md hover:bg-[#2C7FFF] transition disabled:opacity-50 cursor-pointer w-full sm:w-auto">
+                      {isUpdatingEmail ? 'Verifying...' : 'Verify & Update Email'}
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           )}
-
-          {/* --- NOTIFICATIONS SECTION --- */}
-          {activeMenu === 'notifications' && (
-            <div className="animate-fadeIn">
-              <div className="flex items-center gap-3 border-b border-[#03045E]/15 pb-4 mb-8">
-                <div className="p-2.5 bg-[#2C7FFF]/15 border border-[#2C7FFF]/30 rounded-xl text-[#2C7FFF]">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                  </svg>
-                </div>
-                <div>
-                  <h2 className="text-2xl font-extrabold text-[#03045E] [.high-contrast_&]:text-white">Notification Preferences</h2>
-                  <p className="text-xs font-semibold text-[#03045E]/80 [.high-contrast_&]:text-gray-300">Customize how and when you receive recruitment updates</p>
-                </div>
-              </div>
-              
-              <div className="flex flex-col gap-4 max-w-xl">
-                <label className={`flex items-start gap-4 cursor-pointer group p-5 rounded-2xl border transition-all duration-300 shadow-sm ${notifApplies ? 'bg-white [.high-contrast_&]:bg-gray-900 [.high-contrast_&]:border-white border-[#2C7FFF]' : 'bg-white [.high-contrast_&]:bg-gray-900 [.high-contrast_&]:border-white border-[#03045E]/15 hover:border-[#03045E]/30'}`}>
-                  <input type="checkbox" checked={notifApplies} onChange={() => setNotifApplies(!notifApplies)} className="w-5 h-5 mt-1 rounded accent-[#2C7FFF] cursor-pointer" />
-                  <div>
-                    <span className="font-extrabold text-[#03045E] [.high-contrast_&]:text-white text-base group-hover:text-[#2C7FFF] transition-colors">New Applications</span>
-                    <p className="text-xs text-[#03045E]/80 [.high-contrast_&]:text-gray-300 font-medium mt-1 leading-relaxed">Email me immediately when a PWD applicant submits a resume to one of my active job postings.</p>
-                  </div>
-                </label>
-
-                <label className={`flex items-start gap-4 cursor-pointer group p-5 rounded-2xl border transition-all duration-300 shadow-sm ${notifDigest ? 'bg-white [.high-contrast_&]:bg-gray-900 [.high-contrast_&]:border-white border-[#2C7FFF]' : 'bg-white [.high-contrast_&]:bg-gray-900 [.high-contrast_&]:border-white border-[#03045E]/15 hover:border-[#03045E]/30'}`}>
-                  <input type="checkbox" checked={notifDigest} onChange={() => setNotifDigest(!notifDigest)} className="w-5 h-5 mt-1 rounded accent-[#2C7FFF] cursor-pointer" />
-                  <div>
-                    <span className="font-extrabold text-[#03045E] [.high-contrast_&]:text-white text-base group-hover:text-[#2C7FFF] transition-colors">Weekly Digest</span>
-                    <p className="text-xs text-[#03045E]/80 [.high-contrast_&]:text-gray-300 font-medium mt-1 leading-relaxed">Send me a Monday morning summary of recruitment analytics and profile views.</p>
-                  </div>
-                </label>
-
-                <label className={`flex items-start gap-4 cursor-pointer group p-5 rounded-2xl border transition-all duration-300 shadow-sm ${notifMarketing ? 'bg-white [.high-contrast_&]:bg-gray-900 [.high-contrast_&]:border-white border-[#2C7FFF]' : 'bg-white [.high-contrast_&]:bg-gray-900 [.high-contrast_&]:border-white border-[#03045E]/15 hover:border-[#03045E]/30'}`}>
-                  <input type="checkbox" checked={notifMarketing} onChange={() => setNotifMarketing(!notifMarketing)} className="w-5 h-5 mt-1 rounded accent-[#2C7FFF] cursor-pointer" />
-                  <div>
-                    <span className="font-extrabold text-[#03045E] [.high-contrast_&]:text-white text-base group-hover:text-[#2C7FFF] transition-colors">News & Updates</span>
-                    <p className="text-xs text-[#03045E]/80 [.high-contrast_&]:text-gray-300 font-medium mt-1 leading-relaxed">Receive updates about new AbleWork features and accessibility guidelines.</p>
-                  </div>
-                </label>
-
-                <button onClick={handleSavePreferences} className="mt-4 py-4 bg-[#03045E] [.high-contrast_&]:bg-white [.high-contrast_&]:text-black text-white font-extrabold rounded-2xl hover:bg-[#2C7FFF] transition-all duration-300 shadow-md hover:shadow-lg w-full md:w-fit px-8 flex items-center justify-center gap-2 cursor-pointer">
-                  <span>Save Preferences</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* --- PRIVACY SECTION --- */}
-          {activeMenu === 'privacy' && (
-            <div className="animate-fadeIn">
-              <div className="flex items-center gap-3 border-b border-[#03045E]/15 pb-4 mb-8">
-                <div className="p-2.5 bg-[#2C7FFF]/15 border border-[#2C7FFF]/30 rounded-xl text-[#2C7FFF]">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                </div>
-                <div>
-                  <h2 className="text-2xl font-extrabold text-[#03045E] [.high-contrast_&]:text-white">Privacy & Visibility</h2>
-                  <p className="text-xs font-semibold text-[#03045E]/80 [.high-contrast_&]:text-gray-300">Control how candidates see your company profile</p>
-                </div>
-              </div>
-              
-              <div className="flex flex-col gap-6 max-w-xl">
-                <div className="flex items-start justify-between bg-white [.high-contrast_&]:bg-gray-900 [.high-contrast_&]:border-white p-6 rounded-2xl border border-[#03045E]/15 shadow-sm">
-                  <div className="pr-6">
-                    <p className="font-extrabold text-[#03045E] [.high-contrast_&]:text-white text-lg">Public Company Profile</p>
-                    <p className="text-xs text-[#03045E]/80 [.high-contrast_&]:text-gray-300 font-semibold mt-2 leading-relaxed">
-                      Allow job seekers to view your company profile, industry details, and location even when you have no active job postings. Turning this off hides your company from the main directory until you post a new job.
-                    </p>
-                  </div>
-                  <button 
-                    onClick={() => setPublicVisible(!publicVisible)}
-                    className={`w-14 h-8 rounded-full transition-all duration-300 relative shrink-0 mt-1 p-1 shadow-inner cursor-pointer ${publicVisible ? 'bg-[#2C7FFF]' : 'bg-[#03045E]/20 [.high-contrast_&]:bg-gray-700'}`}
-                  >
-                    <div className={`w-6 h-6 bg-white rounded-full shadow-md transition-transform duration-300 transform ${publicVisible ? 'translate-x-6' : 'translate-x-0'}`}></div>
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* --- DANGER ZONE --- */}
-          {activeMenu === 'danger' && (
-            <div className="animate-fadeIn">
-              <div className="flex items-center gap-4 border-b border-red-200 pb-4 mb-8">
-                <div className="p-2.5 bg-red-100 rounded-xl text-red-600">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                </div>
-                <div>
-                  <h2 className="text-2xl font-extrabold text-red-700">Danger Zone</h2>
-                  <p className="text-xs font-semibold text-red-500">Irreversible account actions</p>
-                </div>
-              </div>
-              
-              <div className="p-6 md:p-8 bg-red-50/70 rounded-3xl border border-red-200 max-w-xl shadow-sm">
-                <h3 className="font-extrabold text-red-900 text-lg mb-2">Deactivate Employer Account</h3>
-                <p className="text-xs text-red-900/80 font-semibold mb-6 leading-relaxed">
-                  Deactivating your account will immediately hide all your active job postings, reject pending applicants, and remove your company from the Smart Matching engine. This action cannot be undone from the dashboard.
-                </p>
-                <button onClick={handleDeactivate} className="py-4 px-6 bg-red-600 text-white font-bold rounded-2xl hover:bg-red-700 transition-all duration-300 shadow-md hover:shadow-lg w-full flex items-center justify-center gap-2 cursor-pointer">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  <span>Deactivate Account</span>
-                </button>
-              </div>
-            </div>
-          )}
-
         </div>
+
+        {/* SECTION 3: PASSWORD SETTINGS */}
+        <div className={`bg-white rounded-3xl border shadow-sm overflow-hidden transition-all duration-300 ${openSection === 'password' ? 'border-[#2C7FFF]/40 shadow-md' : 'border-[#03045E]/10 hover:border-[#03045E]/30'}`}>
+          <button onClick={() => toggleSection('password')} className="w-full p-6 sm:p-8 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer">
+            <div className="text-left">
+              <h2 className="text-lg font-bold text-[#03045E]">Change Password</h2>
+              <p className="text-xs text-gray-500 mt-1 font-medium">Update your account password securely.</p>
+            </div>
+            <ChevronIcon isOpen={openSection === 'password'} />
+          </button>
+
+          {openSection === 'password' && (
+            <div className="px-6 pb-6 sm:px-8 sm:pb-8 border-t border-[#03045E]/10 pt-6 animate-fadeIn">
+              
+              {passwordStatus.msg && (
+                <div className={`p-4 mb-6 rounded-xl text-sm font-bold border ${passwordStatus.type === 'error' ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
+                  {passwordStatus.msg}
+                </div>
+              )}
+
+              {passwordStep === 1 ? (
+                <form onSubmit={handleRequestPasswordUpdate} className="flex flex-col gap-5">
+                  <div className="flex flex-col gap-1.5 w-full sm:max-w-md">
+                    <label className="text-xs font-bold text-gray-500 uppercase">Current Password</label>
+                    <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required className="w-full p-3.5 border border-gray-200 rounded-xl focus:border-[#2C7FFF] outline-none transition font-medium" />
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-5 w-full">
+                    <div className="flex flex-col gap-1.5 flex-1">
+                      <label className="text-xs font-bold text-gray-500 uppercase">New Password</label>
+                      <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required className="w-full p-3.5 border border-gray-200 rounded-xl focus:border-[#2C7FFF] outline-none transition font-medium" />
+                    </div>
+                    <div className="flex flex-col gap-1.5 flex-1">
+                      <label className="text-xs font-bold text-gray-500 uppercase">Confirm New Password</label>
+                      <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="w-full p-3.5 border border-gray-200 rounded-xl focus:border-[#2C7FFF] outline-none transition font-medium" />
+                    </div>
+                  </div>
+                  <button type="submit" className="mt-2 w-full sm:max-w-md px-6 py-3.5 bg-[#03045E] text-white font-bold rounded-xl shadow-md hover:bg-[#2C7FFF] transition cursor-pointer">
+                    Request Password Change
+                  </button>
+                </form>
+              ) : (
+                <form onSubmit={handleVerifyAndUpdatePassword} className="flex flex-col gap-4">
+                  <div className="flex flex-col sm:flex-row gap-4 items-end">
+                    <div className="flex-1 w-full">
+                      <label className="text-xs font-bold text-gray-500 uppercase mb-1.5 block">Verification Code</label>
+                      <input type="text" value={passwordOtp} onChange={(e) => setPasswordOtp(e.target.value)} required placeholder="6-digit code sent to email" maxLength="6" className="w-full p-3.5 border border-gray-200 rounded-xl focus:border-[#2C7FFF] outline-none transition tracking-widest font-mono" />
+                    </div>
+                  </div>
+                  <div className="flex gap-3 mt-4">
+                    <button type="button" onClick={() => { setPasswordStep(1); setPasswordStatus({type:'', msg:''}); }} className="px-6 py-3.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition cursor-pointer">Cancel</button>
+                    <button type="submit" disabled={isUpdatingPassword || passwordOtp.length < 6} className="px-6 py-3.5 bg-[#03045E] text-white font-bold rounded-xl shadow-md hover:bg-[#2C7FFF] transition disabled:opacity-50 cursor-pointer w-full sm:w-auto">
+                      {isUpdatingPassword ? 'Verifying...' : 'Verify & Update Password'}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* SECTION 4: Danger Zone */}
+        <div className={`bg-red-50 rounded-3xl border transition-all duration-300 ${openSection === 'danger' ? 'border-red-400 shadow-md' : 'border-red-200 hover:border-red-300'}`}>
+          <button onClick={() => toggleSection('danger')} className="w-full p-6 sm:p-8 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer">
+            <div className="text-left">
+              <h2 className="text-lg font-bold text-red-800">Danger Zone</h2>
+              <p className="text-xs text-red-600/80 mt-1 font-medium">Deactivate or permanently delete your corporate account.</p>
+            </div>
+            <ChevronIcon isOpen={openSection === 'danger'} />
+          </button>
+
+          {openSection === 'danger' && (
+            <div className="px-6 pb-6 sm:px-8 sm:pb-8 border-t border-red-200 pt-6 animate-fadeIn">
+              
+              {/* DEACTIVATE / REACTIVATE TOGGLE */}
+              <div className="flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
+                <div>
+                  <h3 className={`text-sm font-bold ${isDeactivated ? 'text-emerald-800' : 'text-red-900'}`}>
+                    {isDeactivated ? 'Account is Currently Deactivated' : 'Deactivate Account'}
+                  </h3>
+                  <p className={`text-xs mt-1 ${isDeactivated ? 'text-emerald-700' : 'text-red-700'}`}>
+                    {isDeactivated 
+                      ? 'Your company profile and active jobs are hidden. Reactivate to resume hiring.' 
+                      : 'Temporarily hide your company profile and active job postings. You can reactivate later.'}
+                  </p>
+                </div>
+                <button 
+                  onClick={handleToggleDeactivation} 
+                  className={`px-6 py-2.5 font-bold rounded-xl transition whitespace-nowrap cursor-pointer ${
+                    isDeactivated 
+                      ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm' 
+                      : 'bg-white border-2 border-red-300 text-red-600 hover:bg-red-100'
+                  }`}
+                >
+                  {isDeactivated ? 'Reactivate Account' : 'Deactivate Account'}
+                </button>
+              </div>
+
+              <div className="h-px bg-red-200 my-6"></div>
+
+              {/* PERMANENT DELETE */}
+              <div className="flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
+                <div>
+                  <h3 className="text-sm font-bold text-red-900">Delete Account</h3>
+                  <p className="text-xs text-red-700 mt-1">Permanently erase your company data and job history. This action cannot be undone.</p>
+                </div>
+                <button onClick={() => setShowDeleteModal(true)} className="px-6 py-2.5 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 shadow-sm transition whitespace-nowrap cursor-pointer">
+                  Delete Account
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl w-full max-w-md p-6 sm:p-8 shadow-2xl flex flex-col gap-4 animate-fadeIn">
+            <h3 className="text-xl font-extrabold text-[#03045E]">Confirm Deletion</h3>
+            <p className="text-sm font-medium text-gray-600">This will permanently delete your corporate account and all associated job postings. Please enter your password to confirm.</p>
+            
+            {dangerStatus.msg && (
+              <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-sm font-bold rounded-xl">{dangerStatus.msg}</div>
+            )}
+
+            <form onSubmit={handleDelete} className="flex flex-col gap-4 mt-2">
+              <input type="password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} required placeholder="Enter password" className="w-full p-3.5 border border-gray-300 rounded-xl focus:border-red-500 outline-none transition" />
+              <div className="flex gap-3 mt-2">
+                <button type="button" onClick={() => setShowDeleteModal(false)} className="flex-1 py-3.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition cursor-pointer">Cancel</button>
+                <button type="submit" className="flex-1 py-3.5 bg-red-600 text-white font-bold rounded-xl shadow-md hover:bg-red-700 transition cursor-pointer">Confirm Delete</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

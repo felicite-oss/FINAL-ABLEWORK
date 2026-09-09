@@ -4,27 +4,28 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
   const [jobTitle, setJobTitle] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   
-  // Skill & Accommodation States
+  // Skill States
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [currentSkill, setCurrentSkill] = useState('');
-  const [accommodationsText, setAccommodationsText] = useState('');
+  
+  // Accommodation States
+  const [selectedAccommodations, setSelectedAccommodations] = useState([]);
+  const [currentAccommodation, setCurrentAccommodation] = useState('');
+
+  // Salary & Benefits States
+  const [salaryRange, setSalaryRange] = useState('');
+  const [selectedBenefits, setSelectedBenefits] = useState([]);
+  const [currentBenefit, setCurrentBenefit] = useState('');
+  
+  // Disability States (Toggle buttons)
   const [selectedDisabilities, setSelectedDisabilities] = useState([]);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
+  const [statusMessage, setStatusMessage] = useState({ type: '', text: '' }); 
 
-  // EXACT List requested
   const availableDisabilities = [
-    'Deafness', 
-    'Blindness', 
-    'Low Vision', 
-    'Hard of Hearing', 
-    'Color Blindness', 
-    'Paralysis', 
-    'Amputation', 
-    'Cerebral Palsy',
-    'Limited Fine Motor Skills',
-    'Wheelchair User'
+    'Deafness', 'Blindness', 'Low Vision', 'Hard of Hearing', 'Color Blindness', 
+    'Paralysis', 'Amputation', 'Cerebral Palsy', 'Limited Fine Motor Skills', 'Wheelchair User'
   ];
 
   const skillSuggestions = [
@@ -47,7 +48,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
     }
   };
 
-  // --- SKILL AUTOCOMPLETE LOGIC ---
+  // --- SKILL CHIP LOGIC ---
   const handleSkillKeyDown = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -56,9 +57,9 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
   };
 
   const addSkill = (skill) => {
-    const trimmedSkill = skill.trim();
-    if (trimmedSkill && !selectedSkills.some(s => s.toLowerCase() === trimmedSkill.toLowerCase())) {
-      setSelectedSkills([...selectedSkills, trimmedSkill]);
+    const trimmed = skill.trim();
+    if (trimmed && !selectedSkills.some(s => s.toLowerCase() === trimmed.toLowerCase())) {
+      setSelectedSkills([...selectedSkills, trimmed]);
       setCurrentSkill('');
     }
   };
@@ -72,50 +73,78 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
     s.toLowerCase().includes(activeSkillQuery) && !selectedSkills.some(selected => selected.toLowerCase() === s.toLowerCase())
   );
 
-  // --- ACCOMMODATION AUTOCOMPLETE LOGIC ---
-  const accommodationsArray = accommodationsText.split(',');
-  const activeAccTerm = accommodationsArray[accommodationsArray.length - 1].trim().toLowerCase();
-  const existingAccs = accommodationsArray.map(a => a.trim().toLowerCase());
-
-  const filteredAccommodations = activeAccTerm === '' ? [] : accommodationSuggestions.filter(a => 
-    a.toLowerCase().includes(activeAccTerm) && !existingAccs.includes(a.toLowerCase())
-  );
-
-  const addAccommodationChip = (acc) => {
-    const parts = accommodationsText.split(',');
-    parts.pop(); 
-    const prefix = parts.length > 0 ? parts.join(',').trim() + ', ' : '';
-    setAccommodationsText(prefix + acc + ', '); 
+  // --- ACCOMMODATION CHIP LOGIC ---
+  const handleAccommodationKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addAccommodation(currentAccommodation);
+    }
   };
 
+  const addAccommodation = (acc) => {
+    const trimmed = acc.trim();
+    if (trimmed && !selectedAccommodations.some(a => a.toLowerCase() === trimmed.toLowerCase())) {
+      setSelectedAccommodations([...selectedAccommodations, trimmed]);
+      setCurrentAccommodation('');
+    }
+  };
+
+  const removeAccommodation = (accToRemove) => {
+    setSelectedAccommodations(selectedAccommodations.filter(acc => acc !== accToRemove));
+  };
+
+  const activeAccQuery = currentAccommodation.trim().toLowerCase();
+  const filteredAccommodations = activeAccQuery === '' ? [] : accommodationSuggestions.filter(a => 
+    a.toLowerCase().includes(activeAccQuery) && !selectedAccommodations.some(selected => selected.toLowerCase() === a.toLowerCase())
+  );
+
+  // --- BENEFITS CHIP LOGIC ---
+  const handleBenefitKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addBenefit(currentBenefit);
+    }
+  };
+
+  const addBenefit = (benefit) => {
+    const trimmed = benefit.trim();
+    if (trimmed && !selectedBenefits.some(b => b.toLowerCase() === trimmed.toLowerCase())) {
+      setSelectedBenefits([...selectedBenefits, trimmed]);
+      setCurrentBenefit('');
+    }
+  };
+
+  const removeBenefit = (benefitToRemove) => {
+    setSelectedBenefits(selectedBenefits.filter(b => b !== benefitToRemove));
+  };
+
+  // --- SUBMIT LOGIC ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatusMessage({ type: '', text: '' });
 
     if (selectedDisabilities.length === 0) {
-      setStatusMessage({ type: 'error', text: 'Please select at least one accepted disability.' });
-      return;
+      return setStatusMessage({ type: 'error', text: 'Please select at least one accepted disability.' });
     }
     
     if (selectedSkills.length === 0) {
-      setStatusMessage({ type: 'error', text: 'Please add at least one required skill.' });
-      return;
+      return setStatusMessage({ type: 'error', text: 'Please add at least one required skill.' });
     }
 
     setIsLoading(true);
 
-    const finalAccommodationsArray = accommodationsText
-      .split(',')
-      .map(item => item.trim())
-      .filter(item => item !== '');
-
     const payload = {
       employer_id: profile.user_id,
+      company_name: profile.company_name,
       job_title: jobTitle,
       job_description: jobDescription,
-      required_skills: JSON.stringify(selectedSkills),
-      provided_accommodations: JSON.stringify(finalAccommodationsArray), 
-      accepted_disabilities: JSON.stringify(selectedDisabilities), 
+      required_skills: selectedSkills,
+      provided_accommodations: selectedAccommodations, 
+      accepted_disabilities: selectedDisabilities, 
+      salary_range: salaryRange,
+      benefits: selectedBenefits,
+      latitude: profile.latitude,
+      longitude: profile.longitude,
       status: 'Active'
     };
 
@@ -134,8 +163,12 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
         setJobDescription('');
         setSelectedSkills([]);
         setCurrentSkill('');
-        setAccommodationsText('');
+        setSelectedAccommodations([]);
+        setCurrentAccommodation('');
         setSelectedDisabilities([]);
+        setSalaryRange('');
+        setSelectedBenefits([]);
+        setCurrentBenefit('');
         
         await refreshData();
         setTimeout(() => setActiveTab('overview'), 2000);
@@ -175,6 +208,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
 
       <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-[2rem] shadow-sm border border-[#03045E]/10 flex flex-col gap-8">
         
+        {/* Basic Details */}
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <label className="text-sm font-extrabold text-[#03045E] flex items-center gap-2 uppercase tracking-wider">
@@ -203,20 +237,56 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
 
         <hr className="border-[#03045E]/10" />
 
+        {/* Salary & Benefits */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          
+          <div className="flex flex-col gap-3">
+            <label className="text-sm font-extrabold text-[#03045E] flex items-center gap-2 uppercase tracking-wider">
+              Salary Range
+            </label>
+            <p className="text-xs font-semibold text-[#03045E]/70 mb-1">Leave blank if undisclosed.</p>
+            <input
+              type="text" value={salaryRange} onChange={(e) => setSalaryRange(e.target.value)}
+              placeholder="e.g. ₱20,000 - ₱30,000 / month"
+              className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-[#f4f4f4] text-[#03045E] font-semibold focus:outline-none focus:border-[#2C7FFF] focus:bg-white transition-all"
+            />
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <label className="text-sm font-extrabold text-[#03045E] flex items-center gap-2 uppercase tracking-wider">
+              Benefits
+            </label>
+            <p className="text-xs font-semibold text-[#03045E]/70 mb-1">Type a benefit and press <strong>Enter</strong> to add it.</p>
+            <input
+              type="text" value={currentBenefit} onChange={(e) => setCurrentBenefit(e.target.value)} onKeyDown={handleBenefitKeyDown}
+              placeholder="e.g. HMO, 13th Month Pay..."
+              className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-[#f4f4f4] text-[#03045E] font-semibold focus:outline-none focus:border-[#2C7FFF] focus:bg-white transition-all"
+            />
+            {selectedBenefits.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                {selectedBenefits.map(benefit => (
+                  <span key={benefit} className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#03045E] text-white text-xs font-bold rounded-full shadow-sm">
+                    {benefit} <button type="button" onClick={() => removeBenefit(benefit)} className="hover:text-red-300 font-bold ml-0.5">✕</button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <hr className="border-[#03045E]/10" />
+
+        {/* Skills & Accommodations */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="flex flex-col gap-3">
             <label className="text-sm font-extrabold text-[#03045E] flex items-center gap-2 uppercase tracking-wider">
               Required Skills <span className="text-red-500">*</span>
             </label>
             <p className="text-xs font-semibold text-[#03045E]/70 mb-1">Type a skill and press <strong>Enter</strong> to add it.</p>
-            
             <input
               type="text" value={currentSkill} onChange={(e) => setCurrentSkill(e.target.value)} onKeyDown={handleSkillKeyDown}
               placeholder="e.g. Python, Graphic Design..."
               className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-[#f4f4f4] text-[#03045E] font-semibold focus:outline-none focus:border-[#2C7FFF] focus:bg-white transition-all"
             />
-
             {filteredSkills.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-1">
                 {filteredSkills.map(suggestion => (
@@ -226,7 +296,6 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
                 ))}
               </div>
             )}
-
             {selectedSkills.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2 p-3 bg-gray-50 rounded-xl border border-gray-200">
                 {selectedSkills.map(skill => (
@@ -242,20 +311,27 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
             <label className="text-sm font-extrabold text-[#03045E] flex items-center gap-2 uppercase tracking-wider">
               Guaranteed Accommodations
             </label>
-            <p className="text-xs font-semibold text-[#03045E]/70 mb-1">Enter accommodations separated by commas.</p>
-            
+            <p className="text-xs font-semibold text-[#03045E]/70 mb-1">Type an accommodation and press <strong>Enter</strong> to add it.</p>
             <input
-              type="text" value={accommodationsText} onChange={(e) => setAccommodationsText(e.target.value)}
+              type="text" value={currentAccommodation} onChange={(e) => setCurrentAccommodation(e.target.value)} onKeyDown={handleAccommodationKeyDown}
               placeholder="e.g. Wheelchair Access, Screen Reader..."
               className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-[#f4f4f4] text-[#03045E] font-semibold focus:outline-none focus:border-[#2C7FFF] focus:bg-white transition-all"
             />
-
             {filteredAccommodations.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-1">
                 {filteredAccommodations.map(suggestion => (
-                  <button key={suggestion} type="button" onClick={() => addAccommodationChip(suggestion)} className="px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-lg border border-green-200 hover:bg-green-600 hover:text-white transition-colors">
+                  <button key={suggestion} type="button" onClick={() => addAccommodation(suggestion)} className="px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-lg border border-green-200 hover:bg-green-600 hover:text-white transition-colors">
                     + {suggestion}
                   </button>
+                ))}
+              </div>
+            )}
+            {selectedAccommodations.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                {selectedAccommodations.map(acc => (
+                  <span key={acc} className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#03045E] text-white text-xs font-bold rounded-full shadow-sm">
+                    {acc} <button type="button" onClick={() => removeAccommodation(acc)} className="hover:text-red-300 font-bold ml-0.5">✕</button>
+                  </span>
                 ))}
               </div>
             )}
@@ -264,7 +340,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
 
         <hr className="border-[#03045E]/10" />
 
-        {/* UPDATED: EXACT DISABILITY LIST CHIPS */}
+        {/* Accepted Disabilities */}
         <div className="flex flex-col gap-4 p-5 rounded-2xl bg-[#2C7FFF]/5 border border-[#2C7FFF]/20">
           <div>
             <label className="text-sm font-extrabold text-[#03045E] flex items-center gap-2 uppercase tracking-wider">
@@ -293,7 +369,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
 
         <button
           type="submit" disabled={isLoading}
-          className="w-full py-4 bg-[#03045E] hover:bg-[#2C7FFF] text-white text-base font-extrabold rounded-2xl shadow-md transition-all disabled:opacity-50 mt-2 flex justify-center items-center gap-2"
+          className="w-full py-4 bg-[#03045E] hover:bg-[#2C7FFF] text-white text-base font-extrabold rounded-2xl shadow-md transition-all disabled:opacity-50 mt-2 flex justify-center items-center gap-2 cursor-pointer"
         >
           {isLoading ? 'Publishing Job...' : 'Publish Job Posting'}
           {!isLoading && <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>}

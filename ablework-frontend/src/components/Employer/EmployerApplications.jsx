@@ -39,7 +39,10 @@ export default function EmployerApplications({ profile, refreshStats }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           status: newStatus,
-          employer_message: employerMessage 
+          employer_message: employerMessage,
+          applicant_id: selectedApp?.applicant_id,  // <-- Added so the server knows who to notify
+          job_title: selectedApp?.job_title,          // <-- Added for the notification message text
+          company_name: profile?.company_name || 'The Company' // <-- Added for context
         })
       });
 
