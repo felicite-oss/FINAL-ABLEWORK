@@ -18,18 +18,18 @@ export default function ApplicantDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [isOpen, setIsOpen] = useState(false); 
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false); 
-  const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false); // <-- Added Notification State
+  const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false); 
   
   const dropdownRef = useRef(null);
-  const notifRef = useRef(null); // <-- Added Ref for clicking outside notifications
+  const notifRef = useRef(null); 
 
   // Shared Data States
   const [profile, setProfile] = useState(null);
   const [matches, setMatches] = useState([]);
   const [applications, setApplications] = useState([]);
   const [allJobs, setAllJobs] = useState([]); 
-  const [notifications, setNotifications] = useState([]); // <-- Added Notifications Data State
+  const [notifications, setNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -57,27 +57,22 @@ export default function ApplicantDashboard() {
 
     const fetchData = async () => {
       try {
-        // 1. Fetch Profile
         const profileRes = await fetch(`http://localhost:5001/api/applicant/${storedUser.id}/profile`);
         const profileData = await profileRes.json();
         if (profileRes.ok) setProfile({ ...profileData, user_id: storedUser.id });
 
-        // 2. Fetch Smart Matches
         const matchesRes = await fetch(`http://localhost:5001/api/applicant/${storedUser.id}/matches`);
         const matchesData = await matchesRes.json();
         if (matchesRes.ok) setMatches(matchesData);
 
-        // 3. Fetch Job Tracker (Application History)
         const trackerRes = await fetch(`http://localhost:5001/api/applicant/${storedUser.id}/applications`);
         const trackerData = await trackerRes.json();
         if (trackerRes.ok) setApplications(trackerData);
 
-        // 4. Fetch ALL Active Jobs
         const allJobsRes = await fetch('http://localhost:5001/api/jobs');
         const allJobsData = await allJobsRes.json();
         if (allJobsRes.ok) setAllJobs(allJobsData);
 
-        // 5. Fetch Notifications
         const notifRes = await fetch(`http://localhost:5001/api/users/${storedUser.id}/notifications`);
         const notifData = await notifRes.json();
         if (notifRes.ok) setNotifications(notifData);
@@ -92,7 +87,6 @@ export default function ApplicantDashboard() {
     fetchData();
   }, [navigate]);
 
-  // Function to refresh data after an action
   const refreshData = async () => {
     if(!profile) return;
     try {
@@ -106,7 +100,6 @@ export default function ApplicantDashboard() {
     }
   };
 
-  // Function to mark a single notification as read
   const handleMarkAsRead = async (notifId) => {
     try {
       const res = await fetch(`http://localhost:5001/api/notifications/${notifId}/read`, { method: 'PUT' });
@@ -118,7 +111,6 @@ export default function ApplicantDashboard() {
     }
   };
 
-  // Logout handler
   const handleLogout = () => {
     setIsLoggingOut(true);
     setTimeout(() => {
@@ -224,9 +216,10 @@ export default function ApplicantDashboard() {
                             onClick={() => {
                               if (!notif.is_read) handleMarkAsRead(notif.id);
                               
-                              
                               if (notif.type === 'update' || notif.type === 'application') {
                                 setActiveTab('tracker');
+                              } else if (notif.type === 'match') {
+                                setActiveTab('matches');
                               } else {
                                 setActiveTab('overview');
                               }
@@ -259,7 +252,7 @@ export default function ApplicantDashboard() {
               <button
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                 className={`w-10 h-10 rounded-full overflow-hidden bg-white text-[#03045E] border transition-all duration-200 cursor-pointer shadow-[0_2px_10px_rgba(3,4,94,0.04)] hover:shadow-[0_4px_20px_rgba(44,127,255,0.15)] hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center shrink-0 p-0 ${
-                  profileDropdownOpen || activeTab === 'profile' ? 'border-[#2C7FFF] ring-2 ring-[#2C7FFF]/20' : 'border-transparent'
+                  profileDropdownOpen || activeTab === 'profile' || activeTab === 'settings' ? 'border-[#2C7FFF] ring-2 ring-[#2C7FFF]/20' : 'border-transparent'
                 }`}
                 title="Profile Menu"
               >
@@ -294,7 +287,24 @@ export default function ApplicantDashboard() {
                     </svg>
                     <span className="truncate">Edit Profile</span>
                   </button>
+                  
+                  {/* --- NEW: SETTINGS OPTION --- */}
+                  <button
+                    onClick={() => {
+                      setActiveTab('settings');
+                      setProfileDropdownOpen(false);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-[#03045E] hover:bg-[#2C7FFF]/10 hover:text-[#2C7FFF] transition-colors text-left cursor-pointer"
+                  >
+                    <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span className="truncate">Settings</span>
+                  </button>
+
                   <div className="h-px bg-[#03045E]/10 my-1"></div>
+                  
                   <button
                     disabled={isLoggingOut}
                     onClick={() => {
@@ -344,6 +354,7 @@ export default function ApplicantDashboard() {
         >
           <div className="w-full">
             <nav className="flex flex-col px-3 sm:px-6 py-4 sm:py-6 gap-2 text-[15px] sm:text-[16px] font-medium text-[#03045E]">
+              
               <button
                 onClick={() => { setActiveTab('profile'); setIsOpen(false); }}
                 className={`flex items-center gap-3 px-3.5 sm:px-4 py-3 rounded-xl sm:rounded-2xl bg-white text-[#03045E] text-xs sm:text-sm font-bold border transition-all cursor-pointer text-left shadow-sm ${
@@ -370,14 +381,30 @@ export default function ApplicantDashboard() {
                 <span className="truncate">Profile</span>
               </button>
 
+              {/* --- NEW: SETTINGS OPTION FOR MOBILE NAV --- */}
+              <button
+                onClick={() => { setActiveTab('settings'); setIsOpen(false); }}
+                className={`flex items-center gap-3 px-3.5 sm:px-4 py-3 rounded-xl sm:rounded-2xl bg-white text-[#03045E] text-xs sm:text-sm font-bold border transition-all cursor-pointer text-left shadow-sm ${
+                  activeTab === 'settings' ? 'border-[#2C7FFF] bg-[#2C7FFF]/5' : 'border-[#03045E]/10 hover:border-[#2C7FFF]'
+                }`}
+              >
+                <div className="shrink-0 flex items-center justify-center border-none w-6 h-6 rounded-full overflow-hidden bg-[#03045E]/5 text-[#03045E]">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                </div>
+                <span className="truncate">Settings</span>
+              </button>
+
               <div className="h-px bg-[#03045E]/10 my-1"></div>
 
               {[
                 { id: 'overview', label: 'Overview' },
                 { id: 'matches', label: 'Smart Matches' },
                 { id: 'explore-jobs', label: 'Explore Jobs' },
-                { id: 'tracker', label: 'Job Tracker' },
-                { id: 'settings', label: 'Settings' }
+                { id: 'tracker', label: 'Job Tracker' }
+                // Removed 'settings' from the main list here!
               ].map((item) => (
                 <button 
                   key={item.id} 
@@ -426,8 +453,8 @@ export default function ApplicantDashboard() {
                   { id: 'overview', label: 'Overview' },
                   { id: 'matches', label: 'Smart Matches' },
                   { id: 'explore-jobs', label: 'Explore Jobs' },
-                  { id: 'tracker', label: 'Job Tracker' },
-                  { id: 'settings', label: 'Settings' }
+                  { id: 'tracker', label: 'Job Tracker' }
+                  // Removed 'settings' from the desktop sidebar array here!
                 ].map((item) => (
                   <button 
                     key={item.id} 
@@ -456,9 +483,6 @@ export default function ApplicantDashboard() {
                       )}
                       {item.id === 'tracker' && (
                         <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                      )}
-                      {item.id === 'settings' && (
-                        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                       )}
                     </div>
                     <span className="text-base tracking-wide font-semibold truncate">{item.label}</span>

@@ -331,10 +331,11 @@ export default function EmployerDashboard() {
           <div className="hidden md:block relative" ref={dropdownRef}>
             <div 
               onClick={() => setShowProfileDropdown(!showProfileDropdown)} 
-              className="flex items-center gap-3 cursor-pointer p-1.5 rounded-xl bg-white border border-[#03045E]/10 hover:bg-[#2C7FFF]/10 transition-all"
+              className={`flex items-center gap-3 cursor-pointer p-1.5 rounded-xl bg-white border transition-all ${
+                showProfileDropdown || activeTab === 'profile' || activeTab === 'settings' ? 'border-[#2C7FFF] ring-2 ring-[#2C7FFF]/20' : 'border-[#03045E]/10 hover:bg-[#2C7FFF]/10'
+              }`}
             >
               <div className="w-10 h-10 rounded-xl bg-[#03045E] text-[#f4f4f4] flex items-center justify-center font-bold overflow-hidden shadow-md shadow-[#03045E]/20">
-                {/* --- FIXED: Fetches Real Company Logo for Desktop --- */}
                 {profile?.company_logo ? (
                   <img src={`http://localhost:5001${profile.company_logo}`} alt="Company Logo" className="w-full h-full object-cover" />
                 ) : (
@@ -345,28 +346,46 @@ export default function EmployerDashboard() {
                 <p className="text-sm font-extrabold text-[#03045E] leading-tight">
                   {profile?.company_name || profile?.contact_person || 'Employer'}
                 </p>
-                <p className="text-xs text-[#2C7FFF] font-semibold">View Profile</p>
+                <p className="text-xs text-[#2C7FFF] font-semibold">Account Menu</p>
               </div>
             </div>
 
             {/* Desktop Dropdown Menu */}
             {showProfileDropdown && (
-              <div className="absolute right-0 mt-2 w-48 bg-[#f4f4f4] rounded-2xl shadow-xl border border-[#03045E]/10 py-2 z-50">
+              <div className="absolute right-0 mt-2 w-48 bg-[#f4f4f4] rounded-2xl shadow-xl border border-[#03045E]/10 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                 <button
                   onClick={() => {
                     setActiveTab('profile');
                     setShowProfileDropdown(false);
                   }}
-                  className="w-full text-left px-4 py-2.5 text-sm font-bold text-[#03045E] hover:bg-[#2C7FFF]/10 hover:text-[#2C7FFF] transition-colors flex items-center gap-2"
+                  className="w-full text-left px-4 py-2.5 text-sm font-bold text-[#03045E] hover:bg-[#2C7FFF]/10 hover:text-[#2C7FFF] transition-colors flex items-center gap-2 cursor-pointer"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                   Edit Profile
                 </button>
+                
+                {/* --- SETTINGS MOVED HERE --- */}
+                <button
+                  onClick={() => {
+                    setActiveTab('settings');
+                    setShowProfileDropdown(false);
+                  }}
+                  className="w-full text-left px-4 py-2.5 text-sm font-bold text-[#03045E] hover:bg-[#2C7FFF]/10 hover:text-[#2C7FFF] transition-colors flex items-center gap-2 cursor-pointer"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Account Settings
+                </button>
+
+                <div className="h-px bg-[#03045E]/10 my-1"></div>
+
                 <button
                   onClick={handleLogout}
-                  className="w-full text-left px-4 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50 transition-colors flex items-center gap-2"
+                  className="w-full text-left px-4 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50 transition-colors flex items-center gap-2 cursor-pointer"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -382,7 +401,7 @@ export default function EmployerDashboard() {
             <button
               onClick={() => setShowMobileMenu(!showMobileMenu)}
               aria-label="Toggle Menu"
-              className="p-2.5 rounded-2xl bg-[#03045E] text-[#f4f4f4] hover:bg-[#2C7FFF] transition-all shadow-md shadow-[#03045E]/20 flex items-center justify-center"
+              className="p-2.5 rounded-2xl bg-[#03045E] text-[#f4f4f4] hover:bg-[#2C7FFF] transition-all shadow-md shadow-[#03045E]/20 flex items-center justify-center cursor-pointer"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 {showMobileMenu ? (
@@ -406,7 +425,6 @@ export default function EmployerDashboard() {
                   className="flex items-center gap-3 p-3 rounded-2xl bg-[#f4f4f4] cursor-pointer hover:bg-[#2C7FFF]/10 transition-all border border-[#03045E]/10"
                 >
                   <div className="w-12 h-12 rounded-xl bg-[#03045E] text-[#f4f4f4] flex items-center justify-center font-bold overflow-hidden shadow-md flex-shrink-0">
-                    {/* --- FIXED: Fetches Real Company Logo for Mobile --- */}
                     {profile?.company_logo ? (
                       <img src={`http://localhost:5001${profile.company_logo}`} alt="Company Logo" className="w-full h-full object-cover" />
                     ) : (
@@ -421,7 +439,24 @@ export default function EmployerDashboard() {
                   </div>
                 </div>
 
-                {/* Sidebar Navigation Tabs Inside Hamburger */}
+                {/* --- MOBILE ACCOUNT SETTINGS BUTTON --- */}
+                <button
+                  onClick={() => {
+                    setActiveTab('settings');
+                    setShowMobileMenu(false);
+                  }}
+                  className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold transition-all text-sm w-full border border-[#03045E]/10 shadow-sm cursor-pointer ${
+                    activeTab === 'settings' ? 'bg-[#2C7FFF] text-white' : 'bg-[#f4f4f4] text-[#03045E] hover:bg-[#2C7FFF]/10'
+                  }`}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <span className="flex-1 text-left">Account Settings</span>
+                </button>
+
+                {/* Sidebar Navigation Tabs Inside Hamburger (Settings removed from this array) */}
                 <div className="flex flex-col space-y-3 max-h-[50vh] overflow-y-auto pr-1">
                   {[
                     { id: 'overview', label: 'Analytics Dashboard', icon: (
@@ -443,12 +478,6 @@ export default function EmployerDashboard() {
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
-                    )},
-                    { id: 'settings', label: 'Account Settings', icon: (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
                     )}
                   ].map((tabItem) => {
                     const isActive = activeTab === tabItem.id;
@@ -459,7 +488,7 @@ export default function EmployerDashboard() {
                             setActiveTab(tabItem.id);
                             setShowMobileMenu(false);
                         }} 
-                        className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold transition-all text-sm w-full relative group border border-[#03045E]/30 shadow-sm ${
+                        className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold transition-all text-sm w-full relative group border border-[#03045E]/30 shadow-sm cursor-pointer ${
                             isActive 
                               ? 'bg-gradient-to-r from-[#03045E] to-[#07098c] text-white shadow-lg shadow-[#03045E]/25' 
                               : 'bg-white text-[#03045E]/80 hover:bg-[#2C7FFF]/10 hover:text-[#2C7FFF]'
@@ -482,7 +511,7 @@ export default function EmployerDashboard() {
                 {/* Logout Button Inside Hamburger */}
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center justify-center gap-2 p-3.5 rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 font-extrabold text-sm transition-colors border border-red-200 shadow-sm"
+                  className="w-full flex items-center justify-center gap-2 p-3.5 rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 font-extrabold text-sm transition-colors border border-red-200 shadow-sm cursor-pointer"
                 >
                     <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -499,7 +528,7 @@ export default function EmployerDashboard() {
       {/* PAGE BODY CONTAINER WRAPPING SIDEBAR & CONTENT */}
       <div className="flex flex-col md:flex-row flex-1 min-h-screen">
         
-        {/* REDESIGNED DESKTOP SIDEBAR NAVIGATION */}
+        {/* REDESIGNED DESKTOP SIDEBAR NAVIGATION (Settings removed from this array) */}
         <aside className="hidden md:flex w-72 flex-col z-10 bg-white border-r border-[#03045E]/10 p-4 justify-between shadow-sm flex-shrink-0">
           <nav className="flex flex-col space-y-3 w-full">
 
@@ -516,18 +545,12 @@ export default function EmployerDashboard() {
               )},
               { id: 'jobs', label: 'My Job Listings', icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
               )},
               { id: 'applications', label: 'Review Applicants', icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              )},
-              { id: 'settings', label: 'Account Settings', icon: (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               )}
             ].map((tabItem) => {

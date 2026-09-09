@@ -615,19 +615,10 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
                 distanceScore = Math.max(0, 40 - ((distance / maxRadius) * 40));
             }
 
-// B. Accommodation Scoring (Instead of a strict dealbreaker)
+            // B. Accommodation Strict Dealbreaker (Aligns with Notification Engine)
             const jobAccommodations = safeParse(job.provided_accommodations).map(a => a.toLowerCase());
-            let matchingAccomsCount = 0;
-            
-            appAccommodations.forEach(need => {
-                if (jobAccommodations.includes(need)) matchingAccomsCount++;
-            });
-
-            // If applicant has requested accommodations, calculate score component. Default to full points if none needed.
-            const accomScoreWeight = 30; // Weight of accommodations in the total score
-            const accomScore = appAccommodations.length > 0 
-                ? (matchingAccomsCount / appAccommodations.length) * accomScoreWeight 
-                : accomScoreWeight;
+            const meetsAllNeeds = appAccommodations.every(need => jobAccommodations.includes(need));
+            if (!meetsAllNeeds) continue; // If the job doesn't provide all required accommodations, skip it!
 
             // C. Disability Match Check (Case-Insensitive Dealbreaker)
             const jobAcceptedDisabilities = safeParse(job.accepted_disabilities).map(d => d.toLowerCase());
@@ -648,6 +639,7 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
             const overallMatchPercentage = Math.round(skillScore + distanceScore);
 
             if (overallMatchPercentage < 50) continue;
+            
             matchedJobs.push({
                 ...job,
                 distance_km: distance ? distance.toFixed(1) : null,
