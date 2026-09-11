@@ -1105,13 +1105,14 @@ app.get('/api/employer/:id/applications', async (req, res) => {
 // ---------------------------------------------------------
 app.put('/api/applications/:id/status', async (req, res) => {
     const applicationId = req.params.id;
-    const { status, applicant_id, job_title, company_name } = req.body; 
+    const { status, employer_message, applicant_id, job_title, company_name } = req.body; 
 
     try {
-        // 1. Update status in database
-        await db.execute("UPDATE applications SET status = ? WHERE id = ?", [status, applicationId]);
+        await db.execute(
+            "UPDATE applications SET status = ?, employer_message = ? WHERE id = ?", 
+            [status, employer_message || null, applicationId]
+        );
 
-        // 2. Trigger the notification & email
         const alertTitle = `Application Status Update: ${status}`;
         const alertMessage = `Hello! Your application for the ${job_title} role at ${company_name} has been marked as ${status}. Please log in to your AbleWork dashboard for more details.`;
         

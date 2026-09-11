@@ -5,14 +5,11 @@ export default function EmployerApplications({ profile, refreshStats }) {
   const [selectedApp, setSelectedApp] = useState(null); 
   const [isLoading, setIsLoading] = useState(true);
   
-  // --- NEW: ACTIVE TAB STATE ---
   const [activeTab, setActiveTab] = useState('All');
 
-  // States for next steps message
   const [nextSteps, setNextSteps] = useState({ isOpen: false, status: '' });
   const [messageText, setMessageText] = useState('');
 
-  // Fetch applications when component mounts
   const fetchApplications = async () => {
     try {
       const res = await fetch(`http://localhost:5001/api/employer/${profile.user_id}/applications`);
@@ -31,7 +28,6 @@ export default function EmployerApplications({ profile, refreshStats }) {
     fetchApplications();
   }, [profile.user_id]);
 
-  // Update Status Function
   const updateStatus = async (applicationId, newStatus, employerMessage = null, closeModal = true) => {
     try {
       const res = await fetch(`http://localhost:5001/api/applications/${applicationId}/status`, {
@@ -40,9 +36,9 @@ export default function EmployerApplications({ profile, refreshStats }) {
         body: JSON.stringify({ 
           status: newStatus,
           employer_message: employerMessage,
-          applicant_id: selectedApp?.applicant_id,  // <-- Added so the server knows who to notify
-          job_title: selectedApp?.job_title,          // <-- Added for the notification message text
-          company_name: profile?.company_name || 'The Company' // <-- Added for context
+          applicant_id: selectedApp?.applicant_id,
+          job_title: selectedApp?.job_title,
+          company_name: profile?.company_name || 'The Company'
         })
       });
 
@@ -50,13 +46,11 @@ export default function EmployerApplications({ profile, refreshStats }) {
         fetchApplications();
         if (refreshStats) refreshStats();
         
-        // ONLY close the modal if this flag is true (e.g., when Hiring or Rejecting)
         if (closeModal) {
           setSelectedApp(null);
           setNextSteps({ isOpen: false, status: '' });
           setMessageText('');
         } else if (selectedApp && selectedApp.application_id === applicationId) {
-          // If we are keeping it open, dynamically update the badge color inside the modal
           setSelectedApp(prev => ({ ...prev, application_status: newStatus }));
         }
       }
@@ -65,7 +59,6 @@ export default function EmployerApplications({ profile, refreshStats }) {
     }
   };
 
-  // Helper to color-code status badges
   const getStatusColor = (status) => {
     switch (status) {
       case 'Pending': return 'bg-orange-100 text-orange-800';
@@ -77,13 +70,11 @@ export default function EmployerApplications({ profile, refreshStats }) {
     }
   };
 
-  // --- NEW: FILTER LOGIC ---
   const filteredApplications = applications.filter(app => {
     if (activeTab === 'All') return true;
     return app.application_status === activeTab;
   });
 
-  // Array of tabs to render
   const tabs = ['All', 'Pending', 'Under Review', 'Shortlisted', 'Hired', 'Rejected'];
 
   if (isLoading) return <div className="p-10 font-bold text-[#03045E]">Loading applicants...</div>;
@@ -92,7 +83,6 @@ export default function EmployerApplications({ profile, refreshStats }) {
     <div className="animate-fadeIn max-w-6xl relative">
       <h1 className="text-3xl font-extrabold mb-6 text-[#03045E]">Review Applicants</h1>
       
-      {/* --- NEW: TAB NAVIGATION --- */}
       <div className="flex gap-2 overflow-x-auto pb-4 mb-6 border-b border-gray-200 scrollbar-hide">
         {tabs.map(tab => (
           <button
@@ -105,7 +95,6 @@ export default function EmployerApplications({ profile, refreshStats }) {
             }`}
           >
             {tab}
-            {/* Optional: Add a counter for each tab if you want */}
             <span className={`ml-2 px-2 py-0.5 rounded-full text-[10px] ${
               activeTab === tab ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-500'
             }`}>
@@ -117,7 +106,6 @@ export default function EmployerApplications({ profile, refreshStats }) {
         ))}
       </div>
       
-      {/* APPLICANT ROSTER (FILTERED LIST) */}
       <div className="flex flex-col gap-4">
         {filteredApplications.length > 0 ? (
           filteredApplications.map(app => (
@@ -137,12 +125,10 @@ export default function EmployerApplications({ profile, refreshStats }) {
               <div>
                 <button 
                   onClick={() => {
-                    // 1. Open the modal immediately
                     setSelectedApp(app);
                     setNextSteps({ isOpen: false, status: '' });
                     setMessageText('');
 
-                    // 2. Run the background update, but pass FALSE so it doesn't close the modal
                     if(app.application_status === 'Pending') {
                         updateStatus(app.application_id, 'Under Review', null, false);
                     }
@@ -162,12 +148,10 @@ export default function EmployerApplications({ profile, refreshStats }) {
         )}
       </div>
 
-      {/* APPLICANT DETAIL MODAL (Unchanged) */}
       {selectedApp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-white p-8 rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto flex flex-col transition-all">
             
-            {/* Modal Header */}
             <div className="flex justify-between items-start mb-6 pb-6 border-b border-gray-200">
               <div>
                 <h2 className="text-3xl font-extrabold text-[#03045E]">{selectedApp.firstname} {selectedApp.lastname}</h2>
@@ -178,10 +162,8 @@ export default function EmployerApplications({ profile, refreshStats }) {
               </span>
             </div>
 
-            {/* Modal Body - 2 Column Layout */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
               
-              {/* Left Column: Profile & Contact */}
               <div className="flex flex-col gap-6">
                 <div>
                   <h4 className="text-sm font-bold text-[#03045E]/60 uppercase mb-2">Contact Information</h4>
@@ -196,7 +178,6 @@ export default function EmployerApplications({ profile, refreshStats }) {
                 </div>
               </div>
 
-              {/* Right Column: Skills & Accommodations */}
               <div className="flex flex-col gap-6">
                 <div>
                   <h4 className="text-sm font-bold text-[#03045E]/60 uppercase mb-2">Verified Skills</h4>
@@ -225,7 +206,6 @@ export default function EmployerApplications({ profile, refreshStats }) {
               </div>
             </div>
 
-            {/* APPLICATION DOCUMENTS SECTION */}
             <div className="mb-8 pt-6 border-t border-gray-200">
               <h4 className="text-sm font-bold text-[#03045E]/60 uppercase mb-4">Application Documents</h4>
               
@@ -258,8 +238,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
               </div>
             </div>
 
-            {/* Modal Footer - DYNAMIC STATUS MANAGEMENT */}
-            <div className="mt-auto pt-6 border-t border-gray-200">
+            <div className="mt-auto pt-6 border-t border-gray-200 w-full">
               {nextSteps.isOpen ? (
                 <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-bottom-2 duration-200">
                   <label className="text-sm font-bold text-[#03045E]">
@@ -287,34 +266,44 @@ export default function EmployerApplications({ profile, refreshStats }) {
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-wrap gap-3 justify-end">
+                <div className="flex justify-between items-center w-full">
                   <button 
                     onClick={() => setSelectedApp(null)} 
-                    className="px-6 py-3 bg-gray-200 text-gray-800 font-bold rounded-xl hover:bg-gray-300 transition mr-auto"
+                    className="px-6 py-3 bg-gray-200 text-gray-800 font-bold rounded-xl hover:bg-gray-300 transition"
                   >
                     Close Window
                   </button>
                   
-                  <button 
-                    onClick={() => updateStatus(selectedApp.application_id, 'Rejected')} 
-                    className="px-6 py-3 bg-red-100 text-red-800 font-bold rounded-xl hover:bg-red-200 transition"
-                  >
-                    Reject
-                  </button>
-                  
-                  <button 
-                    onClick={() => setNextSteps({ isOpen: true, status: 'Shortlisted' })} 
-                    className="px-6 py-3 bg-green-100 text-green-800 font-bold rounded-xl hover:bg-green-200 transition"
-                  >
-                    Shortlist
-                  </button>
-                  
-                  <button 
-                    onClick={() => setNextSteps({ isOpen: true, status: 'Hired' })} 
-                    className="px-6 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition shadow-md"
-                  >
-                    Hire Applicant
-                  </button>
+                  {selectedApp.application_status !== 'Hired' && selectedApp.application_status !== 'Rejected' ? (
+                    <div className="flex flex-wrap gap-3">
+                      <button 
+                        onClick={() => updateStatus(selectedApp.application_id, 'Rejected')} 
+                        className="px-6 py-3 bg-red-100 text-red-800 font-bold rounded-xl hover:bg-red-200 transition"
+                      >
+                        Reject
+                      </button>
+                      
+                      <button 
+                        onClick={() => setNextSteps({ isOpen: true, status: 'Shortlisted' })} 
+                        className="px-6 py-3 bg-green-100 text-green-800 font-bold rounded-xl hover:bg-green-200 transition"
+                      >
+                        Shortlist
+                      </button>
+                      
+                      <button 
+                        onClick={() => setNextSteps({ isOpen: true, status: 'Hired' })} 
+                        className="px-6 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition shadow-md"
+                      >
+                        Hire Applicant
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+                      <p className="text-sm font-bold text-gray-500 italic">
+                        Application finalized as <span className={selectedApp.application_status === 'Hired' ? 'text-emerald-600' : 'text-red-600'}>{selectedApp.application_status}</span>.
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

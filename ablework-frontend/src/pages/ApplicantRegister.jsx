@@ -531,7 +531,7 @@ export default function ApplicantRegister() {
 
               {/* Accommodations - OPTIONAL */}
               <fieldset className="flex flex-col gap-3">
-                <legend className="text-sm font-bold text-[#03045E]">Required Accommodations <span className="text-gray-400 font-normal ml-1">(Optional)</span></legend>
+                <legend className="text-sm font-bold text-[#03045E]"> Accommodations <span className="text-gray-400 font-normal ml-1">(Optional)</span></legend>
                 <div className="flex flex-wrap gap-2">
                   {availableAccommodations.map((acc) => (
                     <button

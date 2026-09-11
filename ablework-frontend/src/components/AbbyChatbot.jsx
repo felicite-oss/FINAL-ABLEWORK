@@ -7,18 +7,19 @@ export default function AbbyChatbot() {
     { sender: 'abby', text: 'Hi there! I am Abby, your AI assistant. How can I help you today?' }
   ]);
   const [input, setInput] = useState('');
+  const [isTyping, setIsTyping] = useState(false); // <-- 1. Loading state added here
   const chatEndRef = useRef(null);
 
-  // Auto-scroll to the newest message
+  // Auto-scroll to the newest message (includes isTyping so it scrolls when thinking bubble appears)
   useEffect(() => {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isOpen]);
+  }, [messages, isOpen, isTyping]);
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || isTyping) return; // Prevent sending while already loading
 
     const userText = input;
     setInput('');
@@ -26,6 +27,7 @@ export default function AbbyChatbot() {
     // Add user's message to the UI instantly
     const newMessages = [...messages, { sender: 'user', text: userText }];
     setMessages(newMessages);
+    setIsTyping(true); // <-- 2. Turn on loading indicator before fetch starts
 
     // 1. Format history for Gemini
     const formattedHistory = messages
@@ -71,6 +73,8 @@ export default function AbbyChatbot() {
     } catch (error) {
       console.error("Chat Error:", error);
       setMessages((prev) => [...prev, { sender: 'abby', text: 'I am offline right now! Please make sure the backend is running.' }]);
+    } finally {
+      setIsTyping(false); // <-- 3. Turn off loading indicator when complete
     }
   };
 
@@ -142,6 +146,17 @@ export default function AbbyChatbot() {
                 {msg.sender === 'abby' ? formatText(msg.text) : msg.text}
               </div>
             ))}
+
+            {/* --- 4. GEMINI-STYLE THINKING / TYPING INDICATOR --- */}
+            {isTyping && (
+              <div className="bg-white border border-gray-200 text-gray-500 self-start px-4 py-3 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-1.5 animate-pulse">
+                <span className="text-xs font-semibold text-gray-400 mr-1">Abby is thinking</span>
+                <div className="w-1.5 h-1.5 bg-[#48cae4] rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                <div className="w-1.5 h-1.5 bg-[#48cae4] rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                <div className="w-1.5 h-1.5 bg-[#48cae4] rounded-full animate-bounce"></div>
+              </div>
+            )}
+
             <div ref={chatEndRef} />
           </div>
 
@@ -154,14 +169,15 @@ export default function AbbyChatbot() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask Abby something..."
+              disabled={isTyping} // Disable input while processing
+              placeholder={isTyping ? "Abby is generating response..." : "Ask Abby something..."}
               aria-label="Type your message to Abby"
-              className="flex-1 min-w-0 px-4 py-2.5 border border-gray-200 rounded-xl focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none text-gray-800 bg-gray-50 text-sm transition-all"
+              className="flex-1 min-w-0 px-4 py-2.5 border border-gray-200 rounded-xl focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none text-gray-800 bg-gray-50 text-sm transition-all disabled:opacity-50"
             />
             <button 
               type="submit"
               aria-label="Send message"
-              disabled={!input.trim()}
+              disabled={!input.trim() || isTyping} // Disable button while loading or empty
               className="bg-blue-600 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition-colors cursor-pointer text-sm whitespace-nowrap shrink-0 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
             >
               Send
