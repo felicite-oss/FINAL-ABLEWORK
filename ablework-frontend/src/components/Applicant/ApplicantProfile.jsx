@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Circle, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-
-// Fix for default Leaflet marker icons in React
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
@@ -15,7 +13,7 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-// Helper component to smoothly re-center the map when location changes
+
 function MapUpdater({ lat, lng }) {
   const map = useMap();
   useEffect(() => {
@@ -44,7 +42,22 @@ const DISABILITY_OPTIONS = [
 ];
 
 export default function ApplicantProfile({ profile, refreshData, setProfile }) {
+  
+  if (!profile) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 text-[#03045E]">
+        <div className="w-12 h-12 border-4 border-[#2C7FFF] border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="font-bold text-lg">Loading profile data...</p>
+      </div>
+    );
+  }
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUpdatingPicture, setIsUpdatingPicture] = useState(false); 
+  const fileInputRef = useRef(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [tempImagePreview, setTempImagePreview] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const parseInitialList = (data) => {
     if (!data) return [];
@@ -69,11 +82,74 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
     residential_address: profile?.residential_address || '',
     travel_radius_km: profile?.travel_radius_km || 5,
     latitude: profile?.latitude || '',
-    longitude: profile?.longitude || ''
+    longitude: profile?.longitude || '',
+    profile_picture: profile?.profile_picture || profile?.avatar_url || localStorage.getItem('profile_picture') || ''
   });
+
+
+  useEffect(() => {
+    const savedPic = localStorage.getItem('profile_picture');
+    const currentPic = profile?.profile_picture || profile?.avatar_url || savedPic;
+    
+    if (currentPic) {
+      setFormData(prev => ({ ...prev, profile_picture: currentPic }));
+      if (setProfile) {
+        setProfile(prev => ({
+          ...(prev || {}),
+          profile_picture: currentPic,
+          avatar_url: currentPic
+        }));
+      }
+    }
+  }, [profile?.profile_picture, profile?.avatar_url]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setTempImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleConfirmChangePicture = () => {
+    if (!tempImagePreview) return;
+    
+    setIsUpdatingPicture(true);
+
+
+    setTimeout(() => {
+      if (tempImagePreview) {
+        setFormData(prev => ({ ...prev, profile_picture: tempImagePreview }));
+        
+        localStorage.setItem('profile_picture', tempImagePreview);
+        window.dispatchEvent(new Event('storage'));
+        
+        if (setProfile) {
+          setProfile(prev => ({ 
+            ...(prev || {}), 
+            profile_picture: tempImagePreview, 
+            avatar_url: tempImagePreview 
+          }));
+        }
+      }
+      setIsUpdatingPicture(false);
+      setIsModalOpen(false);
+      setSelectedFile(null);
+    }, 2000);
+  };
+
+  const handleCancelChangePicture = () => {
+    setTempImagePreview('');
+    setSelectedFile(null);
+    setIsModalOpen(false);
   };
 
   const handleSkillKeyDown = (e) => {
@@ -158,11 +234,13 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
       workplace_independence: formData.workplace_independence,
       disability_type: selectedDisabilities.join(', '),
       skills: skills,
-      accommodations_needed: accommodations
+      accommodations_needed: accommodations,
+      profile_picture: formData.profile_picture,
+      avatar_url: formData.profile_picture
     };
 
     try {
-      const res = await fetch(`http://localhost:5001/api/applicant/${profile.user_id}/profile`, {
+      const res = await fetch(`http://localhost:5001/api/applicant/${profile?.user_id}/profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -170,8 +248,10 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
 
       if (res.ok) {
         if (setProfile) {
-          setProfile(prev => ({ ...prev, ...payload }));
+          setProfile(prev => ({ ...(prev || {}), ...payload }));
         }
+        localStorage.setItem('profile_picture', formData.profile_picture);
+        window.dispatchEvent(new Event('storage'));
         alert("Profile updated successfully!");
         refreshData(); 
       } else {
@@ -186,22 +266,119 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
 
   return (
     <div className="max-w-6xl relative pb-12 animate-in fade-in duration-300 text-[#03045E]">
+      
+
       <div className="mb-10 bg-[#f4f4f4] p-8 rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border border-[#03045E]/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-6">
+          
+
+          <div className="relative group shrink-0">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-4 border-white shadow-md bg-white flex items-center justify-center text-[#03045E]">
+              {formData.profile_picture ? (
+                <img src={formData.profile_picture} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <svg className="w-12 h-12 text-[#03045E]/40" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                </svg>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setTempImagePreview(formData.profile_picture);
+                setIsModalOpen(true);
+              }}
+              className="absolute bottom-0 right-0 p-2.5 bg-[#2C7FFF] text-white rounded-full shadow-lg hover:bg-[#03045E] transition-all cursor-pointer border-2 border-white"
+              title="Change Profile Picture"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+            </button>
+          </div>
+
           <div>
-            <h1 className="text-2xl font-extrabold text-[#03045E] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#03045E] tracking-tight">
               {profile?.full_name || profile?.name || 'Applicant Profile'}
             </h1>
-            <p className="text-sm font-semibold text-[#03045E] mt-0.5">
-              Manage your personal settings and smart match parameters
+            <p className="text-sm font-semibold text-[#03045E] mt-1">
+              Manage your personal settings, avatar, and smart match parameters
             </p>
           </div>
         </div>
       </div>
 
+  
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-fadeIn">
+          <div className="bg-white rounded-[2rem] p-8 max-w-md w-full shadow-2xl border border-[#03045E]/20 flex flex-col items-center text-center">
+            <h3 className="text-xl font-black text-[#03045E] mb-2">Update Profile Picture</h3>
+            <p className="text-xs font-semibold text-[#03045E]/70 mb-6">Choose a new image to update your profile and header photo.</p>
+
+            
+            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[#2C7FFF]/30 shadow-inner mb-6 bg-gray-100 flex items-center justify-center">
+              {tempImagePreview ? (
+                <img src={tempImagePreview} alt="Preview" className="w-full h-full object-cover" />
+              ) : (
+                <svg className="w-14 h-14 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                </svg>
+              )}
+            </div>
+
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileSelect} 
+              accept="image/*" 
+              className="hidden" 
+            />
+
+            <button 
+              type="button" 
+              onClick={() => fileInputRef.current?.click()} 
+              className="px-6 py-2.5 bg-[#f4f4f4] border border-[#03045E]/20 text-[#03045E] font-extrabold text-xs rounded-xl hover:bg-[#03045E] hover:text-white transition-all mb-6 cursor-pointer"
+            >
+              Browse Image File
+            </button>
+
+          
+            <div className="flex items-center gap-3 w-full">
+              <button 
+                type="button" 
+                disabled={isUpdatingPicture}
+                onClick={handleCancelChangePicture} 
+                className="flex-1 py-3 bg-gray-100 text-gray-700 font-extrabold text-sm rounded-xl hover:bg-gray-200 transition-all cursor-pointer disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button 
+                type="button" 
+                disabled={isUpdatingPicture}
+                onClick={handleConfirmChangePicture} 
+                className="flex-1 py-3 bg-[#2C7FFF] text-white font-extrabold text-sm rounded-xl hover:bg-[#03045E] transition-all cursor-pointer shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isUpdatingPicture ? (
+                  <>
+                    <svg className="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                    <span>Updating...</span>
+                  </>
+                ) : (
+                  <span>Change Profile</span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        {/* LEFT COLUMN: Professional Details */}
+    
         <div className="flex flex-col gap-6 p-8 bg-[#f4f4f4] rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.04)] border border-[#03045E]/20 h-fit transition-all duration-300 hover:shadow-[0_20px_40px_rgba(3,4,94,0.08)]">
           <div className="flex items-center gap-3 border-b border-[#03045E]/20 pb-4">
             <div className="w-10 h-10 rounded-xl bg-white text-[#2C7FFF] border border-[#03045E]/10 flex items-center justify-center shrink-0">
@@ -212,7 +389,6 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
             <h2 className="text-xl font-bold text-[#03045E]">Professional Profile</h2>
           </div>
 
-          {/* SKILLS INPUT & CONDITIONAL RECO CHIPS */}
           <div className="flex flex-col gap-2">
             <label className="text-sm font-bold text-[#03045E]">Skills *</label>
             <div className="p-3 bg-white border border-[#03045E]/20 rounded-2xl flex flex-wrap gap-2 items-center focus-within:border-[#2C7FFF] focus-within:ring-4 focus-within:ring-[#2C7FFF]/20 transition-all">
@@ -251,7 +427,7 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
             <p className="text-xs text-[#03045E] font-semibold mt-1">These must match employer requirements to trigger a Smart Match.</p>
           </div>
 
-          {/* ACCOMMODATIONS INPUT & CONDITIONAL RECO CHIPS */}
+          
           <div className="flex flex-col gap-2">
             <label className="text-sm font-bold text-[#03045E]">Required Accommodations *</label>
             <div className="p-3 bg-white border border-[#03045E]/20 rounded-2xl flex flex-wrap gap-2 items-center focus-within:border-[#2C7FFF] focus-within:ring-4 focus-within:ring-[#2C7FFF]/20 transition-all">
@@ -290,7 +466,7 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
             <p className="text-xs text-[#03045E] font-semibold mt-1">The Smart Engine will only show you jobs that provide these exact accommodations.</p>
           </div>
 
-          {/* DISABILITY SELECTION CHIPS */}
+
           <div className="flex flex-col gap-2">
             <label className="text-sm font-bold text-[#03045E]">Primary Disability Type *</label>
             <div className="flex flex-wrap gap-2 p-3 bg-white border border-[#03045E]/20 rounded-2xl">
@@ -328,7 +504,7 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Geographic Settings */}
+
         <div className="flex flex-col gap-6 p-8 bg-[#f4f4f4] rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.04)] border border-[#03045E]/20 h-fit transition-all duration-300 hover:shadow-[0_20px_40px_rgba(3,4,94,0.08)]">
           <div className="flex items-center gap-3 border-b border-[#03045E]/20 pb-4">
             <div className="w-10 h-10 rounded-xl bg-white text-[#2C7FFF] border border-[#03045E]/10 flex items-center justify-center shrink-0">
@@ -382,7 +558,7 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
             Detect Current Location
           </button>
 
-          {/* DYNAMIC REACT-LEAFLET MAP WITH RADIUS CIRCLE */}
+         
           {formData.latitude && formData.longitude && (
             <div className="rounded-2xl overflow-hidden border border-[#03045E]/20 h-[220px] relative shadow-inner bg-gray-100 z-0">
               <MapContainer 
@@ -398,7 +574,7 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
                 <Marker position={[Number(formData.latitude), Number(formData.longitude)]} />
                 <Circle 
                   center={[Number(formData.latitude), Number(formData.longitude)]}
-                  radius={Number(formData.travel_radius_km) * 1000} // Radius expects meters
+                  radius={Number(formData.travel_radius_km) * 1000} 
                   pathOptions={{ color: '#2C7FFF', fillColor: '#2C7FFF', fillOpacity: 0.15, weight: 2 }}
                 />
                 <MapUpdater lat={Number(formData.latitude)} lng={Number(formData.longitude)} />

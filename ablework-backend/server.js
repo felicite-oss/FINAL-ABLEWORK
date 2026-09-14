@@ -9,8 +9,7 @@ require('dotenv').config();
 
 const nodemailer = require('nodemailer');
 
-// 1. Configure the Email Transporter
-// NOTE: If using Gmail, you MUST use an "App Password", not your normal password!
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -22,30 +21,28 @@ const transporter = nodemailer.createTransport({
 
 async function sendNotification(userId, title, message, type) {
   try {
-    // A. Clean up message for the in-app bell feed (removes the login prompt)
+    
     let inAppMessage = message.replace(/Please log in to your AbleWork dashboard for more details\./gi, '').trim();
     if (inAppMessage.endsWith('.')) {
-      inAppMessage = inAppMessage.slice(0, -1); // Remove trailing dot temporarily to append context cleanly
+      inAppMessage = inAppMessage.slice(0, -1); 
     }
     
-    // Customize the in-app text based on notification type
     if (type === 'match') {
       inAppMessage += '. Check your Smart Matches tab for details.';
     } else {
       inAppMessage += '. Check your Job Tracker for details.';
     }
 
-    // Insert the clean message into the database for the bell feed
     await db.execute(
       "INSERT INTO notifications (user_id, title, message, type) VALUES (?, ?, ?, ?)",
       [userId ?? null, title ?? null, inAppMessage ?? null, type ?? 'general']
     );
 
-    // B. Fetch the User's Email from the users table
+    
     const [users] = await db.execute("SELECT email FROM users WHERE id = ?", [userId ?? null]);
     
     if (users.length > 0 && users[0].email) {
-      // C. Send the actual email safely inside its own try/catch block
+      
       try {
         await transporter.sendMail({
           from: '"AbleWork Notifications" <ableworksys5i@gmail.com>',
@@ -66,22 +63,21 @@ const { OpenAI } = require('openai');
 
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-// Initialize Gemini using your secret key from Google AI Studio
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const app = express();
 
-// Add this line to allow images to be loaded cross-origin
 app.use(
   helmet.crossOriginResourcePolicy({ policy: "cross-origin" })
 );
 
-// 1. Open CORS for development
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 2. Configure Multer to save uploaded files WITH their file extensions (.jpg, .png)
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'uploads/');
@@ -92,19 +88,16 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// 3. Tell Express to serve the 'uploads' folder publicly so React can display the images
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
-// ---------------------------------------------------------
-// HELPER: Fetch Live User Context for ABBY
-// ---------------------------------------------------------
+
 async function getUserLiveContext(userId, role) {
     let contextSummary = { role };
 
     try {
         if (role === 'employer') {
-            // 1. Fetch Employer Profile & Job Stats
             const [profile] = await db.execute(
                 `SELECT company_name, industry FROM employer_profiles WHERE user_id = ?`,
                 [userId]
@@ -113,7 +106,7 @@ async function getUserLiveContext(userId, role) {
                 `SELECT id, job_title, status, created_at FROM job_postings WHERE employer_id = ?`,
                 [userId]
             );
-            // Note: Your table is named `applications`
+            
             const [apps] = await db.execute(
                 `SELECT a.status, COUNT(*) as count 
                  FROM applications a 
@@ -131,7 +124,6 @@ async function getUserLiveContext(userId, role) {
             contextSummary.applicationPipeline = apps;
 
         } else if (role === 'applicant') {
-            // 2. Fetch Applicant Profile & Application History
             const [profile] = await db.execute(
                 `SELECT a.firstname, a.lastname, a.skills, a.accommodations_needed, u.verification_status, u.rejection_reason 
                  FROM applicant_profiles a 
@@ -167,18 +159,16 @@ async function getUserLiveContext(userId, role) {
 // ROUTE: Abby AI Chatbot Engine (Powered by Gemini + RAG)
 // ---------------------------------------------------------
 app.post('/api/chat', async (req, res) => {
-    // We now expect the frontend to send the user's ID, role, and chat history!
     const { message, userId, role, conversationHistory = [] } = req.body;
     console.log(`Received message for Abby from ${role || 'Guest'} ${userId || ''}:`, message);
 
     try {
-        // 1. Retrieve real-time database state if the user is logged in
         let liveContext = {};
         if (userId && role) {
             liveContext = await getUserLiveContext(userId, role);
         }
 
-        // 2. Inject this live data directly into ABBY's brain
+    
         const systemInstruction = `
         You are Abby, the official AI assistant for AbleWork, a job application platform connecting Persons with Disabilities (PWD) to inclusive employers. 
         
@@ -224,19 +214,19 @@ app.post('/api/chat', async (req, res) => {
         4. Applying & Uploading Resumes: To upload a resume, the user MUST click on the specific job they want to apply for.
         5. Archived Jobs: If an employer archives a job, it completely disappears from the active UI.`;
 
-        // 3. Initialize the model 
+       
         const model = genAI.getGenerativeModel({ 
             model: "gemini-3-flash-preview", 
             systemInstruction 
         });
 
-        // 4. Format previous conversation history so ABBY remembers context
+        
         const formattedHistory = conversationHistory.map(turn => ({
             role: turn.sender === 'user' ? 'user' : 'model',
             parts: [{ text: turn.text }]
         }));
 
-        // 5. Start the chat with history and send the new message
+       
         const chat = model.startChat({
             history: formattedHistory,
         });
@@ -251,9 +241,7 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
-// ---------------------------------------------------------
-// ROUTE: Fetch Active Jobs (Explore Tab)
-// ---------------------------------------------------------
+
 app.get('/api/jobs', async (req, res) => {
     try {
         const [jobs] = await db.execute(`
@@ -277,16 +265,16 @@ app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        // 1. Find the user in the main table
+        
         const [users] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
         if (users.length === 0) return res.status(401).json({ error: "Invalid credentials." });
         const user = users[0];
 
-        // 2. Verify password
+       
         const isMatch = await bcrypt.compare(password, user.password_hash);
         if (!isMatch) return res.status(401).json({ error: "Invalid credentials." });
 
-        // 3. Send the successful response WITH the strict DB role
+       
         res.status(200).json({ 
             message: "Login successful", 
             user: { 
@@ -294,7 +282,7 @@ app.post('/api/auth/login', async (req, res) => {
                 email: user.email, 
                 ui_preference: user.ui_preference,
                 verification_status: user.verification_status,
-                role: user.role // Directly from the new database column!
+                role: user.role 
             } 
         });
 
@@ -311,7 +299,6 @@ app.get('/api/applicant/:id/profile', async (req, res) => {
     const userId = req.params.id;
 
     try {
-        // Use a JOIN to grab data from both the users table and applicant_profiles table
         const [rows] = await db.execute(`
             SELECT 
                 u.email, 
@@ -343,15 +330,13 @@ app.get('/api/applicant/:id/profile', async (req, res) => {
 
         const profile = rows[0];
 
-        // Safely parse the JSON arrays for the frontend UI chips
-        // (If they are already valid JSON strings in DB, we parse them back to arrays for React)
+
         let parsedSkills = [];
         let parsedAccommodations = [];
         
         try { parsedSkills = JSON.parse(profile.skills); } catch (e) {}
         try { parsedAccommodations = JSON.parse(profile.accommodations_needed); } catch (e) {}
 
-        // Send the packaged data to the frontend
         res.status(200).json({
             ...profile,
             skills: parsedSkills,
@@ -370,37 +355,32 @@ app.get('/api/applicant/:id/profile', async (req, res) => {
 app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (req, res) => {
     console.log("--- INCOMING APPLICANT REGISTRATION ---");
     
-    // Safety check
+    
     if (!req.body) {
         return res.status(400).json({ message: "No data received. Ensure you are sending FormData." });
     }
 
-    // 1. Destructure using the EXACT variable names you used in your React FormData
     const { 
         firstName, middleName, lastName, email, phone, password, birthdate, 
         address, latitude, longitude, radius, 
         independence, disabilities, accommodations, skills 
     } = req.body;
 
-    // Grab the file path if multer successfully saved the uploaded document
+
     const pwdDocumentPath = req.file ? req.file.path : null;
 
     try {
-        // 2. Check if the email is already in use
         const [existingUser] = await db.execute('SELECT id FROM users WHERE email = ?', [email]);
         if (existingUser.length > 0) {
             return res.status(400).json({ message: "Email is already registered." });
         }
 
-        // 3. Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
         
-        // 4. Start database transaction
         const connection = await db.getConnection();
         await connection.beginTransaction();
 
         try {
-            // STEP A: Insert core data into `users`
             const [userResult] = await connection.execute(
                 `INSERT INTO users (email, phone, password_hash, ui_preference, verification_status, role) 
                  VALUES (?, ?, ?, ?, ?, ?)`,
@@ -408,19 +388,17 @@ app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (re
                     email, 
                     phone, 
                     hashedPassword, 
-                    'default', // <-- FIXED: Removed 'uiPreference' and just hardcoded 'default'
+                    'default', 
                     'Pending', 
                     'applicant'
                 ]
             );
 
             const newUserId = userResult.insertId;
-
-            // Clean up the disabilities JSON array into a comma-separated string for the DB
             const parsedDisabilities = JSON.parse(disabilities || '[]');
             const disabilityString = parsedDisabilities.join(', ');
 
-            // STEP B: Insert into `applicant_profiles` (mapping React names to Database column names)
+
             await connection.execute(
                 `INSERT INTO applicant_profiles 
                 (user_id, firstname, middlename, lastname, birthdate, disability_type, residential_address, latitude, longitude, travel_radius_km, workplace_independence, accommodations_needed, skills, pwd_document_path) 
@@ -463,17 +441,16 @@ app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (re
 // ---------------------------------------------------------
 // ROUTE: FULL EMPLOYER REGISTRATION 
 // ---------------------------------------------------------
-// 1. ADDED: upload.single('verificationDocument')
 app.post('/api/auth/register/employer', upload.single('verificationDocument'), async (req, res) => {
     console.log("--- INCOMING EMPLOYER REGISTRATION ---");
     
-    // 2. REMOVED: documentName (we don't need the string, we need the actual file)
+   
     const { 
         companyName, companyDescription, email, phone, password, industry, 
         jobRole, address, latitude, longitude 
     } = req.body;
 
-    // 3. ADDED: Grab the newly saved file's name from Multer
+
     const documentFilename = req.file ? req.file.filename : null;
 
     try {
@@ -487,7 +464,6 @@ app.post('/api/auth/register/employer', upload.single('verificationDocument'), a
         await connection.beginTransaction();
 
         try {
-            // STEP A: Insert core data into `users` 
             const [userResult] = await connection.execute(
                 `INSERT INTO users (email, phone, password_hash, ui_preference, verification_status, role) 
                  VALUES (?, ?, ?, ?, ?, ?)`,
@@ -496,7 +472,7 @@ app.post('/api/auth/register/employer', upload.single('verificationDocument'), a
 
             const newUserId = userResult.insertId;
 
-            // STEP B: Insert into `employer_profiles` using the real filename
+
             await connection.execute(
                 `INSERT INTO employer_profiles 
                 (user_id, company_name, company_description, industry, job_role, workplace_address, latitude, longitude, verification_document) 
@@ -525,15 +501,10 @@ app.post('/api/auth/register/employer', upload.single('verificationDocument'), a
 });
 
 // ---------------------------------------------------------
-// --- START THE SERVER ---
-// ---------------------------------------------------------
-const PORT = process.env.PORT || 5001;
-
-// ---------------------------------------------------------
-// HELPER: Haversine Formula (Calculates exact distance in KM)
+// HELPER: Haversine Formula 
 // ---------------------------------------------------------
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Radius of the earth in km
+    const R = 6371; 
     const dLat = (lat2 - lat1) * (Math.PI / 180);
     const dLon = (lon2 - lon1) * (Math.PI / 180);
     const a = 
@@ -545,7 +516,7 @@ function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
 }
 
 // ---------------------------------------------------------
-// ROUTE: SMART MATCHING ENGINE (Case-Insensitive & Bulletproof)
+// ROUTE: SMART MATCHING ENGINE 
 // ---------------------------------------------------------
 app.get('/api/applicant/:id/matches', async (req, res) => {
     const userId = req.params.id;
@@ -560,7 +531,7 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
         if (applicantRows.length === 0) return res.status(404).json({ message: "Applicant not found." });
         const applicant = applicantRows[0];
 
-        // --- BULLETPROOF PARSER ---
+    
         const safeParse = (data) => {
             if (!data) return [];
             if (Array.isArray(data)) return data;
@@ -576,7 +547,7 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
             return [];
         };
 
-        // Convert everything to Lowercase for strict, format-free comparison!
+        
         const appSkills = safeParse(applicant.skills).map(s => s.toLowerCase());
         const appAccommodations = safeParse(applicant.accommodations_needed).map(a => a.toLowerCase());
         const appDisabilities = safeParse(applicant.disability_type).map(d => d.toLowerCase()); 
@@ -596,7 +567,7 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
 
         for (let job of jobs) {
             
-            // A. Geofencing & Distance Score
+            // A. geofencing & distance score
             let distance = 0;
             let distanceScore = 40; 
 
@@ -615,12 +586,12 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
                 distanceScore = Math.max(0, 40 - ((distance / maxRadius) * 40));
             }
 
-            // B. Accommodation Strict Dealbreaker (Aligns with Notification Engine)
+            // B. accommodation 
             const jobAccommodations = safeParse(job.provided_accommodations).map(a => a.toLowerCase());
             const meetsAllNeeds = appAccommodations.every(need => jobAccommodations.includes(need));
-            if (!meetsAllNeeds) continue; // If the job doesn't provide all required accommodations, skip it!
+            if (!meetsAllNeeds) continue; 
 
-            // C. Disability Match Check (Case-Insensitive Dealbreaker)
+            // C. disability match check
             const jobAcceptedDisabilities = safeParse(job.accepted_disabilities).map(d => d.toLowerCase());
             const isDisabilitySupported = appDisabilities.some(disability => 
                 jobAcceptedDisabilities.includes(disability)
@@ -665,12 +636,12 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
 // ---------------------------------------------------------
 // ROUTE: SUBMIT A JOB APPLICATION (With Resume Upload)
 // ---------------------------------------------------------
-// Note: We added upload.single('resume') here!
+
 app.post('/api/applications/apply', upload.single('resume'), async (req, res) => {
-    // Because we use FormData on the frontend, data is in req.body
+
     const { applicant_id, job_id, cover_letter } = req.body;
     
-    // Multer saves the file and provides the path
+
     const resumePath = req.file ? `/uploads/${req.file.filename}` : null;
 
     if (!applicant_id || !job_id) {
@@ -682,7 +653,7 @@ app.post('/api/applications/apply', upload.single('resume'), async (req, res) =>
     }
 
     try {
-        // Prevent double-applying
+
         const [existing] = await db.execute(
             'SELECT id FROM applications WHERE applicant_id = ? AND job_id = ?', 
             [applicant_id, job_id]
@@ -692,12 +663,11 @@ app.post('/api/applications/apply', upload.single('resume'), async (req, res) =>
             return res.status(400).json({ message: "You have already applied for this job." });
         }
 
-        // Insert the application with the resume path and cover letter
         await db.execute(
             'INSERT INTO applications (applicant_id, job_id, status, resume_path, cover_letter) VALUES (?, ?, ?, ?, ?)',
             [applicant_id, job_id, 'Under Review', resumePath, cover_letter || null]
         );
-        // 1. Get the Job Title and Employer ID
+
         const [jobRows] = await db.execute(
             "SELECT employer_id, job_title FROM job_postings WHERE id = ?", 
             [job_id] 
@@ -707,14 +677,12 @@ app.post('/api/applications/apply', upload.single('resume'), async (req, res) =>
             const employerId = jobRows[0].employer_id;
             const jobTitle = jobRows[0].job_title;
 
-            // 2. Get the Applicant's Name
             const [appRows] = await db.execute(
                 "SELECT firstname, lastname FROM applicant_profiles WHERE user_id = ?", 
                 [applicant_id] 
             );
             const applicantName = appRows.length > 0 ? `${appRows[0].firstname} ${appRows[0].lastname}` : "A new candidate";
 
-            // 3. Trigger the Notification & Email to the EMPLOYER!
             const alertTitle = `New Application: ${jobTitle}`;
             const alertMessage = `${applicantName} has just applied for your open ${jobTitle} role! Log in to your AbleWork dashboard to review their resume and pitch.`;
 
@@ -735,7 +703,6 @@ app.get('/api/applicant/:id/applications', async (req, res) => {
     const userId = req.params.id;
 
     try {
-        // Use a JOIN to get the job title, company name, AND employer message
         const [applications] = await db.execute(`
             SELECT 
                 a.id as application_id, a.status, a.applied_at, a.employer_message, 
@@ -760,7 +727,6 @@ app.get('/api/employer/:id/profile', async (req, res) => {
     const userId = req.params.id;
 
     try {
-        // Look at the SELECT below. We MUST include e.latitude and e.longitude!
         const [rows] = await db.execute(`
             SELECT u.email, 
                     u.phone, 
@@ -792,13 +758,11 @@ app.get('/api/employer/:id/dashboard-stats', async (req, res) => {
     const employerId = req.params.id;
 
     try {
-        // 1. Get Active Jobs (Strictly 'Active' so archived jobs disappear from UI)
         const [activeJobs] = await db.execute(
             `SELECT COUNT(*) as count FROM job_postings WHERE employer_id = ? AND status = 'Active'`, 
             [employerId]
         );
 
-        // 2. Get Application Stats (Checking for both 'Pending' and 'Under Review')
         const [appStats] = await db.execute(
             `SELECT 
                 SUM(CASE WHEN a.status IN ('Pending', 'Under Review') THEN 1 ELSE 0 END) as pending_count,
@@ -809,8 +773,7 @@ app.get('/api/employer/:id/dashboard-stats', async (req, res) => {
              [employerId]
         );
 
-        // 3. Get Recent Activity 
-        // We use ap.firstname and ap.lastname to match your database!
+
         const [recentActivity] = await db.execute(
             `SELECT a.id, a.applied_at AS created_at, a.status, j.job_title, 
                     ap.firstname AS first_name, ap.lastname AS last_name
@@ -823,9 +786,7 @@ app.get('/api/employer/:id/dashboard-stats', async (req, res) => {
              [employerId]
         );
 
-        // --- NEW: 4. Generate Last 7 Days Application Data for Recharts ---
-        
-        // A. Fetch all applications from the last 7 days
+
         const [recentApps] = await db.execute(
             `SELECT a.applied_at 
              FROM applications a
@@ -835,16 +796,15 @@ app.get('/api/employer/:id/dashboard-stats', async (req, res) => {
              [employerId]
         );
 
-        // B. Dynamically build the 7-day array to ensure empty days equal 0
+
         const chartData = [];
         const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         
-        // Loop backwards from 6 days ago to today (0)
+
         for (let i = 6; i >= 0; i--) {
             const targetDate = new Date();
             targetDate.setDate(targetDate.getDate() - i);
             
-            // Count how many applications in the SQL results match this specific day
             const dailyCount = recentApps.filter(row => {
                 const rowDate = new Date(row.applied_at);
                 return rowDate.getDate() === targetDate.getDate() && 
@@ -853,18 +813,18 @@ app.get('/api/employer/:id/dashboard-stats', async (req, res) => {
             }).length;
 
             chartData.push({
-                name: dayNames[targetDate.getDay()], // Converts day number to 'Mon', 'Tue', etc.
+                name: dayNames[targetDate.getDay()], 
                 applications: dailyCount
             });
         }
 
-        // 5. Send everything to the frontend
+        
         res.status(200).json({
             activeJobs: activeJobs[0].count || 0,
             pendingApps: appStats[0].pending_count || 0,
             shortlistedApps: appStats[0].shortlisted_count || 0,
             recentActivity: recentActivity,
-            chartData: chartData // <-- The new analytics array is now sent to React!
+            chartData: chartData 
         });
 
     } catch (error) {
@@ -967,7 +927,6 @@ for (let applicant of applicants) {
                     const appRadius = Number(applicant.travel_radius_km) || 5;
                     const appAccommodations = safeParse(applicant.accommodations_needed).map(a => a.toLowerCase());
                     
-                    // FIXED: Properly handle string-based disability_type from applicant_profiles
                     const applicantDisabilityStr = (applicant.disability_type || "").toLowerCase();
                     
                     const appSkills = safeParse(applicant.skills).map(s => s.toLowerCase());
@@ -988,15 +947,12 @@ for (let applicant of applicants) {
                         distanceScore = Math.max(0, 40 - ((distance / appRadius) * 40));
                     }
 
-                    // A. Accommodations Dealbreaker Check
                     const meetsAllNeeds = appAccommodations.every(need => jobAccommodations.includes(need));
                     if (!meetsAllNeeds) continue;
 
-                    // B. Disability Check (Ensures the applicant's disability type matches one accepted by the job)
                     const isDisabilitySupported = jobAcceptedDisabilities.length === 0 || jobAcceptedDisabilities.some(d => applicantDisabilityStr.includes(d));
                     if (!isDisabilitySupported) continue;
 
-                    // C. Skill Scoring
                     let matchingSkillsCount = 0;
                     appSkills.forEach(skill => {
                         if (jobSkills.includes(skill)) matchingSkillsCount++;
@@ -1004,7 +960,6 @@ for (let applicant of applicants) {
                     const skillScore = jobSkills.length > 0 ? (matchingSkillsCount / jobSkills.length) * 60 : 60;
                     const overallMatchPercentage = Math.round(skillScore + distanceScore);
 
-                    // D. Fire notification if score is >= 50%
                     if (overallMatchPercentage >= 50) {
                         const alertTitle = `New Smart Match: ${job.job_title}`;
                         const alertMessage = `Great news! A new opening for ${job.job_title} at ${job.company_name} matches your profile with a ${overallMatchPercentage}% score.`;
@@ -1046,7 +1001,7 @@ app.put('/api/jobs/:id', async (req, res) => {
                 job_description, 
                 JSON.stringify(required_skills || []), 
                 JSON.stringify(provided_accommodations || []), 
-                JSON.stringify(accepted_disabilities || []), // <-- Added to update query
+                JSON.stringify(accepted_disabilities || []), 
                 salary_range ?? null,
                 JSON.stringify(benefits || []),
                 jobId
@@ -1131,15 +1086,11 @@ app.put('/api/applications/:id/status', async (req, res) => {
 app.put('/api/employer/:id/settings', upload.single('company_logo'), async (req, res) => {
     const userId = req.params.id;
     const { company_name, company_description, industry, email, latitude, longitude } = req.body;
-    
-    // If a new image was uploaded, we save its new path. Otherwise, we keep it undefined to ignore it in the SQL.
     const company_logo = req.file ? `/uploads/${req.file.filename}` : null;
 
     try {
-        // 1. Update the users table (for email)
         await db.execute(`UPDATE users SET email = ? WHERE id = ?`, [email, userId]);
 
-        // 2. Update the employer_profiles table
         if (company_logo) {
             await db.execute(
                 `UPDATE employer_profiles 
@@ -1201,8 +1152,6 @@ app.put('/api/applicant/:id/profile', async (req, res) => {
 // =========================================================
 //                  ADMIN PANEL ROUTES
 // =========================================================
-
-// 1. Fetch High-Level Platform Statistics (Updated to count pending applicants)
 app.get('/api/admin/stats', async (req, res) => {
     try {
         const [applicantCount] = await db.execute(`SELECT COUNT(*) as count FROM users WHERE role = 'applicant'`);
@@ -1224,7 +1173,7 @@ app.get('/api/admin/stats', async (req, res) => {
     }
 });
 
-// 2. Fetch ALL Employers (Pending, Approved, Rejected, Disabled)
+
 app.get('/api/admin/employers/all', async (req, res) => {
     try {
         const [employers] = await db.execute(`
@@ -1241,7 +1190,7 @@ app.get('/api/admin/employers/all', async (req, res) => {
     }
 });
 
-// 3. Fetch ALL Applicants (Pending, Approved, Rejected, Disabled)
+
 app.get('/api/admin/applicants/all', async (req, res) => {
     try {
         const [applicants] = await db.execute(`
@@ -1258,20 +1207,18 @@ app.get('/api/admin/applicants/all', async (req, res) => {
     }
 });
 
-// 4. Approve/Reject ANY User (Applicant or Employer)
+
 app.put('/api/admin/users/:id/verify', async (req, res) => {
     const { id } = req.params;
     const { status, rejection_reason } = req.body; 
 
     try {
         if (status === 'Rejected') {
-            // Apply rejection reason and set the cooldown timestamp
             await db.execute(
                 `UPDATE users SET verification_status = ?, rejection_reason = ?, rejection_timestamp = NOW() WHERE id = ?`,
                 [status, rejection_reason, id]
             );
         } else {
-            // If approved, clear out any previous rejection data
             await db.execute(
                 `UPDATE users SET verification_status = ?, rejection_reason = NULL, rejection_timestamp = NULL WHERE id = ?`,
                 [status, id]
@@ -1285,7 +1232,7 @@ app.put('/api/admin/users/:id/verify', async (req, res) => {
     }
 });
 
-// 5. Disable/Enable ANY Account
+
 app.put('/api/admin/users/:id/account-status', async (req, res) => {
     const userId = req.params.id;
     const { account_status } = req.body;
@@ -1332,7 +1279,6 @@ app.get('/api/setup-admin', async (req, res) => {
 // ---------------------------------------------------------
 app.get('/api/admin/analytics/annual', async (req, res) => {
     try {
-        // Fetch User Growth by Month (Current Year)
         const [userGrowth] = await db.execute(`
             SELECT MONTH(created_at) as month, COUNT(*) as total 
             FROM users 
@@ -1341,7 +1287,6 @@ app.get('/api/admin/analytics/annual', async (req, res) => {
             ORDER BY month
         `);
 
-        // Format data for Recharts [ { name: 'Jan', users: 10 }, ... ]
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const formattedData = months.map((month, index) => {
             const userStat = userGrowth.find(u => u.month === index + 1);
@@ -1369,7 +1314,6 @@ app.get('/api/skills/popular', async (req, res) => {
             WHERE status = 'Active'
         `);
         
-        // --- ADD THE BULLETPROOF PARSER HERE ---
         const safeParse = (data) => {
             if (!data) return [];
             if (Array.isArray(data)) return data;
@@ -1388,10 +1332,8 @@ app.get('/api/skills/popular', async (req, res) => {
         let skillCounts = {};
         
         jobs.forEach(job => {
-            // USE SAFEPARSE INSTEAD OF JSON.PARSE
             const skills = safeParse(job.required_skills);
             
-            // Now .forEach() will always work because safeParse ALWAYS returns an array!
             skills.forEach(skill => {
                 if (skill) {
                     skillCounts[skill] = (skillCounts[skill] || 0) + 1;
@@ -1414,12 +1356,9 @@ app.get('/api/skills/popular', async (req, res) => {
 app.post('/api/users/:id/resubmit', upload.single('document'), async (req, res) => {
     const userId = req.params.id;
     
-    // 1. CAPTURE CLIENT IP
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
     try {
-        // 2. IP RATE LIMITING (Max 3 reverification attempts per IP)
-        // We sum all reverification attempts made from this specific IP address
         if (clientIp) {
             const [ipCheck] = await db.execute(
                 'SELECT SUM(reverification_attempts) as total_attempts FROM users WHERE ip_address = ?', 
@@ -1434,7 +1373,6 @@ app.post('/api/users/:id/resubmit', upload.single('document'), async (req, res) 
             }
         }
 
-        // 3. Fetch the user's current status and rejection timestamp
         const [userRows] = await db.execute(`
             SELECT verification_status, rejection_timestamp 
             FROM users 
@@ -1444,7 +1382,6 @@ app.post('/api/users/:id/resubmit', upload.single('document'), async (req, res) 
         if (userRows.length === 0) return res.status(404).json({ message: "User not found." });
         const user = userRows[0];
 
-        // 4. ENFORCE THE 7-DAY COOLDOWN
         if (user.verification_status === 'Rejected' && user.rejection_timestamp) {
             const rejectionDate = new Date(user.rejection_timestamp);
             const currentDate = new Date();
@@ -1460,10 +1397,8 @@ app.post('/api/users/:id/resubmit', upload.single('document'), async (req, res) 
             }
         }
 
-        // 5. If they pass all checks, process the file and update the database
         const filePath = req.file.path; 
         
-        // We increment the attempt counter, record the IP used, and clear the rejection status
         await db.execute(`
             UPDATE users 
             SET verification_document = ?, 
@@ -1495,7 +1430,7 @@ app.put('/api/applicant/:id/credentials', async (req, res) => {
         if (users.length === 0) return res.status(404).json({ message: "User not found." });
         const user = users[0];
 
-        // ACTION A: Update Password
+
         if (newPassword) {
             if (!currentPassword) {
                 return res.status(400).json({ message: "Current password is required to set a new password." });
@@ -1510,7 +1445,6 @@ app.put('/api/applicant/:id/credentials', async (req, res) => {
             return res.status(200).json({ message: "Password updated successfully." });
         } 
         
-        // ACTION B: Update Email Only
         if (email && !newPassword) {
             await db.execute('UPDATE users SET email = ? WHERE id = ?', [email, userId]);
             return res.status(200).json({ message: "Email updated successfully." });
@@ -1536,7 +1470,7 @@ app.put('/api/employer/:id/credentials', async (req, res) => {
         if (users.length === 0) return res.status(404).json({ message: "User not found." });
         const user = users[0];
 
-        // ACTION A: Update Password
+
         if (newPassword) {
             if (!currentPassword) {
                 return res.status(400).json({ message: "Current password is required to set a new password." });
@@ -1551,7 +1485,7 @@ app.put('/api/employer/:id/credentials', async (req, res) => {
             return res.status(200).json({ message: "Password updated successfully." });
         } 
         
-        // ACTION B: Update Email Only
+
         if (email && !newPassword) {
             await db.execute('UPDATE users SET email = ? WHERE id = ?', [email, userId]);
             return res.status(200).json({ message: "Email updated successfully." });
@@ -1591,11 +1525,8 @@ app.delete('/api/users/:id', async (req, res) => {
         const isMatch = await bcrypt.compare(password, users[0].password_hash);
         if (!isMatch) return res.status(401).json({ message: "Incorrect password. Deletion aborted." });
 
-        // Delete from both profile tables just to be safe (if a row doesn't exist, it just skips it)
         await db.execute('DELETE FROM applicant_profiles WHERE user_id = ?', [userId]);
         await db.execute('DELETE FROM employer_profiles WHERE user_id = ?', [userId]);
-        // Note: Make sure your `applications` and `job_postings` tables use ON DELETE CASCADE, 
-        // otherwise you'll need to manually delete those records here first!
         await db.execute('DELETE FROM users WHERE id = ?', [userId]);
 
         res.status(200).json({ message: "Account permanently deleted." });
@@ -1640,25 +1571,21 @@ app.post('/api/users/:id/request-otp', async (req, res) => {
     const { email, type } = req.body;
 
     try {
-        // 1. Generate a random 6-digit code
         const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-        
-        // 2. Set expiration for 15 minutes from now
         const expires = new Date(Date.now() + 15 * 60000); 
 
-        // 3. Save OTP to the database for this user
         await db.execute(
             "UPDATE users SET otp_code = ?, otp_expires = ? WHERE id = ?",
             [otpCode, expires, userId]
         );
 
-        // 4. Send the email using your existing nodemailer transporter
+
         const subjectLine = type === 'email' ? 'Verify your new Email Address' : 'Verify your Password Change';
         const messageBody = `Hello!\n\nYour 6-digit AbleWork verification code is: ${otpCode}\n\nThis code will expire in 15 minutes. If you did not request this change, please ignore this email.`;
 
         await transporter.sendMail({
             from: '"AbleWork Security" <ableworksys5i@gmail.com>',
-            to: email, // Sends to the new email if changing email, or current email if changing password
+            to: email, 
             subject: subjectLine,
             text: messageBody
         });
@@ -1676,14 +1603,11 @@ app.post('/api/users/:id/request-otp', async (req, res) => {
 // ---------------------------------------------------------
 app.put('/api/users/:id/toggle-status', async (req, res) => {
     const userId = req.params.id;
-    const { action } = req.body; // Expects 'activate' or 'deactivate'
+    const { action } = req.body; 
 
     try {
-        // Determine the new status string based on the action
         const newStatus = action === 'deactivate' ? 'Deactivated' : 'Active';
 
-        // Update the user's status in the database
-        // Note: If your column is named just 'status' instead of 'account_status', change it here!
         await db.execute(
             "UPDATE users SET account_status = ? WHERE id = ?",
             [newStatus, userId]
@@ -1698,6 +1622,9 @@ app.put('/api/users/:id/toggle-status', async (req, res) => {
         res.status(500).json({ message: "Server error toggling account status." });
     }
 });
+
+
+const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
     console.log(`🚀 Server is officially running on http://localhost:${PORT}`);

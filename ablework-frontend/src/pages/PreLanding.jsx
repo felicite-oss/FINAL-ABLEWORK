@@ -5,15 +5,13 @@ import { AccessibilityContext } from '../context/AccessibilityContext';
 export default function PreLanding() {
   const { mode, setMode } = useContext(AccessibilityContext);
   const navigate = useNavigate();
-
-  // Dynamic Tailwind classes based on the selected mode
   const headingSize = mode === 'Assist' ? 'text-4xl' : 'text-3xl';
   const tapTargetSize = mode === 'Assist' ? 'py-4 px-6 text-xl' : 'py-2 px-4';
 
   return (
     <div className="flex flex-col h-screen items-center justify-center bg-[var(--bg-primary)] gap-8 transition-colors duration-300">
       
-      {/* UI Engine Card */}
+
       <div className="text-center p-8 bg-[var(--bg-card)] rounded-lg shadow-xl border-l-8 border-[var(--border-accent)]">
         <h1 className={`${headingSize} font-bold text-[var(--text-primary)] mb-4`}>
           Welcome to AbleWork
@@ -23,7 +21,7 @@ export default function PreLanding() {
         </p>
       </div>
 
-      {/* Accessibility Controls */}
+
       <div className="flex gap-4">
         <button 
           onClick={() => setMode('Standard')}
@@ -45,7 +43,7 @@ export default function PreLanding() {
         </button>
       </div>
 
-      {/* Navigation Button */}
+   
       <button 
         onClick={() => navigate('/login')}
         className={`mt-4 ${tapTargetSize} bg-[var(--border-accent)] hover:opacity-80 rounded-full font-bold text-white shadow-lg w-64`}

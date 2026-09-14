@@ -7,10 +7,10 @@ export default function AbbyChatbot() {
     { sender: 'abby', text: 'Hi there! I am Abby, your AI assistant. How can I help you today?' }
   ]);
   const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false); // <-- 1. Loading state added here
+  const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef(null);
 
-  // Auto-scroll to the newest message (includes isTyping so it scrolls when thinking bubble appears)
+
   useEffect(() => {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -19,17 +19,15 @@ export default function AbbyChatbot() {
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!input.trim() || isTyping) return; // Prevent sending while already loading
+    if (!input.trim() || isTyping) return;
 
     const userText = input;
     setInput('');
 
-    // Add user's message to the UI instantly
     const newMessages = [...messages, { sender: 'user', text: userText }];
     setMessages(newMessages);
-    setIsTyping(true); // <-- 2. Turn on loading indicator before fetch starts
+    setIsTyping(true);
 
-    // 1. Format history for Gemini
     const formattedHistory = messages
       .filter((_, index) => index !== 0) 
       .map(msg => ({
@@ -37,7 +35,6 @@ export default function AbbyChatbot() {
         text: msg.text
       }));
 
-    // 2. Grab the current user's ID and Role from local storage
     const storedUserStr = localStorage.getItem('user');
     let userId = null;
     let role = null;
@@ -54,7 +51,6 @@ export default function AbbyChatbot() {
         headers: {
           'Content-Type': 'application/json',
         },
-        // 3. Send the message, history, AND the user credentials to the backend
         body: JSON.stringify({ 
           message: userText, 
           userId: userId, 
@@ -74,17 +70,16 @@ export default function AbbyChatbot() {
       console.error("Chat Error:", error);
       setMessages((prev) => [...prev, { sender: 'abby', text: 'I am offline right now! Please make sure the backend is running.' }]);
     } finally {
-      setIsTyping(false); // <-- 3. Turn off loading indicator when complete
+      setIsTyping(false);
     }
   };
 
-  // Helper function to format AI Markdown (Bolding and Line Breaks)
   const formatText = (text) => {
     return text.split('\n').map((line, lineIndex) => (
       <span key={lineIndex} className="block mb-1.5 last:mb-0">
         {line.split(/(\*\*.*?\*\*)/g).map((part, partIndex) => {
           if (part.startsWith('**') && part.endsWith('**')) {
-            return <strong key={partIndex} className="font-bold text-black">{part.slice(2, -2)}</strong>;
+            return <strong key={partIndex} className="font-bold text-[#03045E]">{part.slice(2, -2)}</strong>;
           }
           return part;
         })}
@@ -97,15 +92,15 @@ export default function AbbyChatbot() {
       
       {isOpen && (
         <div 
-          className="bg-white w-[calc(100vw-2rem)] max-w-sm sm:w-96 rounded-2xl shadow-2xl border flex flex-col overflow-hidden mb-3 animate-in fade-in slide-in-from-bottom-3 duration-200"
+          className="bg-[#f4f4f4] w-[calc(100vw-2rem)] max-w-sm sm:w-96 rounded-3xl shadow-2xl border-2 border-[#03045E]/20 flex flex-col overflow-hidden mb-3 animate-in fade-in slide-in-from-bottom-3 duration-200"
           style={{ height: 'min(500px, 70vh)' }}
           role="dialog"
           aria-label="Chat with Abby AI Assistant"
         >
-          {/* Header */}
-          <div className="bg-[#48cae4] text-white px-4 py-3 flex justify-between items-center shrink-0 shadow-sm z-10">
-            <h2 className="font-extrabold text-[15px] flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/50 flex items-center justify-center bg-white shrink-0 pointer-events-none shadow-md">
+        
+          <div className="bg-[#03045E] text-[#f4f4f4] px-5 py-4 flex justify-between items-center shrink-0 shadow-md z-10">
+            <h2 tabIndex="0" className="font-black text-[16px] tracking-tight flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-[#2C7FFF] flex items-center justify-center bg-[#f4f4f4] shrink-0 pointer-events-none shadow-sm" aria-hidden="true">
                 <video 
                   src={abbyVideo} 
                   autoPlay 
@@ -122,63 +117,63 @@ export default function AbbyChatbot() {
             <button 
               onClick={() => setIsOpen(false)}
               aria-label="Close chat window"
-              className="text-white hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center font-bold transition-colors cursor-pointer text-lg"
+              className="text-[#f4f4f4] hover:bg-[#2C7FFF]/30 rounded-full w-8 h-8 flex items-center justify-center font-black transition-colors cursor-pointer text-lg"
             >
               ✕
             </button>
           </div>
 
-          {/* Chat History */}
+        
           <div 
-            className="flex-1 p-4 min-h-0 overflow-y-auto flex flex-col gap-4 bg-gray-50/50"
+            className="flex-1 p-4 min-h-0 overflow-y-auto flex flex-col gap-4 bg-[#f4f4f4]"
             aria-live="polite"
           >
             {messages.map((msg, index) => (
               <div 
-                key={index} 
-                className={`max-w-[88%] px-4 py-3 text-[14px] leading-relaxed shadow-sm ${
+                key={index}
+                tabIndex="0" 
+                className={`max-w-[88%] px-4 py-3 text-[14px] font-semibold leading-relaxed shadow-sm ${
                   msg.sender === 'user' 
-                    ? 'bg-blue-600 text-white self-end rounded-2xl rounded-br-sm' 
-                    : 'bg-white border border-gray-200 text-gray-700 self-start rounded-2xl rounded-bl-sm'
+                    ? 'bg-[#2C7FFF] text-[#f4f4f4] self-end rounded-2xl rounded-br-sm' 
+                    : 'bg-white border-2 border-[#03045E]/10 text-[#03045E] self-start rounded-2xl rounded-bl-sm'
                 }`}
               >
-                {/* Check if it's the bot, if so, apply the formatting function */}
                 {msg.sender === 'abby' ? formatText(msg.text) : msg.text}
               </div>
             ))}
 
-            {/* --- 4. GEMINI-STYLE THINKING / TYPING INDICATOR --- */}
+          
             {isTyping && (
-              <div className="bg-white border border-gray-200 text-gray-500 self-start px-4 py-3 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-1.5 animate-pulse">
-                <span className="text-xs font-semibold text-gray-400 mr-1">Abby is thinking</span>
-                <div className="w-1.5 h-1.5 bg-[#48cae4] rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                <div className="w-1.5 h-1.5 bg-[#48cae4] rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                <div className="w-1.5 h-1.5 bg-[#48cae4] rounded-full animate-bounce"></div>
+              <div tabIndex="0" className="bg-white border-2 border-[#03045E]/10 text-[#03045E] self-start px-4 py-3 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-1.5 animate-pulse">
+                <span className="text-xs font-bold text-[#03045E]/70 mr-1">Abby is thinking</span>
+                <div className="w-1.5 h-1.5 bg-[#2C7FFF] rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                <div className="w-1.5 h-1.5 bg-[#2C7FFF] rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                <div className="w-1.5 h-1.5 bg-[#2C7FFF] rounded-full animate-bounce"></div>
               </div>
             )}
 
             <div ref={chatEndRef} />
           </div>
 
-          {/* Input Area */}
+       
           <form 
             onSubmit={handleSend} 
-            className="p-3 border-t border-gray-100 bg-white flex gap-2 shrink-0 items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]"
+            className="p-3 border-t-2 border-[#03045E]/10 bg-white flex gap-2 shrink-0 items-center shadow-inner"
           >
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              disabled={isTyping} // Disable input while processing
+              disabled={isTyping}
               placeholder={isTyping ? "Abby is generating response..." : "Ask Abby something..."}
               aria-label="Type your message to Abby"
-              className="flex-1 min-w-0 px-4 py-2.5 border border-gray-200 rounded-xl focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none text-gray-800 bg-gray-50 text-sm transition-all disabled:opacity-50"
+              className="flex-1 min-w-0 px-4 py-2.5 border-2 border-[#03045E]/20 rounded-xl focus:border-[#2C7FFF] focus:ring-1 focus:ring-[#2C7FFF] outline-none text-[#03045E] bg-[#f4f4f4] font-semibold text-sm transition-all disabled:opacity-50"
             />
             <button 
               type="submit"
               aria-label="Send message"
-              disabled={!input.trim() || isTyping} // Disable button while loading or empty
-              className="bg-blue-600 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition-colors cursor-pointer text-sm whitespace-nowrap shrink-0 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+              disabled={!input.trim() || isTyping}
+              className="bg-[#2C7FFF] text-[#f4f4f4] px-5 py-2.5 rounded-xl font-bold hover:bg-[#03045E] transition-colors cursor-pointer text-sm whitespace-nowrap shrink-0 disabled:opacity-50 disabled:cursor-not-allowed shadow-md border-2 border-[#2C7FFF] hover:border-[#03045E]"
             >
               Send
             </button>
@@ -186,12 +181,14 @@ export default function AbbyChatbot() {
         </div>
       )}
 
-      {/* Floating Toggle Button */}
+      
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
           aria-label="Open chat with Abby AI Assistant"
-          className="bg-[#48cae4] text-white w-16 h-16 rounded-full shadow-[0_8px_16px_rgba(72,202,228,0.4)] hover:shadow-2xl flex items-center justify-center overflow-hidden hover:scale-105 transition-transform cursor-pointer border-[3px] border-white relative p-0 pointer-events-auto"
+          aria-haspopup="dialog"
+          aria-expanded={isOpen}
+          className="bg-[#2C7FFF] text-[#f4f4f4] w-16 h-16 rounded-full shadow-[0_8px_16px_rgba(44,127,255,0.4)] hover:shadow-2xl flex items-center justify-center overflow-hidden hover:scale-105 transition-transform cursor-pointer border-[3px] border-[#03045E] relative p-0 pointer-events-auto"
           style={{ animation: 'sideToSideBounce 2.5s infinite ease-in-out' }}
         >
           <style>{`
@@ -211,6 +208,7 @@ export default function AbbyChatbot() {
             disablePictureInPicture
             controlsList="nodisablepictureinpicture nofullscreen noremoteplayback"
             className="w-full h-full object-cover pointer-events-none"
+            aria-hidden="true"
           />
         </button>
       )}

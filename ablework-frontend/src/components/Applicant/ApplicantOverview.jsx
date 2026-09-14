@@ -2,8 +2,6 @@ import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-
-// Fix for default Leaflet marker icons not loading in React
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 let DefaultIcon = L.icon({
@@ -14,7 +12,7 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-// Haversine Formula to calculate distance for the map
+
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
   if (!lat1 || !lon1 || !lat2 || !lon2) return null;
   const R = 6371; 
@@ -28,7 +26,7 @@ function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
-// Custom GREEN dot icon for MATCHED Jobs
+
 const MatchJobIcon = L.divIcon({
   className: 'custom-job-icon',
   html: `<div style="background-color: #10B981; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
@@ -36,7 +34,7 @@ const MatchJobIcon = L.divIcon({
   iconAnchor: [10, 10]
 });
 
-// Custom BLUE dot icon for REGULAR Jobs
+
 const OtherJobIcon = L.divIcon({
   className: 'custom-job-icon',
   html: `<div style="background-color: #2C7FFF; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
@@ -44,7 +42,7 @@ const OtherJobIcon = L.divIcon({
   iconAnchor: [10, 10]
 });
 
-// Helper component to smoothly re-center the map
+
 function MapRecenter({ lat, lng }) {
   const map = useMap();
   useEffect(() => {
@@ -57,7 +55,7 @@ function MapRecenter({ lat, lng }) {
 
 export default function ApplicantOverview({ profile, matchesCount, matches = [], jobs = [], applications = [], setActiveTab }) {
   
-  // Dynamically calculate profile strength
+
   const calculateProfileStrength = () => {
     let score = 50; 
     if (profile.skills && profile.skills.length > 0) score += 20;
@@ -68,16 +66,11 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
 
   const profileStrength = calculateProfileStrength();
   const recentApps = applications.slice(0, 4);
-
-  // Parse radius and location safely
   const radiusKm = profile.radius ? Number(profile.radius) : 10;
   const userLat = profile.latitude ? Number(profile.latitude) : null;
   const userLng = profile.longitude ? Number(profile.longitude) : null;
-
-  // SAFETY FALLBACK: If `jobs` isn't passed from the dashboard, use `matches` so the map isn't blank
   const jobListToMap = jobs && jobs.length > 0 ? jobs : matches;
 
-  // Filter the jobs to only show ones within the user's travel radius
   const nearbyJobs = jobListToMap.filter(job => {
     if (!job.latitude || !job.longitude || !userLat || !userLng) return false;
     const dist = getDistanceFromLatLonInKm(userLat, userLng, Number(job.latitude), Number(job.longitude));
@@ -87,7 +80,7 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
   return (
     <div className="animate-fadeIn w-full space-y-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] pb-10">
       
-      {/* --- HEADER ROW --- */}
+      {/*header*/}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-[#03045E]">
@@ -99,11 +92,14 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
         </div>
       </div>
 
-      {/* --- TOP STATS ROW --- */}
+      {/* status(babaw)*/}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
         
-        {/* Profile Strength Card */}
-        <div className="relative overflow-hidden p-6 sm:p-8 rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 flex flex-col justify-between">
+     
+        <div 
+          onClick={() => setActiveTab('settings')}
+          className="relative overflow-hidden p-6 sm:p-8 rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 flex flex-col justify-between cursor-pointer hover:border-[#2C7FFF] hover:shadow-xl transition-all duration-200"
+        >
           <div>
             <div className="flex justify-between items-center mb-6">
               <span className="text-xs font-extrabold uppercase tracking-widest text-[#03045E]">Profile Strength</span>
@@ -128,8 +124,11 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
           </div>
         </div>
 
-        {/* Smart Matches Card */}
-        <div className="p-6 sm:p-8 rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 flex items-center gap-6">
+        {/*smart matches*/}
+        <div 
+          onClick={() => setActiveTab('matches')}
+          className="p-6 sm:p-8 rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 flex items-center gap-6 cursor-pointer hover:border-[#2C7FFF] hover:shadow-xl transition-all duration-200"
+        >
           <div className="w-16 h-16 rounded-[1.25rem] bg-[#f4f4f4] flex items-center justify-center text-[#2C7FFF] shrink-0 border border-[#03045E]/20">
             <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
@@ -141,8 +140,11 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
           </div>
         </div>
 
-        {/* Total Applications Card */}
-        <div className="p-6 sm:p-8 rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 flex items-center gap-6">
+        {/* total applications */}
+        <div 
+          onClick={() => setActiveTab('tracker')}
+          className="p-6 sm:p-8 rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 flex items-center gap-6 cursor-pointer hover:border-[#2C7FFF] hover:shadow-xl transition-all duration-200"
+        >
           <div className="w-16 h-16 rounded-[1.25rem] bg-[#f4f4f4] flex items-center justify-center text-[#03045E] shrink-0 border border-[#03045E]/20">
             <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
@@ -156,7 +158,7 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
 
       </div>
 
-      {/* --- JOB DISCOVERY MAP ROW --- */}
+      
       <div className="p-6 sm:p-8 rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 flex flex-col">
         <div className="flex justify-between items-end mb-6">
           <div>
@@ -181,30 +183,28 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
               
-              {/* Applicant Home Marker */}
+            
               <Marker position={[userLat, userLng]}>
                 <Popup className="font-bold text-[#03045E]">
                   Your Home Location
                 </Popup>
               </Marker>
 
-              {/* Applicant Travel Radius Circle */}
+         
               <Circle 
                 center={[userLat, userLng]} 
                 radius={radiusKm * 1000} 
                 pathOptions={{ color: '#03045E', fillColor: '#03045E', fillOpacity: 0.05, weight: 1.5, dashArray: '5, 5' }} 
               />
 
-              {/* MAP OVER NEARBY JOBS */}
               {nearbyJobs.map((job) => {
-                // Check if this specific job is in the Smart Matches array
                 const isMatch = matches.some(match => match.id === job.id);
 
                 return (
                   <Marker 
                     key={job.id} 
                     position={[Number(job.latitude), Number(job.longitude)]}
-                    icon={isMatch ? MatchJobIcon : OtherJobIcon} // Green if match, Blue if regular
+                    icon={isMatch ? MatchJobIcon : OtherJobIcon}
                   >
                     <Popup>
                       <div className="flex flex-col gap-1 min-w-[150px]">
@@ -243,10 +243,10 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
         )}
       </div>
 
-      {/* --- VISUALIZATIONS ROW --- */}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         
-        {/* Recent Application Activity */}
+
         <div className="p-6 sm:p-8 rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 flex flex-col min-h-[420px]">
           <div className="flex justify-between items-end mb-6">
             <div>
@@ -294,10 +294,10 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
           </div>
         </div>
 
-        {/* Quick Actions & Discovery */}
+
         <div className="flex flex-col gap-6 sm:gap-8">
           
-          {/* Smart Engine Match Action */}
+  
           <div className="p-6 sm:p-8 rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 flex flex-col justify-center">
             <span className="inline-block px-3 py-1 bg-[#f4f4f4] border border-[#03045E]/20 rounded-full text-[10px] font-extrabold uppercase tracking-widest text-[#2C7FFF] mb-4 w-fit">Smart Engine</span>
             <h3 className="text-2xl font-black mb-2 text-[#03045E] leading-tight">Find Your Perfect Fit</h3>
@@ -310,7 +310,7 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
             </button>
           </div>
 
-          {/* General Explore Action */}
+
           <div className="p-6 sm:p-8 rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 flex flex-col justify-center flex-1">
              <div className="mb-2 w-12 h-12 rounded-xl bg-[#f4f4f4] border border-[#03045E]/20 flex items-center justify-center text-[#03045E]">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -319,7 +319,7 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
              </div>
              <h3 className="text-xl font-extrabold text-[#03045E] mb-2">Explore the Marketplace</h3>
              <p className="text-sm font-semibold text-[#03045E] mb-6 leading-relaxed">
-              Browse all available job postings from verified inclusive employers across the platform.
+             Browse all available job postings from verified inclusive employers across the platform.
              </p>
              <button onClick={() => setActiveTab('explore-jobs')} className="flex items-center justify-center gap-2 py-3.5 px-6 bg-[#f4f4f4] border border-[#03045E]/30 text-[#03045E] font-extrabold text-sm rounded-xl hover:bg-[#03045E] hover:text-[#f4f4f4] hover:border-[#03045E] transition-all duration-200 w-full cursor-pointer">
                 <span>Explore All Jobs</span>

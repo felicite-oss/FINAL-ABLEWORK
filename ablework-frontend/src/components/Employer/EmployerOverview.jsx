@@ -1,9 +1,8 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { AccessibilityContext } from '../../context/AccessibilityContext';
-// 1. Import Recharts components
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-// 2. Add mock data for the visual report (You can wire this to your backend stats later!)
+
 const mockChartData = [
   { name: 'Mon', applications: 4 },
   { name: 'Tue', applications: 7 },
@@ -18,7 +17,7 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
   return (
     <div className="animate-fadeIn max-w-7xl mx-auto pb-10">
       
-      {/* --- HEADER ROW --- */}
+  
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-[#f4f4f4]/90 [.high-contrast_&]:bg-black [.high-contrast_&]:border-white backdrop-blur-md p-6 rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border border-[#03045E]/20">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
@@ -32,11 +31,15 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
         </div>
       </div>
       
-      {/* 1. TOP STATS ROW */}
+   
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         
-        {/* Stat Card 1: Active Jobs */}
-        <div className="relative overflow-hidden p-6 rounded-3xl bg-[#f4f4f4] [.high-contrast_&]:bg-black [.high-contrast_&]:border-white shadow-[0_10px_30px_rgba(3,4,94,0.06)] border border-[#03045E]/20 flex items-center justify-between group hover:shadow-[0_20px_40px_rgba(44,127,255,0.15)] hover:border-[#2C7FFF]/50 transition-all duration-300">
+   
+        <button
+          type="button"
+          onClick={() => setActiveTab && setActiveTab('jobs')}
+          className="text-left relative overflow-hidden p-6 rounded-3xl bg-[#f4f4f4] [.high-contrast_&]:bg-black [.high-contrast_&]:border-white shadow-[0_10px_30px_rgba(3,4,94,0.06)] border border-[#03045E]/20 flex items-center justify-between group hover:shadow-[0_20px_40px_rgba(44,127,255,0.15)] hover:border-[#2C7FFF]/50 transition-all duration-300 cursor-pointer"
+        >
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#2C7FFF]/10 to-transparent rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform"></div>
           <div className="flex items-center gap-4 relative z-10">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#2C7FFF]/15 to-[#2C7FFF]/25 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shadow-sm group-hover:rotate-6 transition-transform">
@@ -52,10 +55,14 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
               <p className="text-3xl sm:text-4xl font-black text-[#03045E] [.high-contrast_&]:text-white tracking-tight">{stats.activeJobs}</p>
             </div>
           </div>
-        </div>
+        </button>
 
-        {/* Stat Card 2: Pending Review */}
-        <div className="relative overflow-hidden p-6 rounded-3xl bg-[#f4f4f4] [.high-contrast_&]:bg-black [.high-contrast_&]:border-white shadow-[0_10px_30px_rgba(3,4,94,0.06)] border border-[#03045E]/20 flex items-center justify-between group hover:shadow-[0_20px_40px_rgba(44,127,255,0.15)] hover:border-[#2C7FFF]/50 transition-all duration-300">
+
+        <button
+          type="button"
+          onClick={() => setActiveTab && setActiveTab('applications')}
+          className="text-left relative overflow-hidden p-6 rounded-3xl bg-[#f4f4f4] [.high-contrast_&]:bg-black [.high-contrast_&]:border-white shadow-[0_10px_30px_rgba(3,4,94,0.06)] border border-[#03045E]/20 flex items-center justify-between group hover:shadow-[0_20px_40px_rgba(44,127,255,0.15)] hover:border-[#2C7FFF]/50 transition-all duration-300 cursor-pointer"
+        >
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#2C7FFF]/10 to-transparent rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform"></div>
           <div className="flex items-center gap-4 relative z-10">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#2C7FFF]/15 to-[#2C7FFF]/25 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shadow-sm group-hover:rotate-6 transition-transform">
@@ -71,10 +78,14 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
               <p className="text-3xl sm:text-4xl font-black text-[#03045E] [.high-contrast_&]:text-white tracking-tight">{stats.pendingApps}</p>
             </div>
           </div>
-        </div>
+        </button>
 
-        {/* Stat Card 3: Shortlisted */}
-        <div className="relative overflow-hidden p-6 rounded-3xl bg-[#f4f4f4] [.high-contrast_&]:bg-black [.high-contrast_&]:border-white shadow-[0_10px_30px_rgba(3,4,94,0.06)] border border-[#03045E]/20 flex items-center justify-between group hover:shadow-[0_20px_40px_rgba(44,127,255,0.15)] hover:border-[#2C7FFF]/50 transition-all duration-300">
+
+        <button
+          type="button"
+          onClick={() => setActiveTab && setActiveTab('applications')}
+          className="text-left relative overflow-hidden p-6 rounded-3xl bg-[#f4f4f4] [.high-contrast_&]:bg-black [.high-contrast_&]:border-white shadow-[0_10px_30px_rgba(3,4,94,0.06)] border border-[#03045E]/20 flex items-center justify-between group hover:shadow-[0_20px_40px_rgba(44,127,255,0.15)] hover:border-[#2C7FFF]/50 transition-all duration-300 cursor-pointer"
+        >
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#2C7FFF]/10 to-transparent rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform"></div>
           <div className="flex items-center gap-4 relative z-10">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#2C7FFF]/15 to-[#2C7FFF]/25 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shadow-sm group-hover:rotate-6 transition-transform">
@@ -90,15 +101,15 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
               <p className="text-3xl sm:text-4xl font-black text-[#03045E] [.high-contrast_&]:text-white tracking-tight">{stats.shortlistedApps}</p>
             </div>
           </div>
-        </div>
+        </button>
 
       </div>
 
-      {/* 2. VISUALIZATIONS ROW */}
+
       <div className="grid grid-cols-1 gap-8">
         
 
-        {/* --- NEW: Graphical Analytics Chart Card --- */}
+
         <div className="p-6 sm:p-8 rounded-3xl bg-[#f4f4f4] [.high-contrast_&]:bg-black [.high-contrast_&]:border-white shadow-[0_10px_30px_rgba(3,4,94,0.06)] border border-[#03045E]/20 flex flex-col h-[440px] relative">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2.5">
@@ -113,7 +124,7 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
           </div>
           <p className="text-xs sm:text-sm font-semibold text-[#03045E]/80 [.high-contrast_&]:text-gray-300 mb-6">Volume of candidate applications received over the last 7 days.</p>
           
-          {/* Recharts Container */}
+       
           <div className="flex-1 w-full h-full min-h-[200px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stats.chartData || mockChartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
@@ -151,7 +162,7 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
   );
 }
 
-// Keep your existing AccessibilityToolbar here...
+
 
 export function AccessibilityToolbar() {
   const { mode, setMode } = useContext(AccessibilityContext);

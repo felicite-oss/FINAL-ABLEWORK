@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useContext } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Circle, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import headerLogo from '../assets/Final.png';
-import backgroundImg from '../assets/Final background.png';
-
-// Fix for default Leaflet marker icons not loading in React
+import { AccessibilityContext } from '../context/AccessibilityContext';
+import lightLogo from '../assets/LIGHT MODE.png';
+import darkLogo from '../assets/DARK MODE.png';
+import backgroundImg from '../assets/BG.png';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 let DefaultIcon = L.icon({
@@ -17,7 +17,7 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-// Helper component to smoothly re-center the map when coordinates change
+
 function MapRecenter({ lat, lng }) {
   const map = useMap();
   useEffect(() => {
@@ -29,35 +29,28 @@ function MapRecenter({ lat, lng }) {
 }
 
 export default function ApplicantRegister() {
+  const { mode } = useContext(AccessibilityContext);
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-
-  // Name States
+  const isContrast = mode && typeof mode === 'string' && mode.toLowerCase().includes('contrast');
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
   const [lastName, setLastName] = useState('');
- 
-  // Account & Contact States
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [birthdate, setBirthdate] = useState('');
- 
-  // Location States
   const [address, setAddress] = useState('');
   const [lat, setLat] = useState(null);
   const [lng, setLng] = useState(null);
   const [isDetecting, setIsDetecting] = useState(false);
-  const [radius, setRadius] = useState(10); // Kept as number for map math
- 
-  // Workplace Independence
+  const [radius, setRadius] = useState(10); 
   const [independence, setIndependence] = useState('');
-
-  // Form Submission States
   const [pwdFile, setPwdFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const toggleSelection = (item, selectedArray, setSelectedArray) => {
     if (selectedArray.includes(item)) {
@@ -67,7 +60,7 @@ export default function ApplicantRegister() {
     }
   };
 
-  // 1. Physical and Sensory Disabilities
+ 
   const availableDisabilities = [
     'Deafness', 'Blindness', 'Low Vision', 'Hard of Hearing', 'Color Blindness',
     'Paraplegia (Lower Body)', 'Hemiplegia (One Side)', 'Upper Limb Amputation',
@@ -91,7 +84,7 @@ export default function ApplicantRegister() {
     }
   };
 
-  // 2. Accommodations / Aids
+  
   const availableAccommodations = ['Screen Reader', 'Wheelchair Access', 'Sign Language Interpreter', 'Flexible Hours', 'Quiet Workspace'];
   const extendedAccommodations = [
     'Ergonomic Setup', 'Noise-Cancelling Headphones', 'Screen Magnifier', 'Braille Keyboard', 
@@ -102,7 +95,7 @@ export default function ApplicantRegister() {
   const [showOtherAccommodation, setShowOtherAccommodation] = useState(false);
   const [otherAccommodation, setOtherAccommodation] = useState('');
 
-  // 3. Skills
+
   const defaultAvailable = [
     'Customer Service', 
     'Data Entry', 
@@ -138,13 +131,10 @@ export default function ApplicantRegister() {
         if (response.ok) {
           const popularSkills = await response.json();
           
-          // Combine fetched employer skills with our common defaults, removing any duplicates using Set
+    
           const combinedSkills = Array.from(new Set([...popularSkills, ...defaultAvailable, ...defaultExtended]));
           
-          // Always take the top 6 (prioritizing employer demand, falling back to defaults) for main chips
           setAvailableSkills(combinedSkills.slice(0, 6));
-          
-          // Put the rest into the extended autocomplete list
           setExtendedSkills(combinedSkills.slice(6));
         }
       } catch (error) {
@@ -246,8 +236,11 @@ export default function ApplicantRegister() {
       });
       const data = await response.json();
       if (response.ok) {
-        setStatusMessage({ type: 'success', text: "Registration successful! Redirecting to login..." });
-        setTimeout(() => navigate('/login'), 2000);
+        setShowSuccessModal(true);
+        setTimeout(() => {
+          setShowSuccessModal(false);
+          navigate('/login');
+        }, 2000);
       } else {
         setStatusMessage({ type: 'error', text: data.message || "Registration failed. Please try again." });
       }
@@ -260,13 +253,17 @@ export default function ApplicantRegister() {
   };
 
   return (
-    <main className="h-screen flex flex-col bg-[#f4f4f4] overflow-hidden">
-      {/* ===== HEADER ===== */}
-      <header className="w-full bg-[#f4f4f4] border-b border-[#03045E]/10 fixed top-0 left-0 z-50">
-        <div className="w-full h-16 pl-4 pr-4 md:pr-8 flex items-center justify-between">
+    <main
+      className={`min-h-screen flex flex-col ${isContrast ? 'bg-black text-white' : 'bg-[#f4f4f4] text-[#03045E]'} overflow-hidden relative`}
+      role="main"
+      aria-label="Applicant registration page"
+    >
+      
+      <header className={`w-full ${isContrast ? 'bg-black border-b border-[#2C7FFF]' : 'bg-[#f4f4f4] border-b border-[#03045E]/10'} fixed top-0 left-0 z-50`}>
+        <div className="w-full h-16 pl-4 pr-4 md:pr-8 flex items-center justify-between max-w-[1700px] mx-auto box-border">
           <div className="flex items-center gap-8">
-            <div className="flex items-center flex-shrink-0">
-              <img src={headerLogo} alt="AbleWork Logo" className="h-20 w-auto object-contain max-h-full" />
+            <div className="flex items-center flex-shrink-0 py-1">
+              <img src={isContrast ? darkLogo : lightLogo} alt="AbleWork Logo" className="h-14 w-auto object-contain max-h-full" />
             </div>
             <nav className="hidden md:flex items-center gap-6 text-[15px] font-medium text-[#03045E]">
               <Link to="/" className="hover:text-[#2C7FFF] transition">Home</Link>
@@ -275,12 +272,18 @@ export default function ApplicantRegister() {
             </nav>
           </div>
           <div className="hidden md:flex items-center">
-            <Link
+            <NavLink
               to="/login"
-              className="px-5 py-2 rounded-full bg-white text-[#03045E] text-sm font-medium border border-[#03045E] hover:bg-[#2C7FFF] hover:text-white hover:border-[#2C7FFF] transition"
+              className={({ isActive }) => 
+                `px-5 py-2 rounded-full bg-transparent text-[#03045E] text-sm font-bold border-2 border-[#03045E] hover:bg-[#2C7FFF] hover:text-[#f4f4f4] hover:border-[#2C7FFF] transform duration-200 transition whitespace-nowrap ${
+                  isActive 
+                    ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] underline font-semibold' 
+                    : ''
+                }`
+              }
             >
               Log In
-            </Link>
+            </NavLink>
           </div>
           <button
             className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg bg-[#2C7FFF] text-[#f4f4f4]"
@@ -291,16 +294,25 @@ export default function ApplicantRegister() {
         </div>
       </header>
 
-      {/* ===== POPUP OVERLAY ===== */}
-      <div
-        className="fixed inset-0 z-40 flex items-center justify-center p-4 pt-20 pb-6 bg-black/40 backdrop-blur-sm"
-        style={{
-          backgroundImage: `linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url(${backgroundImg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
+     
+      <div 
+        className={`fixed inset-0 top-16 z-40 flex items-center justify-center p-4 overflow-y-auto transition-all duration-300 ${isOpen ? 'mt-48 sm:mt-56' : 'mt-0'}`}
+        role="region"
+        aria-label="Applicant registration area"
       >
-        <div className="w-full max-w-2xl max-h-[85vh] flex flex-col bg-white/95 rounded-3xl shadow-2xl border border-[#03045E]/10 overflow-hidden">
+        
+        <div
+          className="absolute inset-0 max-w-[1700px] mx-auto w-full bg-no-repeat bg-cover bg-center md:bg-[size:1100px_auto] md:bg-left pointer-events-none"
+          style={{
+            backgroundImage: `url(${backgroundImg})`,
+          }}
+          aria-hidden="true"
+        />
+     
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] pointer-events-none" aria-hidden="true" />
+
+      
+        <div className="w-full max-w-2xl max-h-[85vh] flex flex-col bg-white/95 rounded-3xl shadow-2xl border border-[#03045E]/10 overflow-hidden relative z-50 my-auto animate-fadeIn">
           
           <div className="flex-shrink-0 px-6 pt-6 pb-4 border-b border-[#03045E]/10 bg-white/90">
             <div className="flex items-center justify-between">
@@ -321,6 +333,7 @@ export default function ApplicantRegister() {
             </div>
           </div>
 
+  
           <div className="flex-1 overflow-y-auto px-6 py-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {statusMessage.text && (
               <div
@@ -338,51 +351,51 @@ export default function ApplicantRegister() {
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-7" autoComplete="off">
              
-              {/* Personal Info */}
+      
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="firstName" className="text-sm font-semibold text-[#03045E]">First Name <span className="text-red-500">*</span></label>
-                  <input id="firstName" type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
+                  <label htmlFor="firstName" className="text-sm font-semibold text-[#03045E]">First Name <span className="text-[#03045E]">*</span></label>
+                  <input id="firstName" type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Enter your First Name" required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="middleName" className="text-sm font-semibold text-[#03045E]">Middle Name (Optional)</label>
-                  <input id="middleName" type="text" value={middleName} onChange={(e) => setMiddleName(e.target.value)} className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
+                  <input id="middleName" type="text" value={middleName} onChange={(e) => setMiddleName(e.target.value)} placeholder="Enter your Middle Name" className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="lastName" className="text-sm font-semibold text-[#03045E]">Last Name <span className="text-red-500">*</span></label>
-                  <input id="lastName" type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
+                  <label htmlFor="lastName" className="text-sm font-semibold text-[#03045E]">Last Name <span className="text-[#03045E]">*</span></label>
+                  <input id="lastName" type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Enter your Last Name" required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="phone" className="text-sm font-semibold text-[#03045E]">Phone Number <span className="text-red-500">*</span></label>
-                  <input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
+                  <label htmlFor="phone" className="text-sm font-semibold text-[#03045E]">Phone Number <span className="text-[#03045E]">*</span></label>
+                  <input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Enter your Phone Number" required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="email" className="text-sm font-semibold text-[#03045E]">Email Address <span className="text-red-500">*</span></label>
-                  <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
+                  <label htmlFor="email" className="text-sm font-semibold text-[#03045E]">Email Address <span className="text-[#03045E]">*</span></label>
+                  <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your Email Address" required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="password" className="text-sm font-semibold text-[#03045E]">Password <span className="text-red-500">*</span></label>
-                  <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
+                  <label htmlFor="password" className="text-sm font-semibold text-[#03045E]">Password <span className="text-[#03045E]">*</span></label>
+                  <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your Password" required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="confirmPassword" className="text-sm font-semibold text-[#03045E]">Confirm Password <span className="text-red-500">*</span></label>
-                  <input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
+                  <label htmlFor="confirmPassword" className="text-sm font-semibold text-[#03045E]">Confirm Password <span className="text-[#03045E]">*</span></label>
+                  <input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm your Password" required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="birthdate" className="text-sm font-semibold text-[#03045E]">Birthdate (Must be 18+) <span className="text-red-500">*</span></label>
-                  <input id="birthdate" type="date" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
+                  <label htmlFor="birthdate" className="text-sm font-semibold text-[#03045E]">Birthdate (Must be 18+) <span className="text-[#03045E]">*</span></label>
+                  <input id="birthdate" type="date" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} placeholder="Enter your Birthdate" required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" />
                 </div>
               </div>
 
               <hr className="border-[#03045E]/10" />
 
-              {/* Address & Live Map Visualizer */}
+            
               <div className="flex flex-col gap-3 p-5 border border-[#2C7FFF]/30 rounded-2xl bg-[#2C7FFF]/5">
-                <label htmlFor="address" className="text-sm font-bold text-[#03045E]">Residential Address <span className="text-red-500">*</span></label>
+                <label htmlFor="address" className="text-sm font-bold text-[#03045E]">Residential Address <span className="text-[#03045E]">*</span></label>
                 <button type="button" onClick={handleDetectLocation} disabled={isDetecting} className="bg-[#2C7FFF] text-white px-5 py-2.5 rounded-full text-sm font-semibold shadow-md hover:bg-[#03045E] transition">
                   {isDetecting ? 'Detecting Location...' : '📍 Detect My Location'}
                 </button>
-                <input id="address" type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="e.g. Block 4, Main Street, Manila" required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E]" />
+                <input id="address" type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Enter your Residential Address (e.g. Block 4, Main Street, Manila)" required className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E]" />
                 
                 <div className="mt-4 flex flex-col gap-2">
                   <div className="flex justify-between items-center">
@@ -399,7 +412,7 @@ export default function ApplicantRegister() {
                   <p className="text-xs text-gray-500">Jobs beyond this distance will be filtered out automatically.</p>
                 </div>
 
-                {/* --- LIVE RADIUS MAP --- */}
+              
                 {lat && lng ? (
                   <div className="h-64 w-full mt-4 rounded-xl overflow-hidden border border-[#03045E]/20 z-0 relative shadow-inner">
                     <MapContainer center={[lat, lng]} zoom={11} scrollWheelZoom={false} style={{ height: '100%', width: '100%', zIndex: 0 }}>
@@ -408,7 +421,6 @@ export default function ApplicantRegister() {
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                       />
                       <Marker position={[lat, lng]} />
-                      {/* Circle radius is in meters, so we multiply km by 1000 */}
                       <Circle center={[lat, lng]} radius={radius * 1000} pathOptions={{ color: '#2C7FFF', fillColor: '#2C7FFF', fillOpacity: 0.2, weight: 2 }} />
                       <MapRecenter lat={lat} lng={lng} />
                     </MapContainer>
@@ -423,9 +435,9 @@ export default function ApplicantRegister() {
 
               <hr className="border-[#03045E]/10" />
 
-              {/* Physical & Sensory Disability Chips & Custom Input */}
+             
               <fieldset className="flex flex-col gap-3">
-                <legend className="text-sm font-bold text-[#03045E]">Physical & Sensory Profile (Work-Enabled) <span className="text-red-500">*</span></legend>
+                <legend className="text-sm font-bold text-[#03045E]">Physical & Sensory Profile (Work-Enabled) <span className="text-[#03045E]">*</span></legend>
                 <p className="text-xs text-gray-500">Select applicable physical or sensory categories for tailored job accommodation matching.</p>
                 
                 {selectedDisabilities.length > 0 && (
@@ -508,9 +520,9 @@ export default function ApplicantRegister() {
                 )}
               </fieldset>
 
-              {/* Independence */}
+      
               <fieldset className="flex flex-col gap-3">
-                <legend className="text-sm font-bold text-[#03045E]">Workplace Independence <span className="text-red-500">*</span></legend>
+                <legend className="text-sm font-bold text-[#03045E]">Workplace Independence <span className="text-[#03045E]">*</span></legend>
                 <div className="flex flex-wrap gap-2">
                   {['Independent', 'Requires Assistance'].map((option) => (
                     <button
@@ -529,7 +541,7 @@ export default function ApplicantRegister() {
                 </div>
               </fieldset>
 
-              {/* Accommodations - OPTIONAL */}
+      
               <fieldset className="flex flex-col gap-3">
                 <legend className="text-sm font-bold text-[#03045E]"> Accommodations <span className="text-gray-400 font-normal ml-1">(Optional)</span></legend>
                 <div className="flex flex-wrap gap-2">
@@ -593,9 +605,9 @@ export default function ApplicantRegister() {
                 )}
               </fieldset>
 
-              {/* Skills */}
+        
               <fieldset className="flex flex-col gap-3">
-                <legend className="text-sm font-bold text-[#03045E]">Your Skills <span className="text-red-500">*</span></legend>
+                <legend className="text-sm font-bold text-[#03045E]">Your Skills <span className="text-[#03045E]">*</span></legend>
                 
                 {selectedSkills.length > 0 && (
                   <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-xl border border-gray-200">
@@ -679,9 +691,9 @@ export default function ApplicantRegister() {
 
               <hr className="border-[#03045E]/10" />
 
-              {/* File Upload */}
+        
               <div className="p-4 rounded-2xl border-2 border-dashed border-[#03045E]/20 bg-[#f4f4f4]/50">
-                <label htmlFor="pwdId" className="block text-sm font-bold text-[#03045E] mb-1">Upload PWD ID / Certificates <span className="text-red-500">*</span></label>
+                <label htmlFor="pwdId" className="block text-sm font-bold text-[#03045E] mb-1">Upload PWD ID / Certificates <span className="text-[#03045E]">*</span></label>
                 <input
                   id="pwdId"
                   type="file"
@@ -708,6 +720,54 @@ export default function ApplicantRegister() {
           </div>
         </div>
       </div>
+
+     
+      {showSuccessModal && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#03045E]/50 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="success-title"
+        >
+          <div className="relative w-full max-w-sm bg-[#f4f4f4] rounded-3xl shadow-2xl border-2 border-[#2C7FFF]/30 overflow-hidden animate-fadeIn">
+          
+            <div className="h-1.5 w-full bg-gradient-to-r from-[#03045E] via-[#2C7FFF] to-[#03045E]" />
+
+            <div className="px-8 pt-8 pb-8 flex flex-col items-center text-center">
+       
+              <div className="relative mb-5">
+                <div className="w-20 h-20 rounded-full bg-[#2C7FFF]/15 flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-full bg-[#2C7FFF] flex items-center justify-center shadow-lg shadow-[#2C7FFF]/40">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-[#03045E] flex items-center justify-center">
+                  <span className="text-white text-xs font-black">✓</span>
+                </div>
+              </div>
+
+              <h2 id="success-title" className="text-2xl font-black text-[#03045E] tracking-tight mb-2">
+                You’re all set!
+              </h2>
+              <p className="text-sm text-[#03045E]/75 font-medium leading-relaxed mb-4">
+                Registration completed successfully.
+              </p>
+
+       
+              <div className="flex items-center gap-1.5" aria-label="Redirecting to login">
+                <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-pulse [animation-delay:150ms]" />
+                <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-pulse [animation-delay:300ms]" />
+              </div>
+              <p className="text-xs text-[#2C7FFF] font-semibold mt-3">
+                Taking you to Log In…
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

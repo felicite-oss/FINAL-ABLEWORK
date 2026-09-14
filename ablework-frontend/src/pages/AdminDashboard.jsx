@@ -1,22 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import headerLogo from '../assets/LIGHT MODE.png';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  
-  // Main Tabs
   const [activeTab, setActiveTab] = useState('Overview');
   const [listFilter, setListFilter] = useState('Pending'); 
-
-  // Data States
+  const [isOpen, setIsOpen] = useState(false); 
   const [stats, setStats] = useState(null);
   const [chartData, setChartData] = useState([]);
   const [employers, setEmployers] = useState([]);
   const [applicants, setApplicants] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  // Rejection Modal State
+
   const [rejectModal, setRejectModal] = useState({
     isOpen: false,
     userId: null,
@@ -54,13 +53,15 @@ export default function AdminDashboard() {
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('user'); 
-    navigate('/login'); 
+    setIsLoggingOut(true);
+    setTimeout(() => {
+      localStorage.removeItem('user'); 
+      navigate('/login'); 
+    }, 2000);
   };
 
-  // Handler for Verification (Approve/Reject)
+
   const handleVerification = async (userId, newStatus, reason = null) => {
-    // Only prompt standard confirm if it's an approval. Rejection uses the modal.
     if (newStatus !== 'Rejected' && !window.confirm(`Mark this account as ${newStatus}?`)) return;
     
     try {
@@ -70,7 +71,7 @@ export default function AdminDashboard() {
         body: JSON.stringify({ status: newStatus, rejection_reason: reason })
       });
       if (res.ok) {
-        setRejectModal({ isOpen: false, userId: null, reason: '' }); // Close modal if open
+        setRejectModal({ isOpen: false, userId: null, reason: '' }); 
         fetchAdminData();
       }
     } catch (error) { 
@@ -78,7 +79,7 @@ export default function AdminDashboard() {
     }
   };
 
-  // Submit handler specifically for the Rejection Modal
+
   const submitRejection = () => {
     if (!rejectModal.reason.trim()) {
       alert("Please provide a reason for rejection.");
@@ -107,243 +108,523 @@ export default function AdminDashboard() {
     });
   };
 
-  if (isLoading) return <div className="p-10 font-bold text-[#03045E]">Loading Admin Console...</div>;
+  if (isLoggingOut) return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#f4f4f4] relative overflow-x-hidden">
+      <div className="absolute inset-0 bg-[#f4f4f4]/90 backdrop-blur-md z-50 flex flex-col items-center justify-center p-4 transition-all duration-300">
+        <div className="bg-white border-2 border-[#03045E]/20 px-6 py-8 sm:px-8 sm:py-10 rounded-3xl shadow-[0_20px_50px_rgba(3,4,94,0.15)] flex flex-col items-center max-w-sm w-full mx-auto transform animate-in fade-in zoom-in-95 duration-300">
+          <div className="relative w-16 h-16 flex items-center justify-center mb-5">
+            <div className="absolute inset-0 rounded-full border-4 border-[#2C7FFF]/30 animate-pulse"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-t-[#2C7FFF] border-r-transparent border-b-[#03045E] border-l-transparent animate-spin"></div>
+            <div className="w-6 h-6 rounded-full bg-[#03045E] shadow-md animate-ping opacity-75 absolute"></div>
+          </div>
+          <h3 className="text-lg font-black text-[#03045E] tracking-tight text-center mb-1">Logging out...</h3>
+          <p className="text-xs text-[#03045E]/80 text-center font-bold">Please wait while we securely end your session.</p>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (isLoading) return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#f4f4f4] relative overflow-x-hidden">
+      <div className="absolute inset-0 bg-[#f4f4f4]/90 backdrop-blur-md z-50 flex flex-col items-center justify-center p-4 transition-all duration-300">
+        <div className="bg-white border-2 border-[#03045E]/20 px-6 py-8 sm:px-8 sm:py-10 rounded-3xl shadow-[0_20px_50px_rgba(3,4,94,0.15)] flex flex-col items-center max-w-sm w-full mx-auto transform animate-in fade-in zoom-in-95 duration-300">
+          <div className="relative w-16 h-16 flex items-center justify-center mb-5">
+            <div className="absolute inset-0 rounded-full border-4 border-[#2C7FFF]/30 animate-pulse"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-t-[#2C7FFF] border-r-transparent border-b-[#03045E] border-l-transparent animate-spin"></div>
+            <div className="w-6 h-6 rounded-full bg-[#03045E] shadow-md animate-ping opacity-75 absolute"></div>
+          </div>
+          <h3 className="text-lg font-black text-[#03045E] tracking-tight text-center mb-1">Loading Admin Console</h3>
+          <p className="text-xs text-[#03045E]/80 text-center font-bold">Preparing workspace and analytics...</p>
+        </div>
+      </div>
+    </div>
+  );
+
+  
+  const allUsers = [...employers.map(e => ({ ...e, userType: 'Employer' })), ...applicants.map(a => ({ ...a, userType: 'Applicant' }))];
 
   return (
-    <div className="max-w-7xl mx-auto animate-fadeIn p-4 sm:p-6 relative">
+    <div className="min-h-screen flex flex-col bg-[#f4f4f4] text-[#03045E] selection:bg-[#2C7FFF] selection:text-white relative overflow-x-hidden w-full max-w-[100vw]">
       
-      {/* --- HEADER WITH LOGOUT BUTTON --- */}
-      <div className="mb-8 border-b border-[#03045E]/10 pb-6 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-[#03045E]">Admin Control Center</h1>
-          <p className="opacity-70 font-medium text-[#03045E] mt-1">
-            Manage platform integrity, verify documents, and control account access.
-          </p>
+   
+      <header className="w-full bg-white border-b-2 border-[#03045E]/15 fixed top-0 left-0 z-50 transition-all duration-300 shadow-sm">
+        <div className="w-full h-16 pl-4 pr-4 md:pr-8 flex items-center justify-between max-w-[1700px] mx-auto box-border">
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-6 min-w-0">
+            <div className="flex items-center flex-shrink-0 cursor-pointer overflow-hidden py-1" onClick={() => setActiveTab('Overview')}>
+              <img
+                src={headerLogo}
+                alt="AbleWork Logo"
+                className="h-14 w-auto object-contain max-h-full hover:opacity-95 transition-opacity"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={handleLogout}
+              className="hidden md:flex items-center gap-2 px-5 py-2.5 bg-[#f4f4f4] text-[#03045E] font-extrabold text-sm rounded-xl border-2 border-[#03045E]/25 hover:bg-[#03045E]/10 hover:border-[#03045E] transition shadow-sm cursor-pointer"
+            >
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Logout
+            </button>
+
+     
+            <button
+              className="md:hidden flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white text-[#03045E] border-2 border-[#03045E]/20 shadow-sm cursor-pointer hover:bg-[#03045E] hover:text-white transition-all duration-200 shrink-0"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              {isOpen ? (
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
-        
-        <button 
-          onClick={handleLogout}
-          className="flex items-center gap-2 px-5 py-2.5 bg-red-50 text-red-600 font-bold text-sm rounded-xl border border-red-200 hover:bg-red-100 hover:text-red-700 transition shadow-sm self-start"
+
+  
+        <div
+          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out bg-white border-b-2 border-[#03045E]/20 ${
+            isOpen ? 'max-h-[400px] opacity-100 shadow-xl' : 'max-h-0 opacity-0'
+          }`}
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          Logout
-        </button>
-      </div>
-
-      {/* MAIN TAB NAVIGATION */}
-      <div className="mt-[-1rem] mb-6 flex flex-wrap gap-2">
-        {['Overview', 'Employers', 'Applicants'].map(tab => (
-          <button
-            key={tab}
-            onClick={() => {
-              setActiveTab(tab);
-              setListFilter('Pending'); 
-            }}
-            className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${
-              activeTab === tab ? 'bg-[#03045E] text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-
-      {/* TAB 1: OVERVIEW STATS & ANALYTICS */}
-      {activeTab === 'Overview' && stats && (
-        <div className="flex flex-col gap-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <StatCard title="Total Applicants" value={stats.totalApplicants} icon="👨‍🎓" />
-            <StatCard title="Total Employers" value={stats.totalEmployers} icon="🏢" />
-            <StatCard title="Pending Employers" value={stats.pendingEmployers} icon="⏳" alert={stats.pendingEmployers > 0} />
-            <StatCard title="Pending Applicants" value={stats.pendingApplicants} icon="⏳" alert={stats.pendingApplicants > 0} />
-          </div>
-
-          {/* Annual Analytics Chart (Users Only) */}
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-[#03045E]/10">
-            <div className="mb-6">
-              <h2 className="text-xl font-extrabold text-[#03045E]">Annual Platform Growth</h2>
-              <p className="text-sm font-medium text-gray-500">Monthly registration volume for new users.</p>
-            </div>
-            <div className="h-[400px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12, fontWeight: 600}} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12, fontWeight: 600}} />
-                  <Tooltip 
-                    cursor={{fill: '#F3F4F6'}}
-                    contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}}
-                  />
-                  <Legend iconType="circle" wrapperStyle={{paddingTop: '20px'}}/>
-                  <Bar dataKey="users" name="New Users" fill="#03045E" radius={[4, 4, 0, 0]} barSize={28} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TABS 2 & 3: USER MANAGEMENT */}
-      {(activeTab === 'Employers' || activeTab === 'Applicants') && (
-        <div className="flex flex-col gap-4">
-          
-          {/* SUB-FILTER TABS */}
-          <div className="flex gap-2 bg-gray-100 p-1.5 rounded-xl w-fit">
-            {['Pending', 'Approved', 'Rejected', 'Disabled'].map(filter => {
-               const targetList = activeTab === 'Employers' ? employers : applicants;
-               let count = 0;
-               if (filter === 'Disabled') {
-                 count = targetList.filter(i => i.account_status === 'Disabled').length;
-               } else {
-                 count = targetList.filter(i => i.verification_status === filter && i.account_status !== 'Disabled').length;
-               }
-
-               return (
+          <div className="w-full">
+            <nav className="flex flex-col px-3 sm:px-6 py-4 sm:py-6 gap-2 text-[15px] sm:text-[16px] font-bold text-[#03045E]">
+              {['Overview', 'Employers', 'Applicants'].map((tab) => (
                 <button 
-                  key={filter} 
-                  onClick={() => setListFilter(filter)}
-                  className={`px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 ${
-                    listFilter === filter ? 'bg-white text-[#03045E] shadow-sm' : 'text-gray-500 hover:text-[#03045E]'
+                  key={tab} 
+                  onClick={() => { setActiveTab(tab); setListFilter('Pending'); setIsOpen(false); }} 
+                  className={`flex items-center gap-3 text-left px-3.5 sm:px-4 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-black transition-all capitalize cursor-pointer border-2 ${
+                    activeTab === tab 
+                      ? 'bg-[#03045E] text-white border-[#03045E] shadow-md' 
+                      : 'border-[#03045E]/20 text-[#03045E] hover:bg-[#2C7FFF]/15 hover:border-[#2C7FFF]'
                   }`}
                 >
-                  {filter}
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] ${listFilter === filter ? 'bg-gray-200' : 'bg-gray-300/50'}`}>
-                    {count}
-                  </span>
+                  <span className="text-xs sm:text-sm truncate tracking-wide">{tab}</span>
                 </button>
-              )
-            })}
+              ))}
+              <div className="h-0.5 bg-[#03045E]/15 my-1"></div>
+              <button
+                onClick={() => { setIsOpen(false); handleLogout(); }}
+                className="flex items-center gap-3 px-3.5 sm:px-4 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-[#f4f4f4] text-[#03045E] text-xs sm:text-sm font-black border-2 border-[#03045E]/25 hover:bg-[#03045E]/10 transition-all cursor-pointer text-left shadow-sm"
+              >
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                <span className="truncate">Logout</span>
+              </button>
+            </nav>
           </div>
+        </div>
+      </header>
 
-          {/* RENDER THE FILTERED LIST */}
-          {filterList(activeTab === 'Employers' ? employers : applicants).length > 0 ? (
-            filterList(activeTab === 'Employers' ? employers : applicants).map(user => (
-              <div key={user.user_id} className={`bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 ${listFilter === 'Disabled' ? 'opacity-70' : ''}`}>
-                
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-[#03045E]">
-                    {activeTab === 'Employers' ? user.company_name : `${user.firstname} ${user.lastname}`}
-                  </h3>
-                  <p className="text-sm font-medium text-gray-500">
-                    {activeTab === 'Employers' ? `Industry: ${user.industry}` : `Disability: ${user.disability_type}`} | Email: {user.email}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-2">Registered: {new Date(user.created_at).toLocaleDateString()}</p>
+
+      <div className="flex flex-col w-full max-w-[1700px] mx-auto min-w-0 box-border pt-16 min-h-screen">
+        <div className="flex flex-col md:flex-row flex-1 w-full min-w-0">
+          
+ 
+          <aside className="hidden md:flex shrink-0 flex-col z-10 bg-white border-r-2 border-[#03045E]/15 w-72 lg:w-80 shadow-[4px_0_24px_rgba(3,4,94,0.05)]">
+            <div className="w-full flex flex-col h-full min-w-0">
+              <nav className="flex-1 px-5 py-8 flex flex-col gap-3.5 overflow-y-auto">
+                {['Overview', 'Employers', 'Applicants'].map((tab) => (
+                  <button 
+                    key={tab} 
+                    onClick={() => { setActiveTab(tab); setListFilter('Pending'); }} 
+                    className={`group flex items-center gap-3.5 text-left px-4 py-3.5 rounded-xl font-extrabold transition-all duration-200 capitalize cursor-pointer border-2 ${
+                      activeTab === tab 
+                        ? 'bg-[#03045E] text-white border-[#03045E] shadow-sm' 
+                        : 'bg-white text-[#03045E] border-[#03045E]/20 hover:bg-[#2C7FFF]/10 hover:border-[#2C7FFF] hover:text-[#2C7FFF]'
+                    }`}
+                  >
+                    <div className={`p-2 rounded-lg transition-colors duration-200 shrink-0 ${
+                      activeTab === tab 
+                        ? 'bg-[#2C7FFF] text-white' 
+                        : 'bg-[#03045E]/5 text-[#03045E] group-hover:bg-[#2C7FFF]/20 group-hover:text-[#2C7FFF]'
+                    }`}>
+                      {tab === 'Overview' && (
+                        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                      )}
+                      {tab === 'Employers' && (
+                        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                      )}
+                      {tab === 'Applicants' && (
+                        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                      )}
+                    </div>
+                    <span className="text-base tracking-wide font-extrabold truncate">{tab}</span>
+                  </button>
+                ))}
+              </nav>
+            </div>
+          </aside>
+
+ 
+          <main className="flex-1 p-4 sm:p-6 md:p-10 relative w-full min-w-0 transition-all duration-300 flex flex-col box-border">
+            
+
+            <div className="mb-8 border-b-2 border-[#03045E]/15 pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-black text-[#03045E] tracking-tight">Admin Control Center</h1>
+                <p className="text-sm font-bold text-[#03045E]/70 mt-1">
+                  Manage platform integrity, verify documents, and control account access securely.
+                </p>
+              </div>
+            </div>
+
+           
+            {activeTab === 'Overview' && stats && (
+              <div className="flex flex-col gap-8 animate-in fade-in duration-300">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <StatCard 
+                    title="Total Applicants" 
+                    value={stats.totalApplicants} 
+                    icon={
+                      <svg className="w-6 h-6 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                      </svg>
+                    } 
+                  />
+                  <StatCard 
+                    title="Total Employers" 
+                    value={stats.totalEmployers} 
+                    icon={
+                      <svg className="w-6 h-6 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                      </svg>
+                    } 
+                  />
+                  <StatCard 
+                    title="Pending Employers" 
+                    value={stats.pendingEmployers} 
+                    icon={
+                      <svg className={`w-6 h-6 ${stats.pendingEmployers > 0 ? 'text-[#03045E] animate-pulse' : 'text-[#03045E]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                    } 
+                    alert={stats.pendingEmployers > 0} 
+                  />
+                  <StatCard 
+                    title="Pending Applicants" 
+                    value={stats.pendingApplicants} 
+                    icon={
+                      <svg className={`w-6 h-6 ${stats.pendingApplicants > 0 ? 'text-[#03045E] animate-pulse' : 'text-[#03045E]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                    } 
+                    alert={stats.pendingApplicants > 0} 
+                  />
                 </div>
 
-                <div className="flex flex-col gap-3 min-w-[200px]">
-                  {activeTab === 'Employers' && user.verification_document && (
-                    <a href={`http://localhost:5001/uploads/${user.verification_document.replace(/^uploads[\\/]/, '')}`} 
-      target="_blank" rel="noopener noreferrer" className="text-center px-4 py-2 bg-blue-50 text-[#2C7FFF] font-bold text-sm rounded-lg border border-blue-100 hover:bg-blue-100 transition">📄 View Business Document</a>
-                  )}
-                  {activeTab === 'Applicants' && user.pwd_document_path && (
-                    <a href={`http://localhost:5001/uploads/${user.pwd_document_path.replace(/^uploads[\\/]/, '')}`} target="_blank" rel="noopener noreferrer" className="text-center px-4 py-2 bg-purple-50 text-purple-700 font-bold text-sm rounded-lg border border-purple-100 hover:bg-purple-100 transition">🆔 View PWD ID</a>
-                  )}
-                  {(!user.verification_document && !user.pwd_document_path) && (
-                    <span className="text-center px-4 py-2 bg-gray-50 text-gray-400 font-bold text-sm rounded-lg border border-gray-200">No Document Attached</span>
-                  )}
-                  
-                  <div className="flex gap-2">
-                    {listFilter === 'Pending' && (
-                      <>
-                        <button 
-                          onClick={() => setRejectModal({ isOpen: true, userId: user.user_id, reason: '' })} 
-                          className="flex-1 py-2 bg-red-100 text-red-700 font-bold text-sm rounded-lg hover:bg-red-200 transition"
-                        >
-                          Reject
-                        </button>
-                        <button onClick={() => handleVerification(user.user_id, 'Approved')} className="flex-1 py-2 bg-emerald-500 text-white font-bold text-sm rounded-lg hover:bg-emerald-600 shadow-sm transition">Approve</button>
-                      </>
-                    )}
-                    {listFilter === 'Approved' && (
-                      <button onClick={() => handleAccountStatus(user.user_id, 'Disabled')} className="flex-1 py-2 bg-gray-800 text-white font-bold text-sm rounded-lg hover:bg-black shadow-sm">Disable Account</button>
-                    )}
-                    {listFilter === 'Rejected' && (
-                      <button onClick={() => handleVerification(user.user_id, 'Approved')} className="flex-1 py-2 bg-emerald-100 text-emerald-800 font-bold text-sm rounded-lg hover:bg-emerald-200 shadow-sm transition">Approve (Re-evaluate)</button>
-                    )}
-                    {listFilter === 'Disabled' && (
-                      <button onClick={() => handleAccountStatus(user.user_id, 'Active')} className="flex-1 py-2 bg-blue-600 text-white font-bold text-sm rounded-lg hover:bg-blue-700 shadow-sm">Restore Account</button>
+         
+                <div className="bg-white p-6 sm:p-8 rounded-[2rem] shadow-sm border-2 border-[#03045E]/15">
+                  <div className="mb-6">
+                    <h2 className="text-xl font-black text-[#03045E] tracking-tight">Annual Platform Growth</h2>
+                    <p className="text-xs font-bold text-[#03045E]/70 mt-0.5">Monthly registration volume for new users.</p>
+                  </div>
+                  <div className="h-[400px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#03045E/10" />
+                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#03045E', fontSize: 12, fontWeight: 700}} dy={10} />
+                        <YAxis axisLine={false} tickLine={false} tick={{fill: '#03045E', fontSize: 12, fontWeight: 700}} />
+                        <Tooltip 
+                          cursor={{fill: 'rgba(44,127,255,0.1)'}}
+                          contentStyle={{borderRadius: '16px', border: '2px solid rgba(3,4,94,0.15)', boxShadow: '0 10px 25px rgba(3,4,94,0.1)', fontWeight: 'bold', color: '#03045E'}}
+                        />
+                        <Legend iconType="circle" wrapperStyle={{paddingTop: '20px', fontWeight: 'bold'}}/>
+                        <Bar dataKey="users" name="New Users" fill="#03045E" radius={[6, 6, 0, 0]} barSize={28} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+               
+                <div className="bg-white p-6 sm:p-8 rounded-[2rem] shadow-sm border-2 border-[#03045E]/15 flex flex-col gap-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-[#03045E]/10 pb-4">
+                    <div>
+                      <h2 className="text-xl font-black text-[#03045E] tracking-tight">All Registered Users Overview</h2>
+                      <p className="text-xs font-bold text-[#03045E]/70 mt-0.5">Comprehensive list of all platform applicants and employers.</p>
+                    </div>
+                    <span className="px-4 py-1.5 bg-[#03045E]/10 text-[#03045E] font-black text-xs rounded-xl border border-[#03045E]/20 w-fit">
+                      Total: {allUsers.length} Users
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-3 max-h-[500px] overflow-y-auto pr-1">
+                    {allUsers.length > 0 ? (
+                      allUsers.map((user) => (
+                        <div key={user.user_id} className="p-4 sm:p-5 rounded-2xl bg-[#f4f4f4] border-2 border-[#03045E]/15 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-[#2C7FFF] transition-all">
+                          <div className="flex items-center gap-3.5 min-w-0">
+                            <div className="w-10 h-10 rounded-xl bg-[#03045E] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-sm">
+                              {user.userType === 'Employer' ? (user.company_name?.[0] || 'E') : (user.firstname?.[0] || 'A')}
+                            </div>
+                            <div className="min-w-0">
+                              <h4 className="text-sm font-black text-[#03045E] truncate">
+                                {user.userType === 'Employer' ? user.company_name : `${user.firstname} ${user.lastname}`}
+                              </h4>
+                              <p className="text-xs font-bold text-[#03045E]/70 truncate">{user.email}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2.5 shrink-0 w-full sm:w-auto justify-between sm:justify-end">
+                            <span className={`px-3 py-1 rounded-lg text-[10px] font-black tracking-wider uppercase ${user.userType === 'Employer' ? 'bg-[#2C7FFF]/15 text-[#2C7FFF] border border-[#2C7FFF]/30' : 'bg-[#03045E]/10 text-[#03045E] border border-[#03045E]/20'}`}>
+                              {user.userType}
+                            </span>
+                            <span className={`px-3 py-1 rounded-lg text-[10px] font-black tracking-wider uppercase ${
+                              user.verification_status === 'Approved' ? 'bg-[#2C7FFF]/15 text-[#03045E] border border-[#2C7FFF]/30' :
+                              user.verification_status === 'Rejected' ? 'bg-[#f4f4f4] text-[#03045E] border border-[#03045E]/30' :
+                              'bg-[#03045E]/10 text-[#03045E] border border-[#03045E]/20'
+                            }`}>
+                              {user.verification_status || 'Pending'}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-8 text-center text-xs font-bold text-[#03045E]/70">No registered users found.</div>
                     )}
                   </div>
                 </div>
               </div>
-            ))
-          ) : (
-            <div className="p-10 text-center border-2 border-dashed border-gray-300 rounded-3xl bg-gray-50">
-              <p className="text-sm font-bold text-gray-500">No {listFilter.toLowerCase()} users found in this category.</p>
-            </div>
-          )}
-        </div>
-      )}
+            )}
 
-      {/* REJECTION REASON MODAL */}
-      {rejectModal.isOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-lg p-6 sm:p-8 shadow-2xl flex flex-col gap-5 animate-fadeIn">
-            <div>
-              <h2 className="text-xl font-extrabold text-[#03045E]">Reject Application & Trigger Cooldown</h2>
-              <p className="text-sm font-medium text-gray-500 mt-1">Select a document issue. A 7-day reapplication cooldown will be automatically applied to this user.</p>
-            </div>
-            
-            {/* Quick-Select Standard Reasons (Includes Cooldown Messaging) */}
-            <div className="flex flex-wrap gap-2">
-              {[
-                "Uploaded document is blurry or illegible. Please resubmit a clear copy after your 7-day cooldown period.",
-                "Uploaded document is expired. Please provide a valid, up-to-date document after your 7-day cooldown period.",
-                "Name on the document does not match the registered profile name. You may resubmit after your 7-day cooldown period.",
-                "Invalid document type. Please upload a valid PWD ID or Business Registration after your 7-day cooldown period.",
-                "Document is cropped and missing important verification details. Please try again after your 7-day cooldown period."
-              ].map((standardReason, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={() => setRejectModal({ ...rejectModal, reason: standardReason })}
-                  className="text-left px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-bold rounded-lg border border-gray-200 hover:bg-red-50 hover:text-red-700 hover:border-red-200 transition"
-                >
-                  + {standardReason.split('.')[0]} {/* Shows a shorter label on the chip */}
-                </button>
-              ))}
-            </div>
-            
-            <textarea
-              value={rejectModal.reason}
-              onChange={(e) => setRejectModal({ ...rejectModal, reason: e.target.value })}
-              placeholder="Select a reason above or type a custom reason here..."
-              className="w-full p-4 border border-gray-300 rounded-xl resize-none focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400 transition min-h-[140px] text-sm text-[#03045E] leading-relaxed"
-            ></textarea>
-            
-            <div className="flex gap-3 mt-2">
-              <button 
-                onClick={() => setRejectModal({ isOpen: false, userId: null, reason: '' })}
-                className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={submitRejection}
-                className="flex-1 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 shadow-md transition flex justify-center items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                Reject & Lock (7 Days)
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
+            {(activeTab === 'Employers' || activeTab === 'Applicants') && (
+              <div className="flex flex-col gap-6 animate-in fade-in duration-300">
+                
+          
+                <div className="flex flex-wrap items-center gap-2 bg-white p-3 sm:p-4 rounded-[2rem] border-2 border-[#03045E]/15 w-full shadow-sm">
+                  {['Pending', 'Approved', 'Rejected', 'Disabled'].map(filter => {
+                     const targetList = activeTab === 'Employers' ? employers : applicants;
+                     let count = 0;
+                     if (filter === 'Disabled') {
+                       count = targetList.filter(i => i.account_status === 'Disabled').length;
+                     } else {
+                       count = targetList.filter(i => i.verification_status === filter && i.account_status !== 'Disabled').length;
+                     }
+
+                     return (
+                      <button 
+                        key={filter} 
+                        onClick={() => setListFilter(filter)}
+                        className={`flex-1 min-w-[110px] px-4 py-3 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                          listFilter === filter ? 'bg-[#03045E] text-white shadow-md ring-2 ring-[#03045E]/25' : 'bg-transparent text-[#03045E]/70 hover:bg-[#2C7FFF]/10 hover:text-[#2C7FFF]'
+                        }`}
+                      >
+                        <span className="truncate">{filter}</span>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider ${listFilter === filter ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E]/10 text-[#03045E]'}`}>
+                          {count}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+
+         
+                <div className="flex flex-col gap-4">
+                  {filterList(activeTab === 'Employers' ? employers : applicants).length > 0 ? (
+                    filterList(activeTab === 'Employers' ? employers : applicants).map(user => (
+                      <div key={user.user_id} className={`bg-white p-6 sm:p-7 rounded-[2rem] shadow-sm border-2 border-[#03045E]/15 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 transition-all hover:shadow-md hover:border-[#2C7FFF]/40 ${listFilter === 'Disabled' ? 'opacity-70 bg-[#f4f4f4]/50' : ''}`}>
+                        
+                        <div className="flex items-start gap-4 flex-1 min-w-0">
+                          <div className="w-12 h-12 rounded-2xl bg-[#03045E]/10 text-[#03045E] flex items-center justify-center shrink-0 border-2 border-[#03045E]/15 font-black text-lg">
+                            {activeTab === 'Employers' ? (user.company_name?.[0] || 'E') : (user.firstname?.[0] || 'A')}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-xl font-black text-[#03045E] tracking-tight truncate">
+                              {activeTab === 'Employers' ? user.company_name : `${user.firstname} ${user.lastname}`}
+                            </h3>
+                            <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm font-bold text-[#03045E]/70 mt-1">
+                              <span className="bg-[#f4f4f4] px-2.5 py-1 rounded-lg border border-[#03045E]/10">
+                                {activeTab === 'Employers' ? 'Industry:' : 'Disability:'} <strong className="text-[#03045E]">{activeTab === 'Employers' ? (user.industry || 'N/A') : (user.disability_type || 'N/A')}</strong>
+                              </span>
+                              <span>•</span>
+                              <span className="truncate">Email: <strong className="text-[#03045E]">{user.email}</strong></span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[11px] text-[#2C7FFF] font-black uppercase tracking-wider mt-2.5">
+                              <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                              </svg>
+                              Registered: {new Date(user.created_at).toLocaleDateString()}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-3 min-w-[240px] w-full md:w-auto shrink-0">
+                          {activeTab === 'Employers' && user.verification_document && (
+                            <a href={`http://localhost:5001/uploads/${user.verification_document.replace(/^uploads[\\/]/, '')}`} 
+                              target="_blank" rel="noopener noreferrer" className="text-center px-4 py-2.5 bg-[#2C7FFF]/10 text-[#2C7FFF] font-black text-xs sm:text-sm rounded-xl border-2 border-[#2C7FFF]/30 hover:bg-[#2C7FFF]/20 transition flex items-center justify-center gap-2 shadow-sm">
+                              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                              </svg>
+                              View Business Document
+                            </a>
+                          )}
+                          {activeTab === 'Applicants' && user.pwd_document_path && (
+                            <a href={`http://localhost:5001/uploads/${user.pwd_document_path.replace(/^uploads[\\/]/, '')}`} target="_blank" rel="noopener noreferrer" className="text-center px-4 py-2.5 bg-[#2C7FFF]/10 text-[#2C7FFF] font-black text-xs sm:text-sm rounded-xl border-2 border-[#2C7FFF]/30 hover:bg-[#2C7FFF]/20 transition flex items-center justify-center gap-2 shadow-sm">
+                              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path>
+                              </svg>
+                              View PWD ID
+                            </a>
+                          )}
+                          {(!user.verification_document && !user.pwd_document_path) && (
+                            <div className="text-center px-4 py-2.5 bg-[#f4f4f4] text-[#03045E]/50 font-black text-xs sm:text-sm rounded-xl border-2 border-[#03045E]/10 flex items-center justify-center gap-2">
+                              No Document Attached
+                            </div>
+                          )}
+                          
+                          <div className="flex gap-2">
+                            {listFilter === 'Pending' && (
+                              <>
+                                <button 
+                                  onClick={() => setRejectModal({ isOpen: true, userId: user.user_id, reason: '' })} 
+                                  className="flex-1 py-2.5 bg-[#f4f4f4] text-[#03045E] font-black text-xs sm:text-sm rounded-xl border-2 border-[#03045E]/30 hover:bg-[#03045E]/10 transition cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
+                                >
+                                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                                  </svg>
+                                  Reject
+                                </button>
+                                <button 
+                                  onClick={() => handleVerification(user.user_id, 'Approved')} 
+                                  className="flex-1 py-2.5 bg-[#03045E] text-white font-black text-xs sm:text-sm rounded-xl border-2 border-[#03045E] hover:bg-[#03045E]/90 shadow-sm transition cursor-pointer flex items-center justify-center gap-1.5"
+                                >
+                                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path>
+                                  </svg>
+                                  Approve
+                                </button>
+                              </>
+                            )}
+                            {listFilter === 'Approved' && (
+                              <button 
+                                onClick={() => handleAccountStatus(user.user_id, 'Disabled')} 
+                                className="w-full py-2.5 bg-[#03045E] text-white font-black text-xs sm:text-sm rounded-xl border-2 border-[#03045E] hover:bg-[#03045E]/90 shadow-sm cursor-pointer flex items-center justify-center gap-2"
+                              >
+                                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                                </svg>
+                                Disable Account
+                              </button>
+                            )}
+                            {listFilter === 'Rejected' && (
+                              <button 
+                                onClick={() => handleVerification(user.user_id, 'Approved')} 
+                                className="w-full py-2.5 bg-[#2C7FFF]/15 text-[#03045E] font-black text-xs sm:text-sm rounded-xl border-2 border-[#2C7FFF]/40 hover:bg-[#2C7FFF]/30 shadow-sm transition cursor-pointer flex items-center justify-center gap-2"
+                              >
+                                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                Approve (Re-evaluate)
+                              </button>
+                            )}
+                            {listFilter === 'Disabled' && (
+                              <button 
+                                onClick={() => handleAccountStatus(user.user_id, 'Active')} 
+                                className="w-full py-2.5 bg-[#2C7FFF] text-white font-black text-xs sm:text-sm rounded-xl border-2 border-[#2C7FFF] hover:bg-[#2C7FFF]/90 shadow-sm cursor-pointer flex items-center justify-center gap-2"
+                              >
+                                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                Restore Account
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-16 text-center border-2 border-dashed border-[#03045E]/20 rounded-[2rem] bg-white shadow-sm flex flex-col items-center justify-center">
+                      <div className="w-14 h-14 bg-[#2C7FFF]/15 text-[#2C7FFF] rounded-2xl flex items-center justify-center mb-4 border-2 border-[#2C7FFF]/30">
+                        <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                        </svg>
+                      </div>
+                      <p className="text-base font-black text-[#03045E]">No {listFilter.toLowerCase()} {activeTab.toLowerCase()} found.</p>
+                      <p className="text-xs font-bold text-[#03045E]/70 mt-1">Check back later for new registrations in this category.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {rejectModal.isOpen && (
+              <div className="fixed inset-0 bg-[#03045E]/50 z-50 flex items-center justify-center p-4 backdrop-blur-md animate-in fade-in duration-200">
+                <div className="bg-white rounded-[2rem] w-full max-w-lg p-6 sm:p-8 shadow-[0_25px_60px_rgba(3,4,94,0.3)] border-2 border-[#03045E]/20 flex flex-col gap-5">
+                  <div>
+                    <h2 className="text-xl font-black text-[#03045E] tracking-tight">Reject Application & Cooldown</h2>
+                    <p className="text-xs sm:text-sm font-bold text-[#03045E]/70 mt-1">Select a document issue. A 7-day reapplication cooldown will be automatically applied.</p>
+                  </div>
+                  
+                
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      "Uploaded document is blurry or illegible. Please resubmit a clear copy after your 7-day cooldown period.",
+                      "Uploaded document is expired. Please provide a valid, up-to-date document after your 7-day cooldown period.",
+                      "Name on the document does not match profile name. You may resubmit after your 7-day cooldown period.",
+                      "Invalid document type. Please upload a valid PWD ID or Business Registration after your 7-day cooldown period.",
+                      "Document is cropped and missing important details. Please try again after your 7-day cooldown period."
+                    ].map((standardReason, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => setRejectModal({ ...rejectModal, reason: standardReason })}
+                        className="text-left px-3 py-2 bg-[#f4f4f4] text-[#03045E] text-xs font-black rounded-xl border-2 border-[#03045E]/15 hover:bg-[#03045E]/10 hover:border-[#03045E]/30 transition cursor-pointer"
+                      >
+                        + {standardReason.split('.')[0]}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  <textarea
+                    value={rejectModal.reason}
+                    onChange={(e) => setRejectModal({ ...rejectModal, reason: e.target.value })}
+                    placeholder="Select a reason above or type a custom reason here..."
+                    className="w-full p-4 border-2 border-[#03045E]/20 rounded-2xl resize-none focus:outline-none focus:border-[#2C7FFF] focus:ring-2 focus:ring-[#2C7FFF]/30 transition min-h-[140px] text-sm font-bold text-[#03045E] leading-relaxed bg-[#f4f4f4]"
+                  ></textarea>
+                  
+                  <div className="flex gap-3 mt-2">
+                    <button 
+                      onClick={() => setRejectModal({ isOpen: false, userId: null, reason: '' })}
+                      className="flex-1 py-3 bg-[#f4f4f4] text-[#03045E] font-black text-sm rounded-xl border-2 border-[#03045E]/20 hover:bg-[#03045E]/10 transition cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      onClick={submitRejection}
+                      className="flex-1 py-3 bg-[#03045E] text-white font-black text-sm rounded-xl border-2 border-[#03045E] hover:bg-[#03045E]/90 shadow-md transition flex justify-center items-center gap-2 cursor-pointer"
+                    >
+                      <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                      Reject & Lock (7 Days)
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </main>
+        </div>
+      </div>
     </div>
   );
 }
 
 function StatCard({ title, value, icon, alert }) {
   return (
-    <div className={`p-6 rounded-3xl shadow-sm border ${alert ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-white'}`}>
+    <div className={`p-6 sm:p-7 rounded-[2rem] shadow-sm border-2 ${alert ? 'border-[#03045E]/30 bg-[#03045E]/5' : 'border-[#03045E]/15 bg-white'}`}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className={`text-xs font-extrabold uppercase tracking-wider ${alert ? 'text-red-700' : 'text-gray-500'}`}>{title}</h3>
-        <span className="text-2xl">{icon}</span>
+        <h3 className={`text-xs font-black uppercase tracking-wider ${alert ? 'text-[#03045E]' : 'text-[#03045E]/70'}`}>{title}</h3>
+        <div className="p-2.5 rounded-2xl bg-[#03045E]/5 border border-[#03045E]/10 flex items-center justify-center">
+          {icon}
+        </div>
       </div>
-      <p className={`text-4xl font-black tracking-tight ${alert ? 'text-red-600' : 'text-[#03045E]'}`}>{value}</p>
+      <p className={`text-4xl font-black tracking-tight ${alert ? 'text-[#03045E]' : 'text-[#03045E]'}`}>{value}</p>
     </div>
   );
 }

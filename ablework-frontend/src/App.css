@@ -182,3 +182,21 @@
     border-right-color: var(--border);
   }
 }
+
+/* ====================================================== */
+/* CONDITIONAL TALKBACK GREEN FOCUS INDICATOR             */
+/* (Only activates when TalkBack is turned ON in menu)    */
+/* ====================================================== */
+
+html.talkback-active *:focus, 
+html.talkback-active *:focus-visible {
+  outline: 3px solid #32CD32 !important; /* TalkBack Green */
+  outline-offset: 2px !important;
+  border-radius: 4px; 
+  background-color: rgba(50, 205, 50, 0.08) !important;
+}
+
+html.talkback-active main#main-content:focus,
+html.talkback-active main#main-content:focus-visible {
+  outline: none !important;
+}

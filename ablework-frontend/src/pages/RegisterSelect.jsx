@@ -1,76 +1,76 @@
 import { useState, useContext } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { AccessibilityContext } from '../context/AccessibilityContext';
-import headerLogo from '../assets/Final.png';
-import backgroundImg from '../assets/Final background.png';
+import lightLogo from '../assets/LIGHT MODE.png';
+import darkLogo from '../assets/DARK MODE.png';
+import backgroundImg from '../assets/BG.png';
 
 export default function RegisterSelect() {
   const [isOpen, setIsOpen] = useState(false);
   const { mode } = useContext(AccessibilityContext);
-
-  // Support A / A+ / A++ (same logic as Login)
+  const isContrast = mode && typeof mode === 'string' && mode.toLowerCase().includes('contrast');
   const isAPlusPlus = mode === 'A++' || mode === 'Assist' || mode === 'a++' || mode === 'assist';
   const isAPlus = mode === 'A+' || mode === 'a+';
   const isAssist = isAPlusPlus;
 
-  // Title / subtitle sizes (same as Login)
+
   const titleSize = isAPlusPlus
-    ? 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl'
+    ? 'text-4xl sm:text-5xl md:text-6xl lg:text-5xl'
     : isAPlus
-      ? 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl'
+      ? 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl'
       : 'text-xl sm:text-2xl md:text-3xl lg:text-4xl';
 
   const subtitleSize = isAPlusPlus
-    ? 'text-lg sm:text-xl md:text-2xl'
+    ? 'text-xl sm:text-2xl md:text-3xl'
     : isAPlus
-      ? 'text-base sm:text-lg md:text-xl'
+      ? 'text-lg sm:text-xl md:text-2xl'
       : 'text-sm sm:text-base md:text-lg';
 
-  // Card title & description sizes
+
   const cardTitleSize = isAPlusPlus
-    ? 'text-2xl sm:text-3xl md:text-4xl'
+    ? 'text-3xl sm:text-4xl md:text-5xl'
     : isAPlus
-      ? 'text-xl sm:text-2xl md:text-3xl'
+      ? 'text-2xl sm:text-3xl md:text-4xl'
       : 'text-lg sm:text-xl md:text-2xl';
 
   const cardDescSize = isAPlusPlus
-    ? 'text-base sm:text-lg md:text-xl'
+    ? 'text-lg sm:text-xl md:text-2xl'
     : isAPlus
-      ? 'text-sm sm:text-base md:text-lg'
+      ? 'text-base sm:text-lg md:text-xl'
       : 'text-xs sm:text-sm md:text-base';
 
-  // Container sizing - better mobile + A++ adjustment
+ 
   const containerPadding = isAssist
-    ? 'pt-8 px-5 pb-10 sm:pt-10 sm:px-8 sm:pb-14 md:pt-12 md:px-12 md:pb-16 lg:pt-16 lg:px-14 lg:pb-20'
-    : 'pt-6 px-4 pb-8 sm:pt-8 sm:px-6 sm:pb-12 md:pt-10 md:px-10 md:pb-14 lg:pt-14 lg:px-12 lg:pb-18';
+    ? 'pt-5 px-4 pb-3 sm:pt-6 sm:px-6 sm:pb-4 md:pt-8 md:px-10 md:pb-5 lg:pt-10 lg:px-12 lg:pb-6'
+    : 'pt-5 px-4 pb-3 sm:pt-6 sm:px-6 sm:pb-4 md:pt-8 md:px-8 md:pb-6 lg:pt-10 lg:px-10 lg:pb-8';
 
-  const containerGap = isAssist ? 'gap-6 sm:gap-8' : 'gap-4 sm:gap-6';
+  const containerGap = isAssist ? 'gap-5 sm:gap-6' : 'gap-4 sm:gap-5';
   
   const containerMaxWidth = isAssist
-    ? 'max-w-[96%] sm:max-w-xl md:max-w-3xl lg:max-w-4xl'
-    : 'max-w-[96%] sm:max-w-lg md:max-w-2xl lg:max-w-3xl';
+    ? 'max-w-[94%] sm:max-w-lg md:max-w-2xl lg:max-w-3xl'
+    : 'max-w-[94%] sm:max-w-md md:max-w-xl lg:max-w-2xl';
 
   const containerMinHeight = isAssist
-    ? 'min-h-[auto] sm:min-h-[540px] md:min-h-[620px]'
-    : 'min-h-[auto] sm:min-h-[480px] md:min-h-[560px]';
+    ? 'min-h-[auto] sm:min-h-[440px] md:min-h-[500px]'
+    : 'min-h-[auto] sm:min-h-[400px] md:min-h-[460px]';
 
   return (
-    <main className="flex flex-col bg-[#f4f4f4] overflow-x-hidden md:overflow-y-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-      {/* ===== HEADER (Fixed to Top) ===== */}
-      <header className="w-full bg-[#f4f4f4] border-b border-[#03045E]/10 fixed top-0 left-0 z-50">
-        <div className="w-full h-16 pl-4 pr-4 md:pr-8 flex items-center justify-between">
+    <main className="flex flex-col bg-[#f4f4f4] min-h-screen overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
 
-          {/* Left side: Logo + Desktop Navigation */}
-          <div className="flex items-center gap-8">
-            {/* Logo - Vertically centered with flex items-center */}
+      <header className="w-full bg-[#f4f4f4] border-b border-[#03045E]/10 fixed top-0 left-0 z-50">
+        <div className="w-full h-16 pl-4 pr-4 md:pr-8 flex items-center justify-between max-w-[1700px] mx-auto box-border">
+
+
+          <div className="flex items-center gap-8 max-w-[1700px] mx-auto w-full box-border">
+            
             <div className="flex items-center flex-shrink-0 py-1">
               <img
-                src={headerLogo}
+                src={isContrast ? darkLogo : lightLogo}
                 alt="AbleWork Logo"
-                className="h-20 w-auto object-contain max-h-full"
+                className="h-14 w-auto object-contain max-h-full"
               />
             </div>
-            <nav className="hidden md:flex items-center gap-6 text-[15px] font-medium text-[#03045E]">
+            <nav className="hidden md:flex items-center gap-6 text-[15px] font-medium text-[#03045E]" aria-label="Main navigation">
               <NavLink 
                 to="/" 
                 className={({ isActive }) => 
@@ -98,15 +98,15 @@ export default function RegisterSelect() {
             </nav>
           </div>
 
-          {/* Desktop Log In */}
+        
           <div className="hidden md:flex items-center">
             <NavLink
               to="/login"
               className={({ isActive }) => 
-                `px-5 py-2 rounded-full text-sm font-medium border transition duration-200 transform hover:scale-105 ${
+                `px-5 py-2 rounded-full bg-transparent text-[#03045E] text-sm font-bold border-2 border-[#03045E] hover:bg-[#2C7FFF] hover:text-[#f4f4f4] hover:border-[#2C7FFF] transform duration-200 transition whitespace-nowrap ${
                   isActive 
                     ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] underline font-semibold' 
-                    : 'bg-white text-[#03045E] border-[#03045E] hover:bg-[#2C7FFF] hover:text-white hover:border-[#2C7FFF]'
+                    : ''
                 }`
               }
             >
@@ -114,31 +114,33 @@ export default function RegisterSelect() {
             </NavLink>
           </div>
 
-          {/* Mobile Hamburger Button */}
+        
           <button
             className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg bg-[#2C7FFF] text-[#f4f4f4]"
             onClick={() => setIsOpen(!isOpen)}
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isOpen}
           >
             {isOpen ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             )}
           </button>
         </div>
 
-        {/* Mobile Menu - smooth slide */}
+       
         <div
           className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
             isOpen ? 'max-h-96 opacity-100 border-b border-[#03045E]/10 shadow-lg' : 'max-h-0 opacity-0'
           }`}
         >
           <div className="w-full bg-[#f4f4f4]">
-            <nav className="flex flex-col px-6 py-5 gap-5 text-[16px] font-medium text-[#03045E]">
+            <nav className="flex flex-col px-6 py-5 gap-5 text-[16px] font-medium text-[#03045E] max-w-[1700px] mx-auto box-border" aria-label="Mobile navigation">
               <NavLink 
                 to="/" 
                 className={({ isActive }) => 
@@ -169,10 +171,10 @@ export default function RegisterSelect() {
               <NavLink
                 to="/login"
                 className={({ isActive }) => 
-                  `mt-2 px-5 py-2.5 rounded-full text-sm font-medium border transition duration-200 transform hover:scale-105 w-fit ${
+                  `mt-2 px-5 py-2.5 rounded-full bg-transparent text-[#03045E] text-sm font-bold border-2 border-[#03045E] hover:bg-[#2C7FFF] hover:text-[#f4f4f4] hover:border-[#2C7FFF] transform duration-200 transition w-fit whitespace-nowrap ${
                     isActive 
                       ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] underline font-semibold' 
-                      : 'bg-white text-[#03045E] border-[#03045E] hover:bg-[#2C7FFF] hover:text-white hover:border-[#2C7FFF]'
+                      : ''
                   }`
                 }
                 onClick={() => setIsOpen(false)}
@@ -184,138 +186,173 @@ export default function RegisterSelect() {
         </div>
       </header>
 
-      {/* ===== YOUR ORIGINAL CONTENT ===== */}
-      <div 
-        className={`min-h-[100dvh] pt-24 sm:pt-20 md:pt-16 flex flex-col items-center md:items-end justify-start md:justify-center p-3 sm:p-5 md:p-8 relative bg-no-repeat bg-cover bg-center md:bg-[size:1100px_auto] md:bg-left transition-all duration-300 ${isOpen ? 'mt-48 sm:mt-56' : 'mt-0'}`}
+     
+      <div
+        className={`flex-grow pt-24 pb-12 flex flex-col items-end justify-start p-4 sm:p-6 md:p-12 pr-6 sm:pr-10 md:pr-16 lg:pr-24 pl-4 md:pl-8 max-w-[1700px] mx-auto w-full box-border relative bg-no-repeat bg-cover bg-center md:bg-[size:1100px_auto] md:bg-[position:left_-50px_center] lg:md:bg-[position:left_-100px_center] xl:bg-left min-h-[100vh] md:min-h-[100vh] transition-all duration-300 ${isOpen ? 'mt-48 sm:mt-56' : 'mt-0'}`}
         style={{
           backgroundImage: `url(${backgroundImg})`,
         }}
       >
         
-        {/* ===== ONE OUTER CONTAINER (styled for mobile and web) ===== */}
-        <div className={`w-full ${containerMaxWidth} flex flex-col items-center justify-center ${containerGap} relative z-10
-                    bg-white/60 rounded-3xl shadow-xl border border-[#03045E]/10 
-                    ${containerPadding}
-                    ${containerMinHeight} mb-10 md:mb-0 md:mt-8`}>
+        
+        <div className={`w-full h-auto ${containerMaxWidth} ${containerPadding} ${containerMinHeight} bg-white/90 backdrop-blur-md rounded-[2rem] shadow-xl border border-[#03045E]/15 flex flex-col items-center justify-center relative z-10 transition-all duration-300 mt-8 sm:mt-12 md:mt-16 ml-auto mr-0 md:mr-2 lg:mr-4 origin-top-right`}>
           
-          <div className="text-center w-full max-w-xl px-1">
-            <h1 className={`${titleSize} font-extrabold tracking-tighter text-[#03045E] mb-3 sm:mb-4`}>
-              Join AbleWork
+          <div className="text-center w-full max-w-lg mb-3 sm:mb-4">
+            <span className="inline-block py-1 px-3 rounded-full bg-[#2C7FFF]/15 text-[#2C7FFF] font-bold text-xs uppercase tracking-widest mb-1.5">
+              Welcome to AbleWork
+            </span>
+            <h1 className={`${titleSize} font-black tracking-tight text-[#03045E] mb-1.5`}>
+              Choose Your Path
             </h1>
-            <p className={`${subtitleSize} text-[#03045E]/80 leading-relaxed`}>
-              Please choose how you would like to use our platform
+            <p className={`${subtitleSize} text-[#03045E]/80 font-medium leading-relaxed`}>
+              Select how you would like to experience our inclusive employment platform tailored for your needs.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 w-full">
+          <div className={`grid grid-cols-1 md:grid-cols-2 ${containerGap} w-full`}>
     
-            {/* Applicant Card */}
+            
             <Link
               to="/register/applicant"
-              className="p-5 sm:p-7 md:p-8 bg-[#f4f4f4] rounded-2xl shadow-lg md:shadow-xl border border-[#03045E]/20 hover:border-[#2C7FFF] hover:shadow-2xl flex flex-col items-center text-center transition-all cursor-pointer group"
+              className="p-3.5 sm:p-4.5 md:p-5 bg-white rounded-2xl shadow-md border-2 border-[#03045E]/10 hover:border-[#2C7FFF] hover:shadow-xl hover:-translate-y-1 flex flex-col items-center text-center transition-all duration-300 cursor-pointer group"
+              aria-label="Register as a Job Seeker - Looking for accessible jobs and career opportunities"
             >
-              <div className="mb-3.5 sm:mb-5 text-[#03045E] group-hover:text-[#2C7FFF] transition-colors">
-                <svg className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#03045E]/5 border border-[#03045E]/10 flex items-center justify-center mb-2.5 text-[#03045E] group-hover:bg-[#2C7FFF] group-hover:text-white group-hover:border-[#2C7FFF] transition-all duration-300 shadow-inner">
+                <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                 </svg>
               </div>
 
-              <h2 className={`${cardTitleSize} font-bold text-[#03045E] mb-2 sm:mb-3 group-hover:text-[#2C7FFF]`}>
+              <h2 className={`${cardTitleSize} font-black text-[#03045E] mb-1.5 group-hover:text-[#2C7FFF] transition-colors`}>
                 I am a Job Seeker
               </h2>
 
-              <p className={`${cardDescSize} text-[#03045E]/70`}>
-                Looking for accessible jobs and career opportunities.
+              <p className={`${cardDescSize} text-[#03045E]/70 font-medium leading-relaxed max-w-xs`}>
+                Looking for accessible positions, tailored accommodations, and supportive career growth opportunities.
               </p>
+
+              <span className="mt-2.5 inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#2C7FFF] group-hover:underline">
+                Get Started 
+                <svg className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7"/></svg>
+              </span>
+
             </Link>
 
-            {/* Employer Card */}
+          
             <Link
               to="/register/employer"
-              className="p-5 sm:p-7 md:p-8 bg-[#f4f4f4] rounded-2xl shadow-lg sm:shadow-xl border border-[#03045E]/20 hover:border-[#2C7FFF] hover:shadow-2xl flex flex-col items-center text-center transition-all cursor-pointer group"
+              className="p-3.5 sm:p-4.5 md:p-5 bg-white rounded-2xl shadow-md border-2 border-[#03045E]/10 hover:border-[#2C7FFF] hover:shadow-xl hover:-translate-y-1 flex flex-col items-center text-center transition-all duration-300 cursor-pointer group"
+              aria-label="Register as an Employer - Looking to hire inclusive talent and post job listings"
             >
-              <div className="mb-3.5 sm:mb-5 text-[#03045E] group-hover:text-[#2C7FFF] transition-colors">
-                <svg className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125 1.125 1.125 1.125V21" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#03045E]/5 border border-[#03045E]/10 flex items-center justify-center mb-2.5 text-[#03045E] group-hover:bg-[#2C7FFF] group-hover:text-white group-hover:border-[#2C7FFF] transition-all duration-300 shadow-inner">
+                <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125 1.125 1.125 1.125V21" />
                 </svg>
               </div>
 
-              <h2 className={`${cardTitleSize} font-bold text-[#03045E] mb-2 sm:mb-3 group-hover:text-[#2C7FFF]`}>
+              <h2 className={`${cardTitleSize} font-black text-[#03045E] mb-1.5 group-hover:text-[#2C7FFF] transition-colors`}>
                 I am an Employer
               </h2>
 
-              <p className={`${cardDescSize} text-[#03045E]/70`}>
-                Looking to hire inclusive talent and post job listings.
+              <p className={`${cardDescSize} text-[#03045E]/70 font-medium leading-relaxed max-w-xs`}>
+                Looking to post accessible job listings, cultivate an inclusive workplace, and connect with verified diverse talent.
               </p>
+
+              <span className="mt-2.5 inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#2C7FFF] group-hover:underline">
+                Get Started 
+                <svg className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7"/></svg>
+              </span>
+
             </Link>
+
           </div>
         </div>
-        {/* ===== END ONE OUTER CONTAINER ===== */}
 
       </div>
 
-      {/* ===== UNIQUE FOOTER (left brand / right nav — compact) ===== */}
+     
       <footer
-        className="w-full relative z-20 overflow-hidden"
+        className={`w-full relative z-20 overflow-hidden mt-auto ${
+          isContrast
+            ? 'bg-black text-white border-t-2 border-blue-400'
+            : 'bg-[#03045E] text-white'
+        }`}
         style={{
-          background: 'linear-gradient(135deg, #03045E 0%, #04068A 55%, #0a1a6e 100%)',
-          color: '#f4f4f4',
           filter: 'none',
           WebkitFilter: 'none',
           forcedColorAdjust: 'none',
         }}
       >
-        {/* Top accent line */}
-        <div
-          className="h-0.5 w-full"
-          style={{ background: 'linear-gradient(90deg, #2C7FFF 0%, #5BA3FF 50%, #2C7FFF 100%)' }}
-        />
+        <div className={`h-1 w-full ${isContrast ? 'bg-blue-400' : 'bg-[#2C7FFF]'}`} />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 sm:py-6">
-          <div className="flex flex-col md:flex-row items-center md:items-center justify-between gap-4 md:gap-6">
-
-            {/* Left: Brand + tagline + copyright */}
-            <div className="text-center md:text-left shrink-0">
-              <p className="font-extrabold tracking-tight" style={{ fontSize: '16px', color: '#ffffff' }}>
-                AbleWork
+        <div className="w-full h-auto pl-4 pr-4 md:pr-8 py-10 sm:py-12 max-w-[1700px] mx-auto box-border">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center justify-between">
+            
+            <div className="md:col-span-5 flex flex-col items-center md:items-start text-center md:text-left space-y-3">
+              <div className="flex items-center gap-3">
+                <img
+                  src={isContrast ? darkLogo : lightLogo}
+                  alt="AbleWork Logo"
+                  className="h-10 w-auto object-contain"
+                />
+              </div>
+              <p className={`text-sm sm:text-base font-medium max-w-md leading-relaxed ${isContrast ? 'text-white' : 'text-white/90'}`}>
+                Empowering individuals and fostering an inclusive workforce with accessible smart-matching and equal opportunities for everyone.
               </p>
-              <p className="mt-0.5" style={{ fontSize: '12px', color: 'rgba(244,244,244,0.7)' }}>
-                Building an inclusive workforce for everyone.
-              </p>
-              <p className="mt-1.5" style={{ fontSize: '11px', color: 'rgba(244,244,244,0.5)' }}>
+              <div className={`pt-1 text-xs sm:text-sm font-semibold tracking-wide ${isContrast ? 'text-white' : 'text-white/80'}`}>
                 © {new Date().getFullYear()} AbleWork. All rights reserved.
-              </p>
+              </div>
             </div>
 
-            {/* Right: Nav Links */}
-            <nav
-              className="flex flex-wrap justify-center md:justify-end items-center gap-2"
-              aria-label="Footer navigation"
-            >
-              {[
-                { to: '/', label: 'Home' },
-                { to: '/about', label: 'About Us' },
-                { to: '/policy', label: 'Privacy Policy' },
-                { to: '/terms', label: 'Terms of Service' },
-                { to: '/contact', label: 'Contact Us' },
-              ].map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  className={({ isActive }) =>
-                    `px-3 py-1.5 rounded-full font-semibold transition-all duration-200 border ${
-                      isActive
-                        ? 'bg-[#2C7FFF] border-[#2C7FFF] text-white shadow-md'
-                        : 'bg-white/5 border-white/15 text-[#f4f4f4] hover:bg-[#2C7FFF]/20 hover:border-[#2C7FFF]/50 hover:text-white'
-                    }`
-                  }
-                  style={{ fontSize: '12px' }}
+            <div className="md:col-span-7 flex flex-col md:flex-row items-center justify-center md:justify-end gap-6">
+              <div className="flex flex-col items-center md:items-end space-y-3">
+                <span className={`text-xs sm:text-sm font-extrabold uppercase tracking-widest ${isContrast ? 'text-blue-400' : 'text-[#5BA3FF]'}`}>
+                  Explore Platform
+                </span>
+                <nav
+                  className="flex flex-wrap justify-center md:justify-end items-center gap-3"
+                  aria-label="Footer navigation"
                 >
-                  {item.label}
-                </NavLink>
-              ))}
-            </nav>
+                  {[
+                    { to: '/', label: 'Home' },
+                    { to: '/about', label: 'About Us' },
+                    { to: '/policy', label: 'Privacy Policy' },
+                    { to: '/terms', label: 'Terms of Service' },
+                    { to: '/contact', label: 'Contact Us' },
+                  ].map((item) => (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      className={({ isActive }) =>
+                        `px-4 py-2.5 rounded-xl font-bold transition-all duration-300 border text-sm shadow-md hover:-translate-y-0.5 ${
+                          isActive
+                            ? isContrast
+                              ? 'bg-blue-400 border-blue-400 text-black shadow-[0_0_20px_rgba(96,165,250,0.6)] underline font-black'
+                              : 'bg-[#2C7FFF] border-[#2C7FFF] text-white shadow-[0_0_20px_rgba(44,127,255,0.6)] underline'
+                            : isContrast
+                              ? 'bg-zinc-900 border-blue-400/50 text-white hover:bg-blue-400 hover:text-black hover:border-blue-400'
+                              : 'bg-white/10 border-white/20 text-white hover:bg-[#2C7FFF]/40 hover:border-[#2C7FFF]/60 hover:text-white'
+                        }`
+                      }
+                    >
+                      {item.label}
+                    </NavLink>
+                  ))}
+                </nav>
+              </div>
+            </div>
+
           </div>
+        </div>
+
+        <div
+          className={`w-full py-4 px-4 text-center text-xs sm:text-sm font-medium tracking-wide ${
+            isContrast
+              ? 'bg-zinc-950 text-white border-t border-blue-400'
+              : 'bg-[#020242] text-white/90 border-t border-white/10'
+          }`}
+        >
+          Designed with accessibility and inclusivity at heart.
         </div>
       </footer>
     </main>

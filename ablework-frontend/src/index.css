@@ -1,7 +1,17 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand-primary: var(--color-primary);
+  --color-brand-accent: var(--color-accent);
+  --color-brand-bg: var(--color-background);
+}
+
 /* 1. Default (Standard) Theme — matches system: #03045E, #2C7FFF, #f4f4f4 */
 :root {
+  --color-primary: #03045E;
+  --color-accent: #2C7FFF;
+  --color-background: #f4f4f4;
+
   --bg-primary: #f4f4f4;
   --bg-card: #ffffff;
   --text-primary: #03045E;
@@ -39,6 +49,25 @@ html.high-contrast {
   --btn-bg: #bae6fd;
   --btn-text: #0369a1;
   --focus-ring: 6px solid #b91c1c;
+}
+
+/* 4. Color-Blind Mode Theme (Safe Okabe-Ito Palette) */
+.theme-Color-Blind,
+html.color-blind {
+  --color-primary: #0072B2; /* Safe Dark Blue */
+  --color-accent: #D55E00;  /* Vermilion / High visibility contrast */
+  --color-background: #f4f4f4;
+
+  --bg-primary: #f4f4f4;
+  --bg-card: #ffffff;
+  --text-primary: #000000; /* Max contrast for readability */
+  --text-secondary: #111111;
+  --border-accent: #D55E00; /* Vermilion for high visibility */
+  --btn-bg: #0072B2; /* Safe Dark Blue */
+  --btn-text: #ffffff;
+  --focus-ring: 4px solid #D55E00;
+  --accent: #D55E00;
+  --navy: #0072B2;
 }
 
 /* Apply theme variables globally so Contrast updates all screens */
@@ -163,6 +192,74 @@ html.high-contrast footer,
   border-top: 2px solid #2C7FFF;
 }
 
+
+/* ===== Color-Blind Mode overrides for your system colors ===== */
+
+/* Links */
+html.color-blind a,
+.theme-Color-Blind a {
+  color: #D55E00;
+}
+
+html.color-blind a:hover,
+.theme-Color-Blind a:hover {
+  color: #0072B2;
+}
+
+/* Navy text (#03045E) → Standard Black for maximum readability */
+html.color-blind .text-\[\#03045E\],
+html.color-blind .text-\[\#03045E\]\/80,
+html.color-blind .text-\[\#03045E\]\/70,
+.theme-Color-Blind .text-\[\#03045E\],
+.theme-Color-Blind .text-\[\#03045E\]\/80,
+.theme-Color-Blind .text-\[\#03045E\]\/70 {
+  color: #000000 !important;
+}
+
+/* Navy backgrounds (#03045E) → Safe Dark Blue */
+html.color-blind .bg-\[\#03045E\],
+.theme-Color-Blind .bg-\[\#03045E\] {
+  background-color: #0072B2 !important;
+  color: #ffffff !important;
+}
+
+/* Accent blue (#2C7FFF) → Vermilion (High contrast orange-red) */
+html.color-blind .bg-\[\#2C7FFF\],
+.theme-Color-Blind .bg-\[\#2C7FFF\] {
+  background-color: #D55E00 !important;
+  color: #ffffff !important;
+}
+
+html.color-blind .text-\[\#2C7FFF\],
+.theme-Color-Blind .text-\[\#2C7FFF\] {
+  color: #D55E00 !important;
+}
+
+html.color-blind .border-\[\#03045E\],
+html.color-blind .border-\[\#03045E\]\/10,
+html.color-blind .border-\[\#03045E\]\/20,
+.theme-Color-Blind .border-\[\#03045E\],
+.theme-Color-Blind .border-\[\#03045E\]\/10,
+.theme-Color-Blind .border-\[\#03045E\]\/20 {
+  border-color: #0072B2 !important;
+}
+
+html.color-blind .border-\[\#2C7FFF\],
+.theme-Color-Blind .border-\[\#2C7FFF\] {
+  border-color: #D55E00 !important;
+}
+
+/* Form fields overrides for Color-Blind mode to ensure outline visibility */
+html.color-blind input:focus,
+html.color-blind textarea:focus,
+html.color-blind select:focus {
+  border-color: #D55E00 !important;
+  outline-color: #D55E00 !important;
+}
+
+
+/* ===== Active States ===== */
+
 html.line-spacing-active body {
   line-height: 2.2 !important;
   letter-spacing: 0.05em !important;
@@ -174,5 +271,40 @@ html.highlight-links-active button {
   background-color: rgba(44, 127, 255, 0.1) !important;
 }
 
+/* ===== ARIA / Screen Reader Support (TalkBack) ===== */
 
+/* Screen-reader only class */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
+/* Make skip link visible when focused */
+.sr-only:focus,
+.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+  background-color: #2C7FFF;
+  color: white;
+  border-radius: 0.5rem;
+  z-index: 9999;
+}
+
+/* Stronger focus outline for keyboard / TalkBack users */
+:focus-visible {
+  outline: 3px solid #2C7FFF;
+  outline-offset: 3px;
+}

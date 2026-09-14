@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
+import AbbyChatbot from '../AbbyChatbot';
 
-// Haversine Formula to calculate distance
+
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
   if (!lat1 || !lon1 || !lat2 || !lon2) return null;
   const R = 6371; 
@@ -14,7 +15,7 @@ function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
-// UPGRADED BULLETPROOF PARSER
+
 const safeParse = (data) => {
   if (!data) return [];
   if (Array.isArray(data)) return data;
@@ -37,7 +38,8 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
   const [modalView, setModalView] = useState('details'); 
   const [resumeFile, setResumeFile] = useState(null);
   const [coverLetter, setCoverLetter] = useState('');
-
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [sweetAlert, setSweetAlert] = useState({ isOpen: false, title: '', text: '' });
   const [searchQuery, setSearchQuery] = useState('');
   const [maxDistance, setMaxDistance] = useState('Any');
   const [selectedSkills, setSelectedSkills] = useState([]);
@@ -103,10 +105,18 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
     });
   }, [jobs, searchQuery, maxDistance, selectedSkills, selectedAccs, profile]);
 
+  const closeSweetAlert = () => {
+    setSweetAlert({ ...sweetAlert, isOpen: false });
+  };
+
   const submitApplication = async (e) => {
     e.preventDefault();
     if (!resumeFile) {
-        alert("Please upload your resume.");
+        setSweetAlert({
+          isOpen: true,
+          title: 'Resume Required',
+          text: 'Please upload your resume / CV before submitting your application.'
+        });
         return;
     }
 
@@ -125,14 +135,25 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
       });
       const data = await res.json();
       if (res.ok) {
-        alert("Application submitted successfully!");
-        refreshData(); 
         closeModal();
+        setShowSuccessModal(true);
+        refreshData();
+        setTimeout(() => {
+          setShowSuccessModal(false);
+        }, 2000);
       } else {
-        alert(data.message || "Failed to apply.");
+        setSweetAlert({
+          isOpen: true,
+          title: 'Application Notice',
+          text: data.message || "Failed to apply."
+        });
       }
     } catch (err) {
-      alert("Server error while applying.");
+      setSweetAlert({
+        isOpen: true,
+        title: 'Server Error',
+        text: "Server error while applying."
+      });
     } finally {
       setApplyingTo(null);
     }
@@ -146,6 +167,16 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
   };
 
   const openApplyModal = (job) => {
+    const hasApplied = applications.some(app => app.job_id === job.id);
+    if (hasApplied) {
+      setSweetAlert({
+        isOpen: true,
+        title: 'Already Applied',
+        text: 'You have already applied for this job.'
+      });
+      return;
+    }
+
     setSelectedJob(job);
     setResumeFile(null);
     setCoverLetter('');
@@ -161,262 +192,348 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
   };
 
   return (
-    <div className="animate-fadeIn max-w-5xl relative pb-10 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+    <div className="animate-fadeIn w-full space-y-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] pb-10">
       
-      <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-[#03045E]/10 pb-4">
+
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-[#03045E]">Explore All Jobs</h1>
-          <p className="opacity-70 font-medium text-[#03045E] mt-1">Browse and filter the complete marketplace.</p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#03045E]">
+            Explore All Jobs
+          </h2>
+          <p className="text-[#03045E] mt-1.5 text-sm sm:text-base font-bold">
+            Browse and filter the complete marketplace from inclusive employers.
+          </p>
         </div>
-        <button 
-          onClick={() => setShowFilters(!showFilters)}
-          className={`px-5 py-2.5 rounded-xl font-bold transition flex items-center gap-2 cursor-pointer ${showFilters ? 'bg-[#03045E] text-white shadow-md' : 'bg-white border border-gray-300 text-[#03045E] hover:bg-gray-50'}`}
-        >
-          {showFilters ? '✕ Close Filters' : '🔍 Filter Jobs'}
-        </button>
+        <div className="flex items-center gap-3 flex-wrap">
+          {filteredJobs.length > 0 && (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#f4f4f4] border border-[#03045E]/30">
+              <span className="w-2 h-2 rounded-full bg-[#2c7fff]" />
+              <span className="text-xs font-extrabold uppercase tracking-widest text-[#03045E]">
+                {filteredJobs.length} job{filteredJobs.length !== 1 ? 's' : ''}
+              </span>
+            </div>
+          )}
+          <button 
+            onClick={() => setShowFilters(!showFilters)}
+            className={`px-5 py-3 rounded-xl font-extrabold text-sm transition-all duration-200 flex items-center gap-2 cursor-pointer shadow-sm ${
+              showFilters
+                ? 'bg-[#03045E] text-white border border-[#03045E]'
+                : 'bg-[#f4f4f4] border border-[#03045E]/30 text-[#03045E] hover:bg-[#03045E] hover:text-white hover:border-[#03045E]'
+            }`}
+          >
+            {showFilters ? (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                Close Filters
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                Filter Jobs
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
+
       {showFilters && (
-         <div className="mb-8 p-6 bg-white rounded-2xl shadow-sm border border-[#03045E]/10 animate-fadeIn flex flex-col gap-6">
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-           
-           <div className="flex flex-col gap-1">
-             <label htmlFor="job-search" className="text-xs font-bold text-[#03045E]/60 uppercase">Search by Title or Company</label>
-             <input 
-               id="job-search" type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-               placeholder="e.g. Data Entry, TechNova..."
-               className="p-3 border border-gray-300 rounded-xl focus:border-[#2C7FFF] outline-none"
-             />
-             
-             {searchSuggestions.length > 0 && (
+        <div className="p-6 sm:p-8 rounded-[2rem] bg-white shadow-md border border-[#03045E]/30 animate-fadeIn flex flex-col gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="job-search" className="text-xs font-extrabold text-[#03045E] uppercase tracking-widest">Search by Title or Company</label>
+              <input 
+                id="job-search" type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="e.g. Data Entry, TechNova..."
+                className="p-3.5 border border-[#03045E]/30 rounded-xl bg-[#f4f4f4] text-[#03045E] font-bold focus:border-[#2c7fff] focus:bg-white outline-none transition"
+              />
+              {searchSuggestions.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2 animate-fadeIn">
                   {searchSuggestions.map((suggestion, idx) => (
                     <button
                       key={idx}
                       onClick={() => setSearchQuery(suggestion)}
-                      className="px-3 py-1 bg-[#2C7FFF]/10 text-[#2C7FFF] text-xs font-bold rounded-full hover:bg-[#2C7FFF] hover:text-white transition-colors border border-[#2C7FFF]/20 flex items-center gap-1 cursor-pointer"
+                      className="px-3 py-1.5 bg-[#2c7FFF]/10 text-[#2c7fff] text-xs font-extrabold rounded-full hover:bg-[#2c7fff] hover:text-white transition-colors border border-[#2c7fff]/30 flex items-center gap-1 cursor-pointer"
                     >
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                       {suggestion}
                     </button>
                   ))}
                 </div>
-             )}
-           </div>
+              )}
+            </div>
 
-           <div className="flex flex-col gap-1">
-             <label htmlFor="distance-filter" className="text-xs font-bold text-[#03045E]/60 uppercase">Maximum Distance</label>
-             <select 
-               id="distance-filter" value={maxDistance} onChange={(e) => setMaxDistance(e.target.value)}
-               className="p-3 border border-gray-300 rounded-xl focus:border-[#2C7FFF] outline-none bg-white cursor-pointer"
-             >
-               <option value="Any">Anywhere (Show all)</option>
-               <option value="5">Within 5 km</option>
-               <option value="15">Within 15 km</option>
-               <option value="30">Within 30 km</option>
-               <option value="50">Within 50 km</option>
-             </select>
-           </div>
-         </div>
-         <hr className="border-gray-200" />
-         <div>
-           <span className="text-xs font-bold text-[#03045E]/60 uppercase mb-2 block">Filter by Skills</span>
-           <div className="flex flex-wrap gap-2">
-             {availableSkills.map(skill => (
-               <button 
-                 key={skill} onClick={() => toggleSkill(skill)}
-                 className={`px-3 py-1.5 text-xs font-bold rounded-full border transition-all cursor-pointer ${selectedSkills.includes(skill) ? 'bg-[#03045E] text-white border-[#03045E] shadow-sm' : 'bg-gray-100 text-gray-700 border-gray-200 hover:border-gray-300 hover:bg-gray-200'}`}
-               >
-                 {selectedSkills.includes(skill) ? '✓ ' : ''}{skill}
-               </button>
-             ))}
-           </div>
-         </div>
-         <div>
-           <span className="text-xs font-bold text-[#03045E]/60 uppercase mb-2 block">Filter by Accommodations</span>
-           <div className="flex flex-wrap gap-2">
-             {availableAccs.map(acc => (
-               <button 
-                 key={acc} onClick={() => toggleAcc(acc)}
-                 className={`px-3 py-1.5 text-xs font-bold rounded-full border transition-all cursor-pointer ${selectedAccs.includes(acc) ? 'bg-purple-100 text-purple-800 border-purple-300 shadow-sm' : 'bg-white text-purple-700 border-purple-200 hover:bg-purple-50'}`}
-               >
-                 {selectedAccs.includes(acc) ? '✓ ' : ''}{acc}
-               </button>
-             ))}
-           </div>
-         </div>
-         {(searchQuery || maxDistance !== 'Any' || selectedSkills.length > 0 || selectedAccs.length > 0) && (
-           <div className="flex justify-end mt-2">
-             <button onClick={() => { setSearchQuery(''); setMaxDistance('Any'); setSelectedSkills([]); setSelectedAccs([]); }} className="text-sm font-bold text-red-600 hover:underline cursor-pointer">
-               Clear All Filters
-             </button>
-           </div>
-         )}
-       </div>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="distance-filter" className="text-xs font-extrabold text-[#03045E] uppercase tracking-widest">Maximum Distance</label>
+              <select 
+                id="distance-filter" value={maxDistance} onChange={(e) => setMaxDistance(e.target.value)}
+                className="p-3.5 border border-[#03045E]/30 rounded-xl bg-[#f4f4f4] text-[#03045E] font-bold focus:border-[#2c7fff] focus:bg-white outline-none cursor-pointer transition"
+              >
+                <option value="Any">Anywhere (Show all)</option>
+                <option value="5">Within 5 km</option>
+                <option value="15">Within 15 km</option>
+                <option value="30">Within 30 km</option>
+                <option value="50">Within 50 km</option>
+              </select>
+            </div>
+          </div>
+
+          <hr className="border-[#03045E]/15" />
+
+          <div>
+            <span className="text-xs font-extrabold text-[#03045E] uppercase tracking-widest mb-3 block">Filter by Skills</span>
+            <div className="flex flex-wrap gap-2">
+              {availableSkills.map(skill => (
+                <button 
+                  key={skill} onClick={() => toggleSkill(skill)}
+                  className={`px-3.5 py-1.5 text-xs font-extrabold rounded-full border transition-all cursor-pointer inline-flex items-center gap-1 ${
+                    selectedSkills.includes(skill)
+                      ? 'bg-[#03045E] text-white border-[#03045E] shadow-sm'
+                      : 'bg-[#f4f4f4] text-[#03045E] border-[#03045E]/30 hover:border-[#2c7fff] hover:bg-[#2c7fff]/10'
+                  }`}
+                >
+                  {selectedSkills.includes(skill) && (
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                  )}
+                  {skill}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <span className="text-xs font-extrabold text-[#03045E] uppercase tracking-widest mb-3 block">Filter by Accommodations</span>
+            <div className="flex flex-wrap gap-2">
+              {availableAccs.map(acc => (
+                <button 
+                  key={acc} onClick={() => toggleAcc(acc)}
+                  className={`px-3.5 py-1.5 text-xs font-extrabold rounded-full border transition-all cursor-pointer inline-flex items-center gap-1 ${
+                    selectedAccs.includes(acc)
+                      ? 'bg-[#2c7fff] text-white border-[#2c7fff] shadow-sm'
+                      : 'bg-[#f4f4f4] text-[#2c7fff] border-[#2c7fff]/40 hover:bg-[#2c7fff]/15'
+                  }`}
+                >
+                  {selectedAccs.includes(acc) && (
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                  )}
+                  {acc}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {(searchQuery || maxDistance !== 'Any' || selectedSkills.length > 0 || selectedAccs.length > 0) && (
+            <div className="flex justify-end pt-2 border-t border-[#03045E]/15">
+              <button
+                onClick={() => { setSearchQuery(''); setMaxDistance('Any'); setSelectedSkills([]); setSelectedAccs([]); }}
+                className="text-sm font-extrabold text-[#03045E] hover:text-[#2c7fff] hover:underline cursor-pointer transition"
+              >
+                Clear All Filters
+              </button>
+            </div>
+          )}
+        </div>
       )}
 
-      <div className="flex flex-col gap-4">
+
+      <div className="flex flex-col gap-6 sm:gap-8">
         {filteredJobs.length > 0 ? (
           filteredJobs.map(job => {
             const hasApplied = applications.some(app => app.job_id === job.id);
 
             return (
-              <div key={job.id} className={`bg-white p-6 rounded-2xl shadow-sm border border-[#03045E]/10 transition hover:shadow-md hover:border-[#2C7FFF]/30 flex flex-col md:flex-row justify-between items-center gap-6 ${hasApplied ? 'opacity-70' : ''}`}>
-                
-                <div className="flex-1 w-full">
-                  <div className="flex flex-wrap gap-2 mb-3">
+              <div
+                key={job.id}
+                className={`p-6 sm:p-8 rounded-[2rem] bg-white shadow-md border border-[#03045E]/30 transition-all duration-200 hover:shadow-lg hover:border-[#2c7fff]/50 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 ${hasApplied ? 'opacity-85' : ''}`}
+              >
+                <div className="flex-1 w-full min-w-0">
+                  <div className="flex flex-wrap gap-2 mb-4">
                     {job.calculatedDistance && (
-                      <span className="px-3 py-1 bg-blue-50 text-blue-800 border border-blue-200 text-xs font-bold rounded-full flex items-center gap-1.5 uppercase w-fit">
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <span className="px-3 py-1.5 bg-[#2c7fff]/10 text-[#2c7fff] border border-[#2c7fff]/40 text-xs font-extrabold rounded-full flex items-center gap-1.5 uppercase tracking-wide w-fit">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
                         {job.calculatedDistance} km away
                       </span>
                     )}
+                    {hasApplied && (
+                      <span className="px-3 py-1.5 bg-[#f4f4f4] text-[#03045E] border border-[#03045E]/30 text-xs font-extrabold rounded-full uppercase tracking-wide w-fit inline-flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                        Applied
+                      </span>
+                    )}
                   </div>
-                  <h2 className="text-2xl font-bold text-[#03045E]">{job.job_title}</h2>
-                  <p className="text-lg font-semibold text-[#2C7FFF] mb-2">{job.company_name}</p>
-                  <p className="text-gray-600 text-sm line-clamp-2">{job.job_description}</p>
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-[#03045E] leading-tight">{job.job_title}</h2>
+                  <p className="text-sm font-extrabold text-[#2c7fff] mt-1.5 mb-3">{job.company_name}</p>
+                  <p className="text-[#03045E] text-sm font-bold line-clamp-2 leading-relaxed">{job.job_description}</p>
                 </div>
 
                 <div className="shrink-0 w-full md:w-auto flex flex-row gap-3">
                   <button 
                     onClick={() => openModal(job)}
-                    className="px-6 py-2.5 bg-[#f4f4f4] text-[#03045E] font-bold rounded-xl hover:bg-gray-200 transition whitespace-nowrap cursor-pointer"
+                    className="flex-1 md:flex-none px-6 py-3.5 bg-[#f4f4f4] border border-[#03045E]/30 text-[#03045E] font-extrabold text-sm rounded-xl hover:bg-[#03045E] hover:text-[#f4f4f4] hover:border-[#03045E] transition-all duration-200 whitespace-nowrap cursor-pointer"
                   >
                     View Details
                   </button>
                   <button 
                     onClick={() => openApplyModal(job)}
                     disabled={hasApplied}
-                    className={`px-6 py-2.5 font-bold rounded-xl transition whitespace-nowrap cursor-pointer ${
+                    className={`flex-1 md:flex-none px-6 py-3.5 font-extrabold text-sm rounded-xl transition-all duration-200 whitespace-nowrap shadow-sm cursor-pointer ${
                       hasApplied 
-                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
-                        : 'bg-[#03045E] text-white hover:bg-[#2C7FFF] shadow-md'
+                        ? 'bg-[#f4f4f4] text-[#03045E]/50 border border-[#03045E]/20 cursor-not-allowed' 
+                        : 'bg-[#03045E] text-white hover:bg-[#2c7fff] border border-transparent'
                     }`}
                   >
-                    {hasApplied ? '✓ Applied' : 'Apply Now'}
+                    {hasApplied ? (
+                      <span className="inline-flex items-center gap-1.5">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                        Applied
+                      </span>
+                    ) : (
+                      'Apply Now'
+                    )}
                   </button>
                 </div>
-
               </div>
             );
           })
         ) : (
-          <div className="p-10 text-center font-bold text-gray-500 border-2 border-dashed border-gray-300 rounded-3xl flex flex-col items-center justify-center h-48 bg-white">
-             <span className="text-3xl mb-2 opacity-50">🔍</span>
-             <p>No jobs match your current filters.</p>
-             <button onClick={() => { setSearchQuery(''); setMaxDistance('Any'); setSelectedSkills([]); setSelectedAccs([]); }} className="text-[#2C7FFF] hover:underline mt-2 cursor-pointer">Clear filters</button>
+          <div className="p-8 sm:p-12 rounded-[2rem] border-2 border-dashed border-[#03045E]/40 bg-[#f4f4f4] flex flex-col items-center justify-center text-center min-h-[280px]">
+            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-5 border border-[#03045E]/30 text-[#2c7fff]">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+            <h3 className="text-xl font-extrabold text-[#03045E] mb-2">No jobs match your filters</h3>
+            <p className="text-sm font-bold text-[#03045E] max-w-md mb-4 leading-relaxed">
+              Try adjusting search, distance, skills, or accommodations.
+            </p>
+            <button
+              onClick={() => { setSearchQuery(''); setMaxDistance('Any'); setSelectedSkills([]); setSelectedAccs([]); }}
+              className="px-5 py-2.5 bg-[#2c7fff] text-white font-extrabold text-sm rounded-xl hover:bg-[#03045E] transition shadow-sm cursor-pointer"
+            >
+              Clear all filters
+            </button>
           </div>
         )}
       </div>
 
       {selectedJob && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-white p-8 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#03045E]/60 backdrop-blur-md animate-fadeIn">
+          <div className="bg-white p-6 sm:p-8 rounded-[2rem] max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl border border-[#03045E]/20 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
             
-            <button onClick={closeModal} className="absolute top-6 right-6 w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-200 transition cursor-pointer">
-              ✖
+            <button
+              onClick={closeModal}
+              className="absolute top-5 right-5 w-10 h-10 bg-[#f4f4f4] border border-[#03045E]/30 rounded-full flex items-center justify-center text-[#03045E] hover:bg-[#03045E] hover:text-white transition cursor-pointer"
+              aria-label="Close"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
 
             {modalView === 'details' ? (
-              // --- VIEW 1: JOB DETAILS ---
+
               <div className="animate-fadeIn">
-                <div className="pr-12 mb-8 border-b border-gray-200 pb-6">
+                <div className="pr-12 mb-6 border-b border-[#03045E]/15 pb-6">
                   {selectedJob.calculatedDistance && (
-                    <span className="inline-block px-3 py-1 bg-blue-50 text-blue-800 border border-blue-200 text-xs font-extrabold uppercase rounded-full mb-3 flex items-center gap-1.5 w-fit">
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <span className="inline-flex px-3 py-1.5 bg-[#2c7fff]/10 text-[#2c7fff] border border-[#2c7fff]/40 text-xs font-extrabold uppercase tracking-wide rounded-full mb-3 items-center gap-1.5 w-fit">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                       </svg>
                       {selectedJob.calculatedDistance} km away
                     </span>
                   )}
-                  <h2 className="text-3xl font-extrabold text-[#03045E]">{selectedJob.job_title}</h2>
-                  <p className="text-xl font-semibold text-[#2C7FFF] mt-1">{selectedJob.company_name}</p>
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-[#03045E]">{selectedJob.job_title}</h2>
+                  <p className="text-lg sm:text-xl font-extrabold text-[#2c7fff] mt-1">{selectedJob.company_name}</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   <div className="md:col-span-2 flex flex-col gap-8">
                     <div>
-                      <h3 className="text-sm font-bold text-[#03045E]/60 uppercase mb-3">Job Description</h3>
-                      <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{selectedJob.job_description}</p>
+                      <h3 className="text-xs font-extrabold text-[#03045E] uppercase tracking-widest mb-3">Job Description</h3>
+                      <p className="text-[#03045E] font-bold whitespace-pre-wrap leading-relaxed">{selectedJob.job_description}</p>
                     </div>
                     
                     <div>
-                      <h3 className="text-sm font-bold text-[#03045E]/60 uppercase mb-3">Required Skills</h3>
+                      <h3 className="text-xs font-extrabold text-[#03045E] uppercase tracking-widest mb-3">Required Skills</h3>
                       <div className="flex flex-wrap gap-2">
                         {safeParse(selectedJob.required_skills).map((skill, i) => (
-                          <span key={i} className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-bold rounded-lg border border-gray-200">{skill}</span>
+                          <span key={i} className="px-3 py-1.5 bg-[#f4f4f4] text-[#03045E] text-sm font-extrabold rounded-xl border border-[#03045E]/25">{skill}</span>
                         ))}
                       </div>
                     </div>
 
                     <div>
-                      <h3 className="text-sm font-bold text-[#03045E]/60 uppercase mb-3">Provided Accommodations</h3>
+                      <h3 className="text-xs font-extrabold text-[#03045E] uppercase tracking-widest mb-3">Provided Accommodations</h3>
                       <div className="flex flex-wrap gap-2">
                         {safeParse(selectedJob.provided_accommodations).map((acc, i) => (
-                          <span key={i} className="px-3 py-1.5 bg-purple-50 text-purple-800 text-sm font-bold rounded-lg border border-purple-200">{acc}</span>
+                          <span key={i} className="px-3 py-1.5 bg-[#2c7fff]/10 text-[#2c7fff] text-sm font-extrabold rounded-xl border border-[#2c7fff]/30">{acc}</span>
                         ))}
                       </div>
                     </div>
 
                     <div>
-                      <h3 className="text-sm font-bold text-[#03045E]/60 uppercase mb-3">Accepted Disabilities</h3>
+                      <h3 className="text-xs font-extrabold text-[#03045E] uppercase tracking-widest mb-3">Accepted Disabilities</h3>
                       <div className="flex flex-wrap gap-2">
                         {safeParse(selectedJob.accepted_disabilities).length > 0 ? (
                           safeParse(selectedJob.accepted_disabilities).map((disability, i) => (
-                            <span key={i} className="px-3 py-1.5 bg-[#2C7FFF]/10 text-[#2C7FFF] text-sm font-bold rounded-lg border border-[#2C7FFF]/20">
+                            <span key={i} className="px-3 py-1.5 bg-[#03045E]/5 text-[#03045E] text-sm font-extrabold rounded-xl border border-[#03045E]/25">
                               {disability}
                             </span>
                           ))
                         ) : (
-                          <span className="text-sm font-medium text-gray-400 italic">None specified for this posting</span>
+                          <span className="text-sm font-bold text-[#03045E]/60 italic">None specified for this posting</span>
                         )}
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-6 bg-[#f4f4f4]/50 p-6 rounded-2xl border border-gray-200 h-fit">
+                  <div className="flex flex-col gap-6 bg-[#f4f4f4] p-6 rounded-[1.5rem] border border-[#03045E]/20 h-fit">
                     <div>
-                      <h3 className="text-xs font-bold text-[#03045E]/60 uppercase mb-1">Salary Range</h3>
-                      <p className="font-semibold text-[#03045E] text-lg">{selectedJob.salary_range || 'Not specified'}</p>
+                      <h3 className="text-xs font-extrabold text-[#03045E] uppercase tracking-widest mb-1">Salary Range</h3>
+                      <p className="font-extrabold text-[#03045E] text-lg">{selectedJob.salary_range || 'Not specified'}</p>
                     </div>
                     
                     <div>
-                      <h3 className="text-xs font-bold text-[#03045E]/60 uppercase mb-1">Benefits</h3>
-                      <p className="text-sm text-gray-700 font-medium leading-relaxed">
+                      <h3 className="text-xs font-extrabold text-[#03045E] uppercase tracking-widest mb-1">Benefits</h3>
+                      <p className="text-sm text-[#03045E] font-bold leading-relaxed">
                         {safeParse(selectedJob.benefits).join(' • ') || 'Not specified'}
                       </p>
                     </div>
 
-                    {/* NEW CONTACT INFO SECTION */}
-                    <div className="pt-4 border-t border-gray-300">
-                      <h3 className="text-xs font-bold text-[#03045E]/60 uppercase mb-3">Contact Info</h3>
+                    <div className="pt-4 border-t border-[#03045E]/20">
+                      <h3 className="text-xs font-extrabold text-[#03045E] uppercase tracking-widest mb-3">Contact Info</h3>
                       <div className="flex flex-col gap-3">
-                        <div className="flex items-center gap-2.5 text-sm text-[#03045E] font-medium break-all">
-                          <svg className="w-4 h-4 shrink-0 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        <div className="flex items-center gap-2.5 text-sm text-[#03045E] font-bold break-all">
+                          <svg className="w-4 h-4 shrink-0 text-[#2c7fff]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                           {selectedJob.contact_email || selectedJob.email || 'Not provided'}
                         </div>
-                        <div className="flex items-center gap-2.5 text-sm text-[#03045E] font-medium">
-                          <svg className="w-4 h-4 shrink-0 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                        <div className="flex items-center gap-2.5 text-sm text-[#03045E] font-bold">
+                          <svg className="w-4 h-4 shrink-0 text-[#2c7fff]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
                           {selectedJob.contact_number || selectedJob.phone || 'Not provided'}
                         </div>
                       </div>
                     </div>
 
-                    <div className="mt-2 pt-6 border-t border-gray-300">
+                    <div className="mt-2 pt-6 border-t border-[#03045E]/20">
                       <button 
                         onClick={() => openApplyModal(selectedJob)}
                         disabled={applications.some(app => app.job_id === selectedJob.id)}
-                        className={`py-4 px-6 font-bold rounded-xl transition w-full cursor-pointer ${
+                        className={`py-4 px-6 font-extrabold text-sm rounded-xl transition w-full shadow-sm cursor-pointer ${
                           applications.some(app => app.job_id === selectedJob.id) 
-                            ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
-                            : 'bg-[#03045E] text-white hover:bg-[#2C7FFF] shadow-md'
+                            ? 'bg-white text-[#03045E]/50 border border-[#03045E]/20 cursor-not-allowed' 
+                            : 'bg-[#03045E] text-white hover:bg-[#2c7fff]'
                         }`}
                       >
-                        {applications.some(app => app.job_id === selectedJob.id) ? '✓ Already Applied' : 'Apply Now'}
+                        {applications.some(app => app.job_id === selectedJob.id) ? (
+                          <span className="inline-flex items-center justify-center gap-1.5">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Already Applied
+                          </span>
+                        ) : (
+                          'Apply Now'
+                        )}
                       </button>
                     </div>
                   </div>
@@ -424,43 +541,130 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
               </div>
             ) : modalView === 'unverified' ? (
               <div className="animate-fadeIn max-w-lg mx-auto text-center py-8">
-                <div className="w-20 h-20 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-10 h-10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                <div className="w-20 h-20 bg-[#2c7fff]/10 text-[#2c7fff] rounded-full flex items-center justify-center mx-auto mb-6 border border-[#2c7fff]/30">
+                  <svg className="w-10 h-10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                 </div>
                 <h2 className="text-2xl font-extrabold text-[#03045E] mb-3">Verification Pending</h2>
-                <p className="text-gray-600 font-medium mb-8 leading-relaxed">
+                <p className="text-[#03045E] font-bold mb-8 leading-relaxed">
                   Your PWD ID is currently being reviewed by our admin. Once your account is fully verified, this security lock will be removed and you can start applying to jobs!
                 </p>
-                <button onClick={() => setModalView('details')} className="py-3 px-6 bg-[#03045E] text-white font-bold rounded-xl hover:bg-[#2C7FFF] transition shadow-md w-full cursor-pointer">
+                <button onClick={() => setModalView('details')} className="py-3.5 px-6 bg-[#03045E] text-white font-extrabold text-sm rounded-xl hover:bg-[#2c7fff] transition shadow-sm w-full cursor-pointer">
                   Back to Job Details
                 </button>
               </div>
             ) : (
               <div className="animate-fadeIn max-w-2xl mx-auto">
-                <button onClick={() => setModalView('details')} className="text-sm font-bold text-[#2C7FFF] hover:underline mb-6 block cursor-pointer">← Back to Job Details</button>
-                <h2 className="text-3xl font-extrabold text-[#03045E] mb-2">Submit Application</h2>
-                <p className="text-gray-600 mb-8 font-medium">Applying for <span className="font-bold text-[#2C7FFF]">{selectedJob.job_title}</span> at {selectedJob.company_name}</p>
+                <button onClick={() => setModalView('details')} className="text-sm font-extrabold text-[#2c7fff] hover:underline mb-6 flex items-center gap-1.5 cursor-pointer">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+                  Back to Job Details
+                </button>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#03045E] mb-2">Submit Application</h2>
+                <p className="text-[#03045E] mb-8 font-bold">Applying for <span className="font-extrabold text-[#2c7fff]">{selectedJob.job_title}</span> at {selectedJob.company_name}</p>
                 <form onSubmit={submitApplication} className="flex flex-col gap-6">
                   <div className="flex flex-col gap-2">
-                    <label className="text-sm font-bold text-[#03045E]">Upload Resume / CV <span className="text-red-500">*</span></label>
-                    <div className="border-2 border-dashed border-gray-300 p-6 rounded-2xl bg-gray-50 flex flex-col items-center justify-center text-center">
-                      <span className="text-3xl mb-2">📄</span>
-                      <input type="file" accept=".pdf,.doc,.docx" required onChange={(e) => setResumeFile(e.target.files[0])} className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#2C7FFF]/10 file:text-[#2C7FFF] hover:file:bg-[#2C7FFF]/20 cursor-pointer"/>
-                      <p className="text-xs text-gray-400 mt-3">Supported formats: PDF, DOCX (Max 5MB)</p>
+                    <label className="text-sm font-extrabold text-[#03045E]">Upload Resume / CV <span className="text-red-500">*</span></label>
+                    <div className="border-2 border-dashed border-[#03045E]/30 p-6 rounded-[1.5rem] bg-[#f4f4f4] flex flex-col items-center justify-center text-center">
+                      <svg className="w-10 h-10 text-[#2c7fff] mb-2" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <input type="file" accept=".pdf,.doc,.docx" required onChange={(e) => setResumeFile(e.target.files[0])} className="text-sm text-[#03045E] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-[#2c7fff]/20 file:text-[#2c7fff] hover:file:bg-[#2c7fff]/30 cursor-pointer"/>
+                      <p className="text-xs text-[#03045E]/70 mt-3 font-bold">Supported formats: PDF, DOCX (Max 5MB)</p>
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label className="text-sm font-bold text-[#03045E]">Pitch / Cover Letter <span className="text-gray-400 font-normal">(Optional)</span></label>
-                    <textarea rows="4" value={coverLetter} onChange={(e) => setCoverLetter(e.target.value)} placeholder="Briefly explain why you are a great fit for this role..." className="p-4 border border-gray-300 rounded-2xl focus:border-[#2C7FFF] outline-none resize-none"></textarea>
+                    <label className="text-sm font-extrabold text-[#03045E]">Pitch / Cover Letter <span className="text-[#2c7fff]/60 font-semibold">(Optional)</span></label>
+                    <textarea rows="4" value={coverLetter} onChange={(e) => setCoverLetter(e.target.value)} placeholder="Briefly explain why you are a great fit for this role..." className="p-4 border border-[#03045E]/30 rounded-[1.25rem] bg-white text-[#03045E] focus:border-[#2c7fff] outline-none resize-none font-bold placeholder:text-[#2c7fff]/40"></textarea>
                   </div>
-                  <div className="mt-4 pt-6 border-t border-gray-200">
-                    <button type="submit" disabled={applyingTo === selectedJob.id} className="py-4 px-6 bg-[#03045E] text-white font-bold rounded-xl hover:bg-[#2C7FFF] transition w-full shadow-md disabled:bg-gray-400 cursor-pointer">
+                  <div className="mt-4 pt-6 border-t border-[#03045E]/15">
+                    <button type="submit" disabled={applyingTo === selectedJob.id} className="py-4 px-6 bg-[#03045E] text-white font-extrabold text-sm rounded-xl hover:bg-[#2c7fff] transition w-full shadow-sm disabled:bg-[#03045E]/50 cursor-pointer">
                       {applyingTo === selectedJob.id ? 'Uploading & Submitting...' : 'Submit Application'}
                     </button>
                   </div>
                 </form>
               </div>
             )}
+
+        
+            <AbbyChatbot />
+
+          </div>
+        </div>
+      )}
+
+
+      {sweetAlert.isOpen && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-[#03045E]/60 backdrop-blur-md animate-fadeIn">
+          <div className="relative w-full max-w-sm bg-[#f4f4f4] rounded-[2rem] shadow-2xl border-2 border-[#2c7fff]/40 overflow-hidden transform transition-all animate-in zoom-in duration-200">
+            <div className="h-2 w-full bg-gradient-to-r from-[#03045E] via-[#2c7fff] to-[#03045E]" />
+            
+            <div className="px-8 pt-8 pb-8 flex flex-col items-center text-center">
+              <div className="w-20 h-20 rounded-full bg-[#2c7fff]/15 flex items-center justify-center mb-5 border border-[#2c7fff]/30">
+                <div className="w-14 h-14 rounded-full bg-[#2c7fff] flex items-center justify-center shadow-lg shadow-[#2c7fff]/40">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+              </div>
+
+              <h2 className="text-2xl font-black text-[#03045E] tracking-tight mb-2">
+                {sweetAlert.title}
+              </h2>
+              <p className="text-sm font-bold text-[#03045E] mb-8 leading-relaxed">
+                {sweetAlert.text}
+              </p>
+
+              <button 
+                onClick={closeSweetAlert}
+                className="w-full py-3.5 bg-[#03045E] text-white font-black rounded-xl hover:bg-[#2c7fff] transition-all shadow-md border-2 border-[#03045E] hover:border-[#2c7fff] cursor-pointer"
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {showSuccessModal && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#03045E]/60 backdrop-blur-md"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="apply-success-title"
+        >
+          <div className="relative w-full max-w-sm bg-[#f4f4f4] rounded-3xl shadow-2xl border-2 border-[#2c7fff]/30 overflow-hidden animate-fadeIn">
+            <div className="h-1.5 w-full bg-gradient-to-r from-[#03045E] via-[#2c7fff] to-[#03045E]" />
+
+            <div className="px-8 pt-8 pb-8 flex flex-col items-center text-center">
+              <div className="relative mb-5">
+                <div className="w-20 h-20 rounded-full bg-[#2c7fff]/15 flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-full bg-[#2c7fff] flex items-center justify-center shadow-lg shadow-[#2c7fff]/40">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-[#03045E] flex items-center justify-center">
+                  <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                </div>
+              </div>
+
+              <h2 id="apply-success-title" className="text-2xl font-black text-[#03045E] tracking-tight mb-2">
+                Application sent!
+              </h2>
+              <p className="text-sm text-[#03045E] font-bold leading-relaxed mb-4">
+                Your application was submitted successfully.
+              </p>
+
+              <div className="flex items-center gap-1.5" aria-label="Closing shortly">
+                <span className="w-2 h-2 rounded-full bg-[#2c7fff] animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-[#2c7fff] animate-pulse [animation-delay:150ms]" />
+                <span className="w-2 h-2 rounded-full bg-[#2c7fff] animate-pulse [animation-delay:300ms]" />
+              </div>
+              <p className="text-xs text-[#2c7fff] font-bold mt-3">
+                Closing in a moment…
+              </p>
+            </div>
           </div>
         </div>
       )}

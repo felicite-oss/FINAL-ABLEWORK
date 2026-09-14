@@ -3,23 +3,14 @@ import React, { useState } from 'react';
 export default function EmployerPostJob({ profile, refreshData, setActiveTab }) {
   const [jobTitle, setJobTitle] = useState('');
   const [jobDescription, setJobDescription] = useState('');
-  
-  // Skill States
   const [selectedSkills, setSelectedSkills] = useState([]);
-  const [currentSkill, setCurrentSkill] = useState('');
-  
-  // Accommodation States
+  const [currentSkill, setCurrentSkill] = useState(''); 
   const [selectedAccommodations, setSelectedAccommodations] = useState([]);
   const [currentAccommodation, setCurrentAccommodation] = useState('');
-
-  // Salary & Benefits States
   const [salaryRange, setSalaryRange] = useState('');
   const [selectedBenefits, setSelectedBenefits] = useState([]);
   const [currentBenefit, setCurrentBenefit] = useState('');
-  
-  // Disability States (Toggle buttons)
   const [selectedDisabilities, setSelectedDisabilities] = useState([]);
-
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' }); 
 
@@ -48,7 +39,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
     }
   };
 
-  // --- SKILL CHIP LOGIC ---
+
   const handleSkillKeyDown = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -73,7 +64,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
     s.toLowerCase().includes(activeSkillQuery) && !selectedSkills.some(selected => selected.toLowerCase() === s.toLowerCase())
   );
 
-  // --- ACCOMMODATION CHIP LOGIC ---
+
   const handleAccommodationKeyDown = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -98,7 +89,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
     a.toLowerCase().includes(activeAccQuery) && !selectedAccommodations.some(selected => selected.toLowerCase() === a.toLowerCase())
   );
 
-  // --- BENEFITS CHIP LOGIC ---
+
   const handleBenefitKeyDown = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -118,7 +109,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
     setSelectedBenefits(selectedBenefits.filter(b => b !== benefitToRemove));
   };
 
-  // --- SUBMIT LOGIC ---
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatusMessage({ type: '', text: '' });
@@ -184,10 +175,10 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
   };
 
   return (
-    <div className="animate-fadeIn max-w-4xl mx-auto pb-10">
+    <div className="animate-fadeIn max-w-7xl mx-auto pb-10">
       
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-white p-6 rounded-[2rem] shadow-sm border border-[#03045E]/10">
+     
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-[#f4f4f4]/90 [.high-contrast_&]:bg-black [.high-contrast_&]:border-white backdrop-blur-md p-6 rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border border-[#03045E]/20">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
             <span className="bg-[#2C7FFF]/15 text-[#2C7FFF] text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider border border-[#2C7FFF]/30">Job Management</span>
@@ -208,7 +199,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
 
       <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-[2rem] shadow-sm border border-[#03045E]/10 flex flex-col gap-8">
         
-        {/* Basic Details */}
+     
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <label className="text-sm font-extrabold text-[#03045E] flex items-center gap-2 uppercase tracking-wider">
@@ -237,7 +228,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
 
         <hr className="border-[#03045E]/10" />
 
-        {/* Salary & Benefits */}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="flex flex-col gap-3">
             <label className="text-sm font-extrabold text-[#03045E] flex items-center gap-2 uppercase tracking-wider">
@@ -275,7 +266,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
 
         <hr className="border-[#03045E]/10" />
 
-        {/* Skills & Accommodations */}
+   
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="flex flex-col gap-3">
             <label className="text-sm font-extrabold text-[#03045E] flex items-center gap-2 uppercase tracking-wider">
@@ -340,7 +331,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
 
         <hr className="border-[#03045E]/10" />
 
-        {/* Accepted Disabilities */}
+     
         <div className="flex flex-col gap-4 p-5 rounded-2xl bg-[#2C7FFF]/5 border border-[#2C7FFF]/20">
           <div>
             <label className="text-sm font-extrabold text-[#03045E] flex items-center gap-2 uppercase tracking-wider">
