@@ -86,7 +86,21 @@ const storage = multer.diskStorage({
         cb(null, Date.now() + path.extname(file.originalname));
     }
 });
-const upload = multer({ storage: storage });
+
+const upload = multer({ 
+    storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    fileFilter: (req, file, cb) => {
+        // Enforce .jpg/.jpeg only for applicant PWD ID uploads
+        if (file.fieldname === 'pwdDocument') {
+            const ext = path.extname(file.originalname).toLowerCase();
+            if (ext !== '.jpg' && ext !== '.jpeg') {
+                return cb(new Error('Only .jpeg and .jpg files are allowed for PWD ID uploads.'), false);
+            }
+        }
+        cb(null, true);
+    }
+});
 
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -245,9 +259,10 @@ app.post('/api/chat', async (req, res) => {
 app.get('/api/jobs', async (req, res) => {
     try {
         const [jobs] = await db.execute(`
-            SELECT jp.*, u.email AS contact_email, u.phone AS contact_number 
+            SELECT jp.*, u.email AS contact_email, u.phone AS contact_number, e.workplace_address
             FROM job_postings jp
             LEFT JOIN users u ON jp.employer_id = u.id
+            LEFT JOIN employer_profiles e ON jp.employer_id = e.user_id
             WHERE jp.status = 'Active' 
             ORDER BY jp.created_at DESC
         `);
@@ -557,9 +572,10 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
             SELECT jp.id, jp.employer_id, jp.job_title, jp.company_name, jp.job_description, 
                    jp.required_skills, jp.provided_accommodations, jp.accepted_disabilities, 
                    jp.salary_range, jp.benefits, jp.latitude, jp.longitude, 
-                   u.email AS contact_email, u.phone AS contact_number 
+                   u.email AS contact_email, u.phone AS contact_number, e.workplace_address
             FROM job_postings jp
             LEFT JOIN users u ON jp.employer_id = u.id
+            LEFT JOIN employer_profiles e ON jp.employer_id = e.user_id
             WHERE jp.status = 'Active'
         `);
 
@@ -1620,6 +1636,70 @@ app.put('/api/users/:id/toggle-status', async (req, res) => {
     } catch (error) {
         console.error("Toggle Status Error:", error.message);
         res.status(500).json({ message: "Server error toggling account status." });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: FORGOT PASSWORD (Send OTP to Email)
+// ---------------------------------------------------------
+app.post('/api/auth/forgot-password', async (req, res) => {
+    const { email } = req.body;
+    try {
+        const [users] = await db.execute('SELECT id FROM users WHERE email = ?', [email]);
+        if (users.length === 0) return res.status(404).json({ message: "No account found with that email address." });
+        
+        const userId = users[0].id;
+        const otpCode = Math.floor(100000 + Math.random() * 900000).toString(); // Generate 6 digit code
+        const expires = new Date(Date.now() + 15 * 60000); // Expires in 15 mins
+
+        await db.execute(
+            "UPDATE users SET otp_code = ?, otp_expires = ? WHERE id = ?",
+            [otpCode, expires, userId]
+        );
+
+        await transporter.sendMail({
+            from: '"AbleWork Security" <ableworksys5i@gmail.com>',
+            to: email,
+            subject: 'AbleWork Password Reset Code',
+            text: `Hello,\n\nWe received a request to reset your AbleWork password.\n\nYour 6-digit recovery code is: ${otpCode}\n\nThis code will expire in 15 minutes. If you did not request this change, please ignore this email.`
+        });
+
+        res.status(200).json({ message: "Recovery code sent to your email!" });
+    } catch (error) {
+        console.error("Forgot Password Error:", error.message);
+        res.status(500).json({ message: "Server error sending recovery code." });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: RESET PASSWORD (Verify OTP & Update DB)
+// ---------------------------------------------------------
+app.post('/api/auth/reset-password', async (req, res) => {
+    const { email, otpCode, newPassword } = req.body;
+    try {
+        const [users] = await db.execute('SELECT id, otp_code, otp_expires FROM users WHERE email = ?', [email]);
+        if (users.length === 0) return res.status(404).json({ message: "User not found." });
+        
+        const user = users[0];
+        
+        if (user.otp_code !== otpCode) return res.status(400).json({ message: "Invalid recovery code." });
+        
+        if (new Date() > new Date(user.otp_expires)) {
+            return res.status(400).json({ message: "Recovery code has expired. Please request a new one." });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        
+        // Update password and clear OTP fields
+        await db.execute(
+            "UPDATE users SET password_hash = ?, otp_code = NULL, otp_expires = NULL WHERE id = ?",
+            [hashedPassword, user.id]
+        );
+
+        res.status(200).json({ message: "Password successfully reset!" });
+    } catch (error) {
+        console.error("Reset Password Error:", error.message);
+        res.status(500).json({ message: "Server error resetting password." });
     }
 });
 

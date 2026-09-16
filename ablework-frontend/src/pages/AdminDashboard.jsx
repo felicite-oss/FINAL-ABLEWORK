@@ -15,6 +15,15 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
+  const [pwdModal, setPwdModal] = useState({
+    isOpen: false,
+    user: null
+  });
+
+  const [employerModal, setEmployerModal] = useState({
+    isOpen: false,
+    user: null
+  });
 
   const [rejectModal, setRejectModal] = useState({
     isOpen: false,
@@ -60,7 +69,6 @@ export default function AdminDashboard() {
     }, 2000);
   };
 
-
   const handleVerification = async (userId, newStatus, reason = null) => {
     if (newStatus !== 'Rejected' && !window.confirm(`Mark this account as ${newStatus}?`)) return;
     
@@ -72,13 +80,14 @@ export default function AdminDashboard() {
       });
       if (res.ok) {
         setRejectModal({ isOpen: false, userId: null, reason: '' }); 
+        setPwdModal({ isOpen: false, user: null });
+        setEmployerModal({ isOpen: false, user: null });
         fetchAdminData();
       }
     } catch (error) { 
       alert("Failed to update status."); 
     }
   };
-
 
   const submitRejection = () => {
     if (!rejectModal.reason.trim()) {
@@ -139,14 +148,12 @@ export default function AdminDashboard() {
       </div>
     </div>
   );
-
   
   const allUsers = [...employers.map(e => ({ ...e, userType: 'Employer' })), ...applicants.map(a => ({ ...a, userType: 'Applicant' }))];
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f4f4f4] text-[#03045E] selection:bg-[#2C7FFF] selection:text-white relative overflow-x-hidden w-full max-w-[100vw]">
       
-   
       <header className="w-full bg-white border-b-2 border-[#03045E]/15 fixed top-0 left-0 z-50 transition-all duration-300 shadow-sm">
         <div className="w-full h-16 pl-4 pr-4 md:pr-8 flex items-center justify-between max-w-[1700px] mx-auto box-border">
           <div className="flex items-center gap-2 sm:gap-3 md:gap-6 min-w-0">
@@ -170,7 +177,6 @@ export default function AdminDashboard() {
               Logout
             </button>
 
-     
             <button
               className="md:hidden flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white text-[#03045E] border-2 border-[#03045E]/20 shadow-sm cursor-pointer hover:bg-[#03045E] hover:text-white transition-all duration-200 shrink-0"
               onClick={() => setIsOpen(!isOpen)}
@@ -188,7 +194,6 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-  
         <div
           className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out bg-white border-b-2 border-[#03045E]/20 ${
             isOpen ? 'max-h-[400px] opacity-100 shadow-xl' : 'max-h-0 opacity-0'
@@ -224,11 +229,9 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-
       <div className="flex flex-col w-full max-w-[1700px] mx-auto min-w-0 box-border pt-16 min-h-screen">
         <div className="flex flex-col md:flex-row flex-1 w-full min-w-0">
           
- 
           <aside className="hidden md:flex shrink-0 flex-col z-10 bg-white border-r-2 border-[#03045E]/15 w-72 lg:w-80 shadow-[4px_0_24px_rgba(3,4,94,0.05)]">
             <div className="w-full flex flex-col h-full min-w-0">
               <nav className="flex-1 px-5 py-8 flex flex-col gap-3.5 overflow-y-auto">
@@ -264,10 +267,8 @@ export default function AdminDashboard() {
             </div>
           </aside>
 
- 
           <main className="flex-1 p-4 sm:p-6 md:p-10 relative w-full min-w-0 transition-all duration-300 flex flex-col box-border">
             
-
             <div className="mb-8 border-b-2 border-[#03045E]/15 pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h1 className="text-3xl font-black text-[#03045E] tracking-tight">Admin Control Center</h1>
@@ -277,7 +278,6 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-           
             {activeTab === 'Overview' && stats && (
               <div className="flex flex-col gap-8 animate-in fade-in duration-300">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -321,7 +321,6 @@ export default function AdminDashboard() {
                   />
                 </div>
 
-         
                 <div className="bg-white p-6 sm:p-8 rounded-[2rem] shadow-sm border-2 border-[#03045E]/15">
                   <div className="mb-6">
                     <h2 className="text-xl font-black text-[#03045E] tracking-tight">Annual Platform Growth</h2>
@@ -344,7 +343,6 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-               
                 <div className="bg-white p-6 sm:p-8 rounded-[2rem] shadow-sm border-2 border-[#03045E]/15 flex flex-col gap-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-[#03045E]/10 pb-4">
                     <div>
@@ -394,11 +392,9 @@ export default function AdminDashboard() {
               </div>
             )}
 
-
             {(activeTab === 'Employers' || activeTab === 'Applicants') && (
               <div className="flex flex-col gap-6 animate-in fade-in duration-300">
                 
-          
                 <div className="flex flex-wrap items-center gap-2 bg-white p-3 sm:p-4 rounded-[2rem] border-2 border-[#03045E]/15 w-full shadow-sm">
                   {['Pending', 'Approved', 'Rejected', 'Disabled'].map(filter => {
                      const targetList = activeTab === 'Employers' ? employers : applicants;
@@ -426,7 +422,6 @@ export default function AdminDashboard() {
                   })}
                 </div>
 
-         
                 <div className="flex flex-col gap-4">
                   {filterList(activeTab === 'Employers' ? employers : applicants).length > 0 ? (
                     filterList(activeTab === 'Employers' ? employers : applicants).map(user => (
@@ -458,22 +453,29 @@ export default function AdminDashboard() {
 
                         <div className="flex flex-col gap-3 min-w-[240px] w-full md:w-auto shrink-0">
                           {activeTab === 'Employers' && user.verification_document && (
-                            <a href={`http://localhost:5001/uploads/${user.verification_document.replace(/^uploads[\\/]/, '')}`} 
-                              target="_blank" rel="noopener noreferrer" className="text-center px-4 py-2.5 bg-[#2C7FFF]/10 text-[#2C7FFF] font-black text-xs sm:text-sm rounded-xl border-2 border-[#2C7FFF]/30 hover:bg-[#2C7FFF]/20 transition flex items-center justify-center gap-2 shadow-sm">
+                            <button 
+                              onClick={() => setEmployerModal({ isOpen: true, user: user })} 
+                              className="text-center px-4 py-2.5 bg-[#2C7FFF]/10 text-[#2C7FFF] font-black text-xs sm:text-sm rounded-xl border-2 border-[#2C7FFF]/30 hover:bg-[#2C7FFF]/20 transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                            >
                               <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                               </svg>
                               View Business Document
-                            </a>
+                            </button>
                           )}
+                          
                           {activeTab === 'Applicants' && user.pwd_document_path && (
-                            <a href={`http://localhost:5001/uploads/${user.pwd_document_path.replace(/^uploads[\\/]/, '')}`} target="_blank" rel="noopener noreferrer" className="text-center px-4 py-2.5 bg-[#2C7FFF]/10 text-[#2C7FFF] font-black text-xs sm:text-sm rounded-xl border-2 border-[#2C7FFF]/30 hover:bg-[#2C7FFF]/20 transition flex items-center justify-center gap-2 shadow-sm">
+                            <button 
+                              onClick={() => setPwdModal({ isOpen: true, user: user })} 
+                              className="text-center px-4 py-2.5 bg-[#2C7FFF]/10 text-[#2C7FFF] font-black text-xs sm:text-sm rounded-xl border-2 border-[#2C7FFF]/30 hover:bg-[#2C7FFF]/20 transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                            >
                               <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path>
                               </svg>
                               View PWD ID
-                            </a>
+                            </button>
                           )}
+
                           {(!user.verification_document && !user.pwd_document_path) && (
                             <div className="text-center px-4 py-2.5 bg-[#f4f4f4] text-[#03045E]/50 font-black text-xs sm:text-sm rounded-xl border-2 border-[#03045E]/10 flex items-center justify-center gap-2">
                               No Document Attached
@@ -555,6 +557,181 @@ export default function AdminDashboard() {
               </div>
             )}
 
+            {/* Split-Screen PWD ID Verification Modal */}
+            {pwdModal.isOpen && pwdModal.user && (
+              <div className="fixed inset-0 bg-[#03045E]/60 z-50 flex items-center justify-center p-3 sm:p-6 backdrop-blur-md animate-in fade-in duration-200">
+                <div className="bg-white rounded-[2.5rem] w-full max-w-7xl h-[90vh] shadow-[0_25px_60px_rgba(3,4,94,0.4)] border-2 border-[#03045E]/20 flex flex-col overflow-hidden">
+                  
+                  <div className="px-6 py-4 bg-[#f4f4f4] border-b-2 border-[#03045E]/15 flex items-center justify-between shrink-0">
+                    <div>
+                      <h2 className="text-lg sm:text-xl font-black text-[#03045E] tracking-tight">
+                        PWD ID Verification: {pwdModal.user.firstname} {pwdModal.user.lastname}
+                      </h2>
+                      <p className="text-xs font-bold text-[#03045E]/70">
+                        Review applicant PWD ID and cross-reference with the official portal.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setPwdModal({ isOpen: false, user: null })}
+                      className="w-10 h-10 rounded-full bg-white text-[#03045E] border-2 border-[#03045E]/20 flex items-center justify-center font-black hover:bg-[#03045E] hover:text-white transition cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x-2 divide-[#03045E]/15 overflow-hidden">
+                    
+                    <div className="lg:col-span-2 flex flex-col h-full bg-white overflow-y-auto p-6 gap-6">
+                      <div className="flex items-center justify-between shrink-0">
+                        <span className="text-xs font-black uppercase tracking-wider text-[#03045E]">Applicant Uploaded ID</span>
+                        <span className="px-3 py-1 rounded-lg text-xs font-black bg-[#2C7FFF]/10 text-[#2C7FFF]">
+                          Disability: {pwdModal.user.disability_type || 'N/A'}
+                        </span>
+                      </div>
+
+                      <div className="flex-1 min-h-[350px] bg-[#f4f4f4] rounded-2xl border-2 border-[#03045E]/15 overflow-hidden flex items-center justify-center relative shadow-inner p-2">
+                        {pwdModal.user.pwd_document_path ? (
+                          pwdModal.user.pwd_document_path.match(/\.(jpeg|jpg|png|gif)$/i) ? (
+                            <img
+                              src={`http://localhost:5001/uploads/${pwdModal.user.pwd_document_path.replace(/^uploads[\\/]/, '')}`}
+                              alt="Applicant PWD ID"
+                              className="max-h-full max-w-full object-contain rounded-xl shadow-md"
+                            />
+                          ) : (
+                            <iframe
+                              src={`http://localhost:5001/uploads/${pwdModal.user.pwd_document_path.replace(/^uploads[\\/]/, '')}`}
+                              title="PWD ID Document PDF"
+                              className="w-full h-full rounded-xl"
+                            ></iframe>
+                          )
+                        ) : (
+                          <p className="text-sm font-bold text-[#03045E]/50">No document uploaded.</p>
+                        )}
+                      </div>
+
+                      <div className="flex gap-3 pt-4 border-t-2 border-[#03045E]/10 shrink-0">
+                        <button
+                          onClick={() => {
+                            const userId = pwdModal.user.user_id;
+                            setPwdModal({ isOpen: false, user: null });
+                            setRejectModal({ isOpen: true, userId: userId, reason: '' });
+                          }}
+                          className="flex-1 py-3.5 bg-[#f4f4f4] text-[#03045E] font-black text-sm rounded-xl border-2 border-[#03045E]/30 hover:bg-[#03045E]/10 transition cursor-pointer shadow-sm flex items-center justify-center gap-2"
+                        >
+                          ✕ Reject & Cooldown
+                        </button>
+                        <button
+                          onClick={() => handleVerification(pwdModal.user.user_id, 'Approved')}
+                          className="flex-1 py-3.5 bg-[#03045E] text-white font-black text-sm rounded-xl border-2 border-[#03045E] hover:bg-[#03045E]/90 shadow-md transition cursor-pointer flex items-center justify-center gap-2"
+                        >
+                          ✓ Approve PWD ID
+                        </button>
+                      </div>
+
+                    </div>
+
+                    <div className="lg:col-span-1 flex flex-col h-full bg-[#f4f4f4]/50 overflow-y-auto p-6 justify-center items-center text-center">
+                      <div className="w-14 h-14 bg-[#2C7FFF]/10 rounded-2xl flex items-center justify-center text-[#2C7FFF] mb-4 border border-[#2C7FFF]/30 shadow-sm">
+                        <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                        </svg>
+                      </div>
+                      <h3 className="text-base font-black text-[#03045E] mb-2">DOH Verification Portal</h3>
+                      <p className="text-xs font-bold text-[#03045E]/70 mb-6 leading-relaxed">
+                        Government security policies prevent direct website embedding. Open the portal in a new tab to cross-check details.
+                      </p>
+                      <a
+                        href="https://pwd.doh.gov.ph"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-3.5 bg-[#03045E] text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-md hover:bg-[#2C7FFF] transition flex items-center justify-center gap-2"
+                      >
+                        Launch Portal ↗
+                      </a>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Business Document Review Modal for Employers */}
+            {employerModal.isOpen && employerModal.user && (
+              <div className="fixed inset-0 bg-[#03045E]/60 z-50 flex items-center justify-center p-3 sm:p-6 backdrop-blur-md animate-in fade-in duration-200">
+                <div className="bg-white rounded-[2.5rem] w-full max-w-4xl h-[85vh] shadow-[0_25px_60px_rgba(3,4,94,0.4)] border-2 border-[#03045E]/20 flex flex-col overflow-hidden">
+                  
+                  <div className="px-6 py-4 bg-[#f4f4f4] border-b-2 border-[#03045E]/15 flex items-center justify-between shrink-0">
+                    <div>
+                      <h2 className="text-lg sm:text-xl font-black text-[#03045E] tracking-tight">
+                        Business Registration: {employerModal.user.company_name}
+                      </h2>
+                      <p className="text-xs font-bold text-[#03045E]/70">
+                        Review company registration permit or DTI/SEC document.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setEmployerModal({ isOpen: false, user: null })}
+                      className="w-10 h-10 rounded-full bg-white text-[#03045E] border-2 border-[#03045E]/20 flex items-center justify-center font-black hover:bg-[#03045E] hover:text-white transition cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  <div className="flex-1 flex flex-col bg-white p-6 gap-6 overflow-hidden">
+                    <div className="flex items-center justify-between shrink-0">
+                      <span className="text-xs font-black uppercase tracking-wider text-[#03045E]">Uploaded Verification File</span>
+                      <span className="px-3 py-1 rounded-lg text-xs font-black bg-[#2C7FFF]/10 text-[#2C7FFF]">
+                        Industry: {employerModal.user.industry || 'N/A'}
+                      </span>
+                    </div>
+
+                    <div className="flex-1 bg-[#f4f4f4] rounded-2xl border-2 border-[#03045E]/15 overflow-hidden flex items-center justify-center relative shadow-inner p-2">
+                      {employerModal.user.verification_document ? (
+                        employerModal.user.verification_document.match(/\.(jpeg|jpg|png|gif)$/i) ? (
+                          <img
+                            src={`http://localhost:5001/uploads/${employerModal.user.verification_document.replace(/^uploads[\\/]/, '')}`}
+                            alt="Business Verification Document"
+                            className="max-h-full max-w-full object-contain rounded-xl shadow-md"
+                          />
+                        ) : (
+                          <iframe
+                            src={`http://localhost:5001/uploads/${employerModal.user.verification_document.replace(/^uploads[\\/]/, '')}`}
+                            title="Business Document PDF"
+                            className="w-full h-full rounded-xl"
+                          ></iframe>
+                        )
+                      ) : (
+                        <p className="text-sm font-bold text-[#03045E]/50">No document uploaded.</p>
+                      )}
+                    </div>
+
+                    <div className="flex gap-3 pt-2 border-t-2 border-[#03045E]/10 shrink-0">
+                      <button
+                        onClick={() => {
+                          const userId = employerModal.user.user_id;
+                          setEmployerModal({ isOpen: false, user: null });
+                          setRejectModal({ isOpen: true, userId: userId, reason: '' });
+                        }}
+                        className="flex-1 py-3.5 bg-[#f4f4f4] text-[#03045E] font-black text-sm rounded-xl border-2 border-[#03045E]/30 hover:bg-[#03045E]/10 transition cursor-pointer shadow-sm flex items-center justify-center gap-2"
+                      >
+                        ✕ Reject & Cooldown
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleVerification(employerModal.user.user_id, 'Approved');
+                          setEmployerModal({ isOpen: false, user: null });
+                        }}
+                        className="flex-1 py-3.5 bg-[#03045E] text-white font-black text-sm rounded-xl border-2 border-[#03045E] hover:bg-[#03045E]/90 shadow-md transition cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        ✓ Approve Employer Permit
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            )}
+
             {rejectModal.isOpen && (
               <div className="fixed inset-0 bg-[#03045E]/50 z-50 flex items-center justify-center p-4 backdrop-blur-md animate-in fade-in duration-200">
                 <div className="bg-white rounded-[2rem] w-full max-w-lg p-6 sm:p-8 shadow-[0_25px_60px_rgba(3,4,94,0.3)] border-2 border-[#03045E]/20 flex flex-col gap-5">
@@ -563,7 +740,6 @@ export default function AdminDashboard() {
                     <p className="text-xs sm:text-sm font-bold text-[#03045E]/70 mt-1">Select a document issue. A 7-day reapplication cooldown will be automatically applied.</p>
                   </div>
                   
-                
                   <div className="flex flex-wrap gap-2">
                     {[
                       "Uploaded document is blurry or illegible. Please resubmit a clear copy after your 7-day cooldown period.",

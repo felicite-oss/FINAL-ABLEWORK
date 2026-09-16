@@ -5,7 +5,7 @@ import { AccessibilityContext } from '../context/AccessibilityContext';
 import lightLogo from '../assets/LIGHT MODE.png';
 import darkLogo from '../assets/DARK MODE.png';
 import backgroundImg from '../assets/BG.png';
-import { MapContainer, TileLayer, Marker, Circle, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -162,6 +162,60 @@ export function Home() {
   const { mode } = useContext(AccessibilityContext);
   const isContrast = mode && typeof mode === 'string' && mode.toLowerCase().includes('contrast');
 
+  const [jobs, setJobs] = useState([]);
+  const [userLocation, setUserLocation] = useState(null);
+  const [isDetecting, setIsDetecting] = useState(false);
+  const [locationError, setLocationError] = useState('');
+
+  const defaultCenter = [10.6766, 122.9509]; // Default coordinates fallback
+
+  useEffect(() => {
+    const fetchActiveJobs = async () => {
+      try {
+        const res = await fetch('http://localhost:5001/api/jobs');
+        if (res.ok) {
+          const data = await res.json();
+          setJobs(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch jobs for landing map:", err);
+      }
+    };
+
+    fetchActiveJobs();
+    handleDetectUserLocation(false); 
+  }, []);
+
+  const handleDetectUserLocation = (alertOnError = true) => {
+    if (!navigator.geolocation) {
+      if (alertOnError) setLocationError("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    setIsDetecting(true);
+    setLocationError('');
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        });
+        setIsDetecting(false);
+      },
+      (error) => {
+        console.warn("Geolocation notice:", error.message);
+        setIsDetecting(false);
+        if (alertOnError) {
+          setLocationError("Location permission was denied. You can still explore all jobs on the map!");
+        }
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  };
+
+  const mappedJobs = jobs.filter(j => j.latitude && j.longitude);
+
   return (
     <div className={`min-h-screen flex flex-col ${isContrast ? 'bg-black text-white' : 'bg-[#9CA3AF] text-[#03045E]'}`}>
 
@@ -243,23 +297,142 @@ export function Home() {
                   title="Smart Job Matching"
                   text="Find employment opportunities customized specifically to match your professional skills."
                 />
-
                 <Feature
                   title="Inclusive Employment"
                   text="Directly connect persons with disabilities with certified inclusive and supportive employers."
                 />
-
                 <Feature
                   title="Streamlined Application"
                   text="Search, track, and apply for available jobs easily through one centralized platform."
                 />
-
                 <Feature
                   title="Direct Employer Network"
                   text="Empower forward-thinking employers to discover your verified qualified profile."
                 />
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* --- Interactive Landing Page Job Map Section --- */}
+        <section className="max-w-7xl mx-auto px-6 py-12 w-full">
+          <div className={`p-8 sm:p-10 rounded-[2.5rem] border-2 shadow-xl backdrop-blur-md ${isContrast ? 'bg-black text-white border-white/20' : 'bg-[#f4f4f4]/95 text-[#03045E] border-[#03045E]/20'}`}>
+            
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+              <div>
+                <span className="inline-block px-3.5 py-1 rounded-full bg-[#2C7FFF]/15 text-[#2C7FFF] font-black text-xs uppercase tracking-widest mb-3 border border-[#2C7FFF]/30">
+                  Live Opportunities Map
+                </span>
+                <h2 className="text-3xl sm:text-4xl font-black tracking-tight">
+                  Explore Inclusive Jobs Around You
+                </h2>
+                <p className={`text-sm sm:text-base font-bold mt-2 max-w-2xl ${isContrast ? 'text-white/80' : 'text-[#03045E]/80'}`}>
+                  See verified hiring workplaces near your location before creating an account. Click any marker to view workplace details!
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleDetectUserLocation(true)}
+                  disabled={isDetecting}
+                  className="px-6 py-3.5 bg-[#2C7FFF] text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-md hover:bg-[#03045E] transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                  {isDetecting ? 'Locating...' : 'Find Jobs Near Me'}
+                </button>
+              </div>
+            </div>
+
+            {locationError && (
+              <div className="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold rounded-xl">
+                {locationError}
+              </div>
+            )}
+
+            <div className="h-[480px] w-full rounded-[2rem] overflow-hidden border-2 border-[#03045E]/20 shadow-inner relative z-10">
+              <MapContainer 
+                center={userLocation ? [userLocation.lat, userLocation.lng] : defaultCenter} 
+                zoom={userLocation ? 12 : 10} 
+                scrollWheelZoom={false} 
+                style={{ height: '100%', width: '100%' }}
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+
+                {userLocation && (
+                  <>
+                    <MapRecenter lat={userLocation.lat} lng={userLocation.lng} />
+                    <Marker position={[userLocation.lat, userLocation.lng]}>
+                      <Popup>
+                        <div className="text-center p-1">
+                          <p className="font-black text-[#03045E] text-sm">📍 You are here</p>
+                          <p className="text-xs text-gray-500 font-semibold">Browsing nearby verified jobs</p>
+                        </div>
+                      </Popup>
+                    </Marker>
+                    <Circle 
+                      center={[userLocation.lat, userLocation.lng]} 
+                      radius={10000} 
+                      pathOptions={{ color: '#2C7FFF', fillColor: '#2C7FFF', fillOpacity: 0.15, weight: 2 }} 
+                    />
+                  </>
+                )}
+
+                {mappedJobs.map((job) => (
+                  <Marker 
+                    key={job.id} 
+                    position={[Number(job.latitude), Number(job.longitude)]}
+                  >
+                    <Popup>
+                      <div className="p-1 min-w-[200px] text-[#03045E]">
+                        <span className="inline-block px-2 py-0.5 bg-[#2C7FFF]/15 text-[#03045E] text-[10px] font-black rounded-md uppercase mb-1">
+                          Active Opening
+                        </span>
+                        <h4 className="font-black text-sm text-[#03045E] leading-tight">{job.job_title}</h4>
+                        <p className="text-xs font-extrabold text-[#2C7FFF] mb-2">{job.company_name}</p>
+                        
+                        <p className="text-xs text-gray-600 font-semibold mb-1">
+                          📍 {job.workplace_address || job.company_address || job.address || 'Address provided upon application'}
+                        </p>
+                        {job.salary_range && (
+                          <p className="text-xs text-emerald-700 font-black mb-3">
+                            💰 {job.salary_range}
+                          </p>
+                        )}
+                        
+                        <Link 
+                          to="/register-select"
+                          className="block text-center py-2 px-3 bg-[#03045E] text-white text-xs font-black rounded-lg hover:bg-[#2C7FFF] transition"
+                        >
+                          Apply / Register Now →
+                        </Link>
+                      </div>
+                    </Popup>
+                  </Marker>
+                ))}
+              </MapContainer>
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-4 text-xs font-bold text-[#03045E]/70">
+              <div className="flex items-center gap-3">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded-full bg-[#2C7FFF]"></span> Active Job Pin
+                </span>
+                {userLocation && (
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-full bg-emerald-500"></span> Your Location
+                  </span>
+                )}
+              </div>
+              <span>Showing {mappedJobs.length} live workplace positions</span>
+            </div>
+
           </div>
         </section>
 
@@ -968,7 +1141,7 @@ export default function ApplicantRegister() {
         try {
           const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
           const data = await response.json();
-         
+          
           if (data && data.display_name) {
             setAddress(data.display_name);
           } else {
@@ -992,7 +1165,7 @@ export default function ApplicantRegister() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatusMessage({ type: '', text: '' });
-   
+    
     if (password !== confirmPassword) {
       setStatusMessage({ type: 'error', text: "Passwords do not match. Please check and try again." });
       return;
@@ -1477,15 +1650,20 @@ export default function ApplicantRegister() {
 
               <hr className="border-white/20" />
 
+              {/* Updated Applicant File Upload Section with strict limits */}
               <div className="p-4 rounded-2xl border-2 border-dashed border-white/20 bg-black/50">
                 <label htmlFor="pwdId" className="block text-sm font-bold text-white mb-1">Upload PWD ID / Certificates <span className="text-white">*</span></label>
                 <input
                   id="pwdId"
                   type="file"
+                  accept=".jpg,.jpeg"
                   onChange={(e) => setPwdFile(e.target.files[0])}
                   className="w-full text-sm text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-white file:text-black file:font-semibold cursor-pointer"
                   required
                 />
+                <p className="text-xs text-white/70 mt-2 font-semibold">
+                  Supported formats: .jpg, .jpeg (Max size: 5MB)
+                </p>
               </div>
 
               <button

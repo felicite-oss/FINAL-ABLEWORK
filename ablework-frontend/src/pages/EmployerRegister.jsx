@@ -28,6 +28,9 @@ export default function EmployerRegister() {
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
+  // NEW: State for compliance checkboxes
+  const [agreedTerms, setAgreedTerms] = useState(false);
+  const [agreedPrivacy, setAgreedPrivacy] = useState(false);
   
   const handleDetectLocation = () => {
     if (!navigator.geolocation) {
@@ -69,6 +72,11 @@ export default function EmployerRegister() {
     e.preventDefault();
     setStatusMessage({ type: '', text: '' });
     
+    // NEW: Validation for Checkboxes
+    if (!agreedTerms || !agreedPrivacy) {
+      setStatusMessage({ type: 'error', text: "You must agree to the Terms and Conditions and Privacy Policy to register." });
+      return;
+    }
 
     if (password !== confirmPassword) {
       setStatusMessage({ type: 'error', text: "Passwords do not match. Please check and try again." });
@@ -361,6 +369,35 @@ export default function EmployerRegister() {
                     className={`w-full text-sm file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold transition cursor-pointer ${isContrast ? 'text-white file:bg-blue-400 file:text-black hover:file:bg-blue-300' : 'text-[#03045E] file:bg-[#03045E] file:text-white hover:file:bg-[#2C7FFF]'}`}
                   />
                 </div>
+              </div>
+
+              {/* NEW: Data Privacy & Terms Checkboxes */}
+              <div className="flex flex-col gap-3 mt-2 mb-2">
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input 
+                    type="checkbox" 
+                    checked={agreedTerms} 
+                    onChange={(e) => setAgreedTerms(e.target.checked)}
+                    className={`mt-0.5 w-4 h-4 rounded cursor-pointer shrink-0 ${isContrast ? 'accent-blue-400' : 'accent-[#2C7FFF]'}`}
+                    required 
+                  />
+                  <span className={`text-xs font-bold leading-tight ${isContrast ? 'text-white' : 'text-[#03045E]'}`}>
+                    I have read and agree to the <Link to="/terms" target="_blank" className={`underline ${isContrast ? 'text-blue-400 hover:text-white' : 'text-[#2C7FFF] hover:text-[#03045E]'}`}>ABLEWORK Terms and Conditions</Link>.
+                  </span>
+                </label>
+
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input 
+                    type="checkbox" 
+                    checked={agreedPrivacy} 
+                    onChange={(e) => setAgreedPrivacy(e.target.checked)}
+                    className={`mt-0.5 w-4 h-4 rounded cursor-pointer shrink-0 ${isContrast ? 'accent-blue-400' : 'accent-[#2C7FFF]'}`}
+                    required 
+                  />
+                  <span className={`text-xs font-bold leading-tight ${isContrast ? 'text-white' : 'text-[#03045E]'}`}>
+                    I have read and understood the <Link to="/policy" target="_blank" className={`underline ${isContrast ? 'text-blue-400 hover:text-white' : 'text-[#2C7FFF] hover:text-[#03045E]'}`}>ABLEWORK Privacy Policy</Link> and consent to the collection and processing of my corporate information for employment assistance purposes.
+                  </span>
+                </label>
               </div>
 
               <button

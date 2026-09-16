@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-
 const safeParse = (data) => {
   if (!data) return [];
   if (Array.isArray(data)) return data;
@@ -14,6 +13,19 @@ const safeParse = (data) => {
     return cleaned.split(',').map(item => item.trim()).filter(item => item);
   }
   return [];
+};
+
+const getDistanceBadgeStyles = (km) => {
+  const distance = Number(km);
+  if (isNaN(distance)) return 'bg-[#2C7FFF]/15 text-[#03045E] border-[#2C7FFF]/40';
+  
+  if (distance <= 5) {
+    return 'bg-emerald-500/15 text-emerald-800 border-emerald-500/40';
+  } else if (distance <= 15) {
+    return 'bg-[#2C7FFF]/15 text-[#03045E] border-[#2C7FFF]/40';
+  } else {
+    return 'bg-amber-500/15 text-amber-800 border-amber-500/40';
+  }
 };
 
 export default function ApplicantSmartMatches({ profile, matches, applications = [], refreshData }) {
@@ -90,7 +102,6 @@ export default function ApplicantSmartMatches({ profile, matches, applications =
 
   const isSelectedJobApplied = applications.some(app => app.job_id === selectedJob?.id);
 
-
   const applicantSkills = profile.skills ? (typeof profile.skills === 'string' ? safeParse(profile.skills) : profile.skills).map(s => s.toLowerCase()) : [];
   const applicantAccoms = profile.accommodations ? (typeof profile.accommodations === 'string' ? safeParse(profile.accommodations) : profile.accommodations).map(a => a.toLowerCase()) : [];
   const applicantDisabilities = profile.disability_type ? (typeof profile.disability_type === 'string' ? safeParse(profile.disability_type) : [profile.disability_type]).map(d => d.toLowerCase()) : [];
@@ -98,7 +109,6 @@ export default function ApplicantSmartMatches({ profile, matches, applications =
   return (
     <div className="animate-fadeIn w-full space-y-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] pb-10">
       
-   
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-3xl sm:text-4xl font-black text-[#03045E]">
@@ -117,7 +127,6 @@ export default function ApplicantSmartMatches({ profile, matches, applications =
           </div>
         )}
       </div>
-
 
       <div className="flex flex-col gap-6 sm:gap-8">
         {matches && matches.length > 0 ? (
@@ -140,8 +149,8 @@ export default function ApplicantSmartMatches({ profile, matches, applications =
                       {job.match_percentage}% Overall Match
                     </span>
                     {job.distance_km && (
-                      <span className="px-3.5 py-1.5 bg-[#2C7FFF]/15 text-[#03045E] border-2 border-[#2C7FFF]/40 text-xs font-black rounded-full flex items-center gap-1.5 uppercase tracking-wide w-fit">
-                        <svg className="w-3.5 h-3.5 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <span className={`px-3.5 py-1.5 border-2 text-xs font-black rounded-full flex items-center gap-1.5 uppercase tracking-wide w-fit ${getDistanceBadgeStyles(job.distance_km)}`}>
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
@@ -208,7 +217,6 @@ export default function ApplicantSmartMatches({ profile, matches, applications =
             </button>
 
             {modalView === 'details' ? (
-        
               <div className="animate-fadeIn">
                 <div className="pr-12 mb-6">
                   <div className="flex flex-wrap gap-2 mb-3">
@@ -221,8 +229,8 @@ export default function ApplicantSmartMatches({ profile, matches, applications =
                       {selectedJob.match_percentage}% Overall Match
                     </span>
                     {selectedJob.distance_km && (
-                      <span className="px-3.5 py-1.5 bg-[#2C7FFF]/15 text-[#03045E] border-2 border-[#2C7FFF]/40 text-xs font-black rounded-full flex items-center gap-1.5 uppercase tracking-wide w-fit">
-                        <svg className="w-3.5 h-3.5 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <span className={`px-3.5 py-1.5 border-2 text-xs font-black rounded-full flex items-center gap-1.5 uppercase tracking-wide w-fit ${getDistanceBadgeStyles(selectedJob.distance_km)}`}>
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
@@ -236,12 +244,32 @@ export default function ApplicantSmartMatches({ profile, matches, applications =
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   <div className="md:col-span-2 flex flex-col gap-8">
+                    
+                    {/* Map Location Section */}
+                    {selectedJob.latitude && selectedJob.longitude && (
+                      <div>
+                        <h3 className="text-xs font-black text-[#03045E]/70 uppercase tracking-widest mb-3">Job Location</h3>
+                        <div className="w-full h-48 rounded-[1.25rem] overflow-hidden border-2 border-[#03045E]/20 shadow-sm relative">
+                          <iframe
+                            title="Job Location Map"
+                            width="100%"
+                            height="100%"
+                            frameBorder="0"
+                            scrolling="no"
+                            marginHeight="0"
+                            marginWidth="0"
+                            src={`https://www.openstreetmap.org/export/embed.html?bbox=${Number(selectedJob.longitude) - 0.005},${Number(selectedJob.latitude) - 0.005},${Number(selectedJob.longitude) + 0.005},${Number(selectedJob.latitude) + 0.005}&layer=mapnik&marker=${selectedJob.latitude},${selectedJob.longitude}`}
+                            className="absolute inset-0"
+                          ></iframe>
+                        </div>
+                      </div>
+                    )}
+
                     <div>
                       <h3 className="text-xs font-black text-[#03045E]/70 uppercase tracking-widest mb-3">Job Description</h3>
                       <p className="text-[#03045E] font-bold whitespace-pre-wrap leading-relaxed">{selectedJob.job_description}</p>
                     </div>
                     
-               
                     <div>
                       <h3 className="text-xs font-black text-[#03045E]/70 uppercase tracking-widest mb-3">Skill Comparison</h3>
                       <div className="flex flex-wrap gap-2">
@@ -258,7 +286,6 @@ export default function ApplicantSmartMatches({ profile, matches, applications =
                       </div>
                     </div>
 
-            
                     <div>
                       <h3 className="text-xs font-black text-[#03045E]/70 uppercase tracking-widest mb-3">Accommodations Comparison</h3>
                       <div className="flex flex-wrap gap-2">
@@ -275,7 +302,6 @@ export default function ApplicantSmartMatches({ profile, matches, applications =
                       </div>
                     </div>
 
-                
                     <div>
                       <h3 className="text-xs font-black text-[#03045E]/70 uppercase tracking-widest mb-3">Accepted Disabilities Comparison</h3>
                       <div className="flex flex-wrap gap-2">
@@ -311,7 +337,6 @@ export default function ApplicantSmartMatches({ profile, matches, applications =
                       </p>
                     </div>
 
-             
                     <div className="pt-4 border-t-2 border-[#03045E]/15">
                       <h3 className="text-xs font-black text-[#03045E]/70 uppercase tracking-widest mb-3">Contact Info</h3>
                       <div className="flex flex-col gap-3">
@@ -322,6 +347,17 @@ export default function ApplicantSmartMatches({ profile, matches, applications =
                         <div className="flex items-center gap-2.5 text-sm text-[#03045E] font-bold">
                           <svg className="w-4 h-4 shrink-0 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
                           {selectedJob.contact_number || selectedJob.phone || 'Not provided'}
+                        </div>
+                        
+                        {/* Workplace Address Section */}
+                        <div className="flex items-start gap-2.5 text-sm text-[#03045E] font-bold">
+                          <svg className="w-4 h-4 shrink-0 text-[#2C7FFF] mt-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                          </svg>
+                          <span className="leading-tight">
+                            {selectedJob.workplace_address || selectedJob.company_address || selectedJob.address || selectedJob.location || 'Address not provided'}
+                          </span>
                         </div>
                       </div>
                     </div>

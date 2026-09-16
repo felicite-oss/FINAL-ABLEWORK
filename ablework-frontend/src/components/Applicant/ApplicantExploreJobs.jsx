@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import AbbyChatbot from '../AbbyChatbot';
 
-
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
   if (!lat1 || !lon1 || !lat2 || !lon2) return null;
   const R = 6371; 
@@ -14,7 +13,6 @@ function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); 
   return R * c;
 }
-
 
 const safeParse = (data) => {
   if (!data) return [];
@@ -29,6 +27,19 @@ const safeParse = (data) => {
     return cleaned.split(',').map(item => item.trim()).filter(item => item);
   }
   return [];
+};
+
+const getDistanceBadgeStyles = (km) => {
+  const distance = Number(km);
+  if (isNaN(distance)) return 'bg-[#2c7fff]/10 text-[#2c7fff] border-[#2c7fff]/40';
+  
+  if (distance <= 5) {
+    return 'bg-emerald-500/15 text-emerald-800 border-emerald-500/40';
+  } else if (distance <= 15) {
+    return 'bg-[#2c7fff]/10 text-[#2c7fff] border-[#2c7fff]/40';
+  } else {
+    return 'bg-amber-500/15 text-amber-800 border-amber-500/40';
+  }
 };
 
 export default function ApplicantExploreJobs({ profile, jobs, applications = [], refreshData }) {
@@ -194,7 +205,6 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
   return (
     <div className="animate-fadeIn w-full space-y-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] pb-10">
       
-
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-[#03045E]">
@@ -235,7 +245,6 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
           </button>
         </div>
       </div>
-
 
       {showFilters && (
         <div className="p-6 sm:p-8 rounded-[2rem] bg-white shadow-md border border-[#03045E]/30 animate-fadeIn flex flex-col gap-6">
@@ -335,7 +344,6 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
         </div>
       )}
 
-
       <div className="flex flex-col gap-6 sm:gap-8">
         {filteredJobs.length > 0 ? (
           filteredJobs.map(job => {
@@ -349,7 +357,7 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                 <div className="flex-1 w-full min-w-0">
                   <div className="flex flex-wrap gap-2 mb-4">
                     {job.calculatedDistance && (
-                      <span className="px-3 py-1.5 bg-[#2c7fff]/10 text-[#2c7fff] border border-[#2c7fff]/40 text-xs font-extrabold rounded-full flex items-center gap-1.5 uppercase tracking-wide w-fit">
+                      <span className={`px-3 py-1.5 border text-xs font-extrabold rounded-full flex items-center gap-1.5 uppercase tracking-wide w-fit ${getDistanceBadgeStyles(job.calculatedDistance)}`}>
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -436,7 +444,7 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
               <div className="animate-fadeIn">
                 <div className="pr-12 mb-6 border-b border-[#03045E]/15 pb-6">
                   {selectedJob.calculatedDistance && (
-                    <span className="inline-flex px-3 py-1.5 bg-[#2c7fff]/10 text-[#2c7fff] border border-[#2c7fff]/40 text-xs font-extrabold uppercase tracking-wide rounded-full mb-3 items-center gap-1.5 w-fit">
+                    <span className={`inline-flex px-3 py-1.5 border text-xs font-extrabold uppercase tracking-wide rounded-full mb-3 items-center gap-1.5 w-fit ${getDistanceBadgeStyles(selectedJob.calculatedDistance)}`}>
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -450,6 +458,27 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   <div className="md:col-span-2 flex flex-col gap-8">
+                    
+                    {/* NEW: Map Location Section */}
+                    {selectedJob.latitude && selectedJob.longitude && (
+                      <div>
+                        <h3 className="text-xs font-extrabold text-[#03045E] uppercase tracking-widest mb-3">Job Location</h3>
+                        <div className="w-full h-48 rounded-[1.25rem] overflow-hidden border border-[#03045E]/20 shadow-sm relative">
+                          <iframe
+                            title="Job Location Map"
+                            width="100%"
+                            height="100%"
+                            frameBorder="0"
+                            scrolling="no"
+                            marginHeight="0"
+                            marginWidth="0"
+                            src={`https://www.openstreetmap.org/export/embed.html?bbox=${Number(selectedJob.longitude) - 0.005},${Number(selectedJob.latitude) - 0.005},${Number(selectedJob.longitude) + 0.005},${Number(selectedJob.latitude) + 0.005}&layer=mapnik&marker=${selectedJob.latitude},${selectedJob.longitude}`}
+                            className="absolute inset-0"
+                          ></iframe>
+                        </div>
+                      </div>
+                    )}
+
                     <div>
                       <h3 className="text-xs font-extrabold text-[#03045E] uppercase tracking-widest mb-3">Job Description</h3>
                       <p className="text-[#03045E] font-bold whitespace-pre-wrap leading-relaxed">{selectedJob.job_description}</p>
@@ -512,6 +541,17 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                         <div className="flex items-center gap-2.5 text-sm text-[#03045E] font-bold">
                           <svg className="w-4 h-4 shrink-0 text-[#2c7fff]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
                           {selectedJob.contact_number || selectedJob.phone || 'Not provided'}
+                        </div>
+                        
+                       
+                        <div className="flex items-start gap-2.5 text-sm text-[#03045E] font-bold">
+                          <svg className="w-4 h-4 shrink-0 text-[#2c7fff] mt-0.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                          </svg>
+                          <span className="leading-tight">
+                            {selectedJob.workplace_address || selectedJob.company_address || selectedJob.address || selectedJob.location || 'Address not provided'}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -584,19 +624,17 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
               </div>
             )}
 
-        
             <AbbyChatbot />
 
           </div>
         </div>
       )}
 
-
+      {/* ... [Keeping your existing SweetAlert and SuccessModal exact code below this] ... */}
       {sweetAlert.isOpen && (
         <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-[#03045E]/60 backdrop-blur-md animate-fadeIn">
           <div className="relative w-full max-w-sm bg-[#f4f4f4] rounded-[2rem] shadow-2xl border-2 border-[#2c7fff]/40 overflow-hidden transform transition-all animate-in zoom-in duration-200">
             <div className="h-2 w-full bg-gradient-to-r from-[#03045E] via-[#2c7fff] to-[#03045E]" />
-            
             <div className="px-8 pt-8 pb-8 flex flex-col items-center text-center">
               <div className="w-20 h-20 rounded-full bg-[#2c7fff]/15 flex items-center justify-center mb-5 border border-[#2c7fff]/30">
                 <div className="w-14 h-14 rounded-full bg-[#2c7fff] flex items-center justify-center shadow-lg shadow-[#2c7fff]/40">
@@ -605,18 +643,9 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                   </svg>
                 </div>
               </div>
-
-              <h2 className="text-2xl font-black text-[#03045E] tracking-tight mb-2">
-                {sweetAlert.title}
-              </h2>
-              <p className="text-sm font-bold text-[#03045E] mb-8 leading-relaxed">
-                {sweetAlert.text}
-              </p>
-
-              <button 
-                onClick={closeSweetAlert}
-                className="w-full py-3.5 bg-[#03045E] text-white font-black rounded-xl hover:bg-[#2c7fff] transition-all shadow-md border-2 border-[#03045E] hover:border-[#2c7fff] cursor-pointer"
-              >
+              <h2 className="text-2xl font-black text-[#03045E] tracking-tight mb-2">{sweetAlert.title}</h2>
+              <p className="text-sm font-bold text-[#03045E] mb-8 leading-relaxed">{sweetAlert.text}</p>
+              <button onClick={closeSweetAlert} className="w-full py-3.5 bg-[#03045E] text-white font-black rounded-xl hover:bg-[#2c7fff] transition-all shadow-md border-2 border-[#03045E] hover:border-[#2c7fff] cursor-pointer">
                 Got it
               </button>
             </div>
@@ -624,17 +653,10 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
         </div>
       )}
 
-
       {showSuccessModal && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#03045E]/60 backdrop-blur-md"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="apply-success-title"
-        >
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#03045E]/60 backdrop-blur-md" role="dialog" aria-modal="true" aria-labelledby="apply-success-title">
           <div className="relative w-full max-w-sm bg-[#f4f4f4] rounded-3xl shadow-2xl border-2 border-[#2c7fff]/30 overflow-hidden animate-fadeIn">
             <div className="h-1.5 w-full bg-gradient-to-r from-[#03045E] via-[#2c7fff] to-[#03045E]" />
-
             <div className="px-8 pt-8 pb-8 flex flex-col items-center text-center">
               <div className="relative mb-5">
                 <div className="w-20 h-20 rounded-full bg-[#2c7fff]/15 flex items-center justify-center">
@@ -648,22 +670,14 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                   <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                 </div>
               </div>
-
-              <h2 id="apply-success-title" className="text-2xl font-black text-[#03045E] tracking-tight mb-2">
-                Application sent!
-              </h2>
-              <p className="text-sm text-[#03045E] font-bold leading-relaxed mb-4">
-                Your application was submitted successfully.
-              </p>
-
+              <h2 id="apply-success-title" className="text-2xl font-black text-[#03045E] tracking-tight mb-2">Application sent!</h2>
+              <p className="text-sm text-[#03045E] font-bold leading-relaxed mb-4">Your application was submitted successfully.</p>
               <div className="flex items-center gap-1.5" aria-label="Closing shortly">
                 <span className="w-2 h-2 rounded-full bg-[#2c7fff] animate-pulse" />
                 <span className="w-2 h-2 rounded-full bg-[#2c7fff] animate-pulse [animation-delay:150ms]" />
                 <span className="w-2 h-2 rounded-full bg-[#2c7fff] animate-pulse [animation-delay:300ms]" />
               </div>
-              <p className="text-xs text-[#2c7fff] font-bold mt-3">
-                Closing in a moment…
-              </p>
+              <p className="text-xs text-[#2c7fff] font-bold mt-3">Closing in a moment…</p>
             </div>
           </div>
         </div>

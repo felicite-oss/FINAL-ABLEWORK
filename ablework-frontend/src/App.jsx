@@ -11,6 +11,7 @@ import ApplicantDashboard from './pages/ApplicantDashboard';
 import EmployerDashboard from './pages/EmployerDashboard';
 import AbbyChatbot from './components/AbbyChatbot';
 import AdminDashboard from './pages/AdminDashboard';
+import ForgotPassword from './components/ForgotPassword';
 
 // Navigation Pages & Home
 import {
@@ -137,6 +138,7 @@ function App() {
               <Route path="/policy" element={<Policy />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
               
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
             </Routes>
