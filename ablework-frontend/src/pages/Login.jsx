@@ -13,19 +13,17 @@ export default function Login() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     setEmail('');
     setPassword('');
   }, []);
 
-
   const isContrast = mode && typeof mode === 'string' && mode.toLowerCase().includes('contrast');
   const isAPlusPlus = mode === 'A++' || mode === 'Assist' || mode === 'a++' || mode === 'assist';
   const isAPlus = mode === 'A+' || mode === 'a+';
   const isAssist = isAPlusPlus; 
-
 
   const tapTargetSize = isAPlusPlus
     ? 'py-6 px-8 text-2xl font-bold'
@@ -62,7 +60,6 @@ export default function Login() {
     : isAPlus
       ? 'text-base font-bold'
       : 'text-sm font-bold';
-
 
   const containerPadding = isAssist 
     ? 'pt-10 px-8 pb-12 sm:pt-12 sm:px-10 sm:pb-16 lg:pt-14 lg:px-12 lg:pb-18' 
@@ -118,7 +115,6 @@ export default function Login() {
         aria-label="Site header"
       >
         <div className="w-full h-16 pl-4 pr-4 md:pr-8 flex items-center justify-between max-w-[1700px] mx-auto box-border">
-        
           <div
             className="flex items-center gap-8"
             role="group"
@@ -141,7 +137,6 @@ export default function Login() {
             </nav>
           </div>
 
-         
           <div className="hidden md:flex items-center">
             <span
               className={`px-5 py-2 rounded-full ${isContrast ? 'bg-blue-400 text-black border border-blue-400' : 'bg-[#2C7FFF] text-white border border-[#2C7FFF]'} text-sm font-medium cursor-default`}
@@ -152,7 +147,6 @@ export default function Login() {
             </span>
           </div>
 
-         
           <button
             className={`md:hidden flex items-center justify-center w-10 h-10 rounded-lg ${isContrast ? 'bg-blue-400 text-black' : 'bg-[#2C7FFF] text-[#f4f4f4]'}`}
             onClick={() => setIsOpen(!isOpen)}
@@ -171,7 +165,6 @@ export default function Login() {
             )}
           </button>
         </div>
-
 
         <div
           id="login-mobile-menu"
@@ -201,7 +194,6 @@ export default function Login() {
         </div>
       </header>
 
-     
       <div
         className={`flex-grow pt-16 pb-12 flex flex-col items-center md:items-end justify-center pl-4 pr-4 md:pr-12 lg:pr-16 md:pl-8 max-w-[1700px] mx-auto w-full box-border relative bg-no-repeat bg-cover bg-center md:bg-[size:1100px_auto] md:bg-left min-h-[110vh] md:min-h-[105vh] transition-all duration-300 ${isOpen ? 'mt-48 sm:mt-56' : 'mt-0'}`}
         style={{
@@ -286,27 +278,59 @@ export default function Login() {
               >
                 Password
               </label>
-              <input
-                id="password"
-                type="password"
-                name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="off"
-                readOnly
-                onFocus={(e) => e.target.removeAttribute('readOnly')}
-                className={`${inputSize} ${isContrast ? 'border-2 border-blue-400 bg-black text-white focus:border-blue-300' : 'border-2 border-[#03045E]/30 bg-white text-[#03045E] focus:border-[#2C7FFF]'} rounded-2xl focus:outline-none shadow-sm transition`}
-                placeholder="Enter your password"
-                aria-required="true"
-                aria-invalid={!!errorMessage}
-                required
-              />
+             <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="off"
+                  readOnly
+                  onFocus={(e) => e.target.removeAttribute('readOnly')}
+                  className={`${inputSize} w-full pr-12 ${isContrast ? 'border-2 border-blue-400 bg-black text-white focus:border-blue-300' : 'border-2 border-[#03045E]/30 bg-white text-[#03045E] focus:border-[#2C7FFF]'} rounded-2xl focus:outline-none shadow-sm transition`}
+                  placeholder="Enter your password"
+                  aria-required="true"
+                  aria-invalid={!!errorMessage}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className={`absolute right-4 top-1/2 -translate-y-1/2 transition cursor-pointer ${isContrast ? 'text-white/60 hover:text-white' : 'text-[#03045E]/50 hover:text-[#2C7FFF]'}`}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+                    </svg>
+                  )}
+                </button>
+              </div>  
+            </div>
+
+            <div className="flex justify-end mt-1 mb-2">
+              <Link 
+                to="/forgot-password" 
+                className={`text-sm font-bold transition-all hover:underline ${
+                  isContrast 
+                    ? 'text-[#2C7FFF] hover:text-white' 
+                    : 'text-[#2C7FFF] hover:text-[#03045E]'
+                }`}
+              >
+                Forgot Password?
+              </Link>
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className={`mt-2 ${tapTargetSize} ${isContrast ? 'bg-blue-400 text-black hover:bg-blue-300 border border-blue-400 font-black' : 'bg-[#03045E] hover:bg-[#2C7FFF] text-white'} disabled:opacity-50 disabled:cursor-not-allowed rounded-full shadow-md w-full transition-all duration-200 cursor-pointer`}
+              className={`mt-2 ${tapTargetSize} ${isContrast ? 'bg-blue-400 text-black hover:bg-blue-300 border border-blue-400 font-black hover:brightness-125' : 'bg-[#03045E] hover:bg-[#2C7FFF] text-white hover:brightness-125'} disabled:opacity-50 disabled:cursor-not-allowed rounded-full shadow-md w-full transition-all duration-200 cursor-pointer`}
               aria-label={isLoading ? 'Logging in, please wait' : 'Log in to AbleWork'}
               aria-busy={isLoading}
             >
@@ -314,7 +338,6 @@ export default function Login() {
             </button>
           </form>
 
-       
           {errorMessage && <span id="login-error" className="sr-only">{errorMessage}</span>}
 
           <p className={`text-center ${isContrast ? 'text-white/90' : 'text-[#03045E]/90'} ${footerLinkSize} pt-1`}>
@@ -330,94 +353,86 @@ export default function Login() {
         </div>
       </div>
 
-  
       <footer
-        className={`w-full relative z-20 overflow-hidden ${isContrast ? 'bg-black text-white border-t-1 border-blue-100' : 'bg-[#03045E] text-white'} mt-auto`}
-        style={{
-          filter: 'none',
-          WebkitFilter: 'none',
-          forcedColorAdjust: 'none',
-        }}
+        className={`py-12 px-6 mt-auto border-t-2 shadow-inner ${isContrast ? 'bg-black text-white border-white/20' : 'bg-[#f4f4f4] text-[#03045E] border-[#03045E]/20'}`}
         role="contentinfo"
         aria-label="Site footer"
       >
-        
-        <div className={`h-1 w-full ${isContrast ? 'bg-blue-400' : 'bg-[#2C7FFF]'}`} aria-hidden="true" />
-
-        <div className="w-full h-auto pl-4 pr-4 md:pr-8 py-10 sm:py-12 max-w-[1700px] mx-auto box-border">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center justify-between">
-            
-           
-            <div
-              className="md:col-span-5 flex flex-col items-center md:items-start text-center md:text-left space-y-3"
-              role="group"
-              aria-label="AbleWork brand and description"
-            >
-              <div className="flex items-center gap-3">
-                <img
-                  src={isContrast ? darkLogo : lightLogo}
-                  alt="AbleWork Logo"
-                  className="h-10 w-auto object-contain"
-                />
-              </div>
-              <p className="text-sm sm:text-base text-white/90 font-medium max-w-md leading-relaxed">
-                Empowering individuals and fostering an inclusive workforce with accessible smart-matching and equal opportunities for everyone.
-              </p>
-              <div className="pt-1 text-xs sm:text-sm text-white/80 font-semibold tracking-wide">
-                © {new Date().getFullYear()} AbleWork. All rights reserved.
-              </div>
+        <div className={`max-w-[1700px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b ${isContrast ? 'border-white/10' : 'border-[#03045E]/10'}`}>
+          
+          <div className="md:col-span-1 space-y-3">
+            <img
+              src={isContrast ? darkLogo : lightLogo}
+              alt="AbleWork Logo"
+              className="h-10 w-auto object-contain"
+            />
+            <p className={`text-sm font-semibold leading-relaxed ${isContrast ? 'text-white/80' : 'text-[#03045E]'}`}>
+              Building an inclusive workforce and equal employment opportunities for everyone.
+            </p>
+            <div className={`pt-2 flex items-center space-x-3 text-xs font-bold uppercase tracking-wider ${isContrast ? 'text-white/70' : 'text-[#03045E]'}`}>
+              <span> Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</span>
+              <span></span>
+              <span></span>
             </div>
-
-            
-            <div className="md:col-span-7 flex flex-col md:flex-row items-center justify-center md:justify-end gap-6">
-              <div
-                className="flex flex-col items-center md:items-end space-y-3"
-                role="group"
-                aria-label="Explore platform links"
-              >
-                <span className={`text-xs sm:text-sm font-extrabold uppercase tracking-widest ${isContrast ? 'text-blue-400' : 'text-[03045e]'}`}>
-                  Explore Platform
-                </span>
-                <nav
-                  className="flex flex-wrap justify-center md:justify-end items-center gap-3"
-                  aria-label="Footer navigation"
-                >
-                  {[
-                    { to: '/', label: 'Home' },
-                    { to: '/about', label: 'About Us' },
-                    { to: '/policy', label: 'Privacy Policy' },
-                    { to: '/terms', label: 'Terms of Service' },
-                    { to: '/contact', label: 'Contact Us' },
-                  ].map((item) => (
-                    <NavLink
-                      key={item.to}
-                      to={item.to}
-                      className={({ isActive }) =>
-                        `px-4 py-2.5 rounded-xl font-bold transition-all duration-300 border text-sm shadow-md hover:-translate-y-0.5 ${
-                          isActive
-                            ? isContrast
-                              ? 'bg-blue-400 border-blue-400 text-black shadow-[0_0_20px_rgba(250,204,21,0.6)] underline font-black'
-                              : 'bg-[#2C7FFF] border-[#2C7FFF] text-white shadow-[0_0_20px_rgba(44,127,255,0.6)] underline'
-                            : isContrast
-                              ? 'bg-zinc-900 border-blue-400/50 text-white hover:bg-blue-400 hover:text-black hover:border-blue-400'
-                              : 'bg-white/10 border-white/20 text-white hover:bg-[#2C7FFF]/40 hover:border-[#2C7FFF]/60 hover:text-white'
-                        }`
-                      }
-                    >
-                      {item.label}
-                    </NavLink>
-                  ))}
-                </nav>
-              </div>
-            </div>
-
           </div>
+
+          <div>
+            <h4 className={`font-black text-base mb-4 ${isContrast ? 'text-white' : 'text-[#03045E]'}`}>Quick Links</h4>
+            <ul className="space-y-2 text-sm font-semibold">
+              <li>
+                <Link to="/" className={`transition-colors ${isContrast ? 'text-white/80 hover:text-[#2C7FFF]' : 'text-[#03045E] hover:text-[#2C7FFF]'}`}>
+                  Home Dashboard
+                </Link>
+              </li>
+              <li>
+                <Link to="/about" className={`transition-colors ${isContrast ? 'text-white/80 hover:text-[#2C7FFF]' : 'text-[#03045E] hover:text-[#2C7FFF]'}`}>
+                  About Our Mission
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className={`transition-colors ${isContrast ? 'text-white/80 hover:text-[#2C7FFF]' : 'text-[#03045E] hover:text-[#2C7FFF]'}`}>
+                  Contact Support
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className={`font-black text-base mb-4 ${isContrast ? 'text-white' : 'text-[#03045E]'}`}>Legal & Support</h4>
+            <ul className="space-y-2 text-sm font-semibold">
+              <li>
+                <Link to="/policy" className={`transition-colors ${isContrast ? 'text-white/80 hover:text-[#2C7FFF]' : 'text-[#03045E] hover:text-[#2C7FFF]'}`}>
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms" className={`transition-colors ${isContrast ? 'text-white/80 hover:text-[#2C7FFF]' : 'text-[#03045E] hover:text-[#2C7FFF]'}`}>
+                  Terms of Service
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className={`font-black text-base mb-4 ${isContrast ? 'text-white' : 'text-[#03045E]'}`}>Get Started</h4>
+            <p className={`text-sm font-semibold mb-4 ${isContrast ? 'text-white/80' : 'text-[#03045E]'}`}>
+              Are you an applicant or employer looking to join our network?
+            </p>
+            <Link
+              to="/register-select"
+              className="inline-block bg-[#2C7FFF] text-[#f4f4f4] px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-md hover:bg-[#03045E] transition-all border-2 border-[#2C7FFF] hover:border-[#03045E]"
+            >
+              Register Now
+            </Link>
+          </div>
+
         </div>
 
-    
-        <div className={`w-full ${isContrast ? 'bg-zinc-950 text-blue-03045e border-t border-blue-03045e' : 'bg-[#03045e] text-white/90 border-t border-white/10'} py-4 px-4 text-center text-xs sm:text-sm font-medium tracking-wide`}>
-          Designed with accessibility and inclusivity at heart.
+        <div className={`max-w-[1700px] mx-auto pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-bold ${isContrast ? 'text-white/70' : 'text-[#03045E]'}`}>
+          <p>© {new Date().getFullYear()} AgileWork Inc. All rights reserved.</p>
+          <p className="font-bold">Empowering Abilities, Connecting Opportunities.</p>
         </div>
+
       </footer>
     </main>
   );

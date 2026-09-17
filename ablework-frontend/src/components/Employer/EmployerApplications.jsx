@@ -103,8 +103,8 @@ export default function EmployerApplications({ profile, refreshStats }) {
         case 'Pending': return 'bg-black text-[#f4f4f4] border border-[#2C7FFF]/40';
         case 'Under Review': return 'bg-[#2C7FFF]/20 text-[#2C7FFF] border border-[#2C7FFF]';
         case 'Shortlisted': return 'bg-[#2C7FFF]/40 text-[#f4f4f4] border border-[#2C7FFF]';
-        case 'Hired': return 'bg-[#2C7FFF] text-[#f4f4f4] border border-[#2C7FFF]';
-        case 'Rejected': return 'bg-[#03045E] text-[#f4f4f4] border border-[#f4f4f4]/40';
+        case 'Hired': return 'bg-emerald-500/20 text-emerald-400 border border-emerald-500';
+        case 'Rejected': return 'bg-red-500/20 text-red-400 border border-red-500';
         default: return 'bg-black text-[#f4f4f4] border border-[#2C7FFF]/30';
       }
     }
@@ -112,8 +112,8 @@ export default function EmployerApplications({ profile, refreshStats }) {
       case 'Pending': return 'bg-[#2C7FFF]/10 text-[#03045E] border border-[#2C7FFF]/30';
       case 'Under Review': return 'bg-[#2C7FFF]/15 text-[#03045E] border border-[#2C7FFF]/30';
       case 'Shortlisted': return 'bg-[#2C7FFF]/20 text-[#03045E] border border-[#2C7FFF]/40';
-      case 'Hired': return 'bg-[#2C7FFF] text-[#f4f4f4] border border-[#2C7FFF]';
-      case 'Rejected': return 'bg-[#f4f4f4] text-[#03045E] border border-[#03045E]/30';
+      case 'Hired': return 'bg-emerald-500/10 text-emerald-700 border border-emerald-500/40';
+      case 'Rejected': return 'bg-red-500/10 text-red-700 border border-red-500/40';
       default: return 'bg-[#f4f4f4] text-[#03045E] border border-[#03045E]/20';
     }
   };
@@ -156,7 +156,8 @@ export default function EmployerApplications({ profile, refreshStats }) {
   };
 
   const getAlertBadgeStyle = (tone) => {
-    if (tone === 'rejected') return 'bg-[#03045E]';
+    if (tone === 'rejected') return 'bg-red-500';
+    if (tone === 'hired') return 'bg-emerald-500';
     return 'bg-[#2C7FFF]';
   };
 
@@ -434,8 +435,8 @@ export default function EmployerApplications({ profile, refreshStats }) {
                         onClick={() => updateStatus(selectedApp.application_id, 'Rejected', null, true, true)} 
                         className={`px-6 py-3 font-bold rounded-xl transition cursor-pointer border ${
                           isContrast 
-                            ? 'bg-[#03045E] text-[#f4f4f4] border-[#f4f4f4]/40 hover:bg-[#f4f4f4] hover:text-[#03045E]' 
-                            : 'bg-[#f4f4f4] text-[#03045E] border-[#03045E]/30 hover:bg-[#03045E] hover:text-[#f4f4f4]'
+                            ? 'bg-red-500/20 text-red-400 border-red-500 hover:bg-red-500 hover:text-[#f4f4f4]' 
+                            : 'bg-red-50 text-red-700 border-red-500/40 hover:bg-red-500 hover:text-[#f4f4f4]'
                         }`}
                       >
                         Reject
@@ -454,7 +455,11 @@ export default function EmployerApplications({ profile, refreshStats }) {
                       
                       <button 
                         onClick={() => setNextSteps({ isOpen: true, status: 'Hired' })} 
-                        className="px-6 py-3 bg-[#2C7FFF] text-[#f4f4f4] font-bold rounded-xl hover:bg-[#03045E] transition shadow-md cursor-pointer border border-[#2C7FFF] hover:border-[#03045E]"
+                        className={`px-6 py-3 font-bold rounded-xl transition shadow-md cursor-pointer border ${
+                          isContrast 
+                            ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500 hover:bg-emerald-500 hover:text-[#f4f4f4]' 
+                            : 'bg-emerald-500 text-[#f4f4f4] border-emerald-500 hover:bg-emerald-600 hover:border-emerald-600'
+                        }`}
                       >
                         Hire Applicant
                       </button>

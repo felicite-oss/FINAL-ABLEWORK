@@ -76,157 +76,109 @@ export function EmployerFooter({ activeTab, setActiveTab }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const linkCls = (tab) =>
-    `w-full text-left flex items-center justify-between gap-2.5 px-4 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer border-2 ${
-      activeTab === tab
-        ? 'bg-[#2C7FFF] text-[#f4f4f4] border-[#2C7FFF] shadow-md'
-        : `${isContrast ? 'bg-black' : 'bg-[#03045E]'} text-[#f4f4f4] border-[#2C7FFF]/40 hover:bg-[#2C7FFF] hover:border-[#2C7FFF]`
-    }`;
-
   return (
-    <footer className={`w-full ${isContrast ? 'bg-black' : 'bg-[#03045E]'} text-[#f4f4f4] mt-auto z-10 relative overflow-hidden`}>
-      <div className="h-1.5 w-full bg-[#2C7FFF]" />
-
-      <div className="max-w-[1700px] mx-auto px-6 sm:px-10 py-12 relative z-10">
-        <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-6 pb-10 border-b-2 border-[#2C7FFF]/30">
-
-          <div className="flex flex-col items-start gap-3">
-            <div className="h-14 flex items-center justify-center">
+    <footer className="w-full bg-white text-[#03045E] mt-auto z-10 relative border-t-2 border-[#03045E]/20">
+      <div className="max-w-[1700px] mx-auto px-6 sm:px-10 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+          <div className="space-y-4">
+            <div className="h-14 flex items-center">
               <img
                 src={FinalLogo}
                 alt="AbleWork Logo"
                 className="h-14 w-auto object-contain"
               />
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl sm:text-3xl font-black tracking-tight text-[#f4f4f4]">
-                <span className="text-[#2C7FFF]"></span>
-              </span>
-              <span className="hidden sm:inline-block px-2 py-0.5 text-[10px] font-black uppercase tracking-widest bg-[#2C7FFF]/20 text-[#2C7FFF] border border-[#2C7FFF]/50 rounded-full">
-                Employer Portal
-              </span>
-            </div>
-            <p className="text-[11px] font-bold uppercase tracking-widest text-[#f4f4f4]/70">
-              Empowering Abilities &middot; Connecting Opportunities
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="px-3 py-1.5 rounded-full bg-[#2C7FFF]/20 text-[#f4f4f4] text-[11px] font-black uppercase tracking-wider border border-[#2C7FFF]/50">
-              Inclusive Hiring Hub
-            </span>
-            <span className="px-3 py-1.5 rounded-full bg-[#f4f4f4]/10 text-[#f4f4f4] text-[11px] font-black uppercase tracking-wider border border-[#f4f4f4]/30">
-              Verified Partners
-            </span>
-          </div>
-
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 py-10">
-
-          <div className="space-y-4">
-            <h3 className="text-xs font-black uppercase tracking-widest text-[#2C7FFF] flex items-center gap-2">
-              <span className="w-6 h-1 rounded-full bg-[#2C7FFF]" />
-              About the Platform
-            </h3>
-            <p className="text-sm font-semibold leading-relaxed text-[#f4f4f4]/85">
+            <p className="text-sm font-semibold leading-relaxed text-[#03045E]/80">
               A web-based employment assistance system designed to connect persons with disabilities with suitable employment opportunities and help employers manage job vacancies and applications.
             </p>
-            <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-[#2C7FFF]/10 border-2 border-[#2C7FFF]/40">
-              <svg className="w-5 h-5 text-[#2C7FFF] shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-[#2C7FFF]">Head Office</p>
-                <p className="text-xs font-bold text-[#f4f4f4] leading-relaxed mt-1">
-                  Burgos Street, Barangay Villamonte<br />
-                  Bacolod City, 6100 Negros Occidental, Philippines
-                </p>
-              </div>
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1.5 rounded-full bg-[#2C7FFF]/20 text-[#2C7FFF] text-[11px] font-black uppercase tracking-wider border border-[#2C7FFF]/50">
+                Inclusive Hiring Hub
+              </span>
+              <span className="px-3 py-1.5 rounded-full bg-[#03045E]/10 text-[#03045E] text-[11px] font-black uppercase tracking-wider border border-[#03045E]/30">
+                Verified Partners
+              </span>
             </div>
           </div>
 
           <div className="space-y-4">
-            <h3 className="text-xs font-black uppercase tracking-widest text-[#2C7FFF] flex items-center gap-2">
-              <span className="w-6 h-1 rounded-full bg-[#2C7FFF]" />
-              Employer Resources
-            </h3>
-            <div className="flex flex-col gap-2.5">
-              <button onClick={() => handleTabClick('employer-policy')} className={linkCls('employer-policy')}>
-                <span className="flex items-center gap-2.5">
-                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <span>Privacy Policy</span>
-                </span>
-                <span className="text-[#f4f4f4]/60 text-xs font-black">01</span>
-              </button>
-              <button onClick={() => handleTabClick('employer-terms')} className={linkCls('employer-terms')}>
-                <span className="flex items-center gap-2.5">
-                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                  <span>Terms &amp; Conditions</span>
-                </span>
-                <span className="text-[#f4f4f4]/60 text-xs font-black">02</span>
-              </button>
-              <button onClick={() => handleTabClick('employer-contact')} className={linkCls('employer-contact')}>
-                <span className="flex items-center gap-2.5">
-                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-                  </svg>
-                  <span>Help &amp; Support</span>
-                </span>
-                <span className="text-[#f4f4f4]/60 text-xs font-black">03</span>
-              </button>
-            </div>
+            <h4 className="text-xs font-black uppercase tracking-widest text-[#2C7FFF]">Fast Links</h4>
+            <ul className="space-y-3">
+              <li>
+                <button onClick={() => handleTabClick('employer-policy')} className="text-sm font-bold text-[#03045E]/80 hover:text-[#2C7FFF] transition-colors cursor-pointer">
+                  Privacy Policy
+                </button>
+              </li>
+              <li>
+                <button onClick={() => handleTabClick('employer-terms')} className="text-sm font-bold text-[#03045E]/80 hover:text-[#2C7FFF] transition-colors cursor-pointer">
+                  Terms & Conditions
+                </button>
+              </li>
+              <li>
+                <button onClick={() => handleTabClick('employer-contact')} className="text-sm font-bold text-[#03045E]/80 hover:text-[#2C7FFF] transition-colors cursor-pointer">
+                  Help & Support
+                </button>
+              </li>
+            </ul>
           </div>
 
           <div className="space-y-4">
-            <h3 className="text-xs font-black uppercase tracking-widest text-[#2C7FFF] flex items-center gap-2">
-              <span className="w-6 h-1 rounded-full bg-[#2C7FFF]" />
-              Contact &amp; Custody Team
-            </h3>
-            <div className="p-4 rounded-2xl bg-[#2C7FFF]/10 border-2 border-[#2C7FFF]/40 space-y-3">
-              <div className="flex items-start gap-2.5">
-                <svg className="w-4 h-4 text-[#2C7FFF] shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+            <h4 className="text-xs font-black uppercase tracking-widest text-[#2C7FFF]">System Status</h4>
+            <ul className="space-y-3">
+              <li className="flex items-center gap-2 text-sm font-bold text-[#03045E]/80">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                Platform Core: Online
+              </li>
+              <li className="flex items-center gap-2 text-sm font-bold text-[#03045E]/80">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                Smart Matching: Active
+              </li>
+              <li className="flex items-center gap-2 text-sm font-bold text-[#03045E]/80">
+                <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-pulse" />
+                ABBY Assistant: Ready
+              </li>
+            </ul>
+          </div>
+
+          <div className="space-y-4">
+            <h4 className="text-xs font-black uppercase tracking-widest text-[#2C7FFF]">Contact Info</h4>
+            <ul className="space-y-3">
+              <li className="flex items-start gap-3 text-sm font-bold text-[#03045E]/80">
+                <svg className="w-4 h-4 text-[#2C7FFF] shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</span>
+              </li>
+              <li className="flex items-center gap-3 text-sm font-bold text-[#03045E]/80">
+                <svg className="w-4 h-4 text-[#2C7FFF] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                <div className="min-w-0">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-[#2C7FFF]">Official Email</p>
-                  <p className="text-xs font-bold text-[#f4f4f4] break-all">ableworksys5i@gmail.com</p>
-                </div>
-              </div>
-              <div className="h-px bg-[#2C7FFF]/40" />
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-[#2C7FFF] mb-1">Project Team 5i</p>
-                <p className="text-[11px] font-semibold text-[#f4f4f4]/90 leading-relaxed">
-                  Paquio, Loueala Jean H. &middot; Pagado, Jesie Marie D. &middot; Astodillo, Felicite S. &middot; Gonzales, John Greg A. &middot; Gamboa, John Bryan T.
-                </p>
-              </div>
-              <div className="h-px bg-[#2C7FFF]/40" />
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-[#2C7FFF] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                <span>ableworksys5i@gmail.com</span>
+              </li>
+              <li className="flex items-center gap-3 text-sm font-bold text-[#03045E]/80">
+                <svg className="w-4 h-4 text-[#2C7FFF] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
-                <p className="text-[11px] font-bold text-[#f4f4f4]">STIWNU &middot; ABLEWORK Capstone Project</p>
-              </div>
-            </div>
+                <span>+63 900 000 0000</span>
+              </li>
+            </ul>
           </div>
-
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t-2 border-[#2C7FFF]/30">
-          <p className="text-xs font-bold text-[#f4f4f4]/75">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-[#03045E]/30">
+          <p className="text-xs font-bold text-[#03045E]/70">
             &copy; {new Date().getFullYear()} ABLEWORK Capstone Project. All rights reserved.
           </p>
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#2C7FFF]" />
-            <span className="text-xs font-black uppercase tracking-widest text-[#2C7FFF]">
-              Data Privacy Act Compliant &middot; RA 10173
-            </span>
-          </div>
+          <button
+            onClick={() => handleTabClick('employer-contact')}
+            className="w-full sm:w-auto px-6 py-2.5 bg-[#03045E] text-white font-black text-sm rounded-xl hover:bg-[#2C7FFF] transition-colors cursor-pointer flex items-center justify-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            Contact Support
+          </button>
         </div>
       </div>
     </footer>
@@ -392,157 +344,109 @@ export function ApplicantFooter({ activeTab, setActiveTab }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const linkCls = (tab) =>
-    `w-full text-left flex items-center justify-between gap-2.5 px-4 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer border-2 ${
-      activeTab === tab
-        ? 'bg-[#2C7FFF] text-[#f4f4f4] border-[#2C7FFF] shadow-md'
-        : `${isContrast ? 'bg-black' : 'bg-[#03045E]'} text-[#f4f4f4] border-[#2C7FFF]/40 hover:bg-[#2C7FFF] hover:border-[#2C7FFF]`
-    }`;
-
   return (
-    <footer className={`w-full ${isContrast ? 'bg-black' : 'bg-[#03045E]'} text-[#f4f4f4] mt-auto z-10 relative overflow-hidden`}>
-      <div className="h-1.5 w-full bg-[#2C7FFF]" />
-
-      <div className="max-w-[1700px] mx-auto px-6 sm:px-10 py-12 relative z-10">
-        <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-6 pb-10 border-b-2 border-[#2C7FFF]/30">
-
-          <div className="flex flex-col items-start gap-3">
-            <div className="h-14 flex items-center justify-center">
+    <footer className="w-full bg-white text-[#03045E] mt-auto z-10 relative border-t-2 border-[#03045E]/20">
+      <div className="max-w-[1700px] mx-auto px-6 sm:px-10 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+          <div className="space-y-4">
+            <div className="h-14 flex items-center">
               <img
                 src={FinalLogo}
                 alt="AbleWork Logo"
                 className="h-14 w-auto object-contain"
               />
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl sm:text-3xl font-black tracking-tight text-[#f4f4f4]">
-                ABLE<span className="text-[#2C7FFF]">WORK</span>
-              </span>
-              <span className="hidden sm:inline-block px-2 py-0.5 text-[10px] font-black uppercase tracking-widest bg-[#2C7FFF]/20 text-[#2C7FFF] border border-[#2C7FFF]/50 rounded-full">
-                Candidate Portal
-              </span>
-            </div>
-            <p className="text-[11px] font-bold uppercase tracking-widest text-[#f4f4f4]/70">
-              Empowering Abilities &middot; Connecting Opportunities
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="px-3 py-1.5 rounded-full bg-[#2C7FFF]/20 text-[#f4f4f4] text-[11px] font-black uppercase tracking-wider border border-[#2C7FFF]/50">
-              Equal Opportunity
-            </span>
-            <span className="px-3 py-1.5 rounded-full bg-[#f4f4f4]/10 text-[#f4f4f4] text-[11px] font-black uppercase tracking-wider border border-[#f4f4f4]/30">
-              Smart Match
-            </span>
-          </div>
-
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 py-10">
-
-          <div className="space-y-4">
-            <h3 className="text-xs font-black uppercase tracking-widest text-[#2C7FFF] flex items-center gap-2">
-              <span className="w-6 h-1 rounded-full bg-[#2C7FFF]" />
-              About the Platform
-            </h3>
-            <p className="text-sm font-semibold leading-relaxed text-[#f4f4f4]/85">
+            <p className="text-sm font-semibold leading-relaxed text-[#03045E]/80">
               A web-based employment assistance system designed to connect persons with disabilities with suitable employment opportunities and help employers manage job vacancies and applications.
             </p>
-            <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-[#2C7FFF]/10 border-2 border-[#2C7FFF]/40">
-              <svg className="w-5 h-5 text-[#2C7FFF] shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-[#2C7FFF]">Head Office</p>
-                <p className="text-xs font-bold text-[#f4f4f4] leading-relaxed mt-1">
-                  Burgos Street, Barangay Villamonte<br />
-                  Bacolod City, 6100 Negros Occidental, Philippines
-                </p>
-              </div>
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1.5 rounded-full bg-[#2C7FFF]/20 text-[#2C7FFF] text-[11px] font-black uppercase tracking-wider border border-[#2C7FFF]/50">
+                Equal Opportunity
+              </span>
+              <span className="px-3 py-1.5 rounded-full bg-[#03045E]/10 text-[#03045E] text-[11px] font-black uppercase tracking-wider border border-[#03045E]/30">
+                Smart Match
+              </span>
             </div>
           </div>
 
           <div className="space-y-4">
-            <h3 className="text-xs font-black uppercase tracking-widest text-[#2C7FFF] flex items-center gap-2">
-              <span className="w-6 h-1 rounded-full bg-[#2C7FFF]" />
-              Candidate Navigation
-            </h3>
-            <div className="flex flex-col gap-2.5">
-              <button onClick={() => handleTabClick('applicant-policy')} className={linkCls('applicant-policy')}>
-                <span className="flex items-center gap-2.5">
-                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <span>Privacy Policy</span>
-                </span>
-                <span className="text-[#f4f4f4]/60 text-xs font-black">01</span>
-              </button>
-              <button onClick={() => handleTabClick('applicant-terms')} className={linkCls('applicant-terms')}>
-                <span className="flex items-center gap-2.5">
-                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                  <span>Terms &amp; Conditions</span>
-                </span>
-                <span className="text-[#f4f4f4]/60 text-xs font-black">02</span>
-              </button>
-              <button onClick={() => handleTabClick('applicant-contact')} className={linkCls('applicant-contact')}>
-                <span className="flex items-center gap-2.5">
-                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-                  </svg>
-                  <span>Help &amp; Support</span>
-                </span>
-                <span className="text-[#f4f4f4]/60 text-xs font-black">03</span>
-              </button>
-            </div>
+            <h4 className="text-xs font-black uppercase tracking-widest text-[#2C7FFF]">Fast Links</h4>
+            <ul className="space-y-3">
+              <li>
+                <button onClick={() => handleTabClick('applicant-policy')} className="text-sm font-bold text-[#03045E]/80 hover:text-[#2C7FFF] transition-colors cursor-pointer">
+                  Privacy Policy
+                </button>
+              </li>
+              <li>
+                <button onClick={() => handleTabClick('applicant-terms')} className="text-sm font-bold text-[#03045E]/80 hover:text-[#2C7FFF] transition-colors cursor-pointer">
+                  Terms & Conditions
+                </button>
+              </li>
+              <li>
+                <button onClick={() => handleTabClick('applicant-contact')} className="text-sm font-bold text-[#03045E]/80 hover:text-[#2C7FFF] transition-colors cursor-pointer">
+                  Help & Support
+                </button>
+              </li>
+            </ul>
           </div>
 
           <div className="space-y-4">
-            <h3 className="text-xs font-black uppercase tracking-widest text-[#2C7FFF] flex items-center gap-2">
-              <span className="w-6 h-1 rounded-full bg-[#2C7FFF]" />
-              Contact &amp; Custody Team
-            </h3>
-            <div className="p-4 rounded-2xl bg-[#2C7FFF]/10 border-2 border-[#2C7FFF]/40 space-y-3">
-              <div className="flex items-start gap-2.5">
-                <svg className="w-4 h-4 text-[#2C7FFF] shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+            <h4 className="text-xs font-black uppercase tracking-widest text-[#2C7FFF]">System Status</h4>
+            <ul className="space-y-3">
+              <li className="flex items-center gap-2 text-sm font-bold text-[#03045E]/80">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                Platform Core: Online
+              </li>
+              <li className="flex items-center gap-2 text-sm font-bold text-[#03045E]/80">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                Smart Matching: Active
+              </li>
+              <li className="flex items-center gap-2 text-sm font-bold text-[#03045E]/80">
+                <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-pulse" />
+                ABBY Assistant: Ready
+              </li>
+            </ul>
+          </div>
+
+          <div className="space-y-4">
+            <h4 className="text-xs font-black uppercase tracking-widest text-[#2C7FFF]">Contact Info</h4>
+            <ul className="space-y-3">
+              <li className="flex items-start gap-3 text-sm font-bold text-[#03045E]/80">
+                <svg className="w-4 h-4 text-[#2C7FFF] shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</span>
+              </li>
+              <li className="flex items-center gap-3 text-sm font-bold text-[#03045E]/80">
+                <svg className="w-4 h-4 text-[#2C7FFF] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                <div className="min-w-0">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-[#2C7FFF]">Official Email</p>
-                  <p className="text-xs font-bold text-[#f4f4f4] break-all">ableworksys5i@gmail.com</p>
-                </div>
-              </div>
-              <div className="h-px bg-[#2C7FFF]/40" />
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-[#2C7FFF] mb-1">Project Team 5i</p>
-                <p className="text-[11px] font-semibold text-[#f4f4f4]/90 leading-relaxed">
-                  Paquio, Loueala Jean H. &middot; Pagado, Jesie Marie D. &middot; Astodillo, Felicite S. &middot; Gonzales, John Greg A. &middot; Gamboa, John Bryan T.
-                </p>
-              </div>
-              <div className="h-px bg-[#2C7FFF]/40" />
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-[#2C7FFF] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                <span>ableworksys5i@gmail.com</span>
+              </li>
+              <li className="flex items-center gap-3 text-sm font-bold text-[#03045E]/80">
+                <svg className="w-4 h-4 text-[#2C7FFF] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
-                <p className="text-[11px] font-bold text-[#f4f4f4]">STIWNU &middot; ABLEWORK Capstone Project</p>
-              </div>
-            </div>
+                <span>+63 900 000 0000</span>
+              </li>
+            </ul>
           </div>
-
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t-2 border-[#2C7FFF]/30">
-          <p className="text-xs font-bold text-[#f4f4f4]/75">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-[#03045E]/30">
+          <p className="text-xs font-bold text-[#03045E]/70">
             &copy; {new Date().getFullYear()} ABLEWORK Capstone Project. All rights reserved.
           </p>
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#2C7FFF]" />
-            <span className="text-xs font-black uppercase tracking-widest text-[#2C7FFF]">
-              Data Privacy Act Compliant &middot; RA 10173
-            </span>
-          </div>
+          <button
+            onClick={() => handleTabClick('applicant-contact')}
+            className="w-full sm:w-auto px-6 py-2.5 bg-[#03045E] text-white font-black text-sm rounded-xl hover:bg-[#2C7FFF] transition-colors cursor-pointer flex items-center justify-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            Contact Support
+          </button>
         </div>
       </div>
     </footer>

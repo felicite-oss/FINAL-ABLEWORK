@@ -284,7 +284,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                           setCurrentBenefit('');
                         }} className={`px-5 py-2 text-sm font-bold rounded-full border transition cursor-pointer ${isContrast ? 'text-[#f4f4f4] bg-black border-[#2C7FFF]/40 hover:bg-[#2C7FFF]/20 hover:border-[#2C7FFF]' : 'text-[#03045E] bg-[#f4f4f4] border-[#03045E]/20 hover:bg-[#2C7FFF]/20 hover:border-[#2C7FFF]'}`}>Edit</button>
                         
-                        <button onClick={() => handleArchiveJob(job.id)} className={`px-5 py-2 text-sm font-bold rounded-full border transition cursor-pointer ${isContrast ? 'text-[#f4f4f4] bg-black border-[#2C7FFF] hover:bg-[#2C7FFF] hover:text-[#f4f4f4]' : 'text-[#2C7FFF] bg-[#f4f4f4] border-[#2C7FFF]/30 hover:bg-[#2C7FFF] hover:text-[#f4f4f4]'}`}>Close & Archive</button>
+                        <button onClick={() => handleArchiveJob(job.id)} className={`px-5 py-2 text-sm font-bold rounded-full border transition cursor-pointer ${isContrast ? 'text-[#f4f4f4] bg-black border-[#2C7FFF] hover:bg-[#2C7FFF] hover:text-[#f4f4f4]' : 'text-[#ff0000] bg-[#f4f4f4] border-[#2C7FFF]/30 hover:bg-[#ff0000] hover:text-[#f4f4f4]'}`}>Close & Archive</button>
                     </>
                 ) : (
                     <span className={`px-5 py-2 text-sm font-bold rounded-full border ${isContrast ? 'text-[#f4f4f4]/60 bg-black border-[#2C7FFF]/40' : 'text-[#03045E]/60 bg-[#f4f4f4] border-[#03045E]/20'}`}>Closed</span>

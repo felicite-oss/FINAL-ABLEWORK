@@ -411,96 +411,108 @@ export function ApplicantFooter({ activeTab, setActiveTab, isContrast: propContr
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const footerBg = isContrast ? 'bg-black' : 'bg-[#f4f4f4]';
-  const footerText = isContrast ? 'text-[#f4f4f4]' : 'text-[#03045E]';
-  const accentText = isContrast ? 'text-[#f4f4f4]' : 'text-[#2C7FFF]';
-  const muted = isContrast ? 'text-[#f4f4f4]' : 'text-[#03045E]';
-  const topBorder = 'border-t-4 border-[#2C7FFF]';
-  const divider = isContrast ? 'border-[#2C7FFF]' : 'border-[#03045E]';
-
-  const buttonBase = 'group relative px-5 py-3 rounded-2xl text-xs sm:text-sm font-extrabold transition-all duration-300 cursor-pointer border-2 flex items-center gap-2.5 shadow-sm';
-  const buttonActive = 'bg-[#2C7FFF] text-[#f4f4f4] border-[#2C7FFF] shadow-md';
-  const buttonIdle = isContrast
-    ? 'bg-black text-[#f4f4f4] border-[#f4f4f4] hover:bg-[#2C7FFF] hover:text-[#f4f4f4] hover:border-[#2C7FFF]'
-    : 'bg-[#f4f4f4] text-[#03045E] border-[#03045E] hover:bg-[#2C7FFF] hover:text-[#f4f4f4] hover:border-[#2C7FFF]';
-
-  const dotActive = 'bg-[#f4f4f4]';
-  const dotIdle = isContrast ? 'bg-[#f4f4f4]' : 'bg-[#2C7FFF] group-hover:bg-[#f4f4f4]';
-
   return (
-    <footer className={`w-full ${footerBg} ${footerText} mt-auto z-10 relative ${topBorder}`}>
-      <div className="max-w-[1700px] mx-auto px-6 sm:px-10 py-10 sm:py-12 space-y-8">
-
-        <div className={`flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 pb-8 border-b-2 ${divider}`}>
-
-          <div className="space-y-2 max-w-md">
-            <div className="flex items-center gap-3">
-              <span className="w-4 h-4 rounded-full bg-[#2C7FFF] animate-pulse" />
-              <span className={`text-2xl font-black tracking-wider uppercase ${footerText}`}>
-                Able<span className={accentText}>Work</span>
-              </span>
-            </div>
-            <p className={`text-xs sm:text-sm font-semibold leading-relaxed ${muted}`}>
-              A web-based employment assistance system designed to connect persons with disabilities with suitable employment opportunities and help employers manage job vacancies and applications.
-            </p>
-            <p className={`text-xs font-bold uppercase tracking-wider pt-1 ${muted}`}>
-              Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-            <button
-              onClick={() => handleTabClick('applicant-policy')}
-              className={`${buttonBase} ${activeTab === 'applicant-policy' ? buttonActive : buttonIdle}`}
-            >
-              <span className={`w-2 h-2 rounded-full transition-colors ${activeTab === 'applicant-policy' ? dotActive : dotIdle}`} />
-              <span>Privacy Policy</span>
-            </button>
-
-            <button
-              onClick={() => handleTabClick('applicant-terms')}
-              className={`${buttonBase} ${activeTab === 'applicant-terms' ? buttonActive : buttonIdle}`}
-            >
-              <span className={`w-2 h-2 rounded-full transition-colors ${activeTab === 'applicant-terms' ? dotActive : dotIdle}`} />
-              <span>Terms & Conditions</span>
-            </button>
-
-            <button
-              onClick={() => handleTabClick('applicant-contact')}
-              className={`${buttonBase} ${activeTab === 'applicant-contact' ? buttonActive : buttonIdle}`}
-            >
-              <span className={`w-2 h-2 rounded-full transition-colors ${activeTab === 'applicant-contact' ? dotActive : dotIdle}`} />
-              <span>Help & Support</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-between gap-4 py-2">
-          <div className={`flex flex-wrap items-center gap-2 text-xs font-black ${footerText}`}>
-            <span className="w-2.5 h-2.5 rounded-full bg-[#2C7FFF]" />
-            <span className={`uppercase tracking-wider ${accentText}`}>Project Team 5i:</span>
-            <span className={muted}>ableworksys5i@gmail.com</span>
-          </div>
-
-          <button
-            onClick={() => handleTabClick('applicant-contact')}
-            className={`group px-4 py-2.5 rounded-xl border-2 text-xs font-black uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 shadow-sm ${
-              isContrast
-                ? 'bg-[#2C7FFF] text-[#f4f4f4] border-[#2C7FFF] hover:bg-black hover:text-[#f4f4f4] hover:border-[#f4f4f4]'
-                : 'bg-[#03045E] text-[#f4f4f4] border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'
-            }`}
+    <footer className="w-full bg-white text-[#03045E] relative mt-auto pt-16 pb-8">
+      <div className="max-w-[1700px] mx-auto px-6 sm:px-10">
+        
+        <div className="mb-14">
+          <h1 
+            className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#f4f4f4]" />
-            <span>Contact Help Desk</span>
-            <span className="transition-transform group-hover:translate-x-1">→</span>
-          </button>
+            Where abilities meet<br/>
+            opportunity<span className="text-[#2c7fff]">.</span>
+          </h1>
         </div>
 
-        <div className={`flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-extrabold pt-2 border-t-2 ${divider} ${muted}`}>
-          <p>&copy; {new Date().getFullYear()} AbleWork Capstone Project. All rights reserved.</p>
-          <p className={`tracking-widest uppercase ${accentText}`}>Inclusive Employment Platform</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-16">
+          
+          <div>
+            <h4 className="text-sm font-extrabold text-[#2c7fff] uppercase tracking-widest mb-6">Resources</h4>
+            <ul className="space-y-4 text-sm font-semibold">
+              <li><button onClick={() => handleTabClick('applicant-contact')} className="hover:text-[#2c7fff] transition-colors text-left">Help Center</button></li>
+              <li><button onClick={() => handleTabClick('applicant-terms')} className="hover:text-[#2c7fff] transition-colors text-left">User Agreement</button></li>
+              <li><button onClick={() => handleTabClick('applicant-policy')} className="hover:text-[#2c7fff] transition-colors text-left">Data Privacy</button></li>
+              <li><button onClick={() => handleTabClick('settings')} className="hover:text-[#2c7fff] transition-colors text-left">Accessibility Options</button></li>
+              <li><button onClick={() => handleTabClick('overview')} className="hover:text-[#2c7fff] transition-colors text-left">System Overview</button></li>
+              <li><button onClick={() => handleTabClick('profile')} className="hover:text-[#2c7fff] transition-colors text-left">Manage Profile</button></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-extrabold text-[#2c7fff] uppercase tracking-widest mb-6">Discover</h4>
+            <ul className="space-y-4 text-sm font-semibold">
+              <li><button onClick={() => handleTabClick('overview')} className="hover:text-[#2c7fff] transition-colors text-left">Home</button></li>
+              <li><button onClick={() => handleTabClick('profile')} className="hover:text-[#2c7fff] transition-colors text-left">Profile</button></li>
+              <li><button onClick={() => handleTabClick('settings')} className="hover:text-[#2c7fff] transition-colors text-left">Settings</button></li>
+              <li><button onClick={() => handleTabClick('applicant-policy')} className="hover:text-[#2c7fff] transition-colors text-left">Privacy Policy</button></li>
+              <li><button onClick={() => handleTabClick('applicant-terms')} className="hover:text-[#2c7fff] transition-colors text-left">Terms & Conditions</button></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-extrabold text-[#2c7fff] uppercase tracking-widest mb-6">Get in Touch</h4>
+            <ul className="space-y-4 text-sm font-semibold">
+              <li>+63 900 000 0000</li>
+              <li>ableworksys5i@gmail.com</li>
+              <li>Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</li>
+              <li className="pt-2 text-[#2c7fff]">Project Team 5i</li>
+              <li className="text-xs text-[#03045E]/80">Data Custody Team: Paquio, Pagado, Astodillo, Gonzales, Gamboa</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-extrabold text-[#2c7fff] uppercase tracking-widest mb-6">System Status</h4>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-3 rounded-xl bg-[#03045E]/5 border border-[#03045E]/10">
+                <span className="text-xs font-bold text-[#03045E]">Platform Core</span>
+                <span className="flex items-center gap-1.5 text-[10px] font-black text-green-600 bg-green-500/10 px-2 py-1 rounded-md uppercase tracking-wider">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                  Online
+                </span>
+              </div>
+              <div className="flex items-center justify-between p-3 rounded-xl bg-[#03045E]/5 border border-[#03045E]/10">
+                <span className="text-xs font-bold text-[#03045E]">Smart Matching</span>
+                <span className="flex items-center gap-1.5 text-[10px] font-black text-green-600 bg-green-500/10 px-2 py-1 rounded-md uppercase tracking-wider">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                  Active
+                </span>
+              </div>
+              <div className="flex items-center justify-between p-3 rounded-xl bg-[#03045E]/5 border border-[#03045E]/10">
+                <span className="text-xs font-bold text-[#03045E]">ABBY Assistant</span>
+                <span className="flex items-center gap-1.5 text-[10px] font-black text-[#2C7FFF] bg-[#2C7FFF]/10 px-2 py-1 rounded-md uppercase tracking-wider">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#2C7FFF] animate-pulse"></span>
+                  Ready
+                </span>
+              </div>
+            </div>
+            <div className="mt-4 p-4 rounded-2xl bg-[#03045E] text-[#f4f4f4] relative overflow-hidden">
+              <div className="relative">
+                <p className="text-[10px] font-black text-[#2c7fff] uppercase tracking-widest mb-1">Platform Uptime</p>
+                <p className="text-2xl font-black leading-none mb-1">99.9%</p>
+                <p className="text-[10px] font-bold text-[#f4f4f4]/70">Reliable & Secure Connection</p>
+              </div>
+            </div>
+          </div>
+
         </div>
 
+        <div className="flex flex-col sm:flex-row items-center justify-between border-t border-[#03045E]/10 pt-6 text-xs font-bold text-[#03045E]">
+          <p className="mb-2 sm:mb-0">© {new Date().getFullYear()} AbleWork Capstone Project</p>
+          <p className="mb-2 sm:mb-0 cursor-pointer hover:text-[#2c7fff]" onClick={() => handleTabClick('applicant-policy')}>Privacy Policy</p>
+          <p className="text-[#2c7fff]">Inclusive Employment Platform</p>
+        </div>
+      </div>
+
+      <div className="absolute bottom-6 right-6">
+        <button 
+          onClick={() => handleTabClick('applicant-contact')}
+          className="bg-[#03045e] text-[#f4f4f4] px-6 py-3 rounded-full font-bold flex items-center gap-2 hover:bg-[#2c7fff] transition shadow-lg"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+          </svg>
+          Help & Support
+        </button>
       </div>
     </footer>
   );

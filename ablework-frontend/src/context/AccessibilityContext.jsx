@@ -7,12 +7,10 @@ export function AccessibilityProvider({ children }) {
     return localStorage.getItem('ui_preference') || 'Standard';
   });
 
-  
   const [talkbackPreference, setTalkbackPreference] = useState(() => {
     return localStorage.getItem('talkback_preference') || null;
   });
 
-  
   const [talkbackActive, setTalkbackActive] = useState(() => {
     return localStorage.getItem('talkback_active') === 'true';
   });
@@ -20,7 +18,6 @@ export function AccessibilityProvider({ children }) {
   const [deviceInfo, setDeviceInfo] = useState({ type: 'Device', isMobile: false });
 
   useEffect(() => {
-   
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
     if (/android/i.test(userAgent) || /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
       setDeviceInfo({ type: 'Mobile / Tablet', isMobile: true });
@@ -29,22 +26,7 @@ export function AccessibilityProvider({ children }) {
     }
   }, []);
 
- 
   useEffect(() => {
-    const handleScreenReaderChange = (isEnabled) => {
-      setTalkbackActive(isEnabled);
-    };
-
-   
-    if (window.matchMedia) {
-      const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)'); 
-    }
-
-    
-    if (window.speechSynthesis) {
-    }
-
-    
     const checkNativeScreenReader = () => {
       if (window.AccessibilityInfo && typeof window.AccessibilityInfo.isScreenReaderEnabled === 'function') {
         window.AccessibilityInfo.isScreenReaderEnabled().then((isEnabled) => {
@@ -62,7 +44,6 @@ export function AccessibilityProvider({ children }) {
     }
   }, [talkbackPreference]);
 
-
   useEffect(() => {
     localStorage.setItem('talkback_active', talkbackActive);
     const root = document.documentElement;
@@ -77,9 +58,7 @@ export function AccessibilityProvider({ children }) {
     localStorage.setItem('ui_preference', mode);
     const root = document.documentElement;
 
-
-    root.classList.remove('theme-Standard', 'theme-High-Contrast', 'theme-Assist', 'theme-Color-Blind');
-
+    root.classList.remove('theme-Standard', 'theme-High-Contrast', 'theme-Assist');
 
     root.classList.add(`theme-${mode.replace(' ', '-')}`);
 
@@ -87,13 +66,6 @@ export function AccessibilityProvider({ children }) {
       root.classList.add('high-contrast');
     } else {
       root.classList.remove('high-contrast');
-    }
-    
-
-    if (mode.toLowerCase().includes('color blind')) {
-      root.classList.add('color-blind');
-    } else {
-      root.classList.remove('color-blind');
     }
   }, [mode]);
 

@@ -9,11 +9,11 @@ export default function ApplicantJobTracker({ applications }) {
       case 'Under Review':
         return 'bg-[#2C7FFF]/10 text-[#2C7FFF] border-[#2C7FFF]/30';
       case 'Shortlisted':
-        return 'bg-[#03045E]/10 text-[#03045E] border-[#03045E]/25';
+        return 'bg-[#04AA6D]/10 text-[#04AA6D] border-[#04AA6D]/30';
       case 'Hired':
-        return 'bg-[#03045E] text-white border-[#03045E] shadow-sm';
+        return 'bg-emerald-600 text-white border-emerald-600 shadow-sm';
       case 'Rejected':
-        return 'bg-[#2C7FFF]/15 text-[#2C7FFF] border-[#2C7FFF]/40 opacity-90';
+        return 'bg-red-500/10 text-red-700 border-red-500/40 opacity-90';
       default:
         return 'bg-[#f4f4f4] text-[#03045E] border-[#03045E]/20';
     }
@@ -35,7 +35,6 @@ export default function ApplicantJobTracker({ applications }) {
   return (
     <div className="animate-fadeIn w-full space-y-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] pb-10">
       
-      {/*header*/}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-[#03045E]">
@@ -55,7 +54,6 @@ export default function ApplicantJobTracker({ applications }) {
         )}
       </div>
 
-      {/*tabs*/}
       <div className="flex overflow-x-auto gap-2 p-1.5 rounded-[1.25rem] bg-[#f4f4f4] border border-[#03045E]/15 w-fit max-w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
         {trackingTabs.map(tab => {
           const count = getTabCount(tab);
@@ -82,7 +80,6 @@ export default function ApplicantJobTracker({ applications }) {
         })}
       </div>
 
-      {/*application*/}
       <div className="flex flex-col gap-6 sm:gap-8">
         {filteredApps.length > 0 ? (
           filteredApps.map(app => (
@@ -91,7 +88,6 @@ export default function ApplicantJobTracker({ applications }) {
               className={`p-6 sm:p-8 rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 transition-all duration-200 hover:shadow-lg hover:border-[#2C7FFF]/40 flex flex-col gap-5 ${app.status === 'Rejected' ? 'opacity-80' : ''}`}
             >
               
-              {/*job info & status*/}
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div className="flex-1 min-w-0">
                   <h3 className="text-xl sm:text-2xl font-extrabold text-[#03045E] leading-tight">{app.job_title}</h3>
@@ -124,7 +120,6 @@ export default function ApplicantJobTracker({ applications }) {
                 </div>
               </div>
 
-              {/* employer message*/}
               {app.employer_message && (
                 <div className="mt-1 bg-[#f4f4f4] p-5 rounded-[1.25rem] border border-[#03045E]/15 flex flex-col gap-2">
                   <h4 className="text-xs font-extrabold text-[#2C7FFF] uppercase tracking-widest flex items-center gap-2">

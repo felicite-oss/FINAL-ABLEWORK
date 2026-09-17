@@ -14,12 +14,12 @@ export default function EmployerAccountSettings({ profile }) {
     setOpenSection(openSection === section ? null : section);
   };
 
- 
   const [email, setEmail] = useState(profile?.email || '');
   const [emailStep, setEmailStep] = useState(1); 
   const [emailOtp, setEmailOtp] = useState('');
   const [emailStatus, setEmailStatus] = useState({ type: '', msg: '' });
   const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
+  
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -27,6 +27,13 @@ export default function EmployerAccountSettings({ profile }) {
   const [passwordOtp, setPasswordOtp] = useState('');
   const [passwordStatus, setPasswordStatus] = useState({ type: '', msg: '' });
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+
+  // NEW STATES: For toggling password visibility
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showDeletePassword, setShowDeletePassword] = useState(false);
+
   const [verificationDoc, setVerificationDoc] = useState(null);
   const [verStatus, setVerStatus] = useState({ type: '', msg: '' });
   const [isResubmitting, setIsResubmitting] = useState(false);
@@ -94,6 +101,8 @@ export default function EmployerAccountSettings({ profile }) {
   const dangerDivider = isContrast ? 'border-[#2C7FFF]/40' : 'border-red-200';
   const dangerInner = isContrast ? 'text-[#f4f4f4]' : 'text-red-900';
   const dangerInnerSub = isContrast ? 'text-[#f4f4f4]/70' : 'text-red-700';
+
+  const eyeIconClass = `absolute right-4 top-1/2 -translate-y-1/2 transition cursor-pointer ${isContrast ? 'text-[#f4f4f4]/50 hover:text-[#2C7FFF]' : 'text-[#03045E]/50 hover:text-[#2C7FFF]'}`;
 
   const triggerAlert = (tone, pill, title, subtitle) => {
     setAlertConfig({ tone, pill, title, subtitle });
@@ -429,7 +438,7 @@ export default function EmployerAccountSettings({ profile }) {
                 <div className="flex-1">
                   <p className={`text-xs font-bold uppercase tracking-wider mb-1 ${subtle}`}>Current Standing</p>
                   {profile?.verification_status === 'Approved' && (
-                    <span className={`inline-block px-4 py-1.5 font-bold text-sm rounded-xl border ${isContrast ? 'bg-[#2C7FFF]/20 text-[#f4f4f4] border-[#2C7FFF]' : 'bg-[#2C7FFF]/10 text-[#03045E] border-[#2C7FFF]/30'}`}>
+                    <span className={`inline-block px-4 py-1.5 font-bold text-sm rounded-xl border ${isContrast ? 'bg-[#2C7FFF]/20 text-[#f4f4f4] border-[#2C7FFF]' : 'bg-[#008000]/10 text-[#008000] border-[#2C7FFF]/30'}`}>
                       Approved
                     </span>
                   )}
@@ -550,16 +559,44 @@ export default function EmployerAccountSettings({ profile }) {
                 <form onSubmit={handleRequestPasswordUpdate} className="flex flex-col gap-5">
                   <div className="flex flex-col gap-1.5 w-full sm:max-w-md">
                     <label className={`text-xs font-bold uppercase ${subtle}`}>Current Password</label>
-                    <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required className={inputCls} />
+                    <div className="relative">
+                      <input type={showCurrentPassword ? "text" : "password"} value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required className={`${inputCls} pr-12`} />
+                      <button type="button" onClick={() => setShowCurrentPassword(!showCurrentPassword)} className={eyeIconClass}>
+                        {showCurrentPassword ? (
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        ) : (
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
+                        )}
+                      </button>
+                    </div>
                   </div>
+
                   <div className="flex flex-col sm:flex-row gap-5 w-full">
                     <div className="flex flex-col gap-1.5 flex-1">
                       <label className={`text-xs font-bold uppercase ${subtle}`}>New Password</label>
-                      <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required className={inputCls} />
+                      <div className="relative">
+                        <input type={showNewPassword ? "text" : "password"} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required className={`${inputCls} pr-12`} />
+                        <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className={eyeIconClass}>
+                          {showNewPassword ? (
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                          ) : (
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
+                          )}
+                        </button>
+                      </div>
                     </div>
                     <div className="flex flex-col gap-1.5 flex-1">
                       <label className={`text-xs font-bold uppercase ${subtle}`}>Confirm New Password</label>
-                      <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className={inputCls} />
+                      <div className="relative">
+                        <input type={showConfirmPassword ? "text" : "password"} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className={`${inputCls} pr-12`} />
+                        <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className={eyeIconClass}>
+                          {showConfirmPassword ? (
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                          ) : (
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
                   <button type="submit" className={`mt-2 w-full sm:max-w-md ${primaryBtn}`}>
@@ -661,7 +698,16 @@ export default function EmployerAccountSettings({ profile }) {
             )}
 
             <form onSubmit={handleDelete} className="flex flex-col gap-4 mt-2">
-              <input type="password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} required placeholder="Enter password" className={inputCls} />
+              <div className="relative">
+                <input type={showDeletePassword ? "text" : "password"} value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} required placeholder="Enter password" className={`${inputCls} pr-12`} />
+                <button type="button" onClick={() => setShowDeletePassword(!showDeletePassword)} className={eyeIconClass}>
+                  {showDeletePassword ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
+                  )}
+                </button>
+              </div>
               <div className="flex gap-3 mt-2">
                 <button type="button" onClick={() => setShowDeleteModal(false)} className={`flex-1 ${cancelBtn}`}>Cancel</button>
                 <button 
