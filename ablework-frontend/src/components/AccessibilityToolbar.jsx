@@ -1,12 +1,23 @@
-import { useContext, useState } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { AccessibilityContext } from '../context/AccessibilityContext';
+import ColorPalettePicker from './ColorPalettePicker';
 
-export default function AccessibilityToolbar() {
+export function AccessibilityToolbar() {
   const { mode, setMode } = useContext(AccessibilityContext);
   const [isOpen, setIsOpen] = useState(false);
-  const [fontSize, setFontSize] = useState('normal'); // 'normal', 'large', 'xlarge'
+  const [fontSize, setFontSize] = useState('normal'); 
 
-  // Apply font size class to the document root
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove('dark-mode', 'standard');
+    
+    if (mode === 'Dark') {
+      root.classList.add('dark-mode');
+    } else {
+      root.classList.add('standard');
+    }
+  }, [mode]);
+
   const handleFontSizeChange = (size) => {
     setFontSize(size);
     const root = document.documentElement;
@@ -14,60 +25,78 @@ export default function AccessibilityToolbar() {
     root.classList.add(`font-${size}`);
   };
 
+  const handleThemeChange = (newMode) => {
+    setMode(newMode);
+  };
+
+  const isDarkMode = mode === 'Dark';
+
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    <div className="fixed bottom-6 left-4 sm:left-6 z-[9999] flex flex-col items-start">
       
-      {/* Expanded Control Panel */}
       {isOpen && (
         <div 
-          className="mb-3 w-72 bg-white dark:bg-gray-900 border-2 border-blue-500 rounded-2xl shadow-2xl p-4 flex flex-col gap-4 text-gray-800 dark:text-gray-100"
+          className="mb-3 w-[calc(100vw-2rem)] max-w-72 sm:w-72 bg-[var(--color-surface)] border-2 border-[var(--color-border)] rounded-3xl shadow-2xl p-5 flex flex-col gap-4 text-[var(--color-text)] backdrop-blur-md animate-in fade-in slide-in-from-bottom-3 duration-200 max-h-[80vh] overflow-y-auto"
           role="region"
           aria-label="Accessibility Control Panel"
         >
-          <div className="flex justify-between items-center border-b pb-2">
-            <h3 className="font-bold text-sm tracking-wide uppercase text-blue-600">Accessibility Controls</h3>
+          <div className="flex justify-between items-center border-b-2 border-[var(--color-border)] pb-3">
+            <h3 tabIndex="0" className="font-black text-sm tracking-wide uppercase text-[var(--color-accent)]">Accessibility Controls</h3>
             <button 
               onClick={() => setIsOpen(false)}
-              className="text-gray-400 hover:text-gray-600 font-bold text-lg px-2 cursor-pointer"
+              className="text-[var(--color-textMuted)] hover:text-[var(--color-text)] font-black text-lg px-2 cursor-pointer transition-colors"
               aria-label="Close accessibility menu"
             >
               &times;
             </button>
           </div>
 
-          {/* Theme Switcher Section (Standard & High Contrast Only) */}
-          <div className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold text-gray-500">Display Theme</span>
+          <div className="flex flex-col gap-2">
+            <span tabIndex="0" className="text-xs font-black uppercase tracking-wider text-[var(--color-textMuted)]">Display Theme</span>
             <div className="grid grid-cols-2 gap-2">
               <button
-                onClick={() => setMode('Standard')}
-                className={`py-2 text-xs font-bold rounded border cursor-pointer ${
-                  mode === 'Standard' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-800 border-gray-300'
+                onClick={() => handleThemeChange('Standard')}
+                aria-pressed={mode === 'Standard'}
+                className={`py-2.5 text-xs font-bold rounded-xl border-2 transition-all cursor-pointer shadow-sm ${
+                  mode === 'Standard' 
+                    ? 'bg-[var(--color-primary)] text-[var(--color-background)] border-[var(--color-primary)] shadow-md' 
+                    : 'bg-[var(--color-surface)] text-[var(--color-text)] border-[var(--color-border)] hover:border-[var(--color-accent)]'
                 }`}
                 aria-label="Standard Mode"
               >
                 Standard
               </button>
               <button
-                onClick={() => setMode('High Contrast')}
-                className={`py-2 text-xs font-bold rounded border cursor-pointer ${
-                  mode === 'High Contrast' ? 'bg-yellow-400 text-black border-black' : 'bg-black text-yellow-400 border-yellow-400'
+                onClick={() => handleThemeChange('Dark')}
+                aria-pressed={mode === 'Dark'}
+                className={`py-2.5 text-xs font-bold rounded-xl border-2 transition-all cursor-pointer shadow-sm ${
+                  mode === 'Dark' 
+                    ? 'bg-[var(--color-primary)] text-[var(--color-background)] border-[var(--color-primary)] shadow-md' 
+                    : 'bg-[var(--color-surface)] text-[var(--color-text)] border-[var(--color-border)] hover:border-[var(--color-accent)]'
                 }`}
-                aria-label="High Contrast Mode"
+                aria-label="Toggle Dark Mode"
               >
-                Contrast
+                Dark Mode
               </button>
             </div>
           </div>
 
-          {/* Font Adjustment Section */}
-          <div className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold text-gray-500">Font Size Adjustment</span>
-            <div className="grid grid-cols-3 gap-1.5">
+          {!isDarkMode && (
+            <div className="flex flex-col gap-2 border-t-2 border-[var(--color-border)] pt-3">
+              <ColorPalettePicker />
+            </div>
+          )}
+
+          <div className="flex flex-col gap-2 border-t-2 border-[var(--color-border)] pt-3">
+            <span tabIndex="0" className="text-xs font-black uppercase tracking-wider text-[var(--color-textMuted)]">Font Size Adjustment</span>
+            <div className="grid grid-cols-3 gap-2">
               <button
                 onClick={() => handleFontSizeChange('normal')}
-                className={`py-1.5 text-xs font-bold rounded border cursor-pointer ${
-                  fontSize === 'normal' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-800 border-gray-300'
+                aria-pressed={fontSize === 'normal'}
+                className={`py-2 text-xs font-bold rounded-xl border-2 transition-all cursor-pointer shadow-sm ${
+                  fontSize === 'normal' 
+                    ? 'bg-[var(--color-accent)] text-[var(--color-background)] border-[var(--color-accent)] shadow-md' 
+                    : 'bg-[var(--color-surface)] text-[var(--color-text)] border-[var(--color-border)] hover:border-[var(--color-accent)]'
                 }`}
                 aria-label="Normal Font Size"
               >
@@ -75,8 +104,11 @@ export default function AccessibilityToolbar() {
               </button>
               <button
                 onClick={() => handleFontSizeChange('large')}
-                className={`py-1.5 text-sm font-bold rounded border cursor-pointer ${
-                  fontSize === 'large' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-800 border-gray-300'
+                aria-pressed={fontSize === 'large'}
+                className={`py-2 text-sm font-bold rounded-xl border-2 transition-all cursor-pointer shadow-sm ${
+                  fontSize === 'large' 
+                    ? 'bg-[var(--color-accent)] text-[var(--color-background)] border-[var(--color-accent)] shadow-md' 
+                    : 'bg-[var(--color-surface)] text-[var(--color-text)] border-[var(--color-border)] hover:border-[var(--color-accent)]'
                 }`}
                 aria-label="Large Font Size"
               >
@@ -84,8 +116,11 @@ export default function AccessibilityToolbar() {
               </button>
               <button
                 onClick={() => handleFontSizeChange('xlarge')}
-                className={`py-1.5 text-base font-bold rounded border cursor-pointer ${
-                  fontSize === 'xlarge' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-800 border-gray-300'
+                aria-pressed={fontSize === 'xlarge'}
+                className={`py-2 px-1 text-sm font-bold rounded-xl border-2 transition-all cursor-pointer flex items-center justify-center whitespace-nowrap shadow-sm ${
+                  fontSize === 'xlarge' 
+                    ? 'bg-[var(--color-accent)] text-[var(--color-background)] border-[var(--color-accent)] shadow-md' 
+                    : 'bg-[var(--color-surface)] text-[var(--color-text)] border-[var(--color-border)] hover:border-[var(--color-accent)]'
                 }`}
                 aria-label="Extra Large Font Size"
               >
@@ -97,14 +132,14 @@ export default function AccessibilityToolbar() {
         </div>
       )}
 
-      {/* Main Floating Accessibility Toggle Button with Universal Accessibility Logo */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-2xl flex items-center justify-center transition-transform hover:scale-110 border-2 border-white cursor-pointer"
+        className="bg-[var(--color-accent)] hover:bg-[var(--color-primary)] text-[var(--color-background)] p-4 rounded-full shadow-[0_8px_16px_rgba(44,127,255,0.4)] flex items-center justify-center transition-all hover:scale-110 border-[3px] border-[var(--color-border)] cursor-pointer"
         aria-label="Open Accessibility Menu"
+        aria-haspopup="dialog"
         aria-expanded={isOpen}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" viewBox="0 0 24 24" fill="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <circle cx="12" cy="4" r="2" />
           <path d="M19 13h-2v-3c0-1.1-.9-2-2-2h-3.5c-.3-.6-.9-1-1.5-1h-2c-1.1 0-2 .9-2 2v5c0 1.1.9 2 2 2h2v4h2v-4h1v4h2v-5.5c0-.8-.7-1.5-1.5-1.5z" />
         </svg>
@@ -113,3 +148,5 @@ export default function AccessibilityToolbar() {
     </div>
   );
 }
+
+export default AccessibilityToolbar;
