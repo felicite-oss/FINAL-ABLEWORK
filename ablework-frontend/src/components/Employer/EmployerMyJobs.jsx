@@ -304,28 +304,28 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
         {displayedJobs.length > 0 ? (
           displayedJobs.map((job, idx) => (
-            <div key={job.id} className={`relative overflow-hidden p-6 rounded-3xl border-2 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition ${cardBg} ${isDark ? 'hover:border-white' : 'hover:border-[#2C7FFF]'}`}>
-              <div className={`absolute top-0 left-0 w-1 h-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></div>
+            <div key={job.id} className={`relative overflow-hidden p-6 md:p-8 rounded-2xl md:rounded-3xl border-2 flex flex-col gap-5 md:gap-6 transition ${cardBg} ${isDark ? 'hover:border-white' : 'hover:border-[#2C7FFF]'}`}>
+              <div className={`absolute top-0 left-0 w-1.5 h-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></div>
 
-              <div className="flex items-start gap-4 pl-3">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg shrink-0 border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}>
+              <div className="flex items-start gap-4 pl-2 min-w-0 w-full">
+                <div className={`w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl flex items-center justify-center font-black text-sm md:text-xl shrink-0 border-2 ${isDark ? 'bg-transparent text-white border-white' : 'bg-transparent text-[#03045E] border-[#03045E]'}`}>
                   {String(idx + 1).padStart(2, '0')}
                 </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <h3 className={`text-xl font-black ${pageText}`}>{job.job_title}</h3>
-                    <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg border-2 ${job.status === 'Active' ? (isDark ? 'bg-white text-black border-white' : 'bg-[#2C7FFF] text-white border-[#2C7FFF]') : closedBadge}`}>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-col gap-2 mb-2">
+                    <h3 className={`text-base md:text-xl font-black leading-tight break-words ${pageText}`}>{job.job_title}</h3>
+                    <span className={`text-[9px] md:text-[11px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md border-2 self-start ${job.status === 'Active' ? (isDark ? 'bg-white text-black border-white' : 'bg-[#2C7FFF] text-white border-[#2C7FFF]') : closedBadge}`}>
                       {job.status}
                     </span>
                   </div>
-                  <p className={`text-xs font-bold mt-1 ${subtle}`}>Posted on {new Date(job.created_at).toLocaleDateString()}</p>
+                  <p className={`text-[10px] md:text-xs font-bold mt-1 ${subtle}`}>Posted on {new Date(job.created_at).toLocaleDateString()}</p>
                 </div>
               </div>
               
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex gap-2 flex-wrap justify-end w-full mt-auto">
                 {job.status === 'Active' ? (
                   <>
                     <button 
@@ -342,35 +342,43 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                         setCurrentAccommodation('');
                         setCurrentBenefit('');
                       }} 
-                      className="px-5 py-2.5 text-sm font-black rounded-xl border-2 transition cursor-pointer hover:opacity-90"
+                      className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl border-2 transition cursor-pointer hover:opacity-90"
                       style={editBtnStyle}
+                      title="Edit Job"
+                      aria-label="Edit Job"
                     >
-                      Edit
+                      <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
                     </button>
                     
                     <button 
                       onClick={() => handleArchiveJob(job.id)} 
-                      className="px-5 py-2.5 text-sm font-black rounded-xl border-2 transition cursor-pointer hover:opacity-90"
+                      className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl border-2 transition cursor-pointer hover:opacity-90"
                       style={archiveBtnStyle}
+                      title="Archive Job"
+                      aria-label="Archive Job"
                     >
-                      Archive
+                      <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                      </svg>
                     </button>
                   </>
                 ) : (
-                  <span className={`px-5 py-2.5 text-sm font-black rounded-xl border-2 ${closedBadge}`}>Archived</span>
+                  <span className={`w-full text-center px-4 py-3 text-xs md:text-sm font-black rounded-lg md:rounded-xl border-2 ${closedBadge}`}>Archived</span>
                 )}
               </div>
             </div>
           ))
         ) : (
-          <div className={`p-12 text-center font-black border-2 border-dashed rounded-3xl ${emptyState}`}>
-            <div className="flex flex-col items-center gap-3">
-              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${isDark ? 'bg-white/20 text-white' : 'bg-[#2C7FFF]/15 text-[#2C7FFF]'}`}>
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <div className={`p-10 md:p-14 text-center font-black border-2 border-dashed rounded-2xl md:rounded-3xl col-span-2 md:col-span-3 ${emptyState}`}>
+            <div className="flex flex-col items-center gap-4">
+              <div className={`w-16 h-16 md:w-20 md:h-20 rounded-xl md:rounded-2xl flex items-center justify-center ${isDark ? 'bg-white/20 text-white' : 'bg-[#2C7FFF]/15 text-[#2C7FFF]'}`}>
+                <svg className="w-8 h-8 md:w-10 md:h-10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <span>No {listTab} job postings found.</span>
+              <span className="text-sm md:text-lg">No {listTab} job postings found.</span>
             </div>
           </div>
         )}
@@ -381,53 +389,58 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative p-8 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] border-2 ${modalBg}`}>
+          <div className={`relative p-4 md:p-8 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] border-2 ${modalBg}`}>
             <div className={`absolute top-0 left-0 w-1.5 h-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></div>
 
             <div className={`flex items-center gap-3 mb-6 pb-5 border-b-2 pl-3 ${divider}`}>
-              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${isDark ? 'bg-white text-black' : 'bg-[#03045E] text-white'}`}>
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <div className={`w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center ${isDark ? 'bg-white text-black' : 'bg-[#03045E] text-white'}`}>
+                <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
               </div>
               <div>
                 <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`}>Edit Mode</p>
-                <h2 className={`text-2xl font-black tracking-tight ${pageText}`}>Edit Job Posting</h2>
+                <h2 className={`text-lg md:text-2xl font-black tracking-tight ${pageText}`}>Edit Job Posting</h2>
               </div>
             </div>
             
-            <form onSubmit={handleEditJob} className="flex flex-col gap-5">
+            <form onSubmit={handleEditJob} className="grid grid-cols-2 gap-3 md:gap-5">
               
               <div className="flex flex-col gap-1.5">
-                <label className={`text-[10px] font-black uppercase tracking-wider ${subtle}`}>Job Title</label>
-                <input type="text" value={editingJob.job_title} onChange={e => setEditingJob({...editingJob, job_title: e.target.value})} required className={`p-3.5 border-2 rounded-xl outline-none font-semibold transition-all ${inputBg}`} />
+                <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>Job Title</label>
+                <input type="text" value={editingJob.job_title} onChange={e => setEditingJob({...editingJob, job_title: e.target.value})} required className={`p-2.5 md:p-3.5 border-2 rounded-xl outline-none font-semibold transition-all text-xs md:text-base ${inputBg}`} />
               </div>
               
               <div className="flex flex-col gap-1.5">
-                <label className={`text-[10px] font-black uppercase tracking-wider ${subtle}`}>Description</label>
-                <textarea rows="4" value={editingJob.job_description} onChange={e => setEditingJob({...editingJob, job_description: e.target.value})} required className={`p-3.5 border-2 rounded-xl resize-none outline-none font-semibold transition-all ${inputBg}`}></textarea>
+                <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>Salary Range</label>
+                <input type="text" value={editingJob.salary_range} onChange={e => setEditingJob({...editingJob, salary_range: e.target.value})} className={`p-2.5 md:p-3.5 border-2 rounded-xl outline-none font-semibold transition-all text-xs md:text-base ${inputBg}`} placeholder="e.g. ₱20,000 - ₱30,000" />
               </div>
               
-              <div className={`h-0.5 ${divider}`}></div>
+              <div className="flex flex-col gap-1.5 col-span-2">
+                <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>Description</label>
+                <textarea rows="3" value={editingJob.job_description} onChange={e => setEditingJob({...editingJob, job_description: e.target.value})} required className={`p-2.5 md:p-3.5 border-2 rounded-xl resize-none outline-none font-semibold transition-all text-xs md:text-base ${inputBg}`}></textarea>
+              </div>
+              
+              <div className={`h-0.5 col-span-2 ${divider}`}></div>
 
               <div className="flex flex-col gap-1.5">
-                <label className={`text-[10px] font-black uppercase tracking-wider ${subtle}`}>Required Skills</label>
+                <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>Required Skills</label>
                 <input 
                   type="text" value={currentSkill} 
                   onChange={e => setCurrentSkill(e.target.value)} 
                   onKeyDown={e => handleAddChip(e, 'parsedSkills', currentSkill, setCurrentSkill)} 
-                  placeholder="Type and press Enter to add"
-                  className={`p-3.5 border-2 rounded-xl outline-none font-semibold transition-all ${inputBg}`} 
+                  placeholder="Type + Enter"
+                  className={`p-2.5 md:p-3.5 border-2 rounded-xl outline-none font-semibold transition-all text-xs md:text-base ${inputBg}`} 
                 />
                 
                 {filteredSkills.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-1">
+                  <div className="flex flex-wrap gap-1.5 md:gap-2 mt-1">
                     {filteredSkills.map(suggestion => (
                       <button
                         key={suggestion}
                         type="button"
                         onClick={() => addSuggestion('parsedSkills', suggestion, setCurrentSkill)}
-                        className="px-3 py-1.5 text-xs font-black rounded-lg border-2 transition cursor-pointer hover:opacity-90"
+                        className="px-2 md:px-3 py-1 md:py-1.5 text-[9px] md:text-xs font-black rounded-md md:rounded-lg border-2 transition cursor-pointer hover:opacity-90"
                         style={recommendationBtnStyle}
                       >
                         + {suggestion}
@@ -437,9 +450,9 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                 )}
 
                 {editingJob.parsedSkills.length > 0 && (
-                  <div className={`flex flex-wrap gap-2 mt-2 p-3 rounded-xl border-2 ${chipBoxBg}`}>
+                  <div className={`flex flex-wrap gap-1.5 md:gap-2 mt-2 p-2 md:p-3 rounded-lg md:rounded-xl border-2 ${chipBoxBg}`}>
                     {editingJob.parsedSkills.map((skill, index) => (
-                      <span key={index} className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-black rounded-full ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF] text-white'}`}>
+                      <span key={index} className={`inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-0.5 md:py-1 text-[9px] md:text-xs font-black rounded-full ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF] text-white'}`}>
                         {skill} <button type="button" onClick={() => removeChip('parsedSkills', skill)} className={`font-black ml-0.5 cursor-pointer ${isDark ? 'hover:text-black/60' : 'hover:text-[#03045E]'}`}>✕</button>
                       </span>
                     ))}
@@ -448,23 +461,23 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
               </div>
               
               <div className="flex flex-col gap-1.5">
-                <label className={`text-[10px] font-black uppercase tracking-wider ${subtle}`}>Guaranteed Accommodations</label>
+                <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>Accommodations</label>
                 <input 
                   type="text" value={currentAccommodation} 
                   onChange={e => setCurrentAccommodation(e.target.value)} 
                   onKeyDown={e => handleAddChip(e, 'parsedAccoms', currentAccommodation, setCurrentAccommodation)} 
-                  placeholder="Type and press Enter to add"
-                  className={`p-3.5 border-2 rounded-xl outline-none font-semibold transition-all ${inputBg}`} 
+                  placeholder="Type + Enter"
+                  className={`p-2.5 md:p-3.5 border-2 rounded-xl outline-none font-semibold transition-all text-xs md:text-base ${inputBg}`} 
                 />
                 
                 {filteredAccommodations.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-1">
+                  <div className="flex flex-wrap gap-1.5 md:gap-2 mt-1">
                     {filteredAccommodations.map(suggestion => (
                       <button
                         key={suggestion}
                         type="button"
                         onClick={() => addSuggestion('parsedAccoms', suggestion, setCurrentAccommodation)}
-                        className="px-3 py-1.5 text-xs font-black rounded-lg border-2 transition cursor-pointer hover:opacity-90"
+                        className="px-2 md:px-3 py-1 md:py-1.5 text-[9px] md:text-xs font-black rounded-md md:rounded-lg border-2 transition cursor-pointer hover:opacity-90"
                         style={recommendationBtnStyle}
                       >
                         + {suggestion}
@@ -474,9 +487,9 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                 )}
 
                 {editingJob.parsedAccoms.length > 0 && (
-                  <div className={`flex flex-wrap gap-2 mt-2 p-3 rounded-xl border-2 ${chipBoxBg}`}>
+                  <div className={`flex flex-wrap gap-1.5 md:gap-2 mt-2 p-2 md:p-3 rounded-lg md:rounded-xl border-2 ${chipBoxBg}`}>
                     {editingJob.parsedAccoms.map((acc, index) => (
-                      <span key={index} className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-black rounded-full ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF] text-white'}`}>
+                      <span key={index} className={`inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-0.5 md:py-1 text-[9px] md:text-xs font-black rounded-full ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF] text-white'}`}>
                         {acc} <button type="button" onClick={() => removeChip('parsedAccoms', acc)} className={`font-black ml-0.5 cursor-pointer ${isDark ? 'hover:text-black/60' : 'hover:text-[#03045E]'}`}>✕</button>
                       </span>
                     ))}
@@ -484,11 +497,48 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                 )}
               </div>
 
-              <div className={`flex flex-col gap-2 p-5 rounded-2xl border-2 ${disabBoxBg}`}>
-                <label className={`text-[10px] font-black uppercase tracking-wider ${subtle}`}>
+              <div className="flex flex-col gap-1.5">
+                <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>Benefits</label>
+                <input 
+                  type="text" value={currentBenefit} 
+                  onChange={e => setCurrentBenefit(e.target.value)} 
+                  onKeyDown={e => handleAddChip(e, 'parsedBenefits', currentBenefit, setCurrentBenefit)} 
+                  className={`p-2.5 md:p-3.5 border-2 rounded-xl outline-none font-semibold transition-all text-xs md:text-base ${inputBg}`} 
+                  placeholder="e.g. HMO" 
+                />
+
+                {filteredBenefits.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 md:gap-2 mt-1">
+                    {filteredBenefits.map(suggestion => (
+                      <button
+                        key={suggestion}
+                        type="button"
+                        onClick={() => addSuggestion('parsedBenefits', suggestion, setCurrentBenefit)}
+                        className="px-2 md:px-3 py-1 md:py-1.5 text-[9px] md:text-xs font-black rounded-md md:rounded-lg border-2 transition cursor-pointer hover:opacity-90"
+                        style={recommendationBtnStyle}
+                      >
+                        + {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {editingJob.parsedBenefits.length > 0 && (
+                  <div className={`flex flex-wrap gap-1.5 md:gap-2 mt-2 p-2 md:p-3 rounded-lg md:rounded-xl border-2 ${chipBoxBg}`}>
+                    {editingJob.parsedBenefits.map((benefit, index) => (
+                      <span key={index} className={`inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-0.5 md:py-1 text-[9px] md:text-xs font-black rounded-full ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF] text-white'}`}>
+                        {benefit} <button type="button" onClick={() => removeChip('parsedBenefits', benefit)} className={`font-black ml-0.5 cursor-pointer ${isDark ? 'hover:text-black/60' : 'hover:text-[#03045E]'}`}>✕</button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className={`flex flex-col gap-2 p-3 md:p-5 rounded-lg md:rounded-2xl border-2 ${disabBoxBg}`}>
+                <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>
                   Accepted Disabilities <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>*</span>
                 </label>
-                <div className="flex flex-wrap gap-2 mt-1">
+                <div className="flex flex-wrap gap-1.5 md:gap-2 mt-1">
                   {availableDisabilities.map((disability) => {
                     const isSelected = editingJob.parsedDisabilities.includes(disability);
                     return (
@@ -496,7 +546,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                         type="button"
                         key={disability}
                         onClick={() => toggleDisability(disability)}
-                        className={`px-3 py-2 rounded-xl text-xs font-black border-2 transition cursor-pointer flex items-center gap-1.5 ${
+                        className={`px-2 md:px-3 py-1 md:py-2 rounded-md md:rounded-xl text-[9px] md:text-xs font-black border-2 transition cursor-pointer flex items-center gap-1 md:gap-1.5 ${
                           isSelected
                             ? (isDark ? 'bg-white border-white shadow-md' : 'bg-[var(--color-primary,#2C7FFF)] border-[var(--color-primary,#2C7FFF)] shadow-md')
                             : (isDark ? 'bg-black border-white hover:bg-white hover:text-black' : 'bg-[var(--color-card,#ffffff)] border-[var(--color-primary,#2C7FFF)] hover:bg-[var(--color-primary,#2C7FFF)]')
@@ -519,55 +569,11 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                 </div>
               </div>
 
-              <div className={`h-0.5 ${divider}`}></div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className={`text-[10px] font-black uppercase tracking-wider ${subtle}`}>Salary Range</label>
-                <input type="text" value={editingJob.salary_range} onChange={e => setEditingJob({...editingJob, salary_range: e.target.value})} className={`p-3.5 border-2 rounded-xl outline-none font-semibold transition-all ${inputBg}`} placeholder="e.g. ₱20,000 - ₱30,000 / month" />
-              </div>
-              
-              <div className="flex flex-col gap-1.5">
-                <label className={`text-[10px] font-black uppercase tracking-wider ${subtle}`}>Benefits</label>
-                <input 
-                  type="text" value={currentBenefit} 
-                  onChange={e => setCurrentBenefit(e.target.value)} 
-                  onKeyDown={e => handleAddChip(e, 'parsedBenefits', currentBenefit, setCurrentBenefit)} 
-                  className={`p-3.5 border-2 rounded-xl outline-none font-semibold transition-all ${inputBg}`} 
-                  placeholder="e.g. HMO, 13th Month Pay" 
-                />
-
-                {filteredBenefits.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    {filteredBenefits.map(suggestion => (
-                      <button
-                        key={suggestion}
-                        type="button"
-                        onClick={() => addSuggestion('parsedBenefits', suggestion, setCurrentBenefit)}
-                        className="px-3 py-1.5 text-xs font-black rounded-lg border-2 transition cursor-pointer hover:opacity-90"
-                        style={recommendationBtnStyle}
-                      >
-                        + {suggestion}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {editingJob.parsedBenefits.length > 0 && (
-                  <div className={`flex flex-wrap gap-2 mt-2 p-3 rounded-xl border-2 ${chipBoxBg}`}>
-                    {editingJob.parsedBenefits.map((benefit, index) => (
-                      <span key={index} className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-black rounded-full ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF] text-white'}`}>
-                        {benefit} <button type="button" onClick={() => removeChip('parsedBenefits', benefit)} className={`font-black ml-0.5 cursor-pointer ${isDark ? 'hover:text-black/60' : 'hover:text-[#03045E]'}`}>✕</button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className={`flex gap-3 mt-4 pt-5 border-t-2 ${divider}`}>
-                <button type="submit" disabled={isSubmitting} className={`flex-1 py-3.5 font-black rounded-xl transition cursor-pointer border-2 ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}>
+              <div className={`flex flex-col sm:flex-row gap-2 md:gap-3 mt-2 pt-3 md:pt-5 border-t-2 col-span-2 ${divider}`}>
+                <button type="submit" disabled={isSubmitting} className={`flex-1 py-2.5 md:py-3.5 font-black rounded-lg md:rounded-xl transition cursor-pointer border-2 text-xs md:text-base ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}>
                   Save Changes
                 </button>
-                <button type="button" onClick={() => setEditingJob(null)} className={`flex-1 py-3.5 font-black rounded-xl border-2 transition cursor-pointer ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-white text-[#03045E] border-[#03045E] hover:bg-[#F4F4F4]'}`}>
+                <button type="button" onClick={() => setEditingJob(null)} className={`flex-1 py-2.5 md:py-3.5 font-black rounded-lg md:rounded-xl border-2 transition cursor-pointer text-xs md:text-base ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-white text-[#03045E] border-[#03045E] hover:bg-[#F4F4F4]'}`}>
                   Cancel
                 </button>
               </div>

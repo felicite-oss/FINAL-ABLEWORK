@@ -422,7 +422,7 @@ export default function EmployerAccountSettings({ profile }) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-4">
 
         <div className={`relative rounded-3xl border-2 overflow-hidden transition-all duration-300 ${openSection === 'verification' ? cardActive : cardHover} ${cardBg}`}>
           <div className={`absolute top-0 left-0 w-1 h-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></div>

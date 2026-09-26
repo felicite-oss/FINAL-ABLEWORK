@@ -105,7 +105,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
         case 'Pending': return 'bg-black text-white border-2 border-white';
         case 'Under Review': return 'bg-white text-black border-2 border-white';
         case 'Shortlisted': return 'bg-white text-black border-2 border-white';
-        case 'Hired': return 'bg-white text-black border-2 border-white';
+        case 'Hired': return 'bg-[#2C7FFF] text-[#F4F4F4] border-2 border-[#2C7FFF]';
         case 'Rejected': return 'bg-black text-white border-2 border-white line-through';
         default: return 'bg-black text-white border-2 border-white';
       }
@@ -114,7 +114,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
       case 'Pending': return 'bg-[#F4F4F4] text-[#03045E] border-2 border-[#03045E]';
       case 'Under Review': return 'bg-[#2C7FFF]/15 text-[#03045E] border-2 border-[#2C7FFF]';
       case 'Shortlisted': return 'bg-[#2C7FFF] text-[#F4F4F4] border-2 border-[#2C7FFF]';
-      case 'Hired': return 'bg-[#03045E] text-[#22c55e] border-2 border-[#03045E]';
+      case 'Hired': return 'bg-[#2C7FFF] text-[#F4F4F4] border-2 border-[#2C7FFF]';
       case 'Rejected': return 'bg-[#F4F4F4] text-[#FF0000] border-2 border-[#03045E] line-through';
       default: return 'bg-[#F4F4F4] text-[#03045E] border-2 border-[#03045E]';
     }
@@ -193,12 +193,12 @@ export default function EmployerApplications({ profile, refreshStats }) {
         </div>
       </div>
       
-      <div className={`flex gap-2 overflow-x-auto pb-4 mb-6 border-b-2 scrollbar-hide ${dividerColor}`}>
+      <div className={`grid grid-cols-2 md:flex md:flex-wrap md:justify-between gap-2 md:gap-2 overflow-x-auto px-6 sm:px-8 pb-4 mb-6 border-b-2 scrollbar-hide ${dividerColor}`}>
         {tabs.map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-5 py-3 text-sm font-black rounded-xl whitespace-nowrap transition-all cursor-pointer border-2 ${
+            className={`w-full md:w-auto md:flex-1 px-3 md:px-5 py-2 md:py-3 text-[10px] md:text-sm font-black rounded-lg md:rounded-xl whitespace-nowrap transition-all cursor-pointer border-2 flex items-center justify-center gap-1.5 md:gap-2 ${
               activeTab === tab
                 ? (isDark ? 'bg-white text-black border-white' : 'bg-[#2C7FFF] text-white border-[#2C7FFF]')
                 : isDark
@@ -207,7 +207,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
             }`}
           >
             {tab}
-            <span className={`ml-2 px-2 py-0.5 rounded-full text-[10px] font-black ${
+            <span className={`px-1.5 md:px-2 py-0.5 rounded-full text-[8px] md:text-[10px] font-black ${
               activeTab === tab 
                 ? (isDark ? 'bg-black text-white' : 'bg-white text-[#2C7FFF]')
                 : isDark
@@ -222,24 +222,24 @@ export default function EmployerApplications({ profile, refreshStats }) {
         ))}
       </div>
       
-      <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 px-6 sm:px-8">
         {filteredApplications.length > 0 ? (
           filteredApplications.map(app => (
-            <div key={app.application_id} className={`relative overflow-hidden p-6 rounded-3xl border-2 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition ${cardBg} ${isDark ? 'hover:border-white' : 'hover:border-[#2C7FFF]'}`}>
-              <div className={`absolute top-0 left-0 w-1 h-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></div>
+            <div key={app.application_id} className={`relative overflow-hidden p-5 md:p-8 rounded-2xl md:rounded-3xl border-2 flex flex-col justify-between gap-4 md:gap-6 transition ${cardBg} ${isDark ? 'hover:border-white' : 'hover:border-[#2C7FFF]'}`}>
+              <div className={`absolute top-0 left-0 w-1.5 h-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></div>
 
-              <div className="flex-1 pl-3">
-                <div className="flex items-center gap-3 mb-1 flex-wrap">
-                  <h3 className={`text-xl font-black ${pageText}`}>{app.firstname} {app.lastname}</h3>
-                  <span className={`px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider ${getStatusColor(app.application_status)}`}>
+              <div className="flex-1 pl-2 md:pl-4 w-full min-w-0">
+                <div className="flex flex-col gap-2 md:gap-3 mb-3 md:mb-4">
+                  <h3 className={`text-base md:text-2xl font-black leading-tight ${pageText}`}>{app.firstname} {app.lastname}</h3>
+                  <span className={`px-3 md:px-4 py-1 md:py-1.5 rounded-md md:rounded-full text-[9px] md:text-[11px] font-black uppercase tracking-wider self-start ${getStatusColor(app.application_status)}`}>
                     {app.application_status}
                   </span>
                 </div>
-                <p className={`text-sm font-bold ${muted}`}>Applied for: <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>{app.job_title}</span></p>
-                <p className={`text-xs font-bold mt-1 ${subtle}`}>Date: {new Date(app.applied_at).toLocaleDateString()}</p>
+                <p className={`text-xs md:text-base font-bold leading-tight ${muted}`}>Applied for: <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>{app.job_title}</span></p>
+                <p className={`text-[10px] md:text-sm font-bold mt-2 ${subtle}`}>Date: {new Date(app.applied_at).toLocaleDateString()}</p>
               </div>
 
-              <div>
+              <div className="w-full mt-auto">
                 <button 
                   onClick={() => {
                     setSelectedApp(app);
@@ -250,7 +250,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
                         updateStatus(app.application_id, 'Under Review', null, false);
                     }
                   }} 
-                  className={`px-6 py-3 text-sm font-black rounded-xl transition-all cursor-pointer border-2 ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'border-[var(--color-primary,#2C7FFF)] hover:opacity-90'}`}
+                  className={`w-full px-4 md:px-6 py-3 md:py-4 text-xs md:text-base font-black rounded-lg md:rounded-xl transition-all cursor-pointer border-2 ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'border-[var(--color-primary,#2C7FFF)] hover:opacity-90'}`}
                   style={isDark ? {} : {
                     color: 'var(--color-text, #03045E)',
                     backgroundColor: 'var(--color-card, #ffffff)'
@@ -271,7 +271,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
             </div>
           ))
         ) : (
-          <div className={`p-10 text-center font-black border-2 border-dashed rounded-3xl ${isDark ? 'text-white/70 border-white bg-black' : 'text-[#03045E]/70 border-[#03045E] bg-[#F4F4F4]'}`}>
+          <div className={`p-8 md:p-10 text-center font-black border-2 border-dashed rounded-2xl md:rounded-3xl col-span-2 md:col-span-3 ${isDark ? 'text-white/70 border-white bg-black' : 'text-[#03045E]/70 border-[#03045E] bg-[#F4F4F4]'}`}>
             No {activeTab !== 'All' ? activeTab.toLowerCase() : ''} applications found.
           </div>
         )}
@@ -285,114 +285,114 @@ export default function EmployerApplications({ profile, refreshStats }) {
           <div className={`relative rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto flex flex-col border-2 ${isDark ? 'bg-black border-white text-white' : 'bg-white border-[#03045E] text-[#03045E]'}`}>
             <div className={`absolute top-0 left-0 w-1.5 h-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></div>
 
-            <div className={`relative px-8 pt-8 pb-6 border-b-2 pl-10 ${dividerColor}`}>
+            <div className={`relative px-3 md:px-8 pt-6 md:pt-8 pb-4 md:pb-6 border-b-2 pl-5 md:pl-10 ${dividerColor}`}>
               <div className="flex justify-between items-start gap-4 flex-wrap">
-                <div className="flex items-center gap-4 min-w-0">
-                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center font-black text-xl shrink-0 border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}>
+                <div className="flex items-center gap-3 md:gap-4 min-w-0">
+                  <div className={`w-10 h-10 md:w-16 md:h-16 rounded-xl md:rounded-2xl flex items-center justify-center font-black text-sm md:text-xl shrink-0 border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}>
                     {(selectedApp.firstname?.[0] || '').toUpperCase()}{(selectedApp.lastname?.[0] || '').toUpperCase()}
                   </div>
                   <div className="min-w-0">
-                    <h2 className={`text-2xl sm:text-3xl font-black tracking-tight truncate ${pageText}`}>
+                    <h2 className={`text-base md:text-3xl font-black tracking-tight truncate ${pageText}`}>
                       {selectedApp.firstname} {selectedApp.lastname}
                     </h2>
-                    <p className={`text-sm font-bold mt-0.5 ${muted}`}>
+                    <p className={`text-[10px] md:text-sm font-bold mt-0.5 ${muted}`}>
                       Applying for: <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>{selectedApp.job_title}</span>
                     </p>
                   </div>
                 </div>
-                <span className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider shrink-0 ${getStatusColor(selectedApp.application_status)}`}>
+                <span className={`px-2 md:px-4 py-1 md:py-2 rounded-full text-[9px] md:text-xs font-black uppercase tracking-wider shrink-0 ${getStatusColor(selectedApp.application_status)}`}>
                   {selectedApp.application_status}
                 </span>
               </div>
             </div>
 
-            <div className="px-8 py-6 flex flex-col gap-6">
+            <div className="px-3 md:px-8 py-4 md:py-6 flex flex-col gap-3 md:gap-6">
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className={`p-5 rounded-2xl border-2 ${softPanel}`}>
-                  <h4 className={`text-[10px] font-black uppercase tracking-[0.15em] mb-4 ${subtle}`}>Contact Information</h4>
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF]/15 text-[#2C7FFF]'}`}>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+              <div className="grid grid-cols-2 gap-2 md:gap-6">
+                <div className={`p-2.5 md:p-5 rounded-lg md:rounded-2xl border-2 ${softPanel}`}>
+                  <h4 className={`text-[8px] md:text-[10px] font-black uppercase tracking-[0.15em] mb-2 md:mb-4 ${subtle}`}>Contact Information</h4>
+                  <div className="flex flex-col gap-2 md:gap-3">
+                    <div className="flex items-center gap-2 md:gap-3">
+                      <div className={`w-6 h-6 md:w-9 md:h-9 rounded-md md:rounded-xl flex items-center justify-center shrink-0 ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF]/15 text-[#2C7FFF]'}`}>
+                        <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                       </div>
-                      <span className={`text-sm font-bold truncate ${pageText}`}>{selectedApp.email}</span>
+                      <span className={`text-[9px] md:text-sm font-bold truncate ${pageText}`}>{selectedApp.email}</span>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF]/15 text-[#2C7FFF]'}`}>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+                    <div className="flex items-center gap-2 md:gap-3">
+                      <div className={`w-6 h-6 md:w-9 md:h-9 rounded-md md:rounded-xl flex items-center justify-center shrink-0 ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF]/15 text-[#2C7FFF]'}`}>
+                        <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                         </svg>
                       </div>
-                      <span className={`text-sm font-bold ${pageText}`}>{selectedApp.phone || 'Not provided'}</span>
+                      <span className={`text-[9px] md:text-sm font-bold ${pageText}`}>{selectedApp.phone || 'Not provided'}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className={`p-5 rounded-2xl border-2 ${softPanel}`}>
-                  <h4 className={`text-[10px] font-black uppercase tracking-[0.15em] mb-4 ${subtle}`}>Disability Profile</h4>
-                  <p className={`text-sm font-bold ${pageText}`}>
+                <div className={`p-2.5 md:p-5 rounded-lg md:rounded-2xl border-2 ${softPanel}`}>
+                  <h4 className={`text-[8px] md:text-[10px] font-black uppercase tracking-[0.15em] mb-2 md:mb-4 ${subtle}`}>Disability Profile</h4>
+                  <p className={`text-[9px] md:text-sm font-bold ${pageText}`}>
                     {selectedApp.disability_type || 'Not specified'}
                   </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className={`p-5 rounded-2xl border-2 ${softPanel}`}>
-                  <h4 className={`text-[10px] font-black uppercase tracking-[0.15em] mb-4 ${subtle}`}>Verified Skills</h4>
-                  <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-2 gap-2 md:gap-6">
+                <div className={`p-2.5 md:p-5 rounded-lg md:rounded-2xl border-2 ${softPanel}`}>
+                  <h4 className={`text-[8px] md:text-[10px] font-black uppercase tracking-[0.15em] mb-2 md:mb-4 ${subtle}`}>Verified Skills</h4>
+                  <div className="flex flex-wrap gap-1 md:gap-2">
                     {selectedApp.skills ? 
                       (typeof selectedApp.skills === 'string' ? JSON.parse(selectedApp.skills) : selectedApp.skills).map((skill, i) => (
-                        <span key={i} className={`px-3 py-1 text-xs font-black rounded-lg border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#2C7FFF] text-white border-[#2C7FFF]'}`}>
+                        <span key={i} className={`px-1.5 md:px-3 py-0.5 md:py-1 text-[8px] md:text-xs font-black rounded-md md:rounded-lg border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#2C7FFF] text-white border-[#2C7FFF]'}`}>
                           {skill}
                         </span>
                       ))
-                    : <span className={`text-sm ${subtle}`}>No skills listed</span>}
+                    : <span className={`text-[9px] md:text-sm ${subtle}`}>No skills listed</span>}
                   </div>
                 </div>
 
-                <div className={`p-5 rounded-2xl border-2 ${softPanel}`}>
-                  <h4 className={`text-[10px] font-black uppercase tracking-[0.15em] mb-4 ${subtle}`}>Requested Accommodations</h4>
-                  <div className="flex flex-wrap gap-2">
+                <div className={`p-2.5 md:p-5 rounded-lg md:rounded-2xl border-2 ${softPanel}`}>
+                  <h4 className={`text-[8px] md:text-[10px] font-black uppercase tracking-[0.15em] mb-2 md:mb-4 ${subtle}`}>Requested Accommodations</h4>
+                  <div className="flex flex-wrap gap-1 md:gap-2">
                     {selectedApp.accommodations_needed ? 
                       (typeof selectedApp.accommodations_needed === 'string' ? JSON.parse(selectedApp.accommodations_needed) : selectedApp.accommodations_needed).map((acc, i) => (
-                        <span key={i} className={`px-3 py-1 text-xs font-black rounded-lg border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-[#F4F4F4] text-[#03045E] border-[#03045E]'}`}>
+                        <span key={i} className={`px-1.5 md:px-3 py-0.5 md:py-1 text-[8px] md:text-xs font-black rounded-md md:rounded-lg border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-[#F4F4F4] text-[#03045E] border-[#03045E]'}`}>
                           {acc}
                         </span>
                       ))
-                    : <span className={`text-sm ${subtle}`}>None requested</span>}
+                    : <span className={`text-[9px] md:text-sm ${subtle}`}>None requested</span>}
                   </div>
                 </div>
               </div>
 
-              <div className={`p-5 rounded-2xl border-2 ${softPanel}`}>
-                <h4 className={`text-[10px] font-black uppercase tracking-[0.15em] mb-4 ${subtle}`}>Application Documents</h4>
+              <div className={`p-2.5 md:p-5 rounded-lg md:rounded-2xl border-2 ${softPanel}`}>
+                <h4 className={`text-[8px] md:text-[10px] font-black uppercase tracking-[0.15em] mb-2 md:mb-4 ${subtle}`}>Application Documents</h4>
                 
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-2 md:gap-4">
                   {selectedApp.resume_path ? (
                     <a 
                       href={`http://localhost:5001${selectedApp.resume_path}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`inline-flex items-center gap-2 px-5 py-3 font-black rounded-xl transition border-2 self-start ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+                      className={`inline-flex items-center gap-2 px-3 md:px-5 py-2 md:py-3 font-black rounded-lg md:rounded-xl transition border-2 self-start text-[9px] md:text-base ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
                     >
-                      <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+                      <svg className="w-3.5 h-3.5 md:w-5 md:h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
                       <span>View Attached Resume</span>
                     </a>
                   ) : (
-                    <p className={`text-sm font-bold p-3 rounded-xl border-2 inline-block self-start ${isDark ? 'text-white/70 bg-black border-white/40' : 'text-[#03045E]/70 bg-[#F4F4F4] border-[#03045E]/40'}`}>
+                    <p className={`text-[9px] md:text-sm font-bold p-2 md:p-3 rounded-lg md:rounded-xl border-2 inline-block self-start ${isDark ? 'text-white/70 bg-black border-white/40' : 'text-[#03045E]/70 bg-[#F4F4F4] border-[#03045E]/40'}`}>
                       No resume file was attached to this application.
                     </p>
                   )}
 
                   {selectedApp.cover_letter && selectedApp.cover_letter.trim() !== '' && (
-                    <div className={`p-4 rounded-xl border-2 ${isDark ? 'bg-black border-white/40' : 'bg-white border-[#03045E]/30'}`}>
-                      <h5 className={`text-[10px] font-black uppercase tracking-[0.15em] mb-2 ${subtle}`}>Cover Letter / Message</h5>
-                      <p className={`text-sm font-semibold whitespace-pre-wrap leading-relaxed ${pageText}`}>
+                    <div className={`p-2.5 md:p-4 rounded-lg md:rounded-xl border-2 ${isDark ? 'bg-black border-white/40' : 'bg-white border-[#03045E]/30'}`}>
+                      <h5 className={`text-[8px] md:text-[10px] font-black uppercase tracking-[0.15em] mb-1 md:mb-2 ${subtle}`}>Cover Letter / Message</h5>
+                      <p className={`text-[9px] md:text-sm font-semibold whitespace-pre-wrap leading-relaxed ${pageText}`}>
                         {selectedApp.cover_letter}
                       </p>
                     </div>
@@ -402,47 +402,47 @@ export default function EmployerApplications({ profile, refreshStats }) {
 
             </div>
 
-            <div className={`px-8 py-6 border-t-2 w-full ${dividerColor}`}>
+            <div className={`px-3 md:px-8 py-4 md:py-6 border-t-2 w-full ${dividerColor}`}>
               {nextSteps.isOpen ? (
-                <div className="flex flex-col gap-3">
-                  <label className={`text-sm font-black ${pageText}`}>
+                <div className="flex flex-col gap-2 md:gap-3">
+                  <label className={`text-[10px] md:text-sm font-black ${pageText}`}>
                     Provide Next Steps for the Applicant (for {nextSteps.status} status)
                   </label>
                   <textarea
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
                     placeholder="e.g., We would love to invite you for an interview on Monday at 10 AM. Here is the Google Meet link..."
-                    className={`w-full p-4 border-2 rounded-2xl outline-none min-h-[100px] text-sm resize-none font-semibold transition ${isDark ? 'border-white bg-black focus:bg-black text-white placeholder-white/40 focus:border-white' : 'border-[#03045E] bg-[#F4F4F4] focus:bg-white text-[#03045E] placeholder-[#03045E]/40 focus:border-[#2C7FFF]'}`}
+                    className={`w-full p-3 md:p-4 border-2 rounded-xl md:rounded-2xl outline-none min-h-[80px] md:min-h-[100px] text-[11px] md:text-sm resize-none font-semibold transition ${isDark ? 'border-white bg-black focus:bg-black text-white placeholder-white/40 focus:border-white' : 'border-[#03045E] bg-[#F4F4F4] focus:bg-white text-[#03045E] placeholder-[#03045E]/40 focus:border-[#2C7FFF]'}`}
                   />
-                  <div className="flex justify-end gap-3 mt-2">
+                  <div className="flex justify-end gap-2 md:gap-3 mt-2">
                     <button
                       onClick={() => { setNextSteps({ isOpen: false, status: '' }); setMessageText(''); }}
-                      className={`px-6 py-3 font-black rounded-xl transition cursor-pointer border-2 ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-white text-[#03045E] border-[#03045E] hover:bg-[#F4F4F4]'}`}
+                      className={`px-4 md:px-6 py-2 md:py-3 font-black rounded-lg md:rounded-xl transition cursor-pointer border-2 text-[10px] md:text-sm ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-white text-[#03045E] border-[#03045E] hover:bg-[#F4F4F4]'}`}
                     >
                       Cancel
                     </button>
                     <button
                       onClick={() => updateStatus(selectedApp.application_id, nextSteps.status, messageText, true, true)}
-                      className={`px-6 py-3 font-black rounded-xl transition cursor-pointer border-2 ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+                      className={`px-4 md:px-6 py-2 md:py-3 font-black rounded-lg md:rounded-xl transition cursor-pointer border-2 text-[10px] md:text-sm ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
                     >
                       Confirm & Send
                     </button>
                   </div>
                 </div>
               ) : (
-                <div className="flex justify-between items-center w-full flex-wrap gap-3">
+                <div className="flex justify-between items-center w-full flex-wrap gap-2 md:gap-3">
                   <button 
                     onClick={() => setSelectedApp(null)} 
-                    className={`px-6 py-3 font-black rounded-xl transition cursor-pointer border-2 ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-white text-[#03045E] border-[#03045E] hover:bg-[#F4F4F4]'}`}
+                    className={`px-4 md:px-6 py-2 md:py-3 font-black rounded-lg md:rounded-xl transition cursor-pointer border-2 text-[10px] md:text-sm ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-white text-[#03045E] border-[#03045E] hover:bg-[#F4F4F4]'}`}
                   >
                     Close Window
                   </button>
                   
                   {selectedApp.application_status !== 'Hired' && selectedApp.application_status !== 'Rejected' ? (
-                    <div className="flex flex-wrap gap-3">
+                    <div className="flex flex-wrap gap-2 md:gap-3">
                       <button 
                         onClick={() => updateStatus(selectedApp.application_id, 'Rejected', null, true, true)} 
-                        className={`px-6 py-3 font-black rounded-xl transition-all cursor-pointer border-2 ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'border-[var(--color-primary,#2C7FFF)] hover:opacity-90'}`}
+                        className={`px-4 md:px-6 py-2 md:py-3 font-black rounded-lg md:rounded-xl transition-all cursor-pointer border-2 text-[10px] md:text-sm ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'border-[var(--color-primary,#2C7FFF)] hover:opacity-90'}`}
                         style={isDark ? {} : {
                           color: 'var(--color-text, #03045E)',
                           backgroundColor: 'var(--color-card, #ffffff)'
@@ -453,7 +453,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
                       
                       <button 
                         onClick={() => setNextSteps({ isOpen: true, status: 'Shortlisted' })} 
-                        className={`px-6 py-3 font-black rounded-xl transition-all cursor-pointer border-2 ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'border-[var(--color-primary,#2C7FFF)] hover:opacity-90'}`}
+                        className={`px-4 md:px-6 py-2 md:py-3 font-black rounded-lg md:rounded-xl transition-all cursor-pointer border-2 text-[10px] md:text-sm ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'border-[var(--color-primary,#2C7FFF)] hover:opacity-90'}`}
                         style={isDark ? {} : {
                           color: 'var(--color-button-text, #ffffff)',
                           backgroundColor: 'var(--color-primary, #2C7FFF)'
@@ -464,7 +464,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
                       
                       <button 
                         onClick={() => setNextSteps({ isOpen: true, status: 'Hired' })} 
-                        className={`px-6 py-3 font-black rounded-xl transition-all cursor-pointer border-2 ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'border-[var(--color-primary,#03045E)] hover:opacity-90'}`}
+                        className={`px-4 md:px-6 py-2 md:py-3 font-black rounded-lg md:rounded-xl transition-all cursor-pointer border-2 text-[10px] md:text-sm ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'border-[var(--color-primary,#03045E)] hover:opacity-90'}`}
                         style={isDark ? {} : {
                           color: 'var(--color-button-text, #ffffff)',
                           backgroundColor: 'var(--color-primary, #03045E)'
@@ -474,8 +474,8 @@ export default function EmployerApplications({ profile, refreshStats }) {
                       </button>
                     </div>
                   ) : (
-                    <div className={`px-4 py-2 rounded-xl border-2 ${isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#03045E]'}`}>
-                      <p className={`text-sm font-black italic ${pageText}`}>
+                    <div className={`px-3 md:px-4 py-2 rounded-lg md:rounded-xl border-2 ${isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#03045E]'}`}>
+                      <p className={`text-[10px] md:text-sm font-black italic ${pageText}`}>
                         Application finalized as <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>{selectedApp.application_status}</span>.
                       </p>
                     </div>

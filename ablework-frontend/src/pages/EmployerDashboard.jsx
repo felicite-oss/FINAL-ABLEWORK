@@ -146,42 +146,92 @@ export default function EmployerDashboard() {
     <div className={`min-h-screen flex flex-col w-full overflow-x-hidden ${dark ? 'bg-black text-white' : 'bg-[var(--color-surface,#f4f4f4)] text-[var(--color-text,#03045E)]'}`}>
       
       {isLoggingOut && (
-        <div className={`fixed inset-0 backdrop-blur-xs z-[100] flex flex-col items-center justify-center p-4 transition-all duration-300 animate-in fade-in ${isContrast ? 'bg-black/90' : 'bg-[#f4f4f4]/90'}`}>
-          <div className={`border-2 px-6 py-8 sm:px-8 sm:py-10 rounded-3xl shadow-[0_20px_50px_rgba(3,4,94,0.18)] flex flex-col items-center max-w-sm w-full mx-auto transform animate-in zoom-in-95 duration-300 ${isContrast ? 'bg-black border-white' : 'bg-white border-[#03045E]/20'}`}>
-            <div className="relative w-16 h-16 flex items-center justify-center mb-5">
-              <div className={`absolute inset-0 rounded-full border-4 ${isContrast ? 'border-white/30' : 'border-[#2C7FFF]/30'} animate-pulse`}></div>
-              <div className={`absolute inset-0 rounded-full border-4 border-t-transparent ${isContrast ? 'border-r-transparent border-b-white border-l-transparent' : 'border-r-transparent border-b-[#03045E] border-l-transparent'} animate-spin`} style={isContrast ? { borderTopColor: '#ffffff' } : { borderTopColor: '#2C7FFF' }}></div>
-              <div className={`w-6 h-6 rounded-full shadow-md animate-ping opacity-75 absolute ${isContrast ? 'bg-white' : 'bg-[#03045E]'}`}></div>
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 backdrop-blur-[2px] animate-in fade-in transition-all duration-300"
+          style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(255, 255, 255, 0.6)', filter: 'none' }}
+        >
+          <div
+            className="relative w-full max-w-md rounded-[2rem] shadow-[0_25px_60px_rgba(3,4,94,0.35)] border-2 overflow-hidden transform animate-in zoom-in-95 duration-300"
+            style={{
+              backgroundColor: (isContrast || isDarkMode) ? '#000000' : 'var(--color-card, #ffffff)',
+              borderColor: (isContrast || isDarkMode) ? '#ffffff' : 'var(--color-border, rgba(3,4,94,0.2))'
+            }}
+          >
+            <div
+              className="h-1.5 w-full"
+              style={{ backgroundColor: (isContrast || isDarkMode) ? '#ffffff' : 'var(--color-primary, #2c7fff)' }}
+            ></div>
+            <div className="px-8 pt-8 pb-8 flex flex-col items-center text-center">
+              <div className="relative mb-6">
+                <div
+                  className="w-20 h-20 rounded-full flex items-center justify-center"
+                  style={{
+                    backgroundColor: (isContrast || isDarkMode) ? '#000000' : 'rgba(44,127,255,0.1)',
+                    border: (isContrast || isDarkMode) ? '2px solid #ffffff' : 'none'
+                  }}
+                >
+                  <div
+                    className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
+                    style={{
+                      backgroundColor: (isContrast || isDarkMode) ? '#000000' : '#2C7FFF',
+                      border: (isContrast || isDarkMode) ? '2px solid #ffffff' : 'none'
+                    }}
+                  >
+                    <svg
+                      className="w-7 h-7 animate-spin"
+                      style={{ color: '#ffffff' }}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <h2
+                className="text-2xl font-black tracking-tight mb-2"
+                style={{ color: (isContrast || isDarkMode) ? '#ffffff' : 'var(--color-text, #03045E)' }}
+              >
+                Logging Out...
+              </h2>
+              <p
+                className="text-sm font-bold leading-relaxed mb-4 max-w-xs"
+                style={{ color: (isContrast || isDarkMode) ? '#ffffff' : 'var(--color-text, #03045E)', opacity: (isContrast || isDarkMode) ? 0.9 : 0.75 }}
+              >
+                Please wait while we secure your account and end the session.
+              </p>
             </div>
-            <h3 className={`text-lg font-black tracking-tight text-center mb-1 ${isContrast ? 'text-white' : 'text-[#03045E]'}`}>Logging Out</h3>
-            <p className={`text-xs text-center font-bold ${isContrast ? 'text-white/80' : 'text-[#03045E]/80'}`}>Securing your account and ending session...</p>
           </div>
         </div>
       )}
 
       {showLogoutConfirm && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-xs animate-in fade-in transition-all duration-300"
-          style={{ backgroundColor: 'rgba(255, 255, 255, 0.6)', filter: 'none' }}
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 backdrop-blur-[0.5px] animate-in fade-in transition-all duration-300"
+          style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)', filter: 'none' }}
         >
           <div
             className="relative w-full max-w-md rounded-[2rem] shadow-[0_25px_60px_rgba(3,4,94,0.35)] border-2 overflow-hidden transform animate-in zoom-in-95 duration-300"
             style={{
-              backgroundColor: isContrast ? '#000000' : 'var(--color-card, #ffffff)',
-              borderColor: isContrast ? 'rgba(255,255,255,0.6)' : 'var(--color-border, rgba(3,4,94,0.2))'
+              backgroundColor: (isContrast || isDarkMode) ? '#000000' : 'var(--color-card, #ffffff)',
+              borderColor: (isContrast || isDarkMode) ? '#ffffff' : 'var(--color-border, rgba(3,4,94,0.2))'
             }}
           >
             <div
               className="h-1.5 w-full"
-              style={{ backgroundColor: isContrast ? '#ffffff' : 'var(--color-primary, #2c7fff)' }}
+              style={{ backgroundColor: (isContrast || isDarkMode) ? '#ffffff' : 'var(--color-primary, #2c7fff)' }}
             ></div>
             <div className="px-8 pt-8 pb-8 flex flex-col items-center text-center">
               <div className="relative mb-6">
                 <div
                   className="w-20 h-20 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: isContrast ? 'rgba(127,29,29,0.4)' : 'var(--color-danger-soft, #fee2e2)' }}
+                  style={{ backgroundColor: (isContrast || isDarkMode) ? '#000000' : 'var(--color-danger-soft, #fee2e2)', border: (isContrast || isDarkMode) ? '2px solid #ffffff' : 'none' }}
                 >
-                  <div className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg bg-red-500 shadow-red-500/40">
+                  <div 
+                    className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
+                    style={{ backgroundColor: (isContrast || isDarkMode) ? '#000000' : '#ef4444', border: (isContrast || isDarkMode) ? '2px solid #ffffff' : 'none' }}
+                  >
                     <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
                     </svg>
@@ -190,22 +240,22 @@ export default function EmployerDashboard() {
                 <div
                   className="absolute -top-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center border-2"
                   style={{
-                    backgroundColor: isContrast ? '#ffffff' : 'var(--color-primary, #03045E)',
-                    borderColor: isContrast ? '#000000' : 'var(--color-card, #ffffff)'
+                    backgroundColor: (isContrast || isDarkMode) ? '#000000' : 'var(--color-primary, #03045E)',
+                    borderColor: (isContrast || isDarkMode) ? '#ffffff' : 'var(--color-card, #ffffff)'
                   }}
                 >
-                  <span className={`text-xs font-black ${isContrast ? 'text-black' : 'text-white'}`}>?</span>
+                  <span className="text-white text-xs font-black">?</span>
                 </div>
               </div>
               <h2
                 className="text-2xl font-black tracking-tight mb-2"
-                style={{ color: isContrast ? '#ffffff' : 'var(--color-text, #03045E)' }}
+                style={{ color: (isContrast || isDarkMode) ? '#ffffff' : 'var(--color-text, #03045E)' }}
               >
                 Are you sure to logout?
               </h2>
               <p
                 className="text-sm font-bold leading-relaxed mb-8 max-w-xs"
-                style={{ color: isContrast ? 'rgba(255,255,255,0.75)' : 'var(--color-text, #03045E)', opacity: isContrast ? 1 : 0.75 }}
+                style={{ color: (isContrast || isDarkMode) ? '#ffffff' : 'var(--color-text, #03045E)', opacity: (isContrast || isDarkMode) ? 0.9 : 0.75 }}
               >
                 You will be signed out of your account and returned to the login page.
               </p>
@@ -214,9 +264,9 @@ export default function EmployerDashboard() {
                   onClick={() => setShowLogoutConfirm(false)}
                   className="flex-1 py-4 rounded-xl font-black text-sm cursor-pointer border-2 flex items-center justify-center gap-2"
                   style={{
-                    backgroundColor: isContrast ? '#000000' : 'var(--color-surface, #f4f4f4)',
-                    color: isContrast ? '#ffffff' : 'var(--color-text, #03045E)',
-                    borderColor: isContrast ? 'rgba(255,255,255,0.6)' : 'var(--color-border, rgba(3,4,94,0.2))'
+                    backgroundColor: (isContrast || isDarkMode) ? '#000000' : 'var(--color-surface, #f4f4f4)',
+                    color: (isContrast || isDarkMode) ? '#ffffff' : 'var(--color-text, #03045E)',
+                    borderColor: (isContrast || isDarkMode) ? '#ffffff' : 'var(--color-border, rgba(3,4,94,0.2))'
                   }}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -226,8 +276,12 @@ export default function EmployerDashboard() {
                 </button>
                 <button
                   onClick={handleLogout}
-                  className={`flex-1 py-4 rounded-xl font-black text-sm cursor-pointer border-2 flex items-center justify-center gap-2 shadow-lg ${isContrast ? 'hover:bg-red-500 hover:border-red-500 shadow-red-900/40' : 'hover:bg-red-600 hover:border-red-600 shadow-red-500/30'}`}
-                  style={{ backgroundColor: isContrast ? '#dc2626' : '#ef4444', color: '#ffffff', borderColor: isContrast ? '#dc2626' : '#ef4444' }}
+                  className="flex-1 py-4 rounded-xl font-black text-sm cursor-pointer border-2 flex items-center justify-center gap-2"
+                  style={{
+                    backgroundColor: (isContrast || isDarkMode) ? '#ffffff' : '#ef4444',
+                    color: (isContrast || isDarkMode) ? '#000000' : '#ffffff',
+                    borderColor: (isContrast || isDarkMode) ? '#ffffff' : '#ef4444'
+                  }}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />

@@ -211,17 +211,17 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
   };
 
   const SectionHeader = ({ num, title, subtitle, icon }) => (
-    <div className="flex items-start gap-4 mb-5">
-      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}>
-        {icon}
+    <div className="flex items-start gap-3 md:gap-4 mb-4 md:mb-5">
+      <div className={`w-9 h-9 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0 border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}>
+        <span className="w-5 h-5 md:w-6 md:h-6 [&>svg]:w-full [&>svg]:h-full">{icon}</span>
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`}>Section {num}</span>
+          <span className={`text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`}>Sec {num}</span>
           <div className={`h-px flex-1 max-w-[40px] ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></div>
         </div>
-        <h3 className={`text-lg sm:text-xl font-black tracking-tight ${pageText}`}>{title}</h3>
-        {subtitle && <p className={`text-xs font-semibold mt-0.5 ${muted}`}>{subtitle}</p>}
+        <h3 className={`text-sm md:text-xl font-black tracking-tight leading-tight ${pageText}`}>{title}</h3>
+        {subtitle && <p className={`text-[10px] md:text-xs font-semibold mt-0.5 hidden md:block ${muted}`}>{subtitle}</p>}
       </div>
     </div>
   );
@@ -260,78 +260,77 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className={`relative p-6 sm:p-10 rounded-[2rem] border-2 flex flex-col gap-8 ${formBg}`}>
-        <div className={`absolute top-0 left-0 w-1.5 h-full rounded-l-[2rem] ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></div>
+      <form onSubmit={handleSubmit} className={`relative p-3 md:p-10 rounded-[1.5rem] md:rounded-[2rem] border-2 grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-8 ${formBg}`} style={{ borderLeftWidth: '8px', borderLeftColor: isDark ? '#ffffff' : '#2C7FFF' }}>
 
-        <div className={`flex flex-col gap-6 p-6 rounded-2xl border-2 ${sectionBg}`}>
+        <div className={`flex flex-col gap-4 md:gap-6 p-3 md:p-6 rounded-xl md:rounded-2xl border-2 ${sectionBg}`}>
           <SectionHeader 
             num="01" 
             title="Basic Information" 
             subtitle="Give your job posting a clear, focused identity."
             icon={
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <svg fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             }
           />
 
           <div className="flex flex-col gap-2">
-            <label className={`text-[10px] font-black uppercase tracking-wider ${subtle}`}>
+            <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>
               Job Title <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>*</span>
             </label>
             <input 
               type="text" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} required
               placeholder="e.g. Remote Data Specialist"
-              className={inputCls}
+              className={`${inputCls} !p-2.5 md:!p-4 !text-xs md:!text-base`}
             />
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className={`text-[10px] font-black uppercase tracking-wider ${subtle}`}>
+            <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>
               Full Job Description <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>*</span>
             </label>
             <textarea 
               value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} required rows="5"
               placeholder="Describe the role responsibilities and expectations..."
-              className={`${inputCls} resize-none`}
+              className={`${inputCls} resize-none !p-2.5 md:!p-4 !text-xs md:!text-base`}
             ></textarea>
           </div>
         </div>
 
-        <div className={`flex flex-col gap-6 p-6 rounded-2xl border-2 ${sectionBg}`}>
+        <div className={`flex flex-col gap-4 md:gap-6 p-3 md:p-6 rounded-xl md:rounded-2xl border-2 ${sectionBg}`}>
           <SectionHeader 
             num="02" 
             title="Compensation & Perks" 
             subtitle="Specify salary expectations and added value."
             icon={
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <svg fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             }
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div className="flex flex-col gap-2">
-              <label className={`text-[10px] font-black uppercase tracking-wider ${subtle}`}>Salary Range</label>
+              <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>Salary Range</label>
               <input
                 type="text" value={salaryRange} onChange={(e) => setSalaryRange(e.target.value)}
                 placeholder="e.g. ₱20,000 - ₱30,000 / month"
-                className={inputSmallCls}
+                className={`${inputSmallCls} !p-2.5 md:!p-3 !text-xs md:!text-base`}
               />
-              <p className={`text-[10px] font-bold ${subtle}`}>Leave blank if undisclosed.</p>
+              <p className={`text-[8px] md:text-[10px] font-bold ${subtle}`}>Leave blank if undisclosed.</p>
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className={`text-[10px] font-black uppercase tracking-wider ${subtle}`}>Benefits</label>
+              <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>Benefits</label>
               <input
                 type="text" value={currentBenefit} onChange={(e) => setCurrentBenefit(e.target.value)} onKeyDown={handleBenefitKeyDown}
                 placeholder="Type + press Enter (e.g. HMO)"
-                className={inputSmallCls}
+                className={`${inputSmallCls} !p-2.5 md:!p-3 !text-xs md:!text-base`}
               />
               {selectedBenefits.length > 0 && (
-                <div className={`flex flex-wrap gap-2 mt-1 p-3 rounded-xl border-2 ${chipContainer}`}>
+                <div className={`flex flex-wrap gap-1.5 md:gap-2 mt-1 p-2 md:p-3 rounded-lg md:rounded-xl border-2 ${chipContainer}`}>
                   {selectedBenefits.map(benefit => (
-                    <span key={benefit} className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-black rounded-full ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF] text-white'}`}>
+                    <span key={benefit} className={`inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-0.5 md:py-1 text-[9px] md:text-xs font-black rounded-full ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF] text-white'}`}>
                       {benefit} <button type="button" onClick={() => removeBenefit(benefit)} className={`font-black ml-0.5 cursor-pointer ${isDark ? 'hover:text-black/60' : 'hover:text-[#03045E]'}`}>✕</button>
                     </span>
                   ))}
@@ -341,36 +340,36 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
           </div>
         </div>
 
-        <div className={`flex flex-col gap-6 p-6 rounded-2xl border-2 ${sectionBg}`}>
+        <div className={`flex flex-col gap-4 md:gap-6 p-3 md:p-6 rounded-xl md:rounded-2xl border-2 ${sectionBg}`}>
           <SectionHeader 
             num="03" 
             title="Skills & Accommodations" 
             subtitle="Match with candidates who have the right skills and support needs."
             icon={
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <svg fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
               </svg>
             }
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div className="flex flex-col gap-2">
-              <label className={`text-[10px] font-black uppercase tracking-wider ${subtle}`}>
+              <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>
                 Required Skills <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>*</span>
               </label>
               <input
                 type="text" value={currentSkill} onChange={(e) => setCurrentSkill(e.target.value)} onKeyDown={handleSkillKeyDown}
                 placeholder="Type + press Enter (e.g. Python)"
-                className={inputSmallCls}
+                className={`${inputSmallCls} !p-2.5 md:!p-3 !text-xs md:!text-base`}
               />
               {filteredSkills.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-1">
+                <div className="flex flex-wrap gap-1.5 md:gap-2 mt-1">
                   {filteredSkills.map(suggestion => (
                     <button
                       key={suggestion}
                       type="button"
                       onClick={() => addSkill(suggestion)}
-                      className="px-3 py-1.5 text-xs font-black rounded-lg border-2 transition cursor-pointer hover:opacity-90"
+                      className="px-2 md:px-3 py-1 md:py-1.5 text-[9px] md:text-xs font-black rounded-md md:rounded-lg border-2 transition cursor-pointer hover:opacity-90"
                       style={recommendationBtnStyle}
                     >
                       + {suggestion}
@@ -379,9 +378,9 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
                 </div>
               )}
               {selectedSkills.length > 0 && (
-                <div className={`flex flex-wrap gap-2 mt-1 p-3 rounded-xl border-2 ${chipContainer}`}>
+                <div className={`flex flex-wrap gap-1.5 md:gap-2 mt-1 p-2 md:p-3 rounded-lg md:rounded-xl border-2 ${chipContainer}`}>
                   {selectedSkills.map(skill => (
-                    <span key={skill} className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-black rounded-full ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF] text-white'}`}>
+                    <span key={skill} className={`inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-0.5 md:py-1 text-[9px] md:text-xs font-black rounded-full ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF] text-white'}`}>
                       {skill} <button type="button" onClick={() => removeSkill(skill)} className={`font-black ml-0.5 cursor-pointer ${isDark ? 'hover:text-black/60' : 'hover:text-[#03045E]'}`}>✕</button>
                     </span>
                   ))}
@@ -390,22 +389,22 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className={`text-[10px] font-black uppercase tracking-wider ${subtle}`}>
+              <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>
                 Guaranteed Accommodations
               </label>
               <input
                 type="text" value={currentAccommodation} onChange={(e) => setCurrentAccommodation(e.target.value)} onKeyDown={handleAccommodationKeyDown}
                 placeholder="Type + press Enter (e.g. Remote Work)"
-                className={inputSmallCls}
+                className={`${inputSmallCls} !p-2.5 md:!p-3 !text-xs md:!text-base`}
               />
               {filteredAccommodations.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-1">
+                <div className="flex flex-wrap gap-1.5 md:gap-2 mt-1">
                   {filteredAccommodations.map(suggestion => (
                     <button
                       key={suggestion}
                       type="button"
                       onClick={() => addAccommodation(suggestion)}
-                      className="px-3 py-1.5 text-xs font-black rounded-lg border-2 transition cursor-pointer hover:opacity-90"
+                      className="px-2 md:px-3 py-1 md:py-1.5 text-[9px] md:text-xs font-black rounded-md md:rounded-lg border-2 transition cursor-pointer hover:opacity-90"
                       style={recommendationBtnStyle}
                     >
                       + {suggestion}
@@ -414,9 +413,9 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
                 </div>
               )}
               {selectedAccommodations.length > 0 && (
-                <div className={`flex flex-wrap gap-2 mt-1 p-3 rounded-xl border-2 ${chipContainer}`}>
+                <div className={`flex flex-wrap gap-1.5 md:gap-2 mt-1 p-2 md:p-3 rounded-lg md:rounded-xl border-2 ${chipContainer}`}>
                   {selectedAccommodations.map(acc => (
-                    <span key={acc} className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-black rounded-full ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF] text-white'}`}>
+                    <span key={acc} className={`inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-0.5 md:py-1 text-[9px] md:text-xs font-black rounded-full ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF] text-white'}`}>
                       {acc} <button type="button" onClick={() => removeAccommodation(acc)} className={`font-black ml-0.5 cursor-pointer ${isDark ? 'hover:text-black/60' : 'hover:text-[#03045E]'}`}>✕</button>
                     </span>
                   ))}
@@ -426,19 +425,19 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
           </div>
         </div>
 
-        <div className={`flex flex-col gap-5 p-6 rounded-2xl border-2 ${disabBox}`}>
+        <div className={`flex flex-col gap-3 md:gap-5 p-3 md:p-6 rounded-xl md:rounded-2xl border-2 ${disabBox}`}>
           <SectionHeader 
             num="04" 
             title="Accepted Disabilities" 
             subtitle="Select the conditions this workplace is fully equipped and prepared to support."
             icon={
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <svg fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
             }
           />
 
-          <div className="flex flex-wrap gap-2.5 mt-1">
+          <div className="flex flex-wrap gap-1.5 md:gap-2.5 mt-1">
             {availableDisabilities.map((disability) => {
               const isSelected = selectedDisabilities.includes(disability);
               return (
@@ -446,7 +445,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
                   type="button"
                   key={disability}
                   onClick={() => toggleSelection(disability, selectedDisabilities, setSelectedDisabilities)}
-                  className={`px-4 py-2.5 rounded-xl text-sm font-black border-2 transition cursor-pointer flex items-center gap-2 ${
+                  className={`px-2 md:px-4 py-1.5 md:py-2.5 rounded-md md:rounded-xl text-[9px] md:text-sm font-black border-2 transition cursor-pointer flex items-center gap-1 md:gap-2 ${
                     isSelected
                       ? (isDark ? 'bg-white border-white' : 'bg-[var(--color-primary,#2C7FFF)] border-[var(--color-primary,#2C7FFF)] shadow-md')
                       : (isDark ? 'bg-black border-white hover:bg-white hover:text-black' : 'bg-[var(--color-card,#ffffff)] border-[var(--color-primary,#2C7FFF)] text-[var(--color-text,#03045E)] hover:bg-[var(--color-primary,#2C7FFF)] hover:text-[var(--color-button-text,#ffffff)]')
@@ -469,21 +468,21 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
           </div>
         </div>
 
-        <div className={`flex flex-col sm:flex-row gap-3 pt-2`}>
+        <div className={`flex flex-col sm:flex-row gap-3 pt-2 col-span-2 md:col-span-2`}>
           <button
             type="button" onClick={() => setActiveTab('overview')}
-            className={`flex-1 py-4 font-black text-base rounded-2xl border-2 transition cursor-pointer ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-white text-[#03045E] border-[#03045E] hover:bg-[#F4F4F4]'}`}
+            className={`flex-1 py-3 md:py-4 font-black text-sm md:text-base rounded-xl md:rounded-2xl border-2 transition cursor-pointer ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-white text-[#03045E] border-[#03045E] hover:bg-[#F4F4F4]'}`}
           >
             Cancel
           </button>
 
           <button
             type="submit" disabled={isLoading}
-            className={`flex-[2] py-4 font-black text-base rounded-2xl border-2 transition disabled:opacity-50 flex justify-center items-center gap-2 cursor-pointer ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+            className={`flex-[2] py-3 md:py-4 font-black text-sm md:text-base rounded-xl md:rounded-2xl border-2 transition disabled:opacity-50 flex justify-center items-center gap-2 cursor-pointer ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
           >
             {isLoading ? 'Publishing Job...' : 'Publish Job Posting'}
             {!isLoading && (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             )}
