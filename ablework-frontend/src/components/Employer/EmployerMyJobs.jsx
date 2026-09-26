@@ -42,24 +42,24 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
   const pageText = isDark ? 'text-white' : 'text-[#03045E]';
   const muted = isDark ? 'text-white/80' : 'text-[#03045E]/80';
   const subtle = isDark ? 'text-white/60' : 'text-[#03045E]/60';
-  const cardBg = isDark ? 'bg-black border-[#2C7FFF]' : 'bg-[#F4F4F4] border-[#03045E]';
-  const panelBg = isDark ? 'bg-black border-[#2C7FFF]' : 'bg-[#F4F4F4] border-[#03045E]';
+  const cardBg = isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#03045E]';
+  const panelBg = isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#03045E]';
   const inputBg = isDark
-    ? 'bg-black border-[#2C7FFF] text-white placeholder-white/40 focus:border-[#2C7FFF]'
+    ? 'bg-black border-white text-white placeholder-white/40 focus:border-white'
     : 'bg-white border-[#03045E] text-[#03045E] placeholder-[#03045E]/40 focus:border-[#2C7FFF]';
-  const divider = isDark ? 'border-[#2C7FFF]' : 'border-[#03045E]';
-  const modalBg = isDark ? 'bg-black border-[#2C7FFF]' : 'bg-[#F4F4F4] border-[#03045E]';
-  const chipBoxBg = isDark ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]';
-  const disabBoxBg = isDark ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]';
-  const disabBtnActive = 'bg-[#2C7FFF] text-white border-[#2C7FFF]';
-  const tabContainerBg = isDark ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]';
-  const tabActive = 'bg-[#2C7FFF] text-white';
-  const tabInactive = isDark ? 'text-white hover:bg-[#2C7FFF]/20' : 'text-[#03045E] hover:bg-[#2C7FFF]/10';
+  const divider = isDark ? 'border-white' : 'border-[#03045E]';
+  const modalBg = isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#03045E]';
+  const chipBoxBg = isDark ? 'bg-black border-white' : 'bg-white border-[#03045E]';
+  const disabBoxBg = isDark ? 'bg-black border-white' : 'bg-white border-[#03045E]';
+  const disabBtnActive = isDark ? 'bg-white text-black border-white' : 'bg-[#2C7FFF] text-white border-[#2C7FFF]';
+  const tabContainerBg = isDark ? 'bg-black border-white' : 'bg-white border-[#03045E]';
+  const tabActive = isDark ? 'bg-white text-black' : 'bg-[#2C7FFF] text-white';
+  const tabInactive = isDark ? 'text-white hover:bg-white/10' : 'text-[#03045E] hover:bg-[#2C7FFF]/10';
   const closedBadge = isDark
-    ? 'text-white/60 bg-black border-[#2C7FFF]/40'
+    ? 'text-white/60 bg-black border-white/40'
     : 'text-[#03045E]/60 bg-[#F4F4F4] border-[#03045E]/30';
   const emptyState = isDark
-    ? 'text-white/70 border-[#2C7FFF]'
+    ? 'text-white/70 border-white'
     : 'text-[#03045E]/70 border-[#03045E]';
 
   const availableDisabilities = [
@@ -106,24 +106,26 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
   const renderAlertIcon = (tone) => {
     if (tone === 'archive') {
       return (
-        <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+        <svg className={`w-7 h-7 ${isDark ? 'text-black' : 'text-white'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
         </svg>
       );
     }
     return (
-      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true">
+      <svg className={`w-7 h-7 ${isDark ? 'text-black' : 'text-white'}`} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true">
         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
       </svg>
     );
   };
 
   const getAlertBadge = (tone) => {
+    if (isDark) return 'bg-white';
     if (tone === 'archive') return 'bg-[#03045E]';
     return 'bg-[#2C7FFF]';
   };
 
   const getAlertRing = (tone) => {
+    if (isDark) return 'bg-white/20';
     if (tone === 'archive') return 'bg-[#03045E]/20';
     return 'bg-[#2C7FFF]/20';
   };
@@ -236,19 +238,31 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
     listTab === 'active' ? job.status === 'Active' : job.status === 'Archived'
   );
 
-  const editBtnStyle = {
+  const editBtnStyle = isDark ? {
+    color: '#000000',
+    backgroundColor: '#ffffff',
+    borderColor: '#ffffff'
+  } : {
     color: 'var(--color-text, #03045E)',
     backgroundColor: 'var(--color-card, #ffffff)',
     borderColor: 'var(--color-primary, #2C7FFF)'
   };
 
-  const archiveBtnStyle = {
+  const archiveBtnStyle = isDark ? {
+    color: '#000000',
+    backgroundColor: '#ffffff',
+    borderColor: '#ffffff'
+  } : {
     color: 'var(--color-button-text, #ffffff)',
     backgroundColor: 'var(--color-primary, #03045E)',
     borderColor: 'var(--color-primary, #03045E)'
   };
 
-  const recommendationBtnStyle = {
+  const recommendationBtnStyle = isDark ? {
+    color: '#ffffff',
+    backgroundColor: '#000000',
+    borderColor: '#ffffff'
+  } : {
     color: 'var(--color-text, #03045E)',
     backgroundColor: 'var(--color-card, #ffffff)',
     borderColor: 'var(--color-primary, #2C7FFF)'
@@ -258,15 +272,15 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
     <div className={`animate-fadeIn max-w-7xl mx-auto pb-10 relative ${pageText}`}>
       
       <div className={`relative overflow-hidden flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8 p-6 sm:p-8 rounded-3xl border-2 ${panelBg}`}>
-        <div className="absolute top-0 left-0 w-1.5 h-full bg-[#2C7FFF]"></div>
-        <div className={`absolute -top-20 -right-20 w-64 h-64 rounded-full ${isDark ? 'bg-[#2C7FFF]/10' : 'bg-[#2C7FFF]/10'}`}></div>
-        <div className={`absolute -bottom-20 right-20 w-40 h-40 rounded-full ${isDark ? 'bg-[#2C7FFF]/5' : 'bg-[#03045E]/5'}`}></div>
+        <div className={`absolute top-0 left-0 w-1.5 h-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></div>
+        <div className={`absolute -top-20 -right-20 w-64 h-64 rounded-full ${isDark ? 'bg-white/10' : 'bg-[#2C7FFF]/10'}`}></div>
+        <div className={`absolute -bottom-20 right-20 w-40 h-40 rounded-full ${isDark ? 'bg-white/5' : 'bg-[#03045E]/5'}`}></div>
 
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <span className={`text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full border-2 ${isDark ? 'text-white bg-black border-[#2C7FFF]' : 'text-[#03045E] bg-white border-[#2C7FFF]'}`}>Job Management</span>
-            <span className={`text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full flex items-center gap-1.5 border-2 ${isDark ? 'text-white bg-black border-[#2C7FFF]' : 'text-[#03045E] bg-white border-[#03045E]'}`}>
-              <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-pulse"></span>
+            <span className={`text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full border-2 ${isDark ? 'text-white bg-black border-white' : 'text-[#03045E] bg-white border-[#2C7FFF]'}`}>Job Management</span>
+            <span className={`text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full flex items-center gap-1.5 border-2 ${isDark ? 'text-white bg-black border-white' : 'text-[#03045E] bg-white border-[#03045E]'}`}>
+              <span className={`w-2 h-2 rounded-full animate-pulse ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></span>
               Live Listings
             </span>
           </div>
@@ -277,41 +291,41 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
         <div className={`relative z-10 flex gap-2 p-1.5 rounded-2xl border-2 ${tabContainerBg}`}>
           <button 
             onClick={() => setListTab('active')}
-            className={`px-5 py-2.5 rounded-xl font-black text-sm transition cursor-pointer border-2 ${listTab === 'active' ? `${tabActive} border-[#2C7FFF]` : `${tabInactive} border-transparent`}`}
+            className={`px-5 py-2.5 rounded-xl font-black text-sm transition cursor-pointer border-2 ${listTab === 'active' ? `${tabActive} ${isDark ? 'border-white' : 'border-[#2C7FFF]'}` : `${tabInactive} border-transparent`}`}
           >
             Active
           </button>
           <button 
             onClick={() => setListTab('archived')}
-            className={`px-5 py-2.5 rounded-xl font-black text-sm transition cursor-pointer border-2 ${listTab === 'archived' ? `${tabActive} border-[#2C7FFF]` : `${tabInactive} border-transparent`}`}
+            className={`px-5 py-2.5 rounded-xl font-black text-sm transition cursor-pointer border-2 ${listTab === 'archived' ? `${tabActive} ${isDark ? 'border-white' : 'border-[#2C7FFF]'}` : `${tabInactive} border-transparent`}`}
           >
             Archived
           </button>
         </div>
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
         {displayedJobs.length > 0 ? (
           displayedJobs.map((job, idx) => (
-            <div key={job.id} className={`relative overflow-hidden p-6 rounded-3xl border-2 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition ${cardBg} ${isDark ? 'hover:border-[#2C7FFF]' : 'hover:border-[#2C7FFF]'}`}>
-              <div className="absolute top-0 left-0 w-1 h-full bg-[#2C7FFF]"></div>
+            <div key={job.id} className={`relative overflow-hidden p-6 md:p-8 rounded-2xl md:rounded-3xl border-2 flex flex-col gap-5 md:gap-6 transition ${cardBg} ${isDark ? 'hover:border-white' : 'hover:border-[#2C7FFF]'}`}>
+              <div className={`absolute top-0 left-0 w-1.5 h-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></div>
 
-              <div className="flex items-start gap-4 pl-3">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg shrink-0 border-2 ${isDark ? 'bg-[#2C7FFF] text-black border-[#2C7FFF]' : 'bg-[#03045E] text-white border-[#03045E]'}`}>
+              <div className="flex items-start gap-4 pl-2 min-w-0 w-full">
+                <div className={`w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl flex items-center justify-center font-black text-sm md:text-xl shrink-0 border-2 ${isDark ? 'bg-transparent text-white border-white' : 'bg-transparent text-[#03045E] border-[#03045E]'}`}>
                   {String(idx + 1).padStart(2, '0')}
                 </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <h3 className={`text-xl font-black ${pageText}`}>{job.job_title}</h3>
-                    <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg border-2 ${job.status === 'Active' ? (isDark ? 'bg-[#2C7FFF] text-black border-[#2C7FFF]' : 'bg-[#2C7FFF] text-white border-[#2C7FFF]') : closedBadge}`}>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-col gap-2 mb-2">
+                    <h3 className={`text-base md:text-xl font-black leading-tight break-words ${pageText}`}>{job.job_title}</h3>
+                    <span className={`text-[9px] md:text-[11px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md border-2 self-start ${job.status === 'Active' ? (isDark ? 'bg-white text-black border-white' : 'bg-[#2C7FFF] text-white border-[#2C7FFF]') : closedBadge}`}>
                       {job.status}
                     </span>
                   </div>
-                  <p className={`text-xs font-bold mt-1 ${subtle}`}>Posted on {new Date(job.created_at).toLocaleDateString()}</p>
+                  <p className={`text-[10px] md:text-xs font-bold mt-1 ${subtle}`}>Posted on {new Date(job.created_at).toLocaleDateString()}</p>
                 </div>
               </div>
               
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex gap-2 flex-wrap justify-end w-full mt-auto">
                 {job.status === 'Active' ? (
                   <>
                     <button 
@@ -328,35 +342,43 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                         setCurrentAccommodation('');
                         setCurrentBenefit('');
                       }} 
-                      className="px-5 py-2.5 text-sm font-black rounded-xl border-2 transition cursor-pointer hover:opacity-90"
+                      className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl border-2 transition cursor-pointer hover:opacity-90"
                       style={editBtnStyle}
+                      title="Edit Job"
+                      aria-label="Edit Job"
                     >
-                      Edit
+                      <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
                     </button>
                     
                     <button 
                       onClick={() => handleArchiveJob(job.id)} 
-                      className="px-5 py-2.5 text-sm font-black rounded-xl border-2 transition cursor-pointer hover:opacity-90"
+                      className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl border-2 transition cursor-pointer hover:opacity-90"
                       style={archiveBtnStyle}
+                      title="Archive Job"
+                      aria-label="Archive Job"
                     >
-                      Archive
+                      <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                      </svg>
                     </button>
                   </>
                 ) : (
-                  <span className={`px-5 py-2.5 text-sm font-black rounded-xl border-2 ${closedBadge}`}>Archived</span>
+                  <span className={`w-full text-center px-4 py-3 text-xs md:text-sm font-black rounded-lg md:rounded-xl border-2 ${closedBadge}`}>Archived</span>
                 )}
               </div>
             </div>
           ))
         ) : (
-          <div className={`p-12 text-center font-black border-2 border-dashed rounded-3xl ${emptyState}`}>
-            <div className="flex flex-col items-center gap-3">
-              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${isDark ? 'bg-[#2C7FFF]/20 text-[#2C7FFF]' : 'bg-[#2C7FFF]/15 text-[#2C7FFF]'}`}>
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <div className={`p-10 md:p-14 text-center font-black border-2 border-dashed rounded-2xl md:rounded-3xl col-span-2 md:col-span-3 ${emptyState}`}>
+            <div className="flex flex-col items-center gap-4">
+              <div className={`w-16 h-16 md:w-20 md:h-20 rounded-xl md:rounded-2xl flex items-center justify-center ${isDark ? 'bg-white/20 text-white' : 'bg-[#2C7FFF]/15 text-[#2C7FFF]'}`}>
+                <svg className="w-8 h-8 md:w-10 md:h-10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <span>No {listTab} job postings found.</span>
+              <span className="text-sm md:text-lg">No {listTab} job postings found.</span>
             </div>
           </div>
         )}
@@ -367,53 +389,58 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative p-8 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] border-2 ${modalBg}`}>
-            <div className="absolute top-0 left-0 w-1.5 h-full bg-[#2C7FFF]"></div>
+          <div className={`relative p-4 md:p-8 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] border-2 ${modalBg}`}>
+            <div className={`absolute top-0 left-0 w-1.5 h-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></div>
 
             <div className={`flex items-center gap-3 mb-6 pb-5 border-b-2 pl-3 ${divider}`}>
-              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${isDark ? 'bg-[#2C7FFF] text-black' : 'bg-[#03045E] text-white'}`}>
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <div className={`w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center ${isDark ? 'bg-white text-black' : 'bg-[#03045E] text-white'}`}>
+                <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#2C7FFF]">Edit Mode</p>
-                <h2 className={`text-2xl font-black tracking-tight ${pageText}`}>Edit Job Posting</h2>
+                <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`}>Edit Mode</p>
+                <h2 className={`text-lg md:text-2xl font-black tracking-tight ${pageText}`}>Edit Job Posting</h2>
               </div>
             </div>
             
-            <form onSubmit={handleEditJob} className="flex flex-col gap-5">
+            <form onSubmit={handleEditJob} className="grid grid-cols-2 gap-3 md:gap-5">
               
               <div className="flex flex-col gap-1.5">
-                <label className={`text-[10px] font-black uppercase tracking-wider ${subtle}`}>Job Title</label>
-                <input type="text" value={editingJob.job_title} onChange={e => setEditingJob({...editingJob, job_title: e.target.value})} required className={`p-3.5 border-2 rounded-xl outline-none font-semibold transition-all ${inputBg}`} />
+                <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>Job Title</label>
+                <input type="text" value={editingJob.job_title} onChange={e => setEditingJob({...editingJob, job_title: e.target.value})} required className={`p-2.5 md:p-3.5 border-2 rounded-xl outline-none font-semibold transition-all text-xs md:text-base ${inputBg}`} />
               </div>
               
               <div className="flex flex-col gap-1.5">
-                <label className={`text-[10px] font-black uppercase tracking-wider ${subtle}`}>Description</label>
-                <textarea rows="4" value={editingJob.job_description} onChange={e => setEditingJob({...editingJob, job_description: e.target.value})} required className={`p-3.5 border-2 rounded-xl resize-none outline-none font-semibold transition-all ${inputBg}`}></textarea>
+                <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>Salary Range</label>
+                <input type="text" value={editingJob.salary_range} onChange={e => setEditingJob({...editingJob, salary_range: e.target.value})} className={`p-2.5 md:p-3.5 border-2 rounded-xl outline-none font-semibold transition-all text-xs md:text-base ${inputBg}`} placeholder="e.g. ₱20,000 - ₱30,000" />
               </div>
               
-              <div className={`h-0.5 ${divider}`}></div>
+              <div className="flex flex-col gap-1.5 col-span-2">
+                <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>Description</label>
+                <textarea rows="3" value={editingJob.job_description} onChange={e => setEditingJob({...editingJob, job_description: e.target.value})} required className={`p-2.5 md:p-3.5 border-2 rounded-xl resize-none outline-none font-semibold transition-all text-xs md:text-base ${inputBg}`}></textarea>
+              </div>
+              
+              <div className={`h-0.5 col-span-2 ${divider}`}></div>
 
               <div className="flex flex-col gap-1.5">
-                <label className={`text-[10px] font-black uppercase tracking-wider ${subtle}`}>Required Skills</label>
+                <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>Required Skills</label>
                 <input 
                   type="text" value={currentSkill} 
                   onChange={e => setCurrentSkill(e.target.value)} 
                   onKeyDown={e => handleAddChip(e, 'parsedSkills', currentSkill, setCurrentSkill)} 
-                  placeholder="Type and press Enter to add"
-                  className={`p-3.5 border-2 rounded-xl outline-none font-semibold transition-all ${inputBg}`} 
+                  placeholder="Type + Enter"
+                  className={`p-2.5 md:p-3.5 border-2 rounded-xl outline-none font-semibold transition-all text-xs md:text-base ${inputBg}`} 
                 />
                 
                 {filteredSkills.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-1">
+                  <div className="flex flex-wrap gap-1.5 md:gap-2 mt-1">
                     {filteredSkills.map(suggestion => (
                       <button
                         key={suggestion}
                         type="button"
                         onClick={() => addSuggestion('parsedSkills', suggestion, setCurrentSkill)}
-                        className="px-3 py-1.5 text-xs font-black rounded-lg border-2 transition cursor-pointer hover:opacity-90"
+                        className="px-2 md:px-3 py-1 md:py-1.5 text-[9px] md:text-xs font-black rounded-md md:rounded-lg border-2 transition cursor-pointer hover:opacity-90"
                         style={recommendationBtnStyle}
                       >
                         + {suggestion}
@@ -423,10 +450,10 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                 )}
 
                 {editingJob.parsedSkills.length > 0 && (
-                  <div className={`flex flex-wrap gap-2 mt-2 p-3 rounded-xl border-2 ${chipBoxBg}`}>
+                  <div className={`flex flex-wrap gap-1.5 md:gap-2 mt-2 p-2 md:p-3 rounded-lg md:rounded-xl border-2 ${chipBoxBg}`}>
                     {editingJob.parsedSkills.map((skill, index) => (
-                      <span key={index} className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#2C7FFF] text-white text-xs font-black rounded-full">
-                        {skill} <button type="button" onClick={() => removeChip('parsedSkills', skill)} className="hover:text-[#03045E] font-black ml-0.5 cursor-pointer">✕</button>
+                      <span key={index} className={`inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-0.5 md:py-1 text-[9px] md:text-xs font-black rounded-full ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF] text-white'}`}>
+                        {skill} <button type="button" onClick={() => removeChip('parsedSkills', skill)} className={`font-black ml-0.5 cursor-pointer ${isDark ? 'hover:text-black/60' : 'hover:text-[#03045E]'}`}>✕</button>
                       </span>
                     ))}
                   </div>
@@ -434,23 +461,23 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
               </div>
               
               <div className="flex flex-col gap-1.5">
-                <label className={`text-[10px] font-black uppercase tracking-wider ${subtle}`}>Guaranteed Accommodations</label>
+                <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>Accommodations</label>
                 <input 
                   type="text" value={currentAccommodation} 
                   onChange={e => setCurrentAccommodation(e.target.value)} 
                   onKeyDown={e => handleAddChip(e, 'parsedAccoms', currentAccommodation, setCurrentAccommodation)} 
-                  placeholder="Type and press Enter to add"
-                  className={`p-3.5 border-2 rounded-xl outline-none font-semibold transition-all ${inputBg}`} 
+                  placeholder="Type + Enter"
+                  className={`p-2.5 md:p-3.5 border-2 rounded-xl outline-none font-semibold transition-all text-xs md:text-base ${inputBg}`} 
                 />
                 
                 {filteredAccommodations.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-1">
+                  <div className="flex flex-wrap gap-1.5 md:gap-2 mt-1">
                     {filteredAccommodations.map(suggestion => (
                       <button
                         key={suggestion}
                         type="button"
                         onClick={() => addSuggestion('parsedAccoms', suggestion, setCurrentAccommodation)}
-                        className="px-3 py-1.5 text-xs font-black rounded-lg border-2 transition cursor-pointer hover:opacity-90"
+                        className="px-2 md:px-3 py-1 md:py-1.5 text-[9px] md:text-xs font-black rounded-md md:rounded-lg border-2 transition cursor-pointer hover:opacity-90"
                         style={recommendationBtnStyle}
                       >
                         + {suggestion}
@@ -460,21 +487,58 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                 )}
 
                 {editingJob.parsedAccoms.length > 0 && (
-                  <div className={`flex flex-wrap gap-2 mt-2 p-3 rounded-xl border-2 ${chipBoxBg}`}>
+                  <div className={`flex flex-wrap gap-1.5 md:gap-2 mt-2 p-2 md:p-3 rounded-lg md:rounded-xl border-2 ${chipBoxBg}`}>
                     {editingJob.parsedAccoms.map((acc, index) => (
-                      <span key={index} className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#2C7FFF] text-white text-xs font-black rounded-full">
-                        {acc} <button type="button" onClick={() => removeChip('parsedAccoms', acc)} className="hover:text-[#03045E] font-black ml-0.5 cursor-pointer">✕</button>
+                      <span key={index} className={`inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-0.5 md:py-1 text-[9px] md:text-xs font-black rounded-full ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF] text-white'}`}>
+                        {acc} <button type="button" onClick={() => removeChip('parsedAccoms', acc)} className={`font-black ml-0.5 cursor-pointer ${isDark ? 'hover:text-black/60' : 'hover:text-[#03045E]'}`}>✕</button>
                       </span>
                     ))}
                   </div>
                 )}
               </div>
 
-              <div className={`flex flex-col gap-2 p-5 rounded-2xl border-2 ${disabBoxBg}`}>
-                <label className={`text-[10px] font-black uppercase tracking-wider ${subtle}`}>
-                  Accepted Disabilities <span className="text-[#2C7FFF]">*</span>
+              <div className="flex flex-col gap-1.5">
+                <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>Benefits</label>
+                <input 
+                  type="text" value={currentBenefit} 
+                  onChange={e => setCurrentBenefit(e.target.value)} 
+                  onKeyDown={e => handleAddChip(e, 'parsedBenefits', currentBenefit, setCurrentBenefit)} 
+                  className={`p-2.5 md:p-3.5 border-2 rounded-xl outline-none font-semibold transition-all text-xs md:text-base ${inputBg}`} 
+                  placeholder="e.g. HMO" 
+                />
+
+                {filteredBenefits.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 md:gap-2 mt-1">
+                    {filteredBenefits.map(suggestion => (
+                      <button
+                        key={suggestion}
+                        type="button"
+                        onClick={() => addSuggestion('parsedBenefits', suggestion, setCurrentBenefit)}
+                        className="px-2 md:px-3 py-1 md:py-1.5 text-[9px] md:text-xs font-black rounded-md md:rounded-lg border-2 transition cursor-pointer hover:opacity-90"
+                        style={recommendationBtnStyle}
+                      >
+                        + {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {editingJob.parsedBenefits.length > 0 && (
+                  <div className={`flex flex-wrap gap-1.5 md:gap-2 mt-2 p-2 md:p-3 rounded-lg md:rounded-xl border-2 ${chipBoxBg}`}>
+                    {editingJob.parsedBenefits.map((benefit, index) => (
+                      <span key={index} className={`inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-0.5 md:py-1 text-[9px] md:text-xs font-black rounded-full ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF] text-white'}`}>
+                        {benefit} <button type="button" onClick={() => removeChip('parsedBenefits', benefit)} className={`font-black ml-0.5 cursor-pointer ${isDark ? 'hover:text-black/60' : 'hover:text-[#03045E]'}`}>✕</button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className={`flex flex-col gap-2 p-3 md:p-5 rounded-lg md:rounded-2xl border-2 ${disabBoxBg}`}>
+                <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>
+                  Accepted Disabilities <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>*</span>
                 </label>
-                <div className="flex flex-wrap gap-2 mt-1">
+                <div className="flex flex-wrap gap-1.5 md:gap-2 mt-1">
                   {availableDisabilities.map((disability) => {
                     const isSelected = editingJob.parsedDisabilities.includes(disability);
                     return (
@@ -482,12 +546,16 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                         type="button"
                         key={disability}
                         onClick={() => toggleDisability(disability)}
-                        className={`px-3 py-2 rounded-xl text-xs font-black border-2 transition cursor-pointer flex items-center gap-1.5 ${
+                        className={`px-2 md:px-3 py-1 md:py-2 rounded-md md:rounded-xl text-[9px] md:text-xs font-black border-2 transition cursor-pointer flex items-center gap-1 md:gap-1.5 ${
                           isSelected
-                            ? 'bg-[var(--color-primary,#2C7FFF)] border-[var(--color-primary,#2C7FFF)] shadow-md'
-                            : 'bg-[var(--color-card,#ffffff)] border-[var(--color-primary,#2C7FFF)] hover:bg-[var(--color-primary,#2C7FFF)]'
+                            ? (isDark ? 'bg-white border-white shadow-md' : 'bg-[var(--color-primary,#2C7FFF)] border-[var(--color-primary,#2C7FFF)] shadow-md')
+                            : (isDark ? 'bg-black border-white hover:bg-white hover:text-black' : 'bg-[var(--color-card,#ffffff)] border-[var(--color-primary,#2C7FFF)] hover:bg-[var(--color-primary,#2C7FFF)]')
                         }`}
-                        style={{
+                        style={isDark ? {
+                          color: isSelected ? '#000000' : '#ffffff',
+                          backgroundColor: isSelected ? '#ffffff' : '#000000',
+                          borderColor: '#ffffff'
+                        } : {
                           color: isSelected ? 'var(--color-button-text, #ffffff)' : 'var(--color-text, #03045E)',
                           backgroundColor: isSelected ? 'var(--color-primary, #2C7FFF)' : 'var(--color-card, #ffffff)',
                           borderColor: 'var(--color-primary, #2C7FFF)'
@@ -501,55 +569,11 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                 </div>
               </div>
 
-              <div className={`h-0.5 ${divider}`}></div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className={`text-[10px] font-black uppercase tracking-wider ${subtle}`}>Salary Range</label>
-                <input type="text" value={editingJob.salary_range} onChange={e => setEditingJob({...editingJob, salary_range: e.target.value})} className={`p-3.5 border-2 rounded-xl outline-none font-semibold transition-all ${inputBg}`} placeholder="e.g. ₱20,000 - ₱30,000 / month" />
-              </div>
-              
-              <div className="flex flex-col gap-1.5">
-                <label className={`text-[10px] font-black uppercase tracking-wider ${subtle}`}>Benefits</label>
-                <input 
-                  type="text" value={currentBenefit} 
-                  onChange={e => setCurrentBenefit(e.target.value)} 
-                  onKeyDown={e => handleAddChip(e, 'parsedBenefits', currentBenefit, setCurrentBenefit)} 
-                  className={`p-3.5 border-2 rounded-xl outline-none font-semibold transition-all ${inputBg}`} 
-                  placeholder="e.g. HMO, 13th Month Pay" 
-                />
-
-                {filteredBenefits.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    {filteredBenefits.map(suggestion => (
-                      <button
-                        key={suggestion}
-                        type="button"
-                        onClick={() => addSuggestion('parsedBenefits', suggestion, setCurrentBenefit)}
-                        className="px-3 py-1.5 text-xs font-black rounded-lg border-2 transition cursor-pointer hover:opacity-90"
-                        style={recommendationBtnStyle}
-                      >
-                        + {suggestion}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {editingJob.parsedBenefits.length > 0 && (
-                  <div className={`flex flex-wrap gap-2 mt-2 p-3 rounded-xl border-2 ${chipBoxBg}`}>
-                    {editingJob.parsedBenefits.map((benefit, index) => (
-                      <span key={index} className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#2C7FFF] text-white text-xs font-black rounded-full">
-                        {benefit} <button type="button" onClick={() => removeChip('parsedBenefits', benefit)} className="hover:text-[#03045E] font-black ml-0.5 cursor-pointer">✕</button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className={`flex gap-3 mt-4 pt-5 border-t-2 ${divider}`}>
-                <button type="submit" disabled={isSubmitting} className={`flex-1 py-3.5 font-black rounded-xl transition cursor-pointer border-2 ${isDark ? 'bg-[#2C7FFF] text-black border-[#2C7FFF] hover:bg-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}>
+              <div className={`flex flex-col sm:flex-row gap-2 md:gap-3 mt-2 pt-3 md:pt-5 border-t-2 col-span-2 ${divider}`}>
+                <button type="submit" disabled={isSubmitting} className={`flex-1 py-2.5 md:py-3.5 font-black rounded-lg md:rounded-xl transition cursor-pointer border-2 text-xs md:text-base ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}>
                   Save Changes
                 </button>
-                <button type="button" onClick={() => setEditingJob(null)} className={`flex-1 py-3.5 font-black rounded-xl border-2 transition cursor-pointer ${isDark ? 'bg-black text-white border-[#2C7FFF] hover:bg-[#2C7FFF] hover:text-black' : 'bg-white text-[#03045E] border-[#03045E] hover:bg-[#F4F4F4]'}`}>
+                <button type="button" onClick={() => setEditingJob(null)} className={`flex-1 py-2.5 md:py-3.5 font-black rounded-lg md:rounded-xl border-2 transition cursor-pointer text-xs md:text-base ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-white text-[#03045E] border-[#03045E] hover:bg-[#F4F4F4]'}`}>
                   Cancel
                 </button>
               </div>
@@ -564,21 +588,21 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
           <div className={`relative w-full max-w-sm rounded-[2rem] border-2 overflow-hidden ${modalBg}`}>
-            <div className="h-2 w-full bg-[#2C7FFF]" />
+            <div className={`h-2 w-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
 
             {archiveStage === 'confirm' && (
               <div className="px-8 pt-10 pb-8 flex flex-col items-center text-center">
                 <div className="relative mb-6">
-                  <div className="relative w-20 h-20 rounded-full bg-[#2C7FFF]/20 flex items-center justify-center">
-                    <div className="w-14 h-14 rounded-full bg-[#03045E] flex items-center justify-center">
-                      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                  <div className={`relative w-20 h-20 rounded-full flex items-center justify-center ${isDark ? 'bg-white/20' : 'bg-[#2C7FFF]/20'}`}>
+                    <div className={`w-14 h-14 rounded-full flex items-center justify-center ${isDark ? 'bg-white' : 'bg-[#03045E]'}`}>
+                      <svg className={`w-7 h-7 ${isDark ? 'text-black' : 'text-white'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                       </svg>
                     </div>
                   </div>
                 </div>
 
-                <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 border-2 ${isDark ? 'text-white bg-black border-[#2C7FFF]' : 'text-[#03045E] bg-white border-[#2C7FFF]'}`}>
+                <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 border-2 ${isDark ? 'text-white bg-black border-white' : 'text-[#03045E] bg-white border-[#2C7FFF]'}`}>
                   Confirm Archive
                 </span>
 
@@ -592,13 +616,13 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                 <div className="flex gap-3 w-full">
                   <button
                     onClick={closeArchiveModal}
-                    className={`flex-1 py-3.5 rounded-2xl font-black text-sm uppercase tracking-wider border-2 transition cursor-pointer ${isDark ? 'bg-black text-white border-[#2C7FFF] hover:bg-[#2C7FFF] hover:text-black' : 'bg-white text-[#03045E] border-[#03045E] hover:bg-[#F4F4F4]'}`}
+                    className={`flex-1 py-3.5 rounded-2xl font-black text-sm uppercase tracking-wider border-2 transition cursor-pointer ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-white text-[#03045E] border-[#03045E] hover:bg-[#F4F4F4]'}`}
                   >
                     Cancel
                   </button>
                   <button
                     onClick={confirmArchiveJob}
-                    className={`flex-1 py-3.5 rounded-2xl font-black text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDark ? 'bg-[#2C7FFF] text-black border-[#2C7FFF] hover:bg-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+                    className={`flex-1 py-3.5 rounded-2xl font-black text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
                   >
                     Archive
                   </button>
@@ -609,9 +633,9 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
             {archiveStage === 'processing' && (
               <div className="px-8 py-12 flex flex-col items-center text-center">
                 <div className="relative w-20 h-20 flex items-center justify-center mb-6">
-                  <div className="absolute inset-0 rounded-full border-4 border-[#2C7FFF]/25 animate-pulse" />
-                  <div className="absolute inset-0 rounded-full border-4 border-t-[#2C7FFF] border-r-transparent border-b-[#03045E] border-l-transparent animate-spin" />
-                  <div className="w-8 h-8 rounded-full bg-[#03045E] shadow-lg animate-ping opacity-70 absolute" />
+                  <div className={`absolute inset-0 rounded-full border-4 animate-pulse ${isDark ? 'border-white/25' : 'border-[#2C7FFF]/25'}`} />
+                  <div className={`absolute inset-0 rounded-full border-4 border-r-transparent border-l-transparent animate-spin ${isDark ? 'border-t-white border-b-white' : 'border-t-[#2C7FFF] border-b-[#03045E]'}`} />
+                  <div className={`w-8 h-8 rounded-full shadow-lg animate-ping opacity-70 absolute ${isDark ? 'bg-white' : 'bg-[#03045E]'}`} />
                 </div>
                 <h2 className={`text-xl font-black tracking-tight mb-1.5 ${pageText}`}>
                   Archiving Posting
@@ -620,9 +644,9 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                   Removing job from active matches...
                 </p>
                 <div className="flex items-center gap-1.5 mt-5">
-                  <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-bounce" />
-                  <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <span className={`w-2 h-2 rounded-full animate-bounce ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
+                  <span className={`w-2 h-2 rounded-full animate-bounce ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} style={{ animationDelay: '150ms' }} />
+                  <span className={`w-2 h-2 rounded-full animate-bounce ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} style={{ animationDelay: '300ms' }} />
                 </div>
               </div>
             )}
@@ -630,22 +654,22 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
             {archiveStage === 'success' && (
               <div className="px-8 pt-10 pb-8 flex flex-col items-center text-center">
                 <div className="relative mb-6">
-                  <div className="absolute inset-0 rounded-full bg-[#2C7FFF]/20 animate-ping" />
-                  <div className="relative w-20 h-20 rounded-full bg-[#2C7FFF]/15 flex items-center justify-center">
-                    <div className="w-14 h-14 rounded-full bg-[#2C7FFF] flex items-center justify-center">
-                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true">
+                  <div className={`absolute inset-0 rounded-full animate-ping ${isDark ? 'bg-white/20' : 'bg-[#2C7FFF]/20'}`} />
+                  <div className={`relative w-20 h-20 rounded-full flex items-center justify-center ${isDark ? 'bg-white/20' : 'bg-[#2C7FFF]/15'}`}>
+                    <div className={`w-14 h-14 rounded-full flex items-center justify-center ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}>
+                      <svg className={`w-8 h-8 ${isDark ? 'text-black' : 'text-white'}`} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
                   </div>
-                  <div className={`absolute -top-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center border-2 ${isDark ? 'bg-[#2C7FFF] border-black' : 'bg-[#03045E] border-[#F4F4F4]'}`}>
-                    <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true">
+                  <div className={`absolute -top-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center border-2 ${isDark ? 'bg-white border-black' : 'bg-[#03045E] border-[#F4F4F4]'}`}>
+                    <svg className={`w-3.5 h-3.5 ${isDark ? 'text-black' : 'text-white'}`} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
                 </div>
 
-                <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 border-2 ${isDark ? 'text-white bg-black border-[#2C7FFF]' : 'text-[#03045E] bg-white border-[#2C7FFF]'}`}>
+                <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 border-2 ${isDark ? 'text-white bg-black border-white' : 'text-[#03045E] bg-white border-[#2C7FFF]'}`}>
                   Job Archived
                 </span>
 
@@ -658,7 +682,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
 
                 <button
                   onClick={closeArchiveModal}
-                  className={`w-full py-3.5 rounded-2xl font-black text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDark ? 'bg-[#2C7FFF] text-black border-[#2C7FFF] hover:bg-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+                  className={`w-full py-3.5 rounded-2xl font-black text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
                 >
                   Got it
                 </button>
@@ -668,16 +692,16 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
             {archiveStage === 'error' && (
               <div className="px-8 pt-10 pb-8 flex flex-col items-center text-center">
                 <div className="relative mb-6">
-                  <div className="w-20 h-20 rounded-full bg-[#2C7FFF]/20 flex items-center justify-center">
-                    <div className="w-14 h-14 rounded-full bg-[#03045E] flex items-center justify-center">
-                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                  <div className={`w-20 h-20 rounded-full flex items-center justify-center ${isDark ? 'bg-white/20' : 'bg-[#2C7FFF]/20'}`}>
+                    <div className={`w-14 h-14 rounded-full flex items-center justify-center ${isDark ? 'bg-white' : 'bg-[#03045E]'}`}>
+                      <svg className={`w-8 h-8 ${isDark ? 'text-black' : 'text-white'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </div>
                   </div>
                 </div>
 
-                <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 border-2 ${isDark ? 'text-white bg-black border-[#2C7FFF]' : 'text-[#03045E] bg-white border-[#2C7FFF]'}`}>
+                <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 border-2 ${isDark ? 'text-white bg-black border-white' : 'text-[#03045E] bg-white border-[#2C7FFF]'}`}>
                   Action Failed
                 </span>
 
@@ -690,7 +714,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
 
                 <button
                   onClick={closeArchiveModal}
-                  className={`w-full py-3.5 rounded-2xl font-black text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDark ? 'bg-[#2C7FFF] text-black border-[#2C7FFF] hover:bg-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+                  className={`w-full py-3.5 rounded-2xl font-black text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
                 >
                   Close
                 </button>
@@ -706,7 +730,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
           <div className={`relative w-full max-w-sm rounded-[2rem] border-2 overflow-hidden ${modalBg}`}>
-            <div className="h-2 w-full bg-[#2C7FFF]" />
+            <div className={`h-2 w-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
 
             <div className="px-8 pt-10 pb-8 flex flex-col items-center text-center">
               <div className="relative mb-6">
@@ -716,14 +740,14 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                     {renderAlertIcon(alertConfig.tone)}
                   </div>
                 </div>
-                <div className={`absolute -top-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center border-2 ${isDark ? 'bg-[#2C7FFF] border-black' : 'bg-[#03045E] border-[#F4F4F4]'}`}>
-                  <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true">
+                <div className={`absolute -top-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center border-2 ${isDark ? 'bg-white border-black' : 'bg-[#03045E] border-[#F4F4F4]'}`}>
+                  <svg className={`w-3.5 h-3.5 ${isDark ? 'text-black' : 'text-white'}`} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
               </div>
 
-              <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 border-2 ${isDark ? 'text-white bg-black border-[#2C7FFF]' : 'text-[#03045E] bg-white border-[#2C7FFF]'}`}>
+              <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 border-2 ${isDark ? 'text-white bg-black border-white' : 'text-[#03045E] bg-white border-[#2C7FFF]'}`}>
                 {alertConfig.pill}
               </span>
 
@@ -736,7 +760,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
 
               <button
                 onClick={() => setShowAlert(false)}
-                className={`w-full py-3.5 rounded-2xl font-black text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDark ? 'bg-[#2C7FFF] text-black border-[#2C7FFF] hover:bg-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+                className={`w-full py-3.5 rounded-2xl font-black text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
               >
                 Got it
               </button>

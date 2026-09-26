@@ -77,6 +77,15 @@ export default function EmployerRegister() {
       return;
     }
 
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        if (!passwordRegex.test(password)) {
+          setStatusMessage({ 
+            type: 'error', 
+            text: "Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character." 
+          });
+          return;
+        }
+        
     if (password !== confirmPassword) {
       setStatusMessage({ type: 'error', text: "Passwords do not match. Please check and try again." });
       return;
@@ -242,11 +251,11 @@ export default function EmployerRegister() {
               <div
                 role="alert"
                 aria-live="assertive"
-                className={`p-4 mb-6 rounded-xl font-bold text-center border-2 ${
-                  statusMessage.type === 'success'
-                    ? 'bg-green-100 text-green-800 border-green-400'
-                    : 'bg-white text-red-600 border-red-500'
-                }`}
+                className="p-4 mb-6 rounded-xl font-bold text-center border-2"
+                style={statusMessage.type === 'success'
+                  ? { backgroundColor: '#dcfce7', color: '#166534', borderColor: '#4ade80' }
+                  : { backgroundColor: '#ffffff', color: '#dc2626', borderColor: '#dc2626' }
+                }
               >
                 {statusMessage.text}
               </div>

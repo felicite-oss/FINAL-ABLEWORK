@@ -414,41 +414,85 @@ export default function ForgotPassword({ onClose }) {
 
       {showSuccessModal && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-xs animate-in fade-in transition-all duration-300"
-          style={{ backgroundColor: 'rgba(255, 255, 255, 0.6)', filter: 'none' }}
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 backdrop-blur-[2px] animate-in fade-in transition-all duration-300"
+          style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(255, 255, 255, 0.6)', filter: 'none' }}
           role="dialog"
           aria-modal="true"
           aria-labelledby="success-title"
         >
-          <div className="relative w-full max-w-sm bg-[#f4f4f4] rounded-3xl shadow-2xl border-2 border-[#2C7FFF]/30 overflow-hidden animate-fadeIn">
-            <div className="h-1.5 w-full bg-gradient-to-r from-[#03045E] via-[#2C7FFF] to-[#03045E]" />
+          <div
+            className="relative w-full max-w-md rounded-[2rem] shadow-[0_25px_60px_rgba(3,4,94,0.35)] border-2 overflow-hidden transform animate-in zoom-in-95 duration-300"
+            style={{
+              backgroundColor: (isContrast || isDarkMode) ? '#000000' : 'var(--color-card, #ffffff)',
+              borderColor: (isContrast || isDarkMode) ? '#ffffff' : 'var(--color-border, rgba(3,4,94,0.2))'
+            }}
+          >
+            <div
+              className="h-1.5 w-full"
+              style={{ backgroundColor: (isContrast || isDarkMode) ? '#ffffff' : 'var(--color-primary, #2c7fff)' }}
+            ></div>
             <div className="px-8 pt-8 pb-8 flex flex-col items-center text-center">
-              <div className="relative mb-5">
-                <div className="w-20 h-20 rounded-full bg-[#2C7FFF]/15 flex items-center justify-center">
-                  <div className="w-14 h-14 rounded-full bg-[#2C7FFF] flex items-center justify-center shadow-lg shadow-[#2C7FFF]/40">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+              <div className="relative mb-6">
+                <div
+                  className="w-20 h-20 rounded-full flex items-center justify-center"
+                  style={{
+                    backgroundColor: (isContrast || isDarkMode) ? '#000000' : 'rgba(44,127,255,0.1)',
+                    border: (isContrast || isDarkMode) ? '2px solid #ffffff' : 'none'
+                  }}
+                >
+                  <div
+                    className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
+                    style={{
+                      backgroundColor: (isContrast || isDarkMode) ? '#000000' : '#2C7FFF',
+                      border: (isContrast || isDarkMode) ? '2px solid #ffffff' : 'none'
+                    }}
+                  >
+                    <svg
+                      className="w-8 h-8"
+                      style={{ color: '#ffffff' }}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
                 </div>
-                <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-[#03045E] flex items-center justify-center">
-                  <span className="text-white text-xs font-black">✓</span>
+                <div
+                  className="absolute -top-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center border-2"
+                  style={{
+                    backgroundColor: (isContrast || isDarkMode) ? '#ffffff' : 'var(--color-primary, #03045E)',
+                    borderColor: (isContrast || isDarkMode) ? '#000000' : 'var(--color-card, #ffffff)'
+                  }}
+                >
+                  <span className={`text-xs font-black ${isContrast || isDarkMode ? 'text-black' : 'text-white'}`}>✓</span>
                 </div>
               </div>
 
-              <h2 id="success-title" className="text-2xl font-black text-[#03045E] tracking-tight mb-2">
+              <h2
+                id="success-title"
+                className="text-2xl font-black tracking-tight mb-2"
+                style={{ color: (isContrast || isDarkMode) ? '#ffffff' : 'var(--color-text, #03045E)' }}
+              >
                 Password Reset!
               </h2>
-              <p className="text-sm text-[#03045E]/75 font-medium leading-relaxed mb-4">
+              <p
+                className="text-sm font-bold leading-relaxed mb-6 max-w-xs"
+                style={{ color: (isContrast || isDarkMode) ? '#ffffff' : 'var(--color-text, #03045E)', opacity: (isContrast || isDarkMode) ? 0.9 : 0.75 }}
+              >
                 Your password has been successfully reset.
               </p>
 
               <div className="flex items-center gap-1.5" aria-label="Redirecting to login">
-                <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-pulse" />
-                <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-pulse [animation-delay:150ms]" />
-                <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-pulse [animation-delay:300ms]" />
+                <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: (isContrast || isDarkMode) ? '#ffffff' : '#2C7FFF' }} />
+                <span className="w-2 h-2 rounded-full animate-pulse [animation-delay:150ms]" style={{ backgroundColor: (isContrast || isDarkMode) ? '#ffffff' : '#2C7FFF' }} />
+                <span className="w-2 h-2 rounded-full animate-pulse [animation-delay:300ms]" style={{ backgroundColor: (isContrast || isDarkMode) ? '#ffffff' : '#2C7FFF' }} />
               </div>
-              <p className="text-xs text-[#2C7FFF] font-semibold mt-3">
+              <p
+                className="text-xs font-semibold mt-3"
+                style={{ color: (isContrast || isDarkMode) ? '#ffffff' : '#2C7FFF' }}
+              >
                 Taking you to Log In…
               </p>
             </div>

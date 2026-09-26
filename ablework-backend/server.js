@@ -7,15 +7,20 @@ const path = require('path');
 const helmet = require('helmet');
 require('dotenv').config();
 
-const nodemailer = require('nodemailer');
 
+const isValidPassword = (password) => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    return passwordRegex.test(password);
+};
+
+const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
   host: 'smtp-relay.brevo.com',
   port: 587,
   auth: {
-    user: 'bac527001@smtp-brevo.com',
-    pass: 'xsmtpsib-5904aaa16fe1a5caa1e92008034a1c0d8798d7ed2d1e971f8c6d20976b8fd51c-MsRtLsoji1YPHXVf'
+    user: process.env.BREVO_SMTP_USER,
+    pass: process.env.BREVO_SMTP_KEY
   }
 });
 
@@ -215,7 +220,7 @@ app.post('/api/chat', async (req, res) => {
         - If an employer archives a job, it completely disappears from the active UI for applicants.
 
         5. APPLYING & TRACKING (For Applicants):
-        - To apply, the applicant must click on a job from their 'Smart Matches' or 'Explore Jobs' tab, upload their resume, and submit.
+        - To apply, the applicant must click on a job from their 'Explore Jobs' tab, upload their resume, and submit.
         - Applications start as 'Under Review'. Employers can change the status to 'Shortlisted' or 'Rejected' and leave custom feedback messages for the applicant to read in their Job Tracker.
 
         6. PLATFORM ACCESSIBILITY FEATURES:
@@ -371,7 +376,6 @@ app.get('/api/applicant/:id/profile', async (req, res) => {
 app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (req, res) => {
     console.log("--- INCOMING APPLICANT REGISTRATION ---");
     
-    
     if (!req.body) {
         return res.status(400).json({ message: "No data received. Ensure you are sending FormData." });
     }
@@ -382,6 +386,10 @@ app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (re
         independence, disabilities, accommodations, skills 
     } = req.body;
 
+    // NEW: Strong Password Validation
+    if (!isValidPassword(password)) {
+        return res.status(400).json({ message: "Password must be at least 8 characters long, with an uppercase, lowercase, number, and special character." });
+    }
 
     const pwdDocumentPath = req.file ? req.file.path : null;
 
@@ -413,7 +421,6 @@ app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (re
             const newUserId = userResult.insertId;
             const parsedDisabilities = JSON.parse(disabilities || '[]');
             const disabilityString = parsedDisabilities.join(', ');
-
 
             await connection.execute(
                 `INSERT INTO applicant_profiles 
@@ -460,12 +467,15 @@ app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (re
 app.post('/api/auth/register/employer', upload.single('verificationDocument'), async (req, res) => {
     console.log("--- INCOMING EMPLOYER REGISTRATION ---");
     
-   
     const { 
         companyName, companyDescription, email, phone, password, industry, 
         jobRole, address, latitude, longitude 
     } = req.body;
 
+    // NEW: Strong Password Validation
+    if (!isValidPassword(password)) {
+        return res.status(400).json({ message: "Password must be at least 8 characters long, with an uppercase, lowercase, number, and special character." });
+    }
 
     const documentFilename = req.file ? req.file.filename : null;
 
@@ -487,7 +497,6 @@ app.post('/api/auth/register/employer', upload.single('verificationDocument'), a
             );
 
             const newUserId = userResult.insertId;
-
 
             await connection.execute(
                 `INSERT INTO employer_profiles 
@@ -1687,6 +1696,11 @@ app.post('/api/auth/reset-password', async (req, res) => {
         
         if (new Date() > new Date(user.otp_expires)) {
             return res.status(400).json({ message: "Recovery code has expired. Please request a new one." });
+        }
+
+        // NEW: Strong Password Validation
+        if (!isValidPassword(newPassword)) {
+            return res.status(400).json({ message: "New password must be at least 8 characters long, with an uppercase, lowercase, number, and special character." });
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);

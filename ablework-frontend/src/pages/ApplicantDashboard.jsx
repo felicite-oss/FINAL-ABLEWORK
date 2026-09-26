@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AccessibilityContext } from '../context/AccessibilityContext';
 import ApplicantOverview from '../components/Applicant/ApplicantOverview';
-import ApplicantSmartMatches from '../components/Applicant/ApplicantSmartMatches';
 import ApplicantJobTracker from '../components/Applicant/ApplicantJobTracker';
 import ApplicantProfile from '../components/Applicant/ApplicantProfile';
 import ApplicantAccountSettings from '../components/Applicant/ApplicantAccountSettings';
@@ -39,7 +38,6 @@ export default function ApplicantDashboard() {
   const dropdownRef = useRef(null);
   const notifRef = useRef(null); 
 
-
   const [profile, setProfile] = useState(() => {
     const savedUser = JSON.parse(localStorage.getItem('user'));
     if (!savedUser || !savedUser.id) return null;
@@ -47,13 +45,13 @@ export default function ApplicantDashboard() {
     const savedPic = localStorage.getItem(userPicKey) || localStorage.getItem('profile_picture');
     return { ...savedUser, profile_picture: savedPic, avatar_url: savedPic };
   });
+  
+  // Notice: allJobs state has been completely removed!
   const [matches, setMatches] = useState([]);
   const [applications, setApplications] = useState([]);
-  const [allJobs, setAllJobs] = useState([]); 
   const [notifications, setNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -67,7 +65,6 @@ export default function ApplicantDashboard() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
 
   useEffect(() => {
     const handleStorageSync = () => {
@@ -83,7 +80,6 @@ export default function ApplicantDashboard() {
     window.addEventListener('storage', handleStorageSync);
     return () => window.removeEventListener('storage', handleStorageSync);
   }, []);
-
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -116,10 +112,6 @@ export default function ApplicantDashboard() {
         const trackerRes = await fetch(`http://localhost:5001/api/applicant/${storedUser.id}/applications`);
         const trackerData = await trackerRes.json();
         if (trackerRes.ok) setApplications(trackerData);
-
-        const allJobsRes = await fetch('http://localhost:5001/api/jobs');
-        const allJobsData = await allJobsRes.json();
-        if (allJobsRes.ok) setAllJobs(allJobsData);
 
         const notifRes = await fetch(`http://localhost:5001/api/users/${storedUser.id}/notifications`);
         const notifData = await notifRes.json();
@@ -365,7 +357,6 @@ export default function ApplicantDashboard() {
         </div>
       )}
 
-
       <header className={`w-full border-b-2 fixed top-0 left-0 z-50 transition-all duration-300 shadow-sm ${isContrast ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/15'}`}>
         <div className="w-full h-16 pl-4 pr-4 md:pr-8 flex items-center justify-between max-w-[1700px] mx-auto box-border">
           <div className="flex items-center gap-2 sm:gap-3 md:gap-6 min-w-0">
@@ -379,8 +370,6 @@ export default function ApplicantDashboard() {
           </div>
 
           <div className="flex items-center gap-3">
-            
-
             <div className="relative" ref={notifRef}>
               <button
                 onClick={() => setNotificationDropdownOpen(!notificationDropdownOpen)}
@@ -402,7 +391,6 @@ export default function ApplicantDashboard() {
                   <span className={`absolute top-0 right-0 w-3.5 h-3.5 border-2 rounded-full ${isContrast ? 'bg-[#2C7FFF] border-black' : 'bg-[#2C7FFF] border-white'}`}></span>
                 )}
               </button>
-
 
               {notificationDropdownOpen && (
                 <div className={`absolute right-0 mt-3 w-80 sm:w-96 rounded-2xl shadow-[0_15px_40px_rgba(3,4,94,0.2)] border-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden ${isContrast ? 'bg-black border-[#2C7FFF]/50' : 'bg-white border-[#03045E]/20'}`}>
@@ -429,7 +417,7 @@ export default function ApplicantDashboard() {
                           if (notif.type === 'update' || notif.type === 'application') {
                             setActiveTab('tracker');
                           } else if (notif.type === 'match') {
-                            setActiveTab('matches');
+                            setActiveTab('explore-jobs');
                           } else {
                             setActiveTab('overview');
                           }
@@ -473,7 +461,6 @@ export default function ApplicantDashboard() {
               )}
             </div>
 
-
             <div className="hidden md:block relative" ref={dropdownRef}>
               <button
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
@@ -497,7 +484,6 @@ export default function ApplicantDashboard() {
 
               {profileDropdownOpen && (
                 <div className={`absolute right-0 mt-3 w-72 rounded-3xl shadow-[0_20px_50px_rgba(3,4,94,0.25)] border-2 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 ${isContrast ? 'bg-black border-[#2C7FFF]/60' : 'bg-white border-[#03045E]/20'}`}>
-
                   <div className={`relative p-4 pb-5 ${isContrast ? 'bg-black border-b border-[#2C7FFF]/30' : 'bg-[#f4f4f4] border-b border-[#03045E]/10'}`}>
                     <div className="flex items-center gap-3.5">
                       <div className="relative shrink-0">
@@ -526,11 +512,8 @@ export default function ApplicantDashboard() {
 
                   <div className="p-2">
                     <p className={`px-3 pt-1.5 pb-2 text-[10px] font-black uppercase tracking-[0.15em] ${isContrast ? 'text-white/50' : 'text-[#03045E]/50'}`}>Account</p>
-
                     <button
-                      onClick={() => {
-                        setActiveTab('profile');
-                      }}
+                      onClick={() => { setActiveTab('profile'); setProfileDropdownOpen(false); }}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-black transition-colors text-left cursor-pointer ${
                         activeTab === 'profile'
                           ? (isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white')
@@ -546,16 +529,12 @@ export default function ApplicantDashboard() {
                           <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <span className="truncate block">Edit Profile</span>
-                      </div>
+                      <div className="flex-1 min-w-0"><span className="truncate block">Edit Profile</span></div>
                       {activeTab === 'profile' && <span className={`w-2 h-2 rounded-full shrink-0 ${isContrast ? 'bg-[#2C7FFF]' : 'bg-white'}`}></span>}
                     </button>
 
                     <button
-                      onClick={() => {
-                        setActiveTab('settings');
-                      }}
+                      onClick={() => { setActiveTab('settings'); setProfileDropdownOpen(false); }}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-black transition-colors text-left cursor-pointer ${
                         activeTab === 'settings'
                           ? (isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white')
@@ -572,9 +551,7 @@ export default function ApplicantDashboard() {
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <span className="truncate block">Settings</span>
-                      </div>
+                      <div className="flex-1 min-w-0"><span className="truncate block">Settings</span></div>
                       {activeTab === 'settings' && <span className={`w-2 h-2 rounded-full shrink-0 ${isContrast ? 'bg-[#2C7FFF]' : 'bg-white'}`}></span>}
                     </button>
 
@@ -582,17 +559,11 @@ export default function ApplicantDashboard() {
 
                     <button
                       disabled={isLoggingOut}
-                      onClick={() => {
-                        setProfileDropdownOpen(false);
-                        setShowLogoutConfirm(true);
-                      }}
+                      onClick={() => { setProfileDropdownOpen(false); setShowLogoutConfirm(true); }}
                       style={{ color: '#DC2626' }}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-black transition-colors text-left cursor-pointer disabled:opacity-50`}
                     >
-                      <div
-                        style={{ backgroundColor: '#FEE2E2', color: '#DC2626' }}
-                        className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0`}
-                      >
+                      <div style={{ backgroundColor: '#FEE2E2', color: '#DC2626' }} className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0`}>
                         {isLoggingOut ? (
                           <svg className="w-4 h-4 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -604,21 +575,16 @@ export default function ApplicantDashboard() {
                           </svg>
                         )}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <span className="truncate block">{isLoggingOut ? 'Logging out...' : 'Log Out'}</span>
-                      </div>
+                      <div className="flex-1 min-w-0"><span className="truncate block">{isLoggingOut ? 'Logging out...' : 'Log Out'}</span></div>
                     </button>
                   </div>
                 </div>
               )}
             </div>
 
-
             <button
               className={`md:hidden flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-2 shadow-sm cursor-pointer transition-all duration-200 shrink-0 ${
-                isContrast
-                  ? 'bg-zinc-900 text-white border-white/30'
-                  : 'bg-white text-[#03045E] border-[#03045E]/20'
+                isContrast ? 'bg-zinc-900 text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/20'
               }`}
               onClick={() => setIsOpen(!isOpen)}
             >
@@ -634,7 +600,6 @@ export default function ApplicantDashboard() {
             </button>
           </div>
         </div>
-
 
         <div
           className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out border-b-2 ${
@@ -656,11 +621,7 @@ export default function ApplicantDashboard() {
               >
                 <div className="shrink-0 flex items-center justify-center border-none w-6 h-6 rounded-full overflow-hidden">
                   {getHeaderImageSrc() ? (
-                    <img 
-                      src={getHeaderImageSrc()} 
-                      alt="Profile" 
-                      className="w-full h-full object-cover" 
-                    />
+                    <img src={getHeaderImageSrc()} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
                     <div className={`w-full h-full flex items-center justify-center font-bold text-xs ${isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white'}`}>
                       {profile?.firstname?.[0] || profile?.full_name?.[0] || 'U'}
@@ -691,7 +652,6 @@ export default function ApplicantDashboard() {
 
               {[
                 { id: 'overview', label: 'Overview' },
-                { id: 'matches', label: 'Smart Matches' },
                 { id: 'explore-jobs', label: 'Explore Jobs' },
                 { id: 'tracker', label: 'Job Tracker' }
               ].map((item) => (
@@ -704,9 +664,7 @@ export default function ApplicantDashboard() {
                       : (isContrast ? 'border-white/30 text-white hover:bg-white/10 hover:border-[#2C7FFF]' : 'border-[#03045E]/20 text-[#03045E] hover:bg-[#2C7FFF]/10 hover:border-[#2C7FFF]')
                   }`}
                 >
-                  <span className="text-xs sm:text-sm truncate tracking-wide">
-                    {item.label}
-                  </span>
+                  <span className="text-xs sm:text-sm truncate tracking-wide">{item.label}</span>
                 </button>
               ))}
 
@@ -735,11 +693,9 @@ export default function ApplicantDashboard() {
         </div>
       </header>
       
-
       <div className={`flex flex-col w-full max-w-[1700px] mx-auto min-w-0 box-border pt-16 min-h-screen ${(isContrast || isDarkMode) ? 'bg-black' : ''}`}>
         <div className="flex flex-col md:flex-row flex-1 w-full min-w-0">
           
-   
           <aside className={`hidden md:flex shrink-0 flex-col z-10 w-72 lg:w-80 border-r-2 relative overflow-hidden ${(isContrast || isDarkMode) ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/15'}`}>
             <div className="absolute top-0 left-0 w-1.5 h-full" style={{ backgroundColor: 'var(--color-primary, #2C7FFF)' }}></div>
             <div className="absolute -top-24 -right-24 w-56 h-56 rounded-full opacity-10" style={{ backgroundColor: 'var(--color-primary, #2C7FFF)' }}></div>
@@ -757,7 +713,6 @@ export default function ApplicantDashboard() {
               <nav className="flex-1 px-5 pb-8 pl-7 flex flex-col gap-3 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 {[
                   { id: 'overview', label: 'Overview', desc: 'Your snapshot' },
-                  { id: 'matches', label: 'Smart Matches', desc: 'Curated for you' },
                   { id: 'explore-jobs', label: 'Explore Jobs', desc: 'Browse openings' },
                   { id: 'tracker', label: 'Job Tracker', desc: 'Your progress' }
                 ].map((item) => {
@@ -800,9 +755,6 @@ export default function ApplicantDashboard() {
                       >
                         {item.id === 'overview' && (
                           <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                        )}
-                        {item.id === 'matches' && (
-                          <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                         )}
                         {item.id === 'explore-jobs' && (
                           <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -847,7 +799,6 @@ export default function ApplicantDashboard() {
             </div>
           </aside>
 
-    
           <main className={`flex-1 p-3 sm:p-6 md:p-10 relative w-full min-w-0 transition-all duration-300 flex flex-col box-border ${(isContrast || isDarkMode) ? 'bg-black' : ''}`}>
             <div className="flex items-start gap-4 w-full min-w-0">
               <div className="w-full flex-1 min-w-0 overflow-x-hidden">
@@ -891,16 +842,13 @@ export default function ApplicantDashboard() {
                   </div>
                 )}
                 
+                {/* Notice: Overview now only receives matches */}
                 {activeTab === 'overview' && profile && (
-                  <ApplicantOverview profile={profile} matches={matches} jobs={allJobs} matchesCount={matches.length} applications={applications} setActiveTab={setActiveTab} />
-                )}
-                
-                {activeTab === 'matches' && profile && (
-                  <ApplicantSmartMatches profile={profile} matches={matches} refreshData={refreshData} />
+                  <ApplicantOverview profile={profile} matches={matches} jobs={matches} matchesCount={matches.length} applications={applications} setActiveTab={setActiveTab} />
                 )}
 
                 {activeTab === 'explore-jobs' && profile && (
-                  <ApplicantExploreJobs profile={profile} jobs={allJobs} refreshData={refreshData} />
+                  <ApplicantExploreJobs profile={profile} jobs={matches} refreshData={refreshData} />
                 )}
                 
                 {activeTab === 'tracker' && (
