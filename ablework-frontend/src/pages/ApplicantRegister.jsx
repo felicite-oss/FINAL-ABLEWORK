@@ -198,7 +198,7 @@ export default function ApplicantRegister() {
     }
 
     if (password !== confirmPassword) {
-      setStatusMessage({ type: 'error', text: "Passwords do not match. Please check and try again." });
+      setStatusMessage({ type: 'error', text: 'Passwords do not match. Please check and try again.' });
       return;
     }
 
@@ -381,7 +381,7 @@ export default function ApplicantRegister() {
                 className={`p-4 mb-6 rounded-xl font-bold text-center border-2 ${
                   statusMessage.type === 'success'
                     ? 'bg-green-100 text-green-800 border-green-400'
-                    : 'bg-red-100 text-red-800 border-red-400'
+                    : 'bg-white text-red-600 border-red-600'
                 }`}
               >
                 {statusMessage.text}
@@ -660,7 +660,7 @@ export default function ApplicantRegister() {
                                 toggleSelection(suggestion, selectedDisabilities, setSelectedDisabilities);
                                 setOtherDisability(''); 
                               }}
-                              className="px-3 py-1.5 bg-[#2C7FFF]/10 text-[#2C7FFF] text-xs font-bold rounded-full hover:bg-[#2C7FFF] hover:text-white transition-colors border border-[#2C7FFF]/20"
+                              className="px-3 py-1.5 bg-[#2C7FFF]/10 text-[#03045E] text-xs font-bold rounded-full border border-[#2C7FFF]/20"
                               title={`Click to add ${suggestion}`}
                               aria-label={`Add suggested condition ${suggestion}`}
                             >
@@ -756,7 +756,7 @@ export default function ApplicantRegister() {
                                 toggleSelection(suggestion, selectedAccommodations, setSelectedAccommodations);
                                 setOtherAccommodation(''); 
                               }}
-                              className="px-3 py-1.5 bg-[#2C7FFF]/10 text-[#2C7FFF] text-xs font-bold rounded-full hover:bg-[#2C7FFF] hover:text-white transition-colors border border-[#2C7FFF]/20"
+                              className="px-3 py-1.5 bg-[#2C7FFF]/10 text-[#03045E] text-xs font-bold rounded-full border border-[#2C7FFF]/20"
                               title={`Click to add ${suggestion}`}
                               aria-label={`Add suggested accommodation ${suggestion}`}
                             >
@@ -851,7 +851,7 @@ export default function ApplicantRegister() {
                                 toggleSelection(suggestion, selectedSkills, setSelectedSkills);
                                 setOtherSkill(''); 
                               }}
-                              className="px-3 py-1.5 bg-[#2C7FFF]/10 text-[#2C7FFF] text-xs font-bold rounded-full hover:bg-[#2C7FFF] hover:text-white transition-colors border border-[#2C7FFF]/20"
+                              className="px-3 py-1.5 bg-[#2C7FFF]/10 text-[#03045E] text-xs font-bold rounded-full border border-[#2C7FFF]/20"
                               title={`Click to add ${suggestion}`}
                               aria-label={`Add suggested skill ${suggestion}`}
                             >
