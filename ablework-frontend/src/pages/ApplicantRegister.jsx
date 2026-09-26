@@ -197,6 +197,15 @@ export default function ApplicantRegister() {
       return;
     }
 
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        if (!passwordRegex.test(password)) {
+          setStatusMessage({ 
+            type: 'error', 
+            text: "Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character." 
+          });
+          return;
+        }
+
     if (password !== confirmPassword) {
       setStatusMessage({ type: 'error', text: 'Passwords do not match. Please check and try again.' });
       return;

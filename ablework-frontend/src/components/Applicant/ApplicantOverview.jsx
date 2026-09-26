@@ -97,7 +97,7 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
         
      
         <div 
-          onClick={() => setActiveTab('settings')}
+          onClick={() => setActiveTab('profile')}
           className="relative overflow-hidden p-6 sm:p-8 rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 flex flex-col justify-between cursor-pointer hover:border-[#2C7FFF] hover:shadow-xl transition-all duration-200"
         >
           <div>
@@ -126,7 +126,7 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
 
         {/*smart matches*/}
         <div 
-          onClick={() => setActiveTab('matches')}
+          onClick={() => setActiveTab('explore-jobs')}
           className="p-6 sm:p-8 rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 flex items-center gap-6 cursor-pointer hover:border-[#2C7FFF] hover:shadow-xl transition-all duration-200"
         >
           <div className="w-16 h-16 rounded-[1.25rem] bg-[#f4f4f4] flex items-center justify-center text-[#2C7FFF] shrink-0 border border-[#03045E]/20">
@@ -305,7 +305,7 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
             <p className="text-sm font-semibold text-[#03045E] mb-6 max-w-[90%] leading-relaxed">
               We've analyzed your skills and travel radius to pinpoint jobs tailored exactly for you.
             </p>
-            <button onClick={() => setActiveTab('matches')} className="flex items-center justify-center gap-2 w-max px-6 py-3.5 bg-[#2C7FFF] text-[#f4f4f4] font-extrabold text-sm rounded-xl hover:bg-[#03045E] transition-all duration-200 shadow-sm cursor-pointer">
+            <button onClick={() => setActiveTab('explore-jobs')} className="flex items-center justify-center gap-2 w-max px-6 py-3.5 bg-[#2C7FFF] text-[#f4f4f4] font-extrabold text-sm rounded-xl hover:bg-[#03045E] transition-all duration-200 shadow-sm cursor-pointer">
               View Your Matches
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </button>

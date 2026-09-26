@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { AccessibilityContext } from '../../context/AccessibilityContext';
 
 export default function EmployerPostJob({ profile, refreshData, setActiveTab }) {
@@ -14,6 +14,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
   const [selectedAccommodations, setSelectedAccommodations] = useState([]);
   const [currentAccommodation, setCurrentAccommodation] = useState('');
   const [salaryRange, setSalaryRange] = useState('');
+  const [salaryError, setSalaryError] = useState(''); // Real-time error state
   const [selectedBenefits, setSelectedBenefits] = useState([]);
   const [currentBenefit, setCurrentBenefit] = useState('');
   const [selectedDisabilities, setSelectedDisabilities] = useState([]);
@@ -21,6 +22,25 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' }); 
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [publishedJobTitle, setPublishedJobTitle] = useState('');
+
+  // NEW: Bulletproof real-time validation watcher
+  useEffect(() => {
+    if (salaryRange.trim() === '') {
+      setSalaryError(''); // Clear error if empty (undisclosed is allowed)
+    } else if (!salaryRange.includes('-')) {
+      setSalaryError('Requires a hyphen separator (e.g., 20,000 - 30,000)');
+    } else {
+      const parts = salaryRange.split('-');
+      const hasNumberLeft = /\d/.test(parts[0]);
+      const hasNumberRight = /\d/.test(parts[1]);
+
+      if (!hasNumberLeft || !hasNumberRight) {
+        setSalaryError('Requires amounts on both sides of the hyphen');
+      } else {
+        setSalaryError(''); // Valid format
+      }
+    }
+  }, [salaryRange]);
 
   const availableDisabilities = [
     'Deafness', 'Blindness', 'Low Vision', 'Hard of Hearing', 'Color Blindness', 
@@ -126,6 +146,13 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
       return setStatusMessage({ type: 'error', text: 'Please add at least one required skill.' });
     }
 
+    if (salaryError) {
+      return setStatusMessage({ 
+        type: 'error', 
+        text: 'Please fix the salary range format before publishing.' 
+      });
+    }
+
     setIsLoading(true);
 
     const payload = {
@@ -163,6 +190,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
         setCurrentAccommodation('');
         setSelectedDisabilities([]);
         setSalaryRange('');
+        setSalaryError('');
         setSelectedBenefits([]);
         setCurrentBenefit('');
         
@@ -197,7 +225,10 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
     ? 'w-full p-3 border-2 border-white rounded-xl bg-black text-white placeholder-white/40 font-semibold focus:outline-none focus:border-white transition-all'
     : 'w-full p-3 border-2 border-[#03045E] rounded-xl bg-[#F4F4F4] text-[#03045E] placeholder-[#03045E]/40 font-semibold focus:outline-none focus:border-[#2C7FFF] focus:bg-white transition-all';
   const chipContainer = isDark ? 'bg-black border-white' : 'bg-white border-[#03045E]';
+<<<<<<< HEAD
   const divider = isDark ? 'border-white' : 'border-[#03045E]';
+=======
+>>>>>>> origin/salary-update
   const disabBox = isDark ? 'bg-black border-white' : 'bg-white border-[#2C7FFF]';
 
   const recommendationBtnStyle = isDark ? {
@@ -310,14 +341,31 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+<<<<<<< HEAD
+=======
+            
+>>>>>>> origin/salary-update
             <div className="flex flex-col gap-2">
               <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>Salary Range</label>
               <input
-                type="text" value={salaryRange} onChange={(e) => setSalaryRange(e.target.value)}
+                type="text" 
+                value={salaryRange} 
+                onChange={(e) => setSalaryRange(e.target.value)}
                 placeholder="e.g. ₱20,000 - ₱30,000 / month"
+<<<<<<< HEAD
                 className={`${inputSmallCls} !p-2.5 md:!p-3 !text-xs md:!text-base`}
               />
               <p className={`text-[8px] md:text-[10px] font-bold ${subtle}`}>Leave blank if undisclosed.</p>
+=======
+                className={`${inputSmallCls} ${salaryError ? '!border-red-500 !text-red-500 focus:!border-red-500' : ''} !p-2.5 md:!p-3 !text-xs md:!text-base`}
+                style={salaryError ? { backgroundColor: isDark ? '#000000' : '#F4F4F4' } : {}}
+              />
+              {salaryError ? (
+                <p className="text-[9px] md:text-[10px] font-black text-red-500 mt-0.5">{salaryError}</p>
+              ) : (
+                <p className={`text-[8px] md:text-[10px] font-bold ${subtle}`}>Leave blank if undisclosed.</p>
+              )}
+>>>>>>> origin/salary-update
             </div>
 
             <div className="flex flex-col gap-2">

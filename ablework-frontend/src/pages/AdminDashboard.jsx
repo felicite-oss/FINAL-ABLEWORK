@@ -119,6 +119,21 @@ export default function AdminDashboard() {
     });
   };
 
+const handleDohPortalLaunch = (e) => {
+    e.preventDefault();
+    
+    const popupWidth = 650; 
+    const popupHeight = window.screen.availHeight;
+    const leftPosition = window.screen.availWidth - popupWidth;
+
+    // Updated URL directly to the specific verification list page
+    window.open(
+      'https://pwd.doh.gov.ph/tbl_pwd_id_verificationlist.php',
+      'DOH_Verification_Window',
+      `width=${popupWidth},height=${popupHeight},left=${leftPosition},top=0,menubar=no,toolbar=no,location=yes,status=no,scrollbars=yes,resizable=yes`
+    );
+  };
+
   if (isLoggingOut) return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--color-surface,#f4f4f4)] relative overflow-x-hidden">
       <div className="absolute inset-0 bg-[var(--color-surface,#f4f4f4)]/90 backdrop-blur-md z-50 flex flex-col items-center justify-center p-4 transition-all duration-300">
@@ -859,16 +874,14 @@ export default function AdminDashboard() {
                       </div>
                       <h3 className="text-base font-black text-[var(--color-text,#03045E)] mb-2">DOH Verification Portal</h3>
                       <p className="text-xs font-bold text-[var(--color-text,#03045E)]/70 mb-6 leading-relaxed">
-                        Government security policies prevent direct website embedding. Open the portal in a new tab to cross-check details.
+                        Government security policies prevent direct website embedding. Open the portal in a side-by-side view to cross-check details.
                       </p>
-                      <a
-                        href="https://pwd.doh.gov.ph"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full py-3.5 bg-[var(--color-primary,#03045E)] text-[var(--color-button-text,#ffffff)] font-black text-xs uppercase tracking-wider rounded-xl shadow-md hover:bg-[var(--color-primary,#2C7FFF)] transition flex items-center justify-center gap-2"
+                      <button
+                        onClick={handleDohPortalLaunch}
+                        className="w-full py-3.5 bg-[var(--color-primary,#03045E)] text-[var(--color-button-text,#ffffff)] font-black text-xs uppercase tracking-wider rounded-xl shadow-md hover:bg-[var(--color-primary,#2C7FFF)] transition flex items-center justify-center gap-2 cursor-pointer"
                       >
                         Launch Portal ↗
-                      </a>
+                      </button>
                     </div>
 
                   </div>
