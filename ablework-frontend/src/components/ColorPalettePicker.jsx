@@ -7,13 +7,13 @@ export default function ColorPalettePicker() {
 
   return (
     <div className="flex flex-col gap-2">
-      <span tabIndex="0" className="text-xs font-black uppercase tracking-wider text-[var(--color-textMuted)]">
+      <span tabIndex="0" className="text-[9px] sm:text-xs font-black uppercase tracking-wider text-[var(--color-textMuted)]">
         Color Vision Palette
       </span>
-      <p className="text-[10px] font-bold text-[var(--color-textMuted)] -mt-1 mb-1 leading-snug">
+      <p className="text-[8px] sm:text-[10px] font-bold text-[var(--color-textMuted)] -mt-1 mb-1 leading-snug">
         Choose colors that work best for your eyes
       </p>
-      <div className="grid grid-cols-1 gap-1.5 max-h-64 overflow-y-auto pr-1 bg-[var(--color-surface)] border-2 border-[var(--color-border)] p-2 rounded-2xl">
+      <div className="grid grid-cols-2 gap-1.5 sm:gap-2 max-h-72 overflow-y-auto pr-1 bg-[var(--color-surface)] border-2 border-[var(--color-border)] p-1.5 sm:p-2 rounded-2xl">
         {Object.entries(palettes).map(([key, p]) => {
           const selected = key === paletteKey;
           return (
@@ -22,7 +22,7 @@ export default function ColorPalettePicker() {
               onClick={() => setPaletteKey(key)}
               aria-pressed={selected}
               aria-label={`Select ${p.name} color palette`}
-              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left transition-all cursor-pointer border-2 ${
+              className={`w-full flex flex-col items-center justify-center gap-1 sm:gap-1.5 px-1.5 py-2 sm:px-3 sm:py-3 rounded-xl text-center transition-all cursor-pointer border-2 ${
                 selected
                   ? isHighContrast
                     ? 'bg-[var(--color-surface)] border-[var(--color-text)] shadow-sm'
@@ -36,17 +36,17 @@ export default function ColorPalettePicker() {
                 {p.swatch.map((color, i) => (
                   <span
                     key={i}
-                    className="w-3.5 h-3.5 rounded-full border border-[var(--color-border)]"
+                    className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 rounded-full border border-[var(--color-border)]"
                     style={{ backgroundColor: color }}
                   />
                 ))}
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-black text-[var(--color-text)] truncate">{p.name}</p>
-                <p className={`text-[9px] font-bold truncate ${isHighContrast ? 'text-[var(--color-text)]' : 'text-[var(--color-textMuted)]'}`}>{p.description}</p>
+              <div className="flex-1 min-w-0 w-full">
+                <p className="text-[9px] sm:text-[11px] font-black text-[var(--color-text)] truncate leading-tight">{p.name}</p>
+                <p className={`text-[7px] sm:text-[9px] font-bold truncate leading-tight mt-0.5 ${isHighContrast ? 'text-[var(--color-text)]' : 'text-[var(--color-textMuted)]'}`}>{p.description}</p>
               </div>
               {selected && (
-                <svg className="w-3.5 h-3.5 shrink-0 text-[var(--color-accent)]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                <svg className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 shrink-0 text-[var(--color-accent)]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               )}

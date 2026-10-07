@@ -109,9 +109,21 @@ body {
   color: var(--text-primary);
 }
 
-button:focus-visible, input:focus-visible {
+button:focus-visible {
   outline: var(--focus-ring);
   outline-offset: 4px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 html.font-large {
@@ -641,11 +653,6 @@ html.highlight-links-active button {
   z-index: 9999;
 }
 
-:focus-visible {
-  outline: 3px solid var(--accent);
-  outline-offset: 3px;
-}
-
 html.talkback-active *:focus, 
 html.talkback-active *:focus-visible {
   outline: 3px solid #32CD32 !important;
@@ -769,8 +776,50 @@ html.dark-mode:root.palette-monochrome {
   border-color: var(--color-border) !important;
 }
 
-[class*="text-white"] {
+:root:not(.palette-highContrast):not(.palette-darkComfort) [class*="text-white"] {
   color: var(--color-surface) !important;
+}
+
+html.dark-mode:not(.palette-highContrast):not(.palette-darkComfort) [class*="text-white"] {
+  color: #ffffff !important;
+}
+
+[class*="bg-black"] {
+  background-color: var(--color-primary) !important;
+}
+
+:root.palette-highContrast [class*="text-white"],
+:root.palette-darkComfort [class*="text-white"] {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+:root.palette-highContrast .force-white-text,
+:root.palette-highContrast .force-white-text *,
+:root.palette-darkComfort .force-white-text,
+:root.palette-darkComfort .force-white-text *,
+html.dark-mode:root.palette-highContrast .force-white-text,
+html.dark-mode:root.palette-highContrast .force-white-text *,
+html.dark-mode:root.palette-darkComfort .force-white-text,
+html.dark-mode:root.palette-darkComfort .force-white-text * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+html.dark-mode.palette-highContrast button.force-white-text,
+html.dark-mode.palette-darkComfort button.force-white-text,
+html.palette-highContrast button.force-white-text,
+html.palette-darkComfort button.force-white-text {
+  background-color: #60A5FA !important;
+}
+
+html.dark-mode.palette-highContrast button.force-white-text:hover,
+html.dark-mode.palette-darkComfort button.force-white-text:hover,
+html.palette-highContrast button.force-white-text:hover,
+html.palette-darkComfort button.force-white-text:hover {
+  background-color: #60A5FA !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 [class*="bg-black"] {
@@ -840,11 +889,6 @@ html.dark-mode:root.palette-monochrome {
   background-color: var(--color-surface) !important;
 }
 
-html.dark-mode [class*="text-white"],
-.theme-Dark [class*="text-white"] {
-  color: #ffffff !important;
-}
-
 html.dark-mode [class*="text-black"],
 .theme-Dark [class*="text-black"] {
   color: #ffffff !important;
@@ -906,4 +950,146 @@ html.dark-mode .recharts-legend-item-text,
 .theme-Dark .recharts-legend-item-text {
   color: #d4d4d4 !important;
   fill: #d4d4d4 !important;
+}
+
+html.dark-mode.palette-highContrast .login-btn,
+html.dark-mode.palette-darkComfort .login-btn,
+html.dark-mode.palette-highcontrast .login-btn,
+html.dark-mode.palette-darkcomfort .login-btn,
+.theme-Dark.palette-highContrast .login-btn,
+.theme-Dark.palette-darkComfort .login-btn {
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+html.dark-mode.palette-highContrast .login-btn *,
+html.dark-mode.palette-darkComfort .login-btn *,
+.theme-Dark.palette-highContrast .login-btn *,
+.theme-Dark.palette-darkComfort .login-btn * {
+  color: inherit !important;
+}
+
+html.dark-mode.palette-highContrast .detect-location-btn svg,
+html.dark-mode.palette-darkComfort .detect-location-btn svg,
+html.dark-mode.palette-highcontrast .detect-location-btn svg,
+html.dark-mode.palette-darkcomfort .detect-location-btn svg,
+.theme-Dark.palette-highContrast .detect-location-btn svg,
+.theme-Dark.palette-darkComfort .detect-location-btn svg {
+  color: #000000 !important;
+  stroke: #000000 !important;
+  fill: none !important;
+}
+
+html.dark-mode.palette-highContrast .detect-location-btn svg path,
+html.dark-mode.palette-darkComfort .detect-location-btn svg path,
+html.dark-mode.palette-highcontrast .detect-location-btn svg path,
+html.dark-mode.palette-darkcomfort .detect-location-btn svg path,
+.theme-Dark.palette-highContrast .detect-location-btn svg path,
+.theme-Dark.palette-darkComfort .detect-location-btn svg path {
+  stroke: #000000 !important;
+}
+
+html.dark-mode.palette-highContrast .detect-location-btn,
+html.dark-mode.palette-darkComfort .detect-location-btn,
+html.dark-mode.palette-highcontrast .detect-location-btn,
+html.dark-mode.palette-darkcomfort .detect-location-btn,
+.theme-Dark.palette-highContrast .detect-location-btn,
+.theme-Dark.palette-darkComfort .detect-location-btn {
+  color: #000000 !important;
+}
+
+html.dark-mode.palette-highContrast .detect-pin-icon,
+html.dark-mode.palette-darkComfort .detect-pin-icon,
+.theme-Dark.palette-highContrast .detect-pin-icon,
+.theme-Dark.palette-darkComfort .detect-pin-icon {
+  color: #000000 !important;
+  stroke: #000000 !important;
+}
+
+html.dark-mode.palette-highContrast .detect-pin-icon path,
+html.dark-mode.palette-darkComfort .detect-pin-icon path,
+.theme-Dark.palette-highContrast .detect-pin-icon path,
+.theme-Dark.palette-darkComfort .detect-pin-icon path {
+  stroke: #000000 !important;
+}
+
+html.dark-mode.palette-highContrast .suggestion-btn,
+html.dark-mode.palette-darkComfort .suggestion-btn,
+html.dark-mode.palette-highcontrast .suggestion-btn,
+html.dark-mode.palette-darkcomfort .suggestion-btn,
+.theme-Dark.palette-highContrast .suggestion-btn,
+.theme-Dark.palette-darkComfort .suggestion-btn {
+  color: #ffffff !important;
+  background-color: rgba(212, 212, 212, 0.15) !important;
+}
+
+label[for="companyDescription"],
+label[for="companyDescription"] span {
+  color: var(--color-text) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--color-accent) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--color-accent) !important;
+  outline-offset: 2px !important;
+}
+
+:root.palette-highContrast button.fp-force-black-btn,
+:root.palette-darkComfort button.fp-force-black-btn,
+html.dark-mode:root.palette-highContrast button.fp-force-black-btn,
+html.dark-mode:root.palette-darkComfort button.fp-force-black-btn {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  border-color: #000000 !important;
+  border-radius: 9999px !important;
+}
+:root.palette-highContrast button.fp-force-black-btn:hover,
+:root.palette-darkComfort button.fp-force-black-btn:hover,
+html.dark-mode:root.palette-highContrast button.fp-force-black-btn:hover,
+html.dark-mode:root.palette-darkComfort button.fp-force-black-btn:hover {
+  background-color: #2C7FFF !important;
+  border-color: #2C7FFF !important;
+}
+:root.palette-highContrast button.fp-force-black-btn:disabled,
+:root.palette-darkComfort button.fp-force-black-btn:disabled {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  opacity: 0.5 !important;
+}
+
+html.dark-mode.palette-highContrast .get-started-btn,
+html.dark-mode.palette-darkComfort .get-started-btn,
+html.dark-mode.palette-highContrast .get-started-btn *,
+html.dark-mode.palette-darkComfort .get-started-btn *,
+html.dark-mode.palette-highContrast .learn-more-btn,
+html.dark-mode.palette-darkComfort .learn-more-btn,
+html.dark-mode.palette-highContrast .learn-more-btn *,
+html.dark-mode.palette-darkComfort .learn-more-btn * {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+html.dark-mode.palette-highContrast .get-started-btn svg,
+html.dark-mode.palette-darkComfort .get-started-btn svg,
+html.dark-mode.palette-highContrast .get-started-btn svg *,
+html.dark-mode.palette-darkComfort .get-started-btn svg * {
+  stroke: #000000 !important;
+  color: #000000 !important;
+}
+
+html.dark-mode.palette-highContrast .register-btn,
+html.dark-mode.palette-darkComfort .register-btn,
+html.dark-mode.palette-highContrast .register-btn *,
+html.dark-mode.palette-darkComfort .register-btn * {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
 }

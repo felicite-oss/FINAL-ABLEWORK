@@ -414,105 +414,102 @@ export function ApplicantFooter({ activeTab, setActiveTab, isContrast: propContr
   };
 
   return (
-    <footer className="w-full bg-white text-[#03045E] relative mt-auto pt-16 pb-8">
+    <footer className="w-full bg-[#03045E] text-white relative mt-auto pt-16 pb-8">
       <div className="max-w-[1700px] mx-auto px-6 sm:px-10">
         
         <div className="mb-14">
           <h1 
-            className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight"
+            className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight text-white"
           >
             Where abilities meet<br/>
             opportunity<span className="text-[#2c7fff]">.</span>
           </h1>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-16">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-10 mb-16">
           
           <div>
-            <h4 className="text-sm font-extrabold text-[#03045e] uppercase tracking-widest mb-6">Resources</h4>
-            <ul className="space-y-4 text-sm font-semibold">
-              <li><button onClick={() => handleTabClick('applicant-contact')} className="hover:text-[#2c7fff] transition-colors text-left">Help Center</button></li>
-              <li><button onClick={() => handleTabClick('applicant-terms')} className="hover:text-[#2c7fff] transition-colors text-left">User Agreement</button></li>
-              <li><button onClick={() => handleTabClick('applicant-policy')} className="hover:text-[#2c7fff] transition-colors text-left">Data Privacy</button></li>
-              <li><button onClick={() => handleTabClick('settings')} className="hover:text-[#2c7fff] transition-colors text-left">Accessibility Options</button></li>
-              <li><button onClick={() => handleTabClick('overview')} className="hover:text-[#2c7fff] transition-colors text-left">System Overview</button></li>
-              <li><button onClick={() => handleTabClick('profile')} className="hover:text-[#2c7fff] transition-colors text-left">Manage Profile</button></li>
+            <h4 className="text-xs sm:text-sm font-extrabold text-white uppercase tracking-widest mb-4 sm:mb-6">Resources</h4>
+            <ul className="space-y-3 sm:space-y-4 text-xs sm:text-sm font-semibold">
+              <li><button onClick={() => handleTabClick('applicant-contact')} className="hover:text-[#2c7fff] transition-colors text-left text-white">Help Center</button></li>
+              <li><button onClick={() => handleTabClick('applicant-terms')} className="hover:text-[#2c7fff] transition-colors text-left text-white">User Agreement</button></li>
+              <li><button onClick={() => handleTabClick('applicant-policy')} className="hover:text-[#2c7fff] transition-colors text-left text-white">Data Privacy</button></li>
+              <li><button onClick={() => handleTabClick('settings')} className="hover:text-[#2c7fff] transition-colors text-left text-white">Accessibility Options</button></li>
+              <li><button onClick={() => handleTabClick('overview')} className="hover:text-[#2c7fff] transition-colors text-left text-white">System Overview</button></li>
+              <li><button onClick={() => handleTabClick('profile')} className="hover:text-[#2c7fff] transition-colors text-left text-white">Manage Profile</button></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-sm font-extrabold text-[#03045e] uppercase tracking-widest mb-6">Discover</h4>
-            <ul className="space-y-4 text-sm font-semibold">
-              <li><button onClick={() => handleTabClick('overview')} className="hover:text-[#2c7fff] transition-colors text-left">Home</button></li>
-              <li><button onClick={() => handleTabClick('profile')} className="hover:text-[#2c7fff] transition-colors text-left">Profile</button></li>
-              <li><button onClick={() => handleTabClick('settings')} className="hover:text-[#2c7fff] transition-colors text-left">Settings</button></li>
-              <li><button onClick={() => handleTabClick('applicant-terms')} className="hover:text-[#2c7fff] transition-colors text-left">Terms & Conditions</button></li>
+            <h4 className="text-xs sm:text-sm font-extrabold text-white uppercase tracking-widest mb-4 sm:mb-6">Discover</h4>
+            <ul className="space-y-3 sm:space-y-4 text-xs sm:text-sm font-semibold">
+              <li><button onClick={() => handleTabClick('overview')} className="hover:text-[#2c7fff] transition-colors text-left text-white">Home</button></li>
+              <li><button onClick={() => handleTabClick('profile')} className="hover:text-[#2c7fff] transition-colors text-left text-white">Profile</button></li>
+              <li><button onClick={() => handleTabClick('settings')} className="hover:text-[#2c7fff] transition-colors text-left text-white">Settings</button></li>
+              <li><button onClick={() => handleTabClick('applicant-terms')} className="hover:text-[#2c7fff] transition-colors text-left text-white">Terms & Conditions</button></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-sm font-extrabold text-[#03045e] uppercase tracking-widest mb-6">Get in Touch</h4>
-            <ul className="space-y-4 text-sm font-semibold">
+            <h4 className="text-xs sm:text-sm font-extrabold text-white uppercase tracking-widest mb-4 sm:mb-6">Get in Touch</h4>
+            <ul className="space-y-3 sm:space-y-4 text-xs sm:text-sm font-semibold text-white">
               <li>+63 900 000 0000</li>
-              <li>ableworksys5i@gmail.com</li>
+              <li className="break-all">ableworksys5i@gmail.com</li>
               <li>Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</li>
-              <li className="pt-2 text-[#2c7fff]">Project Team 5i</li>
-              <li className="text-xs text-[#03045E]/80">Data Custody Team: Paquio, Pagado, Astodillo, Gonzales, Gamboa</li>
+              <li className="pt-2 text-white text-base sm:text-lg">Project Team 5i</li>
+              <li className="text-[10px] sm:text-xs text-white/80">Data Custody Team: Paquio, Pagado, Astodillo, Gonzales, Gamboa</li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-sm font-extrabold text-[#03045e] uppercase tracking-widest mb-6">System Status</h4>
+            <h4 className="text-xs sm:text-sm font-extrabold text-white uppercase tracking-widest mb-4 sm:mb-6">System Status</h4>
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 rounded-xl bg-[#03045E]/5 border border-[#03045E]/10">
-                <span className="text-xs font-bold text-[#03045E]">Platform Core</span>
-                <span className="flex items-center gap-1.5 text-[10px] font-black text-white bg-green-600 px-2 py-1 rounded-md uppercase tracking-wider">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-0 p-2 sm:p-3 rounded-xl bg-white border border-white">
+                <span className="text-[10px] sm:text-xs font-bold text-[#03045E]">Platform Core</span>
+                <span style={{ backgroundColor: '#16a34a', color: '#ffffff' }} className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider w-fit">
                   <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
                   Online
                 </span>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-xl bg-[#03045E]/5 border border-[#03045E]/10">
-                <span className="text-xs font-bold text-[#03045E]">Smart Matching</span>
-                <span className="flex items-center gap-1.5 text-[10px] font-black text-white bg-green-600 px-2 py-1 rounded-md uppercase tracking-wider">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-0 p-2 sm:p-3 rounded-xl bg-white border border-white">
+                <span className="text-[10px] sm:text-xs font-bold text-[#03045E]">Smart Matching</span>
+                <span style={{ backgroundColor: '#16a34a', color: '#ffffff' }} className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider w-fit">
                   <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
                   Active
                 </span>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-xl bg-[#03045E]/5 border border-[#03045E]/10">
-                <span className="text-xs font-bold text-[#03045E]">ABBY Assistant</span>
-                <span className="flex items-center gap-1.5 text-[10px] font-black text-[#2C7FFF] bg-[#2C7FFF]/10 px-2 py-1 rounded-md uppercase tracking-wider">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#2C7FFF] animate-pulse"></span>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-0 p-2 sm:p-3 rounded-xl bg-white border border-white">
+                <span className="text-[10px] sm:text-xs font-bold text-[#03045E]">ABBY Assistant</span>
+                <span style={{ backgroundColor: '#2C7FFF', color: '#ffffff' }} className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider w-fit">
+                  <span style={{ backgroundColor: '#ffffff' }} className="w-1.5 h-1.5 rounded-full animate-pulse"></span>
                   Ready
                 </span>
               </div>
             </div>
-            <div className="mt-4 p-4 rounded-2xl bg-[#03045E] text-[#f4f4f4] relative overflow-hidden">
+            <div className="mt-4 p-3 sm:p-4 rounded-2xl bg-white text-[#03045E] relative overflow-hidden">
               <div className="relative">
-                <p className="text-[10px] font-black text-[#2c7fff] uppercase tracking-widest mb-1">Platform Uptime</p>
-                <p className="text-2xl font-black leading-none mb-1">99.9%</p>
+                <p className="text-[9px] sm:text-[10px] font-black text-[#03045E] uppercase tracking-widest mb-1">Platform Uptime</p>
+                <p className="text-xl sm:text-2xl font-black leading-none mb-1">99.9%</p>
               </div>
             </div>
           </div>
 
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between border-t border-[#03045E]/10 pt-6 text-xs font-bold text-[#03045E]">
-          <p className="mb-2 sm:mb-0">© {new Date().getFullYear()} AbleWork Capstone Project</p>
-          <p className="text-[#2c7fff]">Inclusive Employment Platform</p>
+        <div className="flex flex-row items-center justify-between border-t border-white/15 pt-6 text-xs font-bold text-white">
+          <p className="text-left">© {new Date().getFullYear()} AbleWork Capstone Project</p>
+          <div className="flex justify-end">
+            <button 
+              onClick={() => handleTabClick('applicant-contact')}
+              className="bg-white px-4 py-2 sm:px-6 sm:py-3 rounded-full font-bold flex items-center gap-2 shadow-lg text-[#03045E] text-[10px] sm:text-xs"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+              </svg>
+              Help & Support
+            </button>
+          </div>
         </div>
-      </div>
-
-      <div className="absolute bottom-6 right-6">
-        <button 
-          onClick={() => handleTabClick('applicant-contact')}
-          style={{ color: isDarkScreen ? '#000000' : '#ffffff' }}
-          className="bg-[#03045e] px-6 py-3 rounded-full font-bold flex items-center gap-2 hover:bg-[#2c7fff] transition shadow-lg"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-          </svg>
-          Help & Support
-        </button>
       </div>
     </footer>
   );

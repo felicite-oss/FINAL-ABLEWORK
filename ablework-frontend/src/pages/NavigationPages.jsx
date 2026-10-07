@@ -33,19 +33,21 @@ function MapRecenter({ lat, lng }) {
 function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const { mode } = useContext(AccessibilityContext);
+  const { paletteKey } = useColorPalette();
 
   const isContrast = mode && typeof mode === 'string' && mode.toLowerCase().includes('contrast');
+  const isAccessibilityMode = paletteKey === 'highContrast' || paletteKey === 'darkComfort';
 
   return (
-    <header className={`w-full ${isContrast ? 'bg-[var(--color-background)] text-[var(--color-text)] border-b border-[var(--color-border)]' : 'bg-[#f4f4f4] text-[#03045E] border-b border-[#03045E]/20'} fixed top-0 left-0 z-50`}>
-      <div className="w-full h-16 pl-4 pr-4 md:pr-8 flex items-center justify-between max-w-[1700px] mx-auto box-border">
+    <header className={`w-full ${isContrast ? 'bg-black border-b-2 border-[#2C7FFF]' : 'bg-white border-b-2 border-[#03045E]/15'} fixed top-0 left-0 z-50 transition-all duration-300 shadow-sm`}>
+      <div className="w-full h-14 sm:h-16 pl-3 pr-3 sm:pl-4 sm:pr-4 md:pr-8 flex items-center justify-between max-w-[1700px] mx-auto box-border">
 
         <div className="flex items-center gap-8">
           <div className="flex items-center flex-shrink-0 py-1">
             <img
-              src={isContrast ? darkLogo : lightLogo}
+              src={isAccessibilityMode ? darkLogo : lightLogo}
               alt="AbleWork Logo"
-              className="h-14 w-auto object-contain max-h-full"
+              className="h-9 sm:h-12 md:h-14 w-auto object-contain max-h-full"
             />
           </div>
           <nav className={`hidden md:flex items-center gap-6 text-[15px] font-semibold ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`} aria-label="Main navigation">
@@ -90,67 +92,84 @@ function SiteHeader() {
         </div>
 
         <button
-          className={`md:hidden flex items-center justify-center w-10 h-10 rounded-lg ${isContrast ? 'bg-[var(--color-accent)] text-[var(--color-background)]' : 'bg-[#2C7FFF] text-[#f4f4f4]'} hover:brightness-125 transition`}
+          className={`md:hidden flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl border-2 shadow-sm cursor-pointer transition-all duration-200 shrink-0 ${isContrast ? 'bg-zinc-900 text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/20'}`}
           onClick={() => setIsOpen(!isOpen)}
           aria-label={isOpen ? "Close menu" : "Open menu"}
           aria-expanded={isOpen}
         >
           {isOpen ? (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
             </svg>
           ) : (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           )}
         </button>
       </div>
 
       <div
-        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-          isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out border-b-2 ${
+          isContrast ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/20'
+        } ${
+          isOpen ? 'max-h-96 opacity-100 shadow-xl' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className={`w-full ${isContrast ? 'bg-[var(--color-background)] border-t border-[var(--color-border)]' : 'bg-[#f4f4f4] border-t border-[#03045E]/20'}`}>
-          <nav className={`flex flex-col px-6 py-5 gap-5 text-[16px] font-semibold max-w-[1700px] mx-auto ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`} aria-label="Mobile navigation">
+        <div className={`w-full ${isContrast ? 'bg-black' : 'bg-white'}`}>
+          <nav className={`flex flex-col px-2.5 pt-2.5 pb-2.5 gap-2 sm:px-3 sm:pt-3 sm:pb-3 sm:gap-2.5 ${isContrast ? 'text-white' : 'text-[#03045E]'}`} aria-label="Mobile navigation">
             <NavLink 
               to="/" 
-              className={({ isActive }) => 
-                `transition-colors duration-200 hover:text-[var(--color-accent)] hover:scale-105 transform ${isActive ? `font-bold pl-2 border-l-4 ${isContrast ? 'border-[var(--color-text)] text-[var(--color-text)]' : 'border-[#03045E] text-[#03045E]'}` : ''}`
-              } 
               onClick={() => setIsOpen(false)}
+              className="relative flex items-center gap-2.5 sm:gap-3 text-left px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-xl text-xs sm:text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25 shadow-sm"
             >
-              Home
+              <div className="shrink-0 flex items-center justify-center border-none w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-[#03045E]/10 text-[#03045E]">
+                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+              </div>
+              <span className="leading-tight">Home</span>
             </NavLink>
+
             <NavLink 
               to="/about" 
-              className={({ isActive }) => 
-                `transition-colors duration-200 hover:text-[var(--color-accent)] hover:scale-105 transform ${isActive ? `font-bold pl-2 border-l-4 ${isContrast ? 'border-[var(--color-text)] text-[var(--color-text)]' : 'border-[#03045E] text-[#03045E]'}` : ''}`
-              } 
               onClick={() => setIsOpen(false)}
+              className="relative flex items-center gap-2.5 sm:gap-3 text-left px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-xl text-xs sm:text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25 shadow-sm"
             >
-              About Us
+              <div className="shrink-0 flex items-center justify-center border-none w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-[#03045E]/10 text-[#03045E]">
+                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <span className="leading-tight">About Us</span>
             </NavLink>
+
             <NavLink 
               to="/policy" 
-              className={({ isActive }) => 
-                `transition-colors duration-200 hover:text-[var(--color-accent)] hover:scale-105 transform ${isActive ? `font-bold pl-2 border-l-4 ${isContrast ? 'border-[var(--color-text)] text-[var(--color-text)]' : 'border-[#03045E] text-[#03045E]'}` : ''}`
-              } 
               onClick={() => setIsOpen(false)}
+              className="relative flex items-center gap-2.5 sm:gap-3 text-left px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-xl text-xs sm:text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25 shadow-sm"
             >
-              Policy
+              <div className="shrink-0 flex items-center justify-center border-none w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-[#03045E]/10 text-[#03045E]">
+                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <span className="leading-tight">Policy</span>
             </NavLink>
+
+            <div className={`h-px my-0.5 ${isContrast ? 'bg-[#2C7FFF]/30' : 'bg-[#03045E]/15'}`}></div>
+
             <Link
               to="/login"
-              className={`login-btn mt-2 px-5 py-2.5 rounded-full bg-transparent text-sm font-bold border-2 transition transform duration-200 w-fit ${
-                isContrast 
-                  ? 'text-[var(--color-text)] border-[var(--color-text)] hover:bg-[var(--color-accent)] hover:text-[var(--color-background)] hover:border-[var(--color-accent)] hover:brightness-125' 
-                  : 'text-[#03045E] border-[#03045E] hover:bg-[#2C7FFF] hover:text-[#f4f4f4] hover:border-[#2C7FFF] hover:brightness-125'
-              }`}
               onClick={() => setIsOpen(false)}
+              className="relative flex items-center gap-2.5 sm:gap-3 text-left px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-xl text-xs sm:text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25 shadow-sm"
             >
-              Log In
+              <div className="shrink-0 flex items-center justify-center border-none w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-[#03045E]/10 text-[#03045E]">
+                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                </svg>
+              </div>
+              <span className="leading-tight">Log In</span>
             </Link>
           </nav>
         </div>
@@ -277,43 +296,43 @@ export function Home() {
 
       <div className="flex-1 overflow-y-auto flex flex-col pt-16">
 
-        <section className="max-w-7xl mx-auto px-6 py-12 lg:py-16 w-full relative">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 lg:py-16 w-full relative">
           <div
-            className={`hero-bg-img absolute inset-0 rounded-[3rem] bg-no-repeat bg-cover bg-center md:bg-[size:1100px_auto] md:bg-left ${isContrast ? 'bg-[var(--color-background)]/60' : 'bg-white/10'}`}
+            className={`hero-bg-img absolute inset-0 rounded-2xl sm:rounded-[3rem] bg-no-repeat bg-cover bg-center md:bg-[size:1100px_auto] md:bg-left ${isContrast ? 'bg-[var(--color-background)]/60' : 'bg-white/10'}`}
             style={{ backgroundImage: `url(${backgroundImg})` }}
           ></div>
 
-          <div className={`relative z-10 p-8 sm:p-12 rounded-[3rem] shadow-2xl border backdrop-blur-[1px] ${isContrast ? 'bg-[var(--color-surface)]/80 border-[var(--color-border)] text-[var(--color-text)]' : 'bg-[var(--color-surface)]/50 border-white/40 text-[#03045E]'}`}>
-            <div className="grid md:grid-cols-2 gap-12 items-start">
+          <div className={`relative z-10 p-4 sm:p-12 rounded-2xl sm:rounded-[3rem] shadow-2xl border backdrop-blur-[1px] ${isContrast ? 'bg-[var(--color-surface)]/80 border-[var(--color-border)] text-[var(--color-text)]' : 'bg-[var(--color-surface)]/50 border-white/40 text-[#03045E]'}`}>
+            <div className="grid md:grid-cols-2 gap-6 sm:gap-12 items-start">
               <div>
-                <span className={`inline-block px-4 py-1.5 rounded-full ${isContrast ? 'bg-[var(--color-accentSoft)] text-[var(--color-text)] border border-[var(--color-accent)]' : 'bg-[#2C7FFF]/15 text-[#2C7FFF] bg-white/10'} font-black text-xs uppercase tracking-widest mb-4 backdrop-blur-sm shadow-sm`}>
+                <span className={`inline-block px-3 py-1 sm:px-4 sm:py-1.5 rounded-full ${isContrast ? 'bg-[var(--color-accentSoft)] text-[var(--color-text)] border border-[var(--color-accent)]' : 'bg-[#2C7FFF]/15 text-[#2C7FFF] bg-white/10'} font-black text-[10px] sm:text-xs uppercase tracking-widest mb-3 sm:mb-4 backdrop-blur-sm shadow-sm`}>
                   WELCOME TO ABLEWORK
                 </span>
 
-                <h1 data-hc-plain className={`text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight mb-6 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`} style={(isContrast || isDarkMode) ? { textShadow: 'none' } : { textShadow: '0 0 8px rgba(255,255,255,0.95), 0 0 16px rgba(255,255,255,0.85), 0 0 24px rgba(255,255,255,0.7), 0 2px 4px rgba(255,255,255,0.9)' }}>
+                <h1 data-hc-plain className={`text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight mb-4 sm:mb-6 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`} style={(isContrast || isDarkMode) ? { textShadow: 'none' } : { textShadow: '0 0 8px rgba(255,255,255,0.95), 0 0 16px rgba(255,255,255,0.85), 0 0 24px rgba(255,255,255,0.7), 0 2px 4px rgba(255,255,255,0.9)' }}>
                   Building an <span className={isContrast ? 'text-[var(--color-accent)]' : 'text-[#03045E]'}>Inclusive Workforce</span> for Everyone
                 </h1>
 
-                <p data-hc-plain className={`text-lg font-semibold leading-relaxed mb-8 p-3 rounded-xl ${isContrast ? 'text-[var(--color-text)] bg-[var(--color-surface)]/80 border border-[var(--color-border)]' : 'text-[#03045E] bg-[var(--color-surface)]/50'}`} style={(isContrast || isDarkMode) ? { textShadow: 'none' } : { textShadow: '0 0 8px rgba(255,255,255,0.95), 0 0 14px rgba(255,255,255,0.85), 0 0 24px rgba(255,255,255,0.7), 0 2px 4px rgba(255,255,255,0.9)' }}>
+                <p data-hc-plain className={`text-sm sm:text-lg font-semibold leading-relaxed mb-5 sm:mb-8 p-2.5 sm:p-3 rounded-xl ${isContrast ? 'text-[var(--color-text)] bg-[var(--color-surface)]/80 border border-[var(--color-border)]' : 'text-[#03045E] bg-[var(--color-surface)]/50'}`} style={(isContrast || isDarkMode) ? { textShadow: 'none' } : { textShadow: '0 0 8px rgba(255,255,255,0.95), 0 0 14px rgba(255,255,255,0.85), 0 0 24px rgba(255,255,255,0.7), 0 2px 4px rgba(255,255,255,0.9)' }}>
                   AbleWork helps persons with disabilities find suitable employment opportunities based on their unique skills, qualifications, and preferred locations.
                 </p>
 
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-wrap gap-3 sm:gap-4">
                   <Link
                     to="/register-select"
-                    className={`get-started-btn px-8 py-4 rounded-2xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-2 group ${
+                    className={`get-started-btn px-5 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-2 group text-sm sm:text-base ${
                       isContrast 
                         ? 'bg-[#1a1a1a] text-white border-2 border-white hover:bg-[#2C7FFF] hover:border-[#2C7FFF]' 
                         : 'bg-[#03045E] text-[#f4f4f4] border-2 border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF] hover:brightness-125'
                     }`}
                   >
                     Get Started Today
-                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
                   </Link>
 
                   <Link
                     to="/about"
-                    className={`learn-more-btn px-8 py-4 rounded-2xl font-bold transition-all shadow-sm ${
+                    className={`learn-more-btn px-5 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl font-bold transition-all shadow-sm text-sm sm:text-base ${
                       isContrast
                         ? 'bg-[#1a1a1a] text-white border-2 border-white hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'
                         : `bg-[var(--color-surface)]/50 ${isDarkMode ? 'text-black' : 'text-[#03045E]'} border-2 border-[#f4f4f4] hover:bg-[#2c7fff] hover:text-[#f4f4f4] hover:brightness-125`
@@ -323,29 +342,29 @@ export function Home() {
                   </Link>
                 </div>
 
-                <div className={`grid grid-cols-3 gap-6 mt-12 pt-10 border-t ${isContrast ? 'border-[var(--color-border)]' : 'border-[#03045E]/20'}`}>
+                <div className={`grid grid-cols-3 gap-4 sm:gap-6 mt-8 sm:mt-12 pt-6 sm:pt-10 border-t ${isContrast ? 'border-[var(--color-border)]' : 'border-[#03045E]/20'}`}>
                   <div>
-                    <h4 className={`text-2xl sm:text-3xl font-black ${isContrast ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'}`}>100%</h4>
-                    <p className={`text-xs font-black uppercase tracking-wider mt-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Accessible</p>
+                    <h4 className={`text-xl sm:text-3xl font-black ${isContrast ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'}`}>100%</h4>
+                    <p className={`text-[10px] sm:text-xs font-black uppercase tracking-wider mt-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Accessible</p>
                   </div>
                   <div>
-                    <h4 className={`text-2xl sm:text-3xl font-black ${isContrast ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'}`}>24/7</h4>
-                    <p className={`text-xs font-black uppercase tracking-wider mt-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Support</p>
+                    <h4 className={`text-xl sm:text-3xl font-black ${isContrast ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'}`}>24/7</h4>
+                    <p className={`text-[10px] sm:text-xs font-black uppercase tracking-wider mt-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Support</p>
                   </div>
                   <div>
-                    <h4 className={`text-2xl sm:text-3xl font-black ${isContrast ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'}`}>Secure</h4>
-                    <p className={`text-xs font-black uppercase tracking-wider mt-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Platform</p>
+                    <h4 className={`text-xl sm:text-3xl font-black ${isContrast ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'}`}>Secure</h4>
+                    <p className={`text-[10px] sm:text-xs font-black uppercase tracking-wider mt-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Platform</p>
                   </div>
                 </div>
               </div>
 
-              <div className={`h-full flex flex-col justify-center rounded-[2rem] p-6 sm:p-8 shadow-xl border ${isContrast ? 'bg-[var(--color-surface)]/70 border-[var(--color-border)] text-[var(--color-text)]' : 'bg-[var(--color-surface)]/70 border-[#03045E]/20 text-[#03045E]'}`}>
-                <h2 className={`text-2xl font-black mb-6 tracking-tight flex items-center gap-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
+              <div className={`h-full flex flex-col justify-center rounded-xl sm:rounded-[2rem] p-4 sm:p-8 shadow-xl border ${isContrast ? 'bg-[var(--color-surface)]/70 border-[var(--color-border)] text-[var(--color-text)]' : 'bg-[var(--color-surface)]/70 border-[#03045E]/20 text-[#03045E]'}`}>
+                <h2 className={`text-lg sm:text-2xl font-black mb-4 sm:mb-6 tracking-tight flex items-center gap-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
                   <span className="w-3 h-3 rounded-full bg-[var(--color-accent)]"></span>
                   Why Choose AbleWork?
                 </h2>
 
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-6">
                   <Feature
                     title="Smart Job Matching"
                     text="Find employment opportunities customized specifically to match your professional skills."
@@ -368,18 +387,18 @@ export function Home() {
           </div>
         </section>
 
-        <section className="max-w-7xl mx-auto px-6 py-12 w-full">
-          <div className={`p-8 sm:p-10 rounded-[2.5rem] border-2 shadow-xl backdrop-blur-sm ${isContrast ? 'bg-[var(--color-surface)]/50 text-[var(--color-text)] border-[var(--color-border)]' : 'bg-[var(--color-surface)]/50 text-[#03045E] border-[#03045E]/20'}`}>
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full">
+          <div className={`p-5 sm:p-10 rounded-2xl sm:rounded-[2.5rem] border-2 shadow-xl backdrop-blur-sm ${isContrast ? 'bg-[var(--color-surface)]/50 text-[var(--color-text)] border-[var(--color-border)]' : 'bg-[var(--color-surface)]/50 text-[#03045E] border-[#03045E]/20'}`}>
             
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-6 sm:mb-8">
               <div>
-                <span className="inline-block px-3.5 py-1 rounded-full bg-[var(--color-accentSoft)] text-[var(--color-accent)] font-black text-xs uppercase tracking-widest mb-3 border border-[var(--color-accent)]">
+                <span className="inline-block px-3 py-1 rounded-full bg-[var(--color-accentSoft)] text-[var(--color-accent)] font-black text-[10px] sm:text-xs uppercase tracking-widest mb-2 sm:mb-3 border border-[var(--color-accent)]">
                   Live Opportunities Map
                 </span>
-                <h2 className="text-3xl sm:text-4xl font-black tracking-tight">
+                <h2 className="text-xl sm:text-4xl font-black tracking-tight">
                   Explore Inclusive Jobs Around You
                 </h2>
-                <p className={`text-sm sm:text-base font-bold mt-2 max-w-2xl ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/80'}`}>
+                <p className={`text-xs sm:text-base font-bold mt-2 max-w-2xl ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/80'}`}>
                   See verified hiring workplaces near your location before creating an account. Click any marker to view workplace details!
                 </p>
               </div>
@@ -389,7 +408,7 @@ export function Home() {
                   type="button"
                   onClick={() => handleDetectUserLocation(true)}
                   disabled={isDetecting}
-                  className="find-jobs-btn px-6 py-3.5 bg-[var(--color-accent)] text-[var(--color-background)] font-black text-xs uppercase tracking-wider rounded-2xl shadow-md hover:brightness-125 transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="find-jobs-btn px-4 py-2.5 sm:px-6 sm:py-3.5 bg-[var(--color-accent)] text-[var(--color-background)] font-black text-[10px] sm:text-xs uppercase tracking-wider rounded-xl sm:rounded-2xl shadow-md hover:brightness-125 transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
@@ -401,12 +420,12 @@ export function Home() {
             </div>
 
             {locationError && (
-              <div className="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold rounded-xl">
+              <div className="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-800 text-[10px] sm:text-xs font-bold rounded-xl">
                 {locationError}
               </div>
             )}
 
-            <div className="h-[480px] w-full rounded-[2rem] overflow-hidden border-2 border-[var(--color-border)] shadow-inner relative z-10">
+            <div className="h-[320px] sm:h-[480px] w-full rounded-2xl sm:rounded-[2rem] overflow-hidden border-2 border-[var(--color-border)] shadow-inner relative z-10">
               <MapContainer 
                 center={userLocation ? [userLocation.lat, userLocation.lng] : defaultCenter} 
                 zoom={userLocation ? 12 : 10} 
@@ -472,7 +491,7 @@ export function Home() {
               </MapContainer>
             </div>
 
-            <div className={`mt-4 flex flex-wrap items-center justify-between gap-4 text-xs font-bold ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/70'}`}>
+            <div className={`mt-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4 text-[10px] sm:text-xs font-bold ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/70'}`}>
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1.5">
                   <span className="w-3 h-3 rounded-full bg-[var(--color-accent)]"></span> Active Job Pin
@@ -489,16 +508,16 @@ export function Home() {
           </div>
         </section>
 
-        <section className={`py-16 px-6 my-8 ${isContrast ? 'bg-[var(--color-background)] border-y border-[var(--color-border)]' : 'bg-[#03045E]'}`}>
-          <div className="max-w-5xl mx-auto text-center space-y-6">
-            <h2 className={`text-3xl sm:text-4xl font-black tracking-tight !text-white`}>Ready to Take the Next Step in Your Career?</h2>
-            <p className={`text-base sm:text-lg font-semibold max-w-2xl mx-auto !text-white`}>
+        <section className={`py-10 sm:py-16 px-4 sm:px-6 my-6 sm:my-8 ${isContrast ? 'bg-[var(--color-background)] border-y border-[var(--color-border)]' : 'bg-[#03045E]'}`}>
+          <div className="max-w-5xl mx-auto text-center space-y-4 sm:space-y-6">
+            <h2 className={`text-xl sm:text-4xl font-black tracking-tight !text-white`}>Ready to Take the Next Step in Your Career?</h2>
+            <p className={`text-xs sm:text-lg font-semibold max-w-2xl mx-auto !text-white`}>
               Join our growing community of empowered candidates and inclusive companies building a barrier-free workplace.
             </p>
             <div className="pt-2">
               <Link
                 to="/register-select"
-                className={`inline-block px-9 py-4 rounded-2xl font-black shadow-xl hover:bg-[var(--color-accent)] hover:text-[var(--color-background)] hover:scale-105 hover:brightness-125 transition-all border-2 ${
+                className={`inline-block px-6 py-3 sm:px-9 sm:py-4 rounded-xl sm:rounded-2xl font-black shadow-xl hover:bg-[var(--color-accent)] hover:text-[var(--color-background)] hover:scale-105 hover:brightness-125 transition-all border-2 text-sm sm:text-base ${
                   isContrast 
                     ? 'bg-[var(--color-surface)]/50 !text-black border-[var(--color-accent)]' 
                     : 'bg-[#03045E] text-[#f4f4f4] border-[#2C7FFF]'
@@ -522,18 +541,18 @@ export function About() {
   return (
     <PageLayout title="About Us">
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid md:grid-cols-2 gap-4 sm:gap-8">
 
         <InfoBox>
-          <h2 className="text-2xl font-black mb-5">
+          <h2 className="text-lg sm:text-2xl font-black mb-3 sm:mb-5">
             About AbleWork
           </h2>
-          <p className="font-semibold leading-7">
+          <p className="text-xs sm:text-base font-semibold leading-6 sm:leading-7">
             AbleWork is a web-based employment assistance system
             designed to help persons with disabilities find
             appropriate employment opportunities.
           </p>
-          <p className="font-semibold leading-7 mt-5">
+          <p className="text-xs sm:text-base font-semibold leading-6 sm:leading-7 mt-3 sm:mt-5">
             The system connects applicants and employers while
             helping employers find qualified candidates based on
             skills, qualifications, and location.
@@ -541,10 +560,10 @@ export function About() {
         </InfoBox>
 
         <InfoBox>
-          <h2 className="text-2xl font-black mb-5">
+          <h2 className="text-lg sm:text-2xl font-black mb-3 sm:mb-5">
             What We Do
           </h2>
-          <ul className="space-y-4 font-semibold">
+          <ul className="space-y-3 sm:space-y-4 text-xs sm:text-base font-semibold">
             <li>✓ Connect applicants with employers</li>
             <li>✓ Provide suitable job recommendations</li>
             <li>✓ Help applicants search and apply for jobs</li>
@@ -555,7 +574,7 @@ export function About() {
 
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6 mt-8">
+      <div className="grid md:grid-cols-3 gap-4 sm:gap-6 mt-4 sm:mt-8">
         <InfoCard
           title="Our Mission"
           text="To make employment opportunities more accessible and inclusive."
@@ -648,32 +667,32 @@ export function Policy() {
   return (
     <PageLayout title="Privacy Policy">
       <div className="w-full">
-        <div className={`p-6 sm:p-8 md:p-12 rounded-3xl border-2 backdrop-blur-sm ${isContrast ? 'bg-[var(--color-surface)]/50 text-[var(--color-text)] border-[var(--color-border)]' : 'bg-[var(--color-surface)]/50 text-[#03045E] border-white/40'}`}>
+        <div className={`p-4 sm:p-8 md:p-12 rounded-2xl sm:rounded-3xl border-2 backdrop-blur-sm ${isContrast ? 'bg-[var(--color-surface)]/50 text-[var(--color-text)] border-[var(--color-border)]' : 'bg-[var(--color-surface)]/50 text-[#03045E] border-white/40'}`}>
 
-          <div className={`pb-8 mb-8 border-b ${isContrast ? 'border-[var(--color-border)]' : 'border-[#03045E]/10'}`}>
-            <span className="text-[var(--color-accent)] font-black text-xs uppercase tracking-widest block mb-2">Transparency & Commitment</span>
-            <h2 className={`text-2xl font-black mb-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Your Privacy Matters to Us</h2>
-            <p className={`text-sm sm:text-base font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'}`}>
+          <div className={`pb-6 sm:pb-8 mb-6 sm:mb-8 border-b ${isContrast ? 'border-[var(--color-border)]' : 'border-[#03045E]/10'}`}>
+            <span className="text-[var(--color-accent)] font-black text-[10px] sm:text-xs uppercase tracking-widest block mb-2">Transparency & Commitment</span>
+            <h2 className={`text-lg sm:text-2xl font-black mb-2 sm:mb-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Your Privacy Matters to Us</h2>
+            <p className={`text-xs sm:text-base font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'}`}>
               At AbleWork, we safeguard your personal and sensitive data with uncompromising standards. Review our commitments below regarding how we collect, secure, and handle your information under the Data Privacy Act of 2012.
             </p>
           </div>
 
-          <div className="space-y-8">
+          <div className="space-y-5 sm:space-y-8">
             {policySections.map((item, idx) => (
-              <div key={idx} className="flex items-start gap-5">
-                <div className="w-12 h-12 rounded-2xl bg-[var(--color-accentSoft)] flex items-center justify-center shrink-0 mt-1 shadow-inner">
+              <div key={idx} className="flex items-start gap-3 sm:gap-5">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[var(--color-accentSoft)] flex items-center justify-center shrink-0 mt-1 shadow-inner">
                   {item.icon}
                 </div>
-                <div className="space-y-2 flex-1">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-black text-[var(--color-accent)] px-2.5 py-0.5 rounded-full bg-[var(--color-accentSoft)]">
+                <div className="space-y-1.5 sm:space-y-2 flex-1 min-w-0">
+                  <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                    <span className="text-[10px] sm:text-xs font-black text-[var(--color-accent)] px-2 py-0.5 rounded-full bg-[var(--color-accentSoft)]">
                       {item.num}
                     </span>
-                    <h3 className={`text-xl font-black tracking-tight ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
+                    <h3 className={`text-base sm:text-xl font-black tracking-tight ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
                       {item.title}
                     </h3>
                   </div>
-                  <p className={`text-sm sm:text-base font-semibold leading-7 ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'}`}>
+                  <p className={`text-xs sm:text-base font-semibold leading-6 sm:leading-7 ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'}`}>
                     {item.desc}
                   </p>
               </div>
@@ -767,27 +786,27 @@ export function Terms() {
   return (
     <PageLayout title="Terms of Service">
       <div className="w-full">
-        <div className={`p-6 sm:p-8 md:p-12 rounded-3xl border-2 backdrop-blur-sm ${isContrast ? 'bg-[var(--color-surface)]/50 text-[var(--color-text)] border-[var(--color-border)]' : 'bg-[var(--color-surface)]/50 text-[#03045E] border-white/40'}`}>
+        <div className={`p-4 sm:p-8 md:p-12 rounded-2xl sm:rounded-3xl border-2 backdrop-blur-sm ${isContrast ? 'bg-[var(--color-surface)]/50 text-[var(--color-text)] border-[var(--color-border)]' : 'bg-[var(--color-surface)]/50 text-[#03045E] border-white/40'}`}>
 
-          <div className={`pb-8 mb-8 border-b ${isContrast ? 'border-[var(--color-border)]' : 'border-[#03045E]/10'}`}>
-            <span className="text-[var(--color-accent)] font-black text-xs uppercase tracking-widest block mb-2">User Guidelines</span>
-            <h2 className={`text-2xl font-black mb-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Platform Rules & Conditions</h2>
-            <p className={`text-sm sm:text-base font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'}`}>
+          <div className={`pb-6 sm:pb-8 mb-6 sm:mb-8 border-b ${isContrast ? 'border-[var(--color-border)]' : 'border-[#03045E]/10'}`}>
+            <span className="text-[var(--color-accent)] font-black text-[10px] sm:text-xs uppercase tracking-widest block mb-2">User Guidelines</span>
+            <h2 className={`text-lg sm:text-2xl font-black mb-2 sm:mb-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Platform Rules & Conditions</h2>
+            <p className={`text-xs sm:text-base font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'}`}>
               Please read these terms carefully before utilizing AbleWork. By interacting with our system, you commit to maintaining a secure, honest, and respectful community ecosystem for all job seekers and employers.
             </p>
           </div>
 
-          <div className="space-y-8">
+          <div className="space-y-5 sm:space-y-8">
             {termsSections.map((item, idx) => (
-              <div key={idx} className="flex items-start gap-5">
-                <div className="w-12 h-12 rounded-2xl bg-[var(--color-accent)] text-[var(--color-background)] flex items-center justify-center font-black text-xs shrink-0 shadow-md">
+              <div key={idx} className="flex items-start gap-3 sm:gap-5">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[var(--color-accent)] text-[var(--color-background)] flex items-center justify-center font-black text-[10px] sm:text-xs shrink-0 shadow-md">
                   {item.num}
                 </div>
-                <div className="space-y-2 flex-1">
-                  <h3 className={`text-xl font-black tracking-tight ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
+                <div className="space-y-1.5 sm:space-y-2 flex-1 min-w-0">
+                  <h3 className={`text-base sm:text-xl font-black tracking-tight ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
                     {item.title}
                   </h3>
-                  <p className={`text-sm sm:text-base font-semibold leading-7 ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'}`}>
+                  <p className={`text-xs sm:text-base font-semibold leading-6 sm:leading-7 ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'}`}>
                     {item.desc}
                   </p>
                 </div>
@@ -807,29 +826,29 @@ export function Contact() {
 
   return (
     <PageLayout title="Contact Us">
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid md:grid-cols-2 gap-4 sm:gap-8">
         
         <InfoBox>
-          <h2 className="text-2xl font-black mb-6">Get in Touch</h2>
-          <div className="space-y-6">
+          <h2 className="text-lg sm:text-2xl font-black mb-4 sm:mb-6">Get in Touch</h2>
+          <div className="space-y-4 sm:space-y-6">
             <div>
-              <h3 className="font-black">Email</h3>
-              <p className="font-semibold">ableworksys5@gmail.com</p>
+              <h3 className="text-xs sm:text-base font-black">Email</h3>
+              <p className="text-xs sm:text-base font-semibold">ableworksys5@gmail.com</p>
             </div>
             <div>
-              <h3 className="font-black">Phone</h3>
-              <p className="font-semibold">+63 900 000 0000</p>
+              <h3 className="text-xs sm:text-base font-black">Phone</h3>
+              <p className="text-xs sm:text-base font-semibold">+63 900 000 0000</p>
             </div>
             <div>
-              <h3 className="font-black">Address</h3>
-              <p className="font-semibold">Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</p>
+              <h3 className="text-xs sm:text-base font-black">Address</h3>
+              <p className="text-xs sm:text-base font-semibold">Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</p>
             </div>
           </div>
         </InfoBox>
 
         <InfoBox>
-          <h2 className="text-2xl font-black mb-6">Send Us a Message</h2>
-          <form className="space-y-4">
+          <h2 className="text-lg sm:text-2xl font-black mb-4 sm:mb-6">Send Us a Message</h2>
+          <form className="space-y-3 sm:space-y-4">
             <div>
               <label htmlFor="contact-name" className="sr-only">Your Name</label>
               <input
@@ -837,7 +856,7 @@ export function Contact() {
                 type="text"
                 placeholder="Your Name"
                 aria-label="Your Name"
-                className={`w-full p-3 bg-transparent border-2 rounded-xl font-semibold focus:outline-none focus:border-[var(--color-accent)] ${
+                className={`w-full p-2.5 sm:p-3 bg-transparent border-2 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-[var(--color-accent)] ${
                   isContrast ? 'border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-textSubtle)]' : 'border-[#03045E]/30 text-[#03045E] placeholder-[#03045E]/70'
                 }`}
               />
@@ -849,7 +868,7 @@ export function Contact() {
                 type="email"
                 placeholder="Your Email"
                 aria-label="Your Email"
-                className={`w-full p-3 bg-transparent border-2 rounded-xl font-semibold focus:outline-none focus:border-[var(--color-accent)] ${
+                className={`w-full p-2.5 sm:p-3 bg-transparent border-2 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-[var(--color-accent)] ${
                   isContrast ? 'border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-textSubtle)]' : 'border-[#03045E]/30 text-[#03045E] placeholder-[#03045E]/70'
                 }`}
               />
@@ -861,14 +880,14 @@ export function Contact() {
                 rows="5"
                 placeholder="Your Message"
                 aria-label="Your Message"
-                className={`w-full p-3 bg-transparent border-2 rounded-xl font-semibold focus:outline-none focus:border-[var(--color-accent)] ${
+                className={`w-full p-2.5 sm:p-3 bg-transparent border-2 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-[var(--color-accent)] ${
                   isContrast ? 'border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-textSubtle)]' : 'border-[#03045E]/30 text-[#03045E] placeholder-[#03045E]/70'
                 }`}
               />
             </div>
             <button
               type="button"
-              className={`w-full py-3 rounded-full font-bold transition border-2 hover:brightness-125 ${
+              className={`w-full py-2.5 sm:py-3 rounded-full font-bold transition border-2 hover:brightness-125 text-xs sm:text-sm ${
                 isContrast 
                   ? 'bg-[var(--color-surface)]/50 text-[var(--color-text)] border-[var(--color-surface)] hover:text-[var(--color-background)] hover:border-[var(--color-accent)]' 
                   : 'bg-[#03045E] text-[#f4f4f4] border-[#03045E] hover:text-[#f4f4f4] hover:border-[#2C7FFF]'
@@ -884,12 +903,12 @@ export function Contact() {
   );
 }
 
-function InfoBox({ children, className = "p-8" }) {
+function InfoBox({ children, className = "p-5 sm:p-8" }) {
   const { mode } = useContext(AccessibilityContext);
   const isContrast = mode && typeof mode === 'string' && mode.toLowerCase().includes('contrast');
 
   return (
-    <div className={`rounded-3xl shadow-xl border-2 backdrop-blur-sm ${isContrast ? 'bg-[var(--color-surface)]/50 text-[var(--color-text)] border-[var(--color-border)]' : 'bg-[var(--color-surface)]/50 text-[#03045E] border-white/40'} ${className}`}>
+    <div className={`rounded-2xl sm:rounded-3xl shadow-xl border-2 backdrop-blur-sm ${isContrast ? 'bg-[var(--color-surface)]/50 text-[var(--color-text)] border-[var(--color-border)]' : 'bg-[var(--color-surface)]/50 text-[#03045E] border-white/40'} ${className}`}>
       {children}
     </div>
   );
@@ -933,9 +952,9 @@ function PageLayout({ title, children }) {
 
       <div className="flex-1 overflow-y-auto flex flex-col pt-16">
 
-        <main className="flex-grow max-w-7xl mx-auto px-6 py-16 w-full">
+        <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16 w-full">
 
-          <h1 className={`text-4xl md:text-5xl font-black text-center mb-12 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
+          <h1 className={`text-2xl sm:text-4xl md:text-5xl font-black text-center mb-8 sm:mb-12 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
             {title}
           </h1>
 
@@ -953,23 +972,25 @@ function PageLayout({ title, children }) {
 
 function SimpleFooter() {
   const { mode } = useContext(AccessibilityContext);
+  const { paletteKey } = useColorPalette();
   const isContrast = mode && typeof mode === 'string' && mode.toLowerCase().includes('contrast');
+  const isAccessibilityMode = paletteKey === 'highContrast' || paletteKey === 'darkComfort';
 
   return (
-    <footer className={`py-12 px-6 mt-auto border-t-2 shadow-inner ${isContrast ? 'bg-[var(--color-background)] text-[var(--color-text)] border-[var(--color-border)]' : 'bg-[#f4f4f4] text-[#03045E] border-[#03045E]/20'}`}>
+    <footer className={`py-6 sm:py-12 px-4 sm:px-6 mt-auto border-t-2 shadow-inner ${isContrast ? 'bg-[var(--color-background)] text-[var(--color-text)] border-[var(--color-border)]' : 'bg-[#f4f4f4] text-[#03045E] border-[#03045E]/20'}`}>
 
-      <div className={`max-w-[1700px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b ${isContrast ? 'border-[var(--color-border)]' : 'border-[#03045E]/10'}`}>
+      <div className={`max-w-[1700px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 pb-6 sm:pb-10 border-b ${isContrast ? 'border-[var(--color-border)]' : 'border-[#03045E]/10'}`}>
         
-        <div className="md:col-span-1 space-y-3">
+        <div className="col-span-2 md:col-span-1 space-y-2 sm:space-y-3">
           <img
-            src={isContrast ? darkLogo : lightLogo}
+            src={isAccessibilityMode ? darkLogo : lightLogo}
             alt="AbleWork Logo"
-            className="h-10 w-auto object-contain"
+            className="h-8 sm:h-10 w-auto object-contain"
           />
-          <p className={`text-sm font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]'}`}>
+          <p className={`text-[10px] sm:text-sm font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]'}`}>
             Building an inclusive workforce and equal employment opportunities for everyone.
           </p>
-          <div className={`pt-2 flex items-center space-x-3 text-xs font-bold uppercase tracking-wider ${isContrast ? 'text-[var(--color-textSubtle)]' : 'text-[#03045E]'}`}>
+          <div className={`pt-1 flex items-center space-x-3 text-[9px] sm:text-xs font-bold uppercase tracking-wider ${isContrast ? 'text-[var(--color-textSubtle)]' : 'text-[#03045E]'}`}>
             <span> Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</span>
             <span></span>
             <span></span>
@@ -977,8 +998,8 @@ function SimpleFooter() {
         </div>
 
         <div>
-          <h4 className={`font-black text-base mb-4 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Quick Links</h4>
-          <ul className="space-y-2 text-sm font-semibold">
+          <h4 className={`text-xs sm:text-base font-black mb-2 sm:mb-4 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Quick Links</h4>
+          <ul className="space-y-1 sm:space-y-2 text-[10px] sm:text-sm font-semibold">
             <li>
               <Link to="/" className={`transition-colors ${isContrast ? 'text-[var(--color-textMuted)] hover:text-[var(--color-accent)]' : 'text-[#03045E] hover:text-[#2C7FFF]'}`}>
                 Home Dashboard
@@ -998,8 +1019,8 @@ function SimpleFooter() {
         </div>
 
         <div>
-          <h4 className={`font-black text-base mb-4 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Legal & Support</h4>
-          <ul className="space-y-2 text-sm font-semibold">
+          <h4 className={`text-xs sm:text-base font-black mb-2 sm:mb-4 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Legal & Support</h4>
+          <ul className="space-y-1 sm:space-y-2 text-[10px] sm:text-sm font-semibold">
             <li>
               <Link to="/policy" className={`transition-colors ${isContrast ? 'text-[var(--color-textMuted)] hover:text-[var(--color-accent)]' : 'text-[#03045E] hover:text-[#2C7FFF]'}`}>
                 Privacy Policy
@@ -1014,13 +1035,13 @@ function SimpleFooter() {
         </div>
 
         <div>
-          <h4 className={`font-black text-base mb-4 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Get Started</h4>
-          <p className={`text-sm font-semibold mb-4 ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]'}`}>
+          <h4 className={`text-xs sm:text-base font-black mb-2 sm:mb-4 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Get Started</h4>
+          <p className={`text-[10px] sm:text-sm font-semibold mb-2 sm:mb-4 ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]'}`}>
             Are you an applicant or employer looking to join our network?
           </p>
           <Link
             to="/register-select"
-            className="register-btn inline-block bg-[var(--color-accent)] text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-md hover:brightness-125 hover:text-white transition-all border-2 border-[var(--color-accent)] hover:border-[var(--color-background)]"
+            className="register-btn inline-block bg-[var(--color-accent)] text-white px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-xl font-bold text-[9px] sm:text-xs uppercase tracking-wider shadow-md hover:brightness-125 hover:text-white transition-all border-2 border-[var(--color-accent)] hover:border-[var(--color-background)]"
           >
             Register Now
           </Link>
@@ -1028,7 +1049,7 @@ function SimpleFooter() {
 
       </div>
 
-      <div className={`max-w-[1700px] mx-auto pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-bold ${isContrast ? 'text-[var(--color-textSubtle)]' : 'text-[#03045E]'}`}>
+      <div className={`max-w-[1700px] mx-auto pt-3 sm:pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 text-[9px] sm:text-xs font-bold ${isContrast ? 'text-[var(--color-textSubtle)]' : 'text-[#03045E]'}`}>
         <p>© {new Date().getFullYear()} AgileWork Inc. All rights reserved.</p>
         <p className="font-bold">Empowering Abilities, Connecting Opportunities.</p>
       </div>
@@ -1043,15 +1064,15 @@ function Feature({ title, text }) {
   const id = `feature-${title.replace(/\s+/g, '-').toLowerCase()}`;
 
   return (
-    <div role="group" aria-labelledby={id} className="flex gap-4 items-start p-3 rounded-2xl">
-      <div className="w-8 h-8 rounded-xl bg-[var(--color-accentSoft)] text-[var(--color-accent)] flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
+    <div role="group" aria-labelledby={id} className="flex gap-3 sm:gap-4 items-start p-2 sm:p-3 rounded-xl sm:rounded-2xl">
+      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-[var(--color-accentSoft)] text-[var(--color-accent)] flex items-center justify-center font-bold text-xs sm:text-sm shrink-0 mt-0.5">
         ✓
       </div>
       <div>
-        <h3 id={id} className={`font-black text-base mb-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
+        <h3 id={id} className={`text-sm sm:text-base font-black mb-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
           {title}
         </h3>
-        <p className={`text-sm font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]'}`}>
+        <p className={`text-xs sm:text-sm font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]'}`}>
           {text}
         </p>
       </div>
@@ -1066,14 +1087,14 @@ function InfoCard({ title, text }) {
 
   return (
     <div
-      className={`rounded-2xl shadow-xl p-7 border-2 backdrop-blur-sm ${isContrast ? 'bg-[var(--color-surface)]/50 text-[var(--color-text)] border-[var(--color-border)]' : 'bg-[var(--color-surface)]/50 text-[#03045E] border-white/40'}`}
+      className={`rounded-2xl shadow-xl p-5 sm:p-7 border-2 backdrop-blur-sm ${isContrast ? 'bg-[var(--color-surface)]/50 text-[var(--color-text)] border-[var(--color-border)]' : 'bg-[var(--color-surface)]/50 text-[#03045E] border-white/40'}`}
       role="region"
       aria-labelledby={id}
     >
-      <h3 id={id} className={`text-xl font-black mb-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
+      <h3 id={id} className={`text-base sm:text-xl font-black mb-2 sm:mb-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
         {title}
       </h3>
-      <p className={`font-semibold leading-6 ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]'}`}>
+      <p className={`text-xs sm:text-base font-semibold leading-6 ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]'}`}>
         {text}
       </p>
     </div>
@@ -1082,10 +1103,12 @@ function InfoCard({ title, text }) {
 
 export default function ApplicantRegister() {
   const { mode } = useContext(AccessibilityContext);
+  const { paletteKey } = useColorPalette();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
   const isContrast = mode && typeof mode === 'string' && mode.toLowerCase().includes('contrast');
+  const isAccessibilityMode = paletteKey === 'highContrast' || paletteKey === 'darkComfort';
 
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
@@ -1316,7 +1339,7 @@ export default function ApplicantRegister() {
         <div className="w-full h-14 px-4 flex items-center justify-between max-w-md mx-auto box-border">
           <div className="flex items-center gap-3">
             <div className="flex items-center flex-shrink-0 py-1">
-              <img src={darkLogo} alt="AbleWork Logo" className="h-9 w-auto object-contain max-h-full" />
+              <img src={isAccessibilityMode ? darkLogo : lightLogo} alt="AbleWork Logo" className="h-9 w-auto object-contain max-h-full" />
             </div>
           </div>
           <div className="flex items-center">

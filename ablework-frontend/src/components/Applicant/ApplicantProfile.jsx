@@ -283,10 +283,24 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
         setSaveSuccess({ isOpen: true, message: 'Your profile has been updated successfully. All changes are now live.' });
         refreshData(); 
       } else {
-        alert("Failed to update profile.");
+        setLocationAlert({
+          isOpen: true,
+          type: 'error',
+          title: 'Update Failed',
+          message: 'Failed to update profile. Please check your information and try again.',
+          latitude: '',
+          longitude: ''
+        });
       }
     } catch (err) {
-      alert("Server error while saving profile.");
+      setLocationAlert({
+        isOpen: true,
+        type: 'error',
+        title: 'Server Error',
+        message: 'Server error while saving profile. Please try again later.',
+        latitude: '',
+        longitude: ''
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -305,16 +319,16 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
         `}</style>
       )}
 
-      <div className="mb-10 bg-[#f4f4f4] p-8 rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border border-[#03045E]/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div className="flex items-center gap-6">
+      {/* PROFILE HEADER - Adjusted padding, margin, and flex direction for mobile */}
+      <div className="mb-6 sm:mb-10 bg-[#f4f4f4] p-4 sm:p-8 rounded-2xl sm:rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border border-[#03045E]/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6">
+        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full">
           
-
           <div className="relative group shrink-0">
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-4 border-white shadow-md bg-white flex items-center justify-center text-[#03045E]">
+            <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-full overflow-hidden border-4 border-white shadow-md bg-white flex items-center justify-center text-[#03045E]">
               {formData.profile_picture ? (
                 <img src={formData.profile_picture} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                <svg className="w-12 h-12 text-[#03045E]/40" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-10 h-10 sm:w-12 sm:h-12 text-[#03045E]/40" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
                 </svg>
               )}
@@ -326,20 +340,20 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
                 setTempImagePreview(formData.profile_picture);
                 setIsModalOpen(true);
               }}
-              className="absolute bottom-0 right-0 p-2.5 bg-[#2C7FFF] text-white rounded-full shadow-lg hover:bg-[#03045E] transition-all cursor-pointer border-2 border-white"
+              className="absolute bottom-0 right-0 p-2 sm:p-2.5 bg-[#2C7FFF] text-white rounded-full shadow-lg cursor-pointer border-2 border-white"
               title="Change Profile Picture"
             >
-              <svg className="w-4 h-4" style={{ color: isDarkMode ? '#000000' : '#ffffff' }} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: isDarkMode ? '#000000' : '#ffffff' }} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
               </svg>
             </button>
           </div>
 
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#03045E] tracking-tight">
+          <div className="text-center sm:text-left">
+            <h1 className="text-xl sm:text-3xl font-extrabold text-[#03045E] tracking-tight">
               {profile?.full_name || profile?.name || 'Applicant Profile'}
             </h1>
-            <p className="text-sm font-semibold text-[#03045E] mt-1">
+            <p className="text-xs sm:text-sm font-semibold text-[#03045E] mt-1">
               Manage your personal settings, avatar, and smart match parameters
             </p>
           </div>
@@ -347,47 +361,48 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
       </div>
 
   
+      {/* MODAL: UPDATE AVATAR - Adjusted padding and sizes for mobile */}
       {isModalOpen && (
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 backdrop-blur-[0.5px] animate-in fade-in transition-all duration-300"
-          style={{ backgroundColor: 'rgba(255, 255, 255, 0.6)', filter: 'none' }}
+          className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
+          style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className="relative w-full max-w-md rounded-[2rem] shadow-[0_25px_60px_rgba(3,4,94,0.25)] overflow-hidden animate-in zoom-in-95 duration-300 bg-white">
+          <div className="relative w-full max-w-md rounded-2xl sm:rounded-[2rem] shadow-[0_25px_60px_rgba(3,4,94,0.25)] overflow-hidden animate-in zoom-in-95 duration-300 bg-white">
             <div className="absolute -top-20 -right-20 w-56 h-56 rounded-full bg-[#2C7FFF]/10"></div>
 
             <div className="relative h-1.5 w-full bg-[#2C7FFF]"></div>
 
-            <div className="relative px-8 pt-8 pb-8 flex flex-col items-center text-center">
-              <div className="relative mb-5">
-                <div className="absolute inset-0 rounded-2xl bg-[#2C7FFF]/20 rotate-6"></div>
-                <div className="relative w-14 h-14 rounded-2xl bg-[#2C7FFF] shadow-lg shadow-[#2C7FFF]/40 flex items-center justify-center -rotate-3">
-                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <div className="relative px-5 pt-6 pb-6 sm:px-8 sm:pt-8 sm:pb-8 flex flex-col items-center text-center">
+              <div className="relative mb-4 sm:mb-5">
+                <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-[#2C7FFF]/20 rotate-6"></div>
+                <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-[#2C7FFF] shadow-lg shadow-[#2C7FFF]/40 flex items-center justify-center -rotate-3">
+                  <svg className="w-6 h-6 sm:w-7 sm:h-7" style={{ color: isDarkMode ? '#000000' : '#ffffff' }} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                   </svg>
                 </div>
               </div>
 
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-[#2C7FFF] bg-[#2C7FFF]/10 px-3 py-1 rounded-full mb-3">
+              <span className="inline-flex items-center gap-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.18em] text-[#2C7FFF] bg-[#2C7FFF]/10 px-2.5 sm:px-3 py-1 rounded-full mb-2 sm:mb-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2C7FFF] animate-pulse"></span>
                 Profile Picture
               </span>
 
-              <h3 className="text-2xl font-black text-[#03045E] tracking-tight mb-2">Update Your Avatar</h3>
-              <p className="text-xs font-semibold text-[#03045E]/70 mb-6 max-w-xs">Choose a new image to refresh your profile and header photo.</p>
+              <h3 className="text-xl sm:text-2xl font-black text-[#03045E] tracking-tight mb-1 sm:mb-2">Update Your Avatar</h3>
+              <p className="text-[11px] sm:text-xs font-semibold text-[#03045E]/70 mb-4 sm:mb-6 max-w-xs">Choose a new image to refresh your profile and header photo.</p>
 
-              <div className="relative mb-6">
+              <div className="relative mb-5 sm:mb-6">
                 <div className="absolute inset-0 rounded-full bg-[#2C7FFF]/15 blur-xl"></div>
-                <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-xl ring-4 ring-[#2C7FFF]/30 bg-gray-100 flex items-center justify-center">
+                <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-white shadow-xl ring-4 ring-[#2C7FFF]/30 bg-gray-100 flex items-center justify-center">
                   {tempImagePreview ? (
                     <img src={tempImagePreview} alt="Preview" className="w-full h-full object-cover" />
                   ) : (
-                    <svg className="w-14 h-14 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-10 h-10 sm:w-14 sm:h-14 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
                     </svg>
                   )}
                 </div>
-                <span className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-[#2C7FFF] border-3 border-white flex items-center justify-center text-white shadow-lg">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                <span className="absolute -bottom-1 -right-1 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#2C7FFF] border-3 border-white flex items-center justify-center text-white shadow-lg">
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke={isDarkMode ? '#000000' : '#ffffff'} strokeWidth="3" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                   </svg>
                 </span>
@@ -404,20 +419,20 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
               <button 
                 type="button" 
                 onClick={() => fileInputRef.current?.click()} 
-                className="group w-full px-6 py-3 bg-[#f4f4f4] border-2 border-dashed border-[#2C7FFF]/40 text-[#03045E] font-extrabold text-xs rounded-2xl hover:bg-[#2C7FFF]/5 hover:border-[#2C7FFF] transition-all mb-5 cursor-pointer flex items-center justify-center gap-2"
+                className="group w-full px-4 py-2.5 sm:px-6 sm:py-3 bg-[#f4f4f4] border-2 border-dashed border-[#03045E]/30 text-[#03045E] font-extrabold text-[11px] sm:text-xs rounded-xl sm:rounded-2xl transition-all mb-4 sm:mb-5 cursor-pointer flex items-center justify-center gap-2"
               >
-                <svg className="w-4 h-4 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 <span>Browse Image File</span>
               </button>
 
-              <div className="flex items-center gap-3 w-full">
+              <div className="flex items-center gap-2 sm:gap-3 w-full">
                 <button 
                   type="button" 
                   disabled={isUpdatingPicture}
                   onClick={handleCancelChangePicture} 
-                  className="flex-1 py-3.5 bg-gray-100 text-gray-700 font-extrabold text-sm rounded-2xl hover:bg-gray-200 transition-all cursor-pointer disabled:opacity-50 border-2 border-transparent hover:border-gray-300"
+                  className="flex-1 py-2.5 sm:py-3.5 bg-gray-100 text-gray-700 font-extrabold text-[11px] sm:text-sm rounded-xl sm:rounded-2xl hover:bg-gray-200 transition-all cursor-pointer disabled:opacity-50 border-2 border-transparent hover:border-gray-300"
                 >
                   Cancel
                 </button>
@@ -425,22 +440,23 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
                   type="button" 
                   disabled={isUpdatingPicture}
                   onClick={handleConfirmChangePicture} 
-                  className="flex-1 py-3.5 bg-[#2C7FFF] text-white font-extrabold text-sm rounded-2xl hover:bg-[#03045E] transition-all cursor-pointer shadow-lg shadow-[#2C7FFF]/30 flex items-center justify-center gap-2 disabled:opacity-50"
+                  style={{ color: isDarkMode ? '#000000' : '#ffffff' }}
+                  className="flex-1 py-2.5 sm:py-3.5 bg-[#2C7FFF] font-extrabold text-[11px] sm:text-sm rounded-xl sm:rounded-2xl cursor-pointer shadow-lg shadow-[#2C7FFF]/40 flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {isUpdatingPicture ? (
                     <>
-                      <svg className="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" style={{ color: isDarkMode ? '#000000' : '#ffffff' }} fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                       </svg>
-                      <span>Updating...</span>
+                      <span style={{ color: isDarkMode ? '#000000' : '#ffffff' }}>Updating...</span>
                     </>
                   ) : (
                     <>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: isDarkMode ? '#000000' : '#ffffff' }} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
-                      <span>Save Avatar</span>
+                      <span style={{ color: isDarkMode ? '#000000' : '#ffffff' }}>Save Avatar</span>
                     </>
                   )}
                 </button>
@@ -450,28 +466,29 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
         </div>
       )}
 
+      {/* MODAL: LOCATION ALERT - Adjusted padding and sizes for mobile */}
       {locationAlert.isOpen && (
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 backdrop-blur-[0.5px] animate-in fade-in transition-all duration-300"
-          style={{ backgroundColor: 'rgba(255, 255, 255, 0.6)', filter: 'none' }}
+          className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
+          style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative w-full max-w-md rounded-[2rem] shadow-2xl border-2 overflow-hidden animate-in zoom-in-95 duration-300 bg-white ${locationAlert.type === 'error' ? 'border-red-500/30' : locationAlert.type === 'warning' ? 'border-amber-500/30' : 'border-[#2C7FFF]/30'}`}>
-            <div className="px-8 pt-8 pb-7 flex flex-col items-center text-center">
-              <div className="relative mb-5">
-                <div className={`w-20 h-20 rounded-full flex items-center justify-center ${locationAlert.type === 'error' ? 'bg-red-100' : locationAlert.type === 'warning' ? 'bg-amber-100' : 'bg-[#2C7FFF]/10'}`}>
-                  <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg ${locationAlert.type === 'error' ? 'bg-red-500 shadow-red-500/40' : locationAlert.type === 'warning' ? 'bg-amber-500 shadow-amber-500/40' : 'bg-[#2C7FFF] shadow-[#2C7FFF]/40'}`}>
+          <div className={`relative w-full max-w-md rounded-2xl sm:rounded-[2rem] shadow-2xl border-2 overflow-hidden animate-in zoom-in-95 duration-300 bg-white ${locationAlert.type === 'error' ? 'border-red-500/30' : locationAlert.type === 'warning' ? 'border-amber-500/30' : 'border-[#2C7FFF]/30'}`}>
+            <div className="px-5 pt-6 pb-5 sm:px-8 sm:pt-8 sm:pb-7 flex flex-col items-center text-center">
+              <div className="relative mb-4 sm:mb-5">
+                <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center ${locationAlert.type === 'error' ? 'bg-red-100' : locationAlert.type === 'warning' ? 'bg-amber-100' : 'bg-[#2C7FFF]/10'}`}>
+                  <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-lg ${locationAlert.type === 'error' ? 'bg-red-500 shadow-red-500/40' : locationAlert.type === 'warning' ? 'bg-amber-500 shadow-amber-500/40' : 'bg-[#2C7FFF] shadow-[#2C7FFF]/40'}`}>
                     {locationAlert.type === 'success' && (
-                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke={isDarkMode ? '#000000' : '#ffffff'} viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
                       </svg>
                     )}
                     {locationAlert.type === 'error' && (
-                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     )}
                     {locationAlert.type === 'warning' && (
-                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                       </svg>
                     )}
@@ -479,30 +496,31 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
                 </div>
               </div>
 
-              <h2 className="text-2xl font-black text-[#03045E] tracking-tight mb-2">
+              <h2 className="text-xl sm:text-2xl font-black text-[#03045E] tracking-tight mb-2">
                 {locationAlert.title}
               </h2>
-              <p className="text-sm font-semibold text-[#03045E]/70 leading-relaxed mb-6">
+              <p className="text-xs sm:text-sm font-semibold text-[#03045E]/70 leading-relaxed mb-5 sm:mb-6">
                 {locationAlert.message}
               </p>
 
               {locationAlert.type === 'success' && locationAlert.latitude && (
-                <div className="w-full bg-[#f4f4f4] rounded-2xl p-4 border-2 border-[#2C7FFF]/20 mb-6 text-left">
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="text-[11px] font-black text-[#03045E]/55 uppercase tracking-wider">Latitude</span>
-                    <span className="text-sm font-black text-[#2C7FFF]">{locationAlert.latitude}</span>
+                <div className="w-full bg-[#f4f4f4] rounded-xl sm:rounded-2xl p-3 sm:p-4 border-2 border-[#2C7FFF]/20 mb-5 sm:mb-6 text-left">
+                  <div className="flex justify-between items-center mb-2 sm:mb-3">
+                    <span className="text-[10px] sm:text-[11px] font-black text-[#03045E]/55 uppercase tracking-wider">Latitude</span>
+                    <span className="text-xs sm:text-sm font-black text-[#2C7FFF]">{locationAlert.latitude}</span>
                   </div>
-                  <div className="h-px bg-[#03045E]/10 mb-3"></div>
+                  <div className="h-px bg-[#03045E]/10 mb-2 sm:mb-3"></div>
                   <div className="flex justify-between items-center">
-                    <span className="text-[11px] font-black text-[#03045E]/55 uppercase tracking-wider">Longitude</span>
-                    <span className="text-sm font-black text-[#2C7FFF]">{locationAlert.longitude}</span>
+                    <span className="text-[10px] sm:text-[11px] font-black text-[#03045E]/55 uppercase tracking-wider">Longitude</span>
+                    <span className="text-xs sm:text-sm font-black text-[#2C7FFF]">{locationAlert.longitude}</span>
                   </div>
                 </div>
               )}
 
               <button
                 onClick={() => setLocationAlert({ isOpen: false, type: '', title: '', message: '', latitude: '', longitude: '' })}
-                className="w-full py-3.5 rounded-2xl bg-[#2C7FFF] hover:bg-[#03045E] text-white font-black text-sm uppercase tracking-wider shadow-md transition-all cursor-pointer"
+                style={{ color: isDarkMode ? '#000000' : '#ffffff' }}
+                className="w-full py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-[#2C7FFF] font-black text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all cursor-pointer"
               >
                 {locationAlert.type === 'error' ? 'Try Again' : 'Got it!'}
               </button>
@@ -511,45 +529,42 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
         </div>
       )}
 
+      {/* MODAL: SAVE SUCCESS - Adjusted padding and sizes for mobile */}
       {saveSuccess.isOpen && (
         <div
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative w-full max-w-sm rounded-[2rem] border-2 overflow-hidden ${isDarkScreen ? 'bg-black border-[#2C7FFF]' : 'bg-[#F4F4F4] border-[#2C7FFF]'}`}>
+          <div className={`relative w-full max-w-sm rounded-2xl sm:rounded-[2rem] border-2 overflow-hidden ${isDarkScreen ? 'bg-black border-[#2C7FFF]' : 'bg-[#F4F4F4] border-[#2C7FFF]'}`}>
             <div className="h-2 w-full bg-[#2C7FFF]" />
 
-            <div className="px-8 pt-10 pb-8 flex flex-col items-center text-center">
-              <div className="relative mb-6">
+            <div className="px-5 pt-8 pb-6 sm:px-8 sm:pt-10 sm:pb-8 flex flex-col items-center text-center">
+              <div className="relative mb-5 sm:mb-6">
                 <div className="absolute inset-0 rounded-full bg-[#2C7FFF]/20 animate-ping" />
-                <div className="relative w-20 h-20 rounded-full bg-[#2C7FFF]/15 flex items-center justify-center">
-                  <div className="w-14 h-14 rounded-full bg-[#2C7FFF] flex items-center justify-center">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#2C7FFF]/15 flex items-center justify-center">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#2C7FFF] flex items-center justify-center">
+                    <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke={isDarkMode ? '#000000' : '#ffffff'} viewBox="0 0 24 24" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
                 </div>
-                <div className={`absolute -top-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center border-2 ${isDarkScreen ? 'bg-[#2C7FFF] border-black' : 'bg-[#03045E] border-[#F4F4F4]'}`}>
-                  <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
               </div>
 
-              <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 border-2 ${isDarkScreen ? 'text-white bg-black border-[#2C7FFF]' : 'text-[#03045E] bg-white border-[#2C7FFF]'}`}>
+              <span className={`inline-block px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-2 sm:mb-3 border-2 ${isDarkScreen ? 'text-white bg-black border-[#2C7FFF]' : 'text-[#03045E] bg-white border-[#2C7FFF]'}`}>
                 Profile Saved
               </span>
 
-              <h2 className={`text-2xl font-black tracking-tight mb-2 ${isDarkScreen ? 'text-white' : 'text-[#03045E]'}`}>
+              <h2 className={`text-xl sm:text-2xl font-black tracking-tight mb-2 ${isDarkScreen ? 'text-white' : 'text-[#03045E]'}`}>
                 Profile Saved Successfully!
               </h2>
-              <p className={`text-sm font-bold leading-relaxed mb-6 max-w-xs ${isDarkScreen ? 'text-white/80' : 'text-[#03045E]/80'}`}>
+              <p className={`text-xs sm:text-sm font-bold leading-relaxed mb-5 sm:mb-6 max-w-xs ${isDarkScreen ? 'text-white/80' : 'text-[#03045E]/80'}`}>
                 {saveSuccess.message}
               </p>
 
               <button
                 onClick={() => setSaveSuccess({ isOpen: false, message: '' })}
-                className={`w-full py-3.5 rounded-2xl font-black text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDarkScreen ? 'bg-[#2C7FFF] text-black border-[#2C7FFF] hover:bg-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+                style={{ color: isDarkMode ? '#000000' : '#ffffff' }}
+                className={`w-full py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDarkScreen ? 'bg-[#2C7FFF] border-[#2C7FFF] hover:bg-white' : 'bg-[#03045E] border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
               >
                 Got it
               </button>
@@ -558,24 +573,24 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
         
-    
-        <div className="flex flex-col gap-6 p-8 bg-[#f4f4f4] rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.04)] border border-[#03045E]/20 h-fit transition-all duration-300 hover:shadow-[0_20px_40px_rgba(3,4,94,0.08)]">
-          <div className="flex items-center gap-3 border-b border-[#03045E]/20 pb-4">
-            <div className="w-10 h-10 rounded-xl bg-white text-[#2C7FFF] border border-[#03045E]/10 flex items-center justify-center shrink-0">
-              <svg className="w-5 h-5 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        {/* LEFT COLUMN: PROFESSIONAL PROFILE - Adjusted padding and text sizes for mobile */}
+        <div className="flex flex-col gap-4 sm:gap-6 p-4 sm:p-8 bg-[#f4f4f4] rounded-2xl sm:rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.04)] border border-[#03045E]/20 h-fit transition-all duration-300 hover:shadow-[0_20px_40px_rgba(3,4,94,0.08)]">
+          <div className="flex items-center gap-2 sm:gap-3 border-b border-[#03045E]/20 pb-3 sm:pb-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white text-[#2C7FFF] border border-[#03045E]/10 flex items-center justify-center shrink-0">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-[#03045E]">Professional Profile</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-[#03045E]">Professional Profile</h2>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-bold text-[#03045E]">Skills *</label>
-            <div className="p-3 bg-white border border-[#03045E]/20 rounded-2xl flex flex-wrap gap-2 items-center focus-within:border-[#2C7FFF] focus-within:ring-4 focus-within:ring-[#2C7FFF]/20 transition-all">
+          <div className="flex flex-col gap-1.5 sm:gap-2">
+            <label className="text-xs sm:text-sm font-bold text-[#03045E]">Skills *</label>
+            <div className="p-2 sm:p-3 bg-white border border-[#03045E]/20 rounded-xl sm:rounded-2xl flex flex-wrap gap-1.5 sm:gap-2 items-center focus-within:border-[#2C7FFF] focus-within:ring-4 focus-within:ring-[#2C7FFF]/20 transition-all">
               {skills.map((skill, index) => (
-                <span key={index} className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#03045E] text-white text-xs font-bold rounded-xl shadow-sm">
+                <span key={index} className="inline-flex items-center gap-1 px-2.5 py-1 sm:px-3.5 sm:py-1.5 bg-[#03045E] text-white text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl shadow-sm">
                   {skill}
                   <button type="button" onClick={() => removeSkill(index)} className="hover:text-red-300 font-extrabold cursor-pointer ml-1">×</button>
                 </span>
@@ -587,12 +602,12 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
                 onChange={(e) => setSkillInput(e.target.value)} 
                 onKeyDown={handleSkillKeyDown}
                 placeholder={skills.length === 0 ? "Type a skill and press Enter..." : "Add more..."}
-                className="flex-1 min-w-[140px] outline-none bg-transparent text-sm font-medium text-[#03045E] placeholder:text-[#03045E]/40 p-1"
+                className="flex-1 min-w-[120px] outline-none bg-transparent text-xs sm:text-sm font-medium text-[#03045E] placeholder:text-gray-400 p-1"
               />
             </div>
             
             {skillInput.trim().length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-2 animate-fadeIn">
+              <div className="flex flex-wrap gap-1.5 mt-1.5 sm:mt-2 animate-fadeIn">
                 {SKILL_RECOMMENDATIONS
                   .filter(s => s.toLowerCase().includes(skillInput.toLowerCase()) && !skills.includes(s))
                   .map((rec, i) => (
@@ -600,22 +615,22 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
                       type="button"
                       key={i}
                       onClick={() => addSkillChip(rec)}
-                      className="px-3 py-1 bg-white border border-[#2C7FFF]/30 text-[#2C7FFF] hover:bg-[#2C7FFF] hover:text-white text-xs font-bold rounded-full transition-all cursor-pointer shadow-2xs"
+                      className="px-2.5 py-1 bg-white border border-[#03045E]/30 text-[#03045E] text-[10px] sm:text-xs font-bold rounded-full cursor-pointer"
                     >
                       + {rec}
                     </button>
                   ))}
               </div>
             )}
-            <p className="text-xs text-[#03045E] font-semibold mt-1">These must match employer requirements to trigger a Smart Match.</p>
+            <p className="text-[10px] sm:text-xs text-[#03045E] font-semibold mt-1">These must match employer requirements to trigger a Smart Match.</p>
           </div>
 
           
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-bold text-[#03045E]">Required Accommodations *</label>
-            <div className="p-3 bg-white border border-[#03045E]/20 rounded-2xl flex flex-wrap gap-2 items-center focus-within:border-[#2C7FFF] focus-within:ring-4 focus-within:ring-[#2C7FFF]/20 transition-all">
+          <div className="flex flex-col gap-1.5 sm:gap-2">
+            <label className="text-xs sm:text-sm font-bold text-[#03045E]">Required Accommodations *</label>
+            <div className="p-2 sm:p-3 bg-white border border-[#03045E]/20 rounded-xl sm:rounded-2xl flex flex-wrap gap-1.5 sm:gap-2 items-center focus-within:border-[#2C7FFF] focus-within:ring-4 focus-within:ring-[#2C7FFF]/20 transition-all">
               {accommodations.map((acc, index) => (
-                <span key={index} className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#03045E] text-white text-xs font-bold rounded-xl shadow-sm">
+                <span key={index} className="inline-flex items-center gap-1 px-2.5 py-1 sm:px-3.5 sm:py-1.5 bg-[#03045E] text-white text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl shadow-sm">
                   {acc}
                   <button type="button" onClick={() => removeAccom(index)} className="hover:text-red-300 font-extrabold cursor-pointer ml-1">×</button>
                 </span>
@@ -627,12 +642,12 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
                 onChange={(e) => setAccomInput(e.target.value)} 
                 onKeyDown={handleAccomKeyDown}
                 placeholder={accommodations.length === 0 ? "Type an accommodation and press Enter..." : "Add more..."}
-                className="flex-1 min-w-[140px] outline-none bg-transparent text-sm font-medium text-[#03045E] placeholder:text-[#03045E]/40 p-1"
+                className="flex-1 min-w-[120px] outline-none bg-transparent text-xs sm:text-sm font-medium text-[#03045E] placeholder:text-gray-400 p-1"
               />
             </div>
 
             {accomInput.trim().length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-2 animate-fadeIn">
+              <div className="flex flex-wrap gap-1.5 mt-1.5 sm:mt-2 animate-fadeIn">
                 {ACCOMMODATION_RECOMMENDATIONS
                   .filter(a => a.toLowerCase().includes(accomInput.toLowerCase()) && !accommodations.includes(a))
                   .map((rec, i) => (
@@ -640,20 +655,20 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
                       type="button"
                       key={i}
                       onClick={() => addAccomChip(rec)}
-                      className="px-3 py-1 bg-white border border-purple-300 text-purple-700 hover:bg-purple-600 hover:text-white text-xs font-bold rounded-full transition-all cursor-pointer shadow-2xs"
+                      className="px-2.5 py-1 bg-white border border-[#03045E]/30 text-[#03045E] text-[10px] sm:text-xs font-bold rounded-full cursor-pointer"
                     >
                       + {rec}
                     </button>
                   ))}
               </div>
             )}
-            <p className="text-xs text-[#03045E] font-semibold mt-1">The Smart Engine will only show you jobs that provide these exact accommodations.</p>
+            <p className="text-[10px] sm:text-xs text-[#03045E] font-semibold mt-1">The Smart Engine will only show you jobs that provide these exact accommodations.</p>
           </div>
 
 
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-bold text-[#03045E]">Primary Disability Type *</label>
-            <div className="flex flex-wrap gap-2 p-3 bg-white border border-[#03045E]/20 rounded-2xl">
+          <div className="flex flex-col gap-1.5 sm:gap-2">
+            <label className="text-xs sm:text-sm font-bold text-[#03045E]">Primary Disability Type *</label>
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 p-2 sm:p-3 bg-white border border-[#03045E]/20 rounded-xl sm:rounded-2xl">
               {DISABILITY_OPTIONS.map((option, i) => {
                 const isSelected = selectedDisabilities.includes(option);
                 const selectedColor = isDarkMode ? '#000000' : '#ffffff';
@@ -663,7 +678,7 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
                     key={i}
                     onClick={() => toggleDisability(option)}
                     style={isSelected ? { color: selectedColor } : undefined}
-                    className={`px-3.5 py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 ${
+                    className={`px-2.5 py-1.5 sm:px-3.5 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl border transition-all cursor-pointer flex items-center gap-1 ${
                       isSelected 
                         ? 'bg-[#2C7FFF] border-[#2C7FFF] shadow-md' 
                         : 'bg-white text-[#03045E] border-gray-200 hover:border-[#2C7FFF]'
@@ -677,11 +692,11 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
             </div>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-bold text-[#03045E]">Workplace Independence Level</label>
+          <div className="flex flex-col gap-1.5 sm:gap-2">
+            <label className="text-xs sm:text-sm font-bold text-[#03045E]">Workplace Independence Level</label>
             <select 
               name="workplace_independence" value={formData.workplace_independence} onChange={handleChange} required
-              className="w-full p-3.5 pl-4 bg-white rounded-2xl text-[#03045E] transition-all font-medium text-sm cursor-pointer"
+              className="w-full p-3 sm:p-3.5 pl-3 sm:pl-4 bg-white rounded-xl sm:rounded-2xl text-[#03045E] transition-all font-medium text-xs sm:text-sm cursor-pointer"
               style={{ borderWidth: '2px', borderStyle: 'solid', borderColor: 'var(--color-primary, #2C7FFF)', outline: 'none', boxShadow: 'none' }}
             >
               <option value="" disabled style={{ backgroundColor: '#ffffff', color: 'rgba(3,4,94,0.4)' }}>Select independence level</option>
@@ -691,55 +706,55 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
           </div>
         </div>
 
-
-        <div className="flex flex-col gap-6 p-8 bg-[#f4f4f4] rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.04)] border border-[#03045E]/20 h-fit transition-all duration-300 hover:shadow-[0_20px_40px_rgba(3,4,94,0.08)]">
-          <div className="flex items-center gap-3 border-b border-[#03045E]/20 pb-4">
-            <div className="w-10 h-10 rounded-xl bg-white text-[#2C7FFF] border border-[#03045E]/10 flex items-center justify-center shrink-0">
-              <svg className="w-5 h-5 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        {/* RIGHT COLUMN: MATCH RADIUS & LOCATION - Adjusted padding and text sizes for mobile */}
+        <div className="flex flex-col gap-4 sm:gap-6 p-4 sm:p-8 bg-[#f4f4f4] rounded-2xl sm:rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.04)] border border-[#03045E]/20 h-fit transition-all duration-300 hover:shadow-[0_20px_40px_rgba(3,4,94,0.08)]">
+          <div className="flex items-center gap-2 sm:gap-3 border-b border-[#03045E]/20 pb-3 sm:pb-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white text-[#2C7FFF] border border-[#03045E]/10 flex items-center justify-center shrink-0">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-[#03045E]">Match Radius & Location</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-[#03045E]">Match Radius & Location</h2>
           </div>
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1.5 sm:gap-2">
             <div className="flex justify-between items-center">
-              <label className="text-sm font-bold text-[#03045E]">Travel Radius</label>
-              <span className="font-extrabold text-sm px-3 py-1 rounded-full bg-white text-[#2C7FFF] border border-[#03045E]/20">{formData.travel_radius_km} km</span>
+              <label className="text-xs sm:text-sm font-bold text-[#03045E]">Travel Radius</label>
+              <span className="font-extrabold text-[10px] sm:text-sm px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-white text-[#2C7FFF] border border-[#03045E]/20">{formData.travel_radius_km} km</span>
             </div>
-            <div className="flex items-center gap-4 py-2">
+            <div className="flex items-center gap-3 sm:gap-4 py-1.5 sm:py-2">
               <input 
                 type="range" name="travel_radius_km" min="1" max="100" 
                 value={formData.travel_radius_km} onChange={handleChange} 
-                className="flex-1 h-2 bg-white rounded-lg appearance-none cursor-pointer accent-[#2C7FFF]" 
+                className="flex-1 h-1.5 sm:h-2 bg-white rounded-lg appearance-none cursor-pointer accent-[#2C7FFF]" 
               />
             </div>
-            <p className="text-xs text-[#03045E] font-semibold">We will hide jobs that are further away than this limit.</p>
+            <p className="text-[10px] sm:text-xs text-[#03045E] font-semibold">We will hide jobs that are further away than this limit.</p>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-bold text-[#03045E]">Residential Address</label>
+          <div className="flex flex-col gap-1.5 sm:gap-2">
+            <label className="text-xs sm:text-sm font-bold text-[#03045E]">Residential Address</label>
             <input 
               type="text" name="residential_address" value={formData.residential_address} onChange={handleChange} required 
-              className="w-full p-3.5 pl-4 bg-white border border-[#03045E]/20 rounded-2xl focus:border-[#2C7FFF] focus:ring-4 focus:ring-[#2C7FFF]/20 outline-none text-[#03045E] transition-all font-medium text-sm placeholder:text-[#03045E]/40" 
+              className="w-full p-3 sm:p-3.5 pl-3 sm:pl-4 bg-white border border-[#03045E]/20 rounded-xl sm:rounded-2xl focus:border-[#2C7FFF] focus:ring-4 focus:ring-[#2C7FFF]/20 outline-none text-[#03045E] transition-all font-medium text-xs sm:text-sm placeholder:text-[#03045E]/40" 
               placeholder="Enter your street address or city"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-bold text-[#03045E]">Latitude</label>
-              <input type="text" value={formData.latitude} readOnly className="w-full p-3.5 bg-white border border-[#03045E]/20 rounded-2xl outline-none text-[#03045E] font-medium text-sm cursor-not-allowed opacity-75" placeholder="Not set" />
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            <div className="flex flex-col gap-1.5 sm:gap-2">
+              <label className="text-xs sm:text-sm font-bold text-[#03045E]">Latitude</label>
+              <input type="text" value={formData.latitude} readOnly className="w-full p-3 sm:p-3.5 bg-white border border-[#03045E]/20 rounded-xl sm:rounded-2xl outline-none text-[#03045E] font-medium text-xs sm:text-sm cursor-not-allowed opacity-75" placeholder="Not set" />
             </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-bold text-[#03045E]">Longitude</label>
-              <input type="text" value={formData.longitude} readOnly className="w-full p-3.5 bg-white border border-[#03045E]/20 rounded-2xl outline-none text-[#03045E] font-medium text-sm cursor-not-allowed opacity-75" placeholder="Not set" />
+            <div className="flex flex-col gap-1.5 sm:gap-2">
+              <label className="text-xs sm:text-sm font-bold text-[#03045E]">Longitude</label>
+              <input type="text" value={formData.longitude} readOnly className="w-full p-3 sm:p-3.5 bg-white border border-[#03045E]/20 rounded-xl sm:rounded-2xl outline-none text-[#03045E] font-medium text-xs sm:text-sm cursor-not-allowed opacity-75" placeholder="Not set" />
             </div>
           </div>
 
-          <button type="button" onClick={handleDetectLocation} style={{ color: isDarkMode ? '#000000' : '#ffffff' }} className="w-full py-3.5 bg-[#2C7FFF] font-bold rounded-2xl transition-all border border-[#2C7FFF] flex items-center justify-center gap-2.5 cursor-pointer shadow-sm">
-            <svg className="w-5 h-5" style={{ color: isDarkMode ? '#000000' : '#ffffff' }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <button type="button" onClick={handleDetectLocation} style={{ color: isDarkMode ? '#000000' : '#ffffff' }} className="w-full py-3 sm:py-3.5 bg-[#2C7FFF] font-bold rounded-xl sm:rounded-2xl transition-all border border-[#2C7FFF] flex items-center justify-center gap-2 sm:gap-2.5 cursor-pointer shadow-sm text-xs sm:text-sm">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: isDarkMode ? '#000000' : '#ffffff' }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span style={{ color: isDarkMode ? '#000000' : '#ffffff' }}>Detect Current Location</span>
@@ -747,7 +762,7 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
 
          
           {formData.latitude && formData.longitude && (
-            <div className="rounded-2xl overflow-hidden border border-[#03045E]/20 h-[220px] relative shadow-inner bg-gray-100 z-0">
+            <div className="rounded-xl sm:rounded-2xl overflow-hidden border border-[#03045E]/20 h-[180px] sm:h-[220px] relative shadow-inner bg-gray-100 z-0">
               <MapContainer 
                 center={[Number(formData.latitude), Number(formData.longitude)]} 
                 zoom={11} 
@@ -770,10 +785,10 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
           )}
 
           <div className="mt-2 pt-4 border-t border-[#03045E]/20 flex flex-col">
-             <button type="submit" disabled={isSubmitting} style={{ color: isDarkMode ? '#000000' : '#ffffff' }} className="w-full py-4 bg-[#03045E] font-bold rounded-2xl hover:bg-[#2C7FFF] transition-all shadow-[0_10px_25px_rgba(3,4,94,0.15)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50">
+             <button type="submit" disabled={isSubmitting} style={{ color: isDarkMode ? '#000000' : '#ffffff' }} className="w-full py-3.5 sm:py-4 bg-[#03045E] font-bold rounded-xl sm:rounded-2xl hover:bg-[#2C7FFF] transition-all shadow-[0_10px_25px_rgba(3,4,94,0.15)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 text-xs sm:text-sm">
               {isSubmitting ? (
                 <>
-                  <svg className="w-5 h-5 animate-spin" style={{ color: isDarkMode ? '#000000' : '#ffffff' }} fill="none" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" style={{ color: isDarkMode ? '#000000' : '#ffffff' }} fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                   </svg>
@@ -781,7 +796,7 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
                 </>
               ) : (
                 <>
-                  <svg className="w-5 h-5" style={{ color: isDarkMode ? '#000000' : '#ffffff' }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: isDarkMode ? '#000000' : '#ffffff' }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                   <span style={{ color: isDarkMode ? '#000000' : '#ffffff' }}>Save Profile Settings</span>

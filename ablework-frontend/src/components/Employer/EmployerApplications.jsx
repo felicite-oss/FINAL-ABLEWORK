@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AccessibilityContext } from '../../context/AccessibilityContext';
+import { useColorPalette } from '../../context/ColorPaletteContext';
 
 export default function EmployerApplications({ profile, refreshStats }) {
   const { mode } = useContext(AccessibilityContext);
+  const { paletteKey } = useColorPalette();
   const isContrast = mode && typeof mode === 'string' && mode.toLowerCase().includes('contrast');
   const isDarkMode = mode && typeof mode === 'string' && (mode.toLowerCase().includes('dark') || mode.toLowerCase().includes('comfort'));
   const isDark = isContrast || isDarkMode;
+  const isHighContrastOrDarkComfort = paletteKey === 'highContrast' || paletteKey === 'darkComfort';
 
   const [applications, setApplications] = useState([]);
   const [selectedApp, setSelectedApp] = useState(null); 
@@ -100,23 +103,33 @@ export default function EmployerApplications({ profile, refreshStats }) {
   };
 
   const getStatusColor = (status) => {
+    if (isHighContrastOrDarkComfort) {
+      switch (status) {
+        case 'Pending': return 'bg-white text-black border border-white';
+        case 'Under Review': return 'bg-white text-black border border-white';
+        case 'Shortlisted': return 'bg-white text-black border border-white';
+        case 'Hired': return 'bg-white text-emerald-400 border border-emerald-500';
+        case 'Rejected': return 'bg-white text-red-600 border border-red-500';
+        default: return 'bg-white text-black border border-white';
+      }
+    }
     if (isDark) {
       switch (status) {
-        case 'Pending': return 'bg-black text-white border-2 border-white';
-        case 'Under Review': return 'bg-white text-black border-2 border-white';
-        case 'Shortlisted': return 'bg-white text-black border-2 border-white';
-        case 'Hired': return 'bg-[#2C7FFF] text-[#F4F4F4] border-2 border-[#2C7FFF]';
-        case 'Rejected': return 'bg-black text-white border-2 border-white line-through';
-        default: return 'bg-black text-white border-2 border-white';
+        case 'Pending': return 'bg-black text-white border border-white';
+        case 'Under Review': return 'bg-black text-white border border-white';
+        case 'Shortlisted': return 'bg-black text-white border border-white';
+        case 'Hired': return 'bg-black text-emerald-400 border border-emerald-500';
+        case 'Rejected': return 'bg-white text-red-600 border border-red-500';
+        default: return 'bg-black text-white border border-white';
       }
     }
     switch (status) {
-      case 'Pending': return 'bg-[#F4F4F4] text-[#03045E] border-2 border-[#03045E]';
-      case 'Under Review': return 'bg-[#2C7FFF]/15 text-[#03045E] border-2 border-[#2C7FFF]';
-      case 'Shortlisted': return 'bg-[#2C7FFF] text-[#F4F4F4] border-2 border-[#2C7FFF]';
-      case 'Hired': return 'bg-[#2C7FFF] text-[#F4F4F4] border-2 border-[#2C7FFF]';
-      case 'Rejected': return 'bg-[#F4F4F4] text-[#FF0000] border-2 border-[#03045E] line-through';
-      default: return 'bg-[#F4F4F4] text-[#03045E] border-2 border-[#03045E]';
+      case 'Pending': return 'bg-white text-[#03045E] border border-gray-200';
+      case 'Under Review': return 'bg-white text-[#03045E] border border-gray-200';
+      case 'Shortlisted': return 'bg-white text-[#03045E] border border-gray-200';
+      case 'Hired': return 'bg-white text-emerald-700 border border-emerald-500';
+      case 'Rejected': return 'bg-white text-red-600 border border-red-500';
+      default: return 'bg-white text-[#03045E] border border-gray-200';
     }
   };
 
@@ -128,39 +141,38 @@ export default function EmployerApplications({ profile, refreshStats }) {
   const tabs = ['All', 'Pending', 'Under Review', 'Shortlisted', 'Hired', 'Rejected'];
 
   const pageText = isDark ? 'text-white' : 'text-[#03045E]';
-  const panelBg = isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#03045E]';
-  const cardBg = isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#03045E]';
-  const softPanel = isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#03045E]';
+  const panelBg = isDark ? 'bg-black border-white' : 'bg-white border-gray-200';
+  const cardBg = isDark ? 'bg-black border-white' : 'bg-white border-gray-200';
+  const softPanel = isDark ? 'bg-black border-white' : 'bg-white border-gray-200';
   const muted = isDark ? 'text-white/80' : 'text-[#03045E]/80';
   const subtle = isDark ? 'text-white/60' : 'text-[#03045E]/60';
-  const dividerColor = isDark ? 'border-white' : 'border-[#03045E]';
+  const dividerColor = isDark ? 'border-white' : 'border-gray-200';
 
   const renderAlertIcon = (tone) => {
     if (tone === 'rejected') {
       return (
-        <svg className={`w-8 h-8 ${isDark ? 'text-black' : 'text-[#F4F4F4]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <svg className="w-5 h-5 sm:w-8 sm:h-8 text-[#f4f4f4]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12" />
         </svg>
       );
     }
     if (tone === 'shortlisted') {
       return (
-        <svg className={`w-8 h-8 ${isDark ? 'text-black' : 'text-[#F4F4F4]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <svg className="w-5 h-5 sm:w-8 sm:h-8 text-[#f4f4f4]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
         </svg>
       );
     }
     return (
-      <svg className={`w-8 h-8 ${isDark ? 'text-black' : 'text-[#F4F4F4]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <svg className="w-5 h-5 sm:w-8 sm:h-8 text-[#f4f4f4]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
       </svg>
     );
   };
 
   const getAlertBadgeStyle = (tone) => {
-    if (isDark) return 'bg-white';
-    if (tone === 'rejected') return 'bg-[#03045E]';
-    if (tone === 'hired') return 'bg-[#03045E]';
+    if (tone === 'rejected') return 'bg-red-500';
+    if (tone === 'hired') return 'bg-emerald-500';
     return 'bg-[#2C7FFF]';
   };
 
@@ -171,48 +183,47 @@ export default function EmployerApplications({ profile, refreshStats }) {
     return 'Status Updated';
   };
 
-  if (isLoading) return <div className={`p-10 font-bold ${pageText}`}>Loading applicants...</div>;
+  if (isLoading) return <div className={`p-6 sm:p-10 font-bold text-sm sm:text-base ${pageText}`}>Loading applicants...</div>;
 
   return (
-    <div className={`animate-fadeIn max-w-7xl mx-auto pb-10 relative ${pageText}`}>
-      <div className={`relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 p-6 sm:p-8 rounded-3xl border-2 ${panelBg}`}>
-        <div className={`absolute top-0 left-0 w-1.5 h-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></div>
-        <div className={`absolute -top-20 -right-20 w-64 h-64 rounded-full ${isDark ? 'bg-white/10' : 'bg-[#2C7FFF]/10'}`}></div>
-        <div className={`absolute -bottom-20 right-20 w-40 h-40 rounded-full ${isDark ? 'bg-white/5' : 'bg-[#03045E]/5'}`}></div>
-
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <span className={`text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full border-2 ${isDark ? 'text-white bg-black border-white' : 'text-[#03045E] bg-white border-[#2C7FFF]'}`}>Candidate Hub</span>
-            <span className={`text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full flex items-center gap-1.5 border-2 ${isDark ? 'text-white bg-black border-white' : 'text-[#03045E] bg-white border-[#03045E]'}`}>
-              <span className={`w-2 h-2 rounded-full animate-pulse ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></span>
-              Active Pipeline
+    <div className={`animate-fadeIn max-w-7xl mx-auto pb-6 sm:pb-10 relative px-1 sm:px-0 ${pageText}`}>
+      <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 backdrop-blur-md p-4 sm:p-6 rounded-[15px] border-2 ${panelBg}`}>
+        <div>
+          <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-1.5 flex-wrap">
+            <span className={`text-[10px] sm:text-xs font-extrabold px-2 sm:px-3 py-0.5 sm:py-1 rounded-[15px] uppercase tracking-wider border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#2C7FFF] border-gray-200'}`}>Candidate Hub</span>
+            <span className={`text-[10px] sm:text-xs font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-[15px] flex items-center gap-1 sm:gap-1.5 border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-gray-200'}`}>
+              <span className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'} animate-pulse`}></span> Active Pipeline
             </span>
           </div>
-          <h1 className={`text-3xl sm:text-4xl font-black tracking-tight ${pageText}`}>Review Applicants</h1>
-          <p className={`text-sm font-bold mt-2 max-w-xl ${muted}`}>Manage incoming applications, review qualifications, and update recruitment statuses.</p>
+          <h1 className={`text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight ${pageText}`}>Review Applicants</h1>
+          <p className={`text-xs sm:text-sm font-semibold mt-0.5 ${muted}`}>Manage incoming applications, review qualifications, and update recruitment statuses.</p>
         </div>
       </div>
       
-      <div className={`grid grid-cols-2 md:flex md:flex-wrap md:justify-between gap-2 md:gap-2 overflow-x-auto px-6 sm:px-8 pb-4 mb-6 border-b-2 scrollbar-hide ${dividerColor}`}>
+      <div className={`grid grid-cols-2 sm:flex sm:flex-row gap-2 sm:gap-4 p-3 sm:p-6 mb-6 sm:mb-8 rounded-[15px] border-2 ${panelBg}`}>
         {tabs.map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`w-full md:w-auto md:flex-1 px-3 md:px-5 py-2 md:py-3 text-[10px] md:text-sm font-black rounded-lg md:rounded-xl whitespace-nowrap transition-all cursor-pointer border-2 flex items-center justify-center gap-1.5 md:gap-2 ${
+            className={`w-full sm:w-auto sm:flex-1 flex items-center justify-center px-2 sm:px-4 py-2 sm:py-2.5 text-[10px] sm:text-sm font-bold rounded-[15px] whitespace-nowrap transition-all cursor-pointer border-2 ${
               activeTab === tab
-                ? (isDark ? 'bg-white text-black border-white' : 'bg-[#2C7FFF] text-white border-[#2C7FFF]')
-                : isDark
-                  ? 'bg-black text-white border-white/40 hover:border-white'
-                  : 'bg-white text-[#03045E] border-[#03045E] hover:bg-[#F4F4F4]'
+                ? (isHighContrastOrDarkComfort
+                    ? (isDark ? 'bg-white text-black border-white' : 'bg-[#2C7FFF] !text-white border-[#2C7FFF]')
+                    : isDark
+                      ? 'bg-white text-black border-white'
+                      : 'bg-[#2C7FFF] text-white border-[#2C7FFF]')
+                : (isDark
+                  ? 'bg-black text-white/70 border-white/40 hover:bg-white hover:text-black hover:border-white'
+                  : 'bg-white text-[#03045E] border-gray-200 hover:bg-gray-100')
             }`}
           >
-            {tab}
-            <span className={`px-1.5 md:px-2 py-0.5 rounded-full text-[8px] md:text-[10px] font-black ${
+            <span>{tab}</span>
+            <span className={`ml-1 sm:ml-2 min-w-[20px] sm:min-w-[24px] inline-flex items-center justify-center px-1 sm:px-2 py-0.5 rounded-[15px] text-[9px] sm:text-[11px] font-black border-2 ${
               activeTab === tab 
-                ? (isDark ? 'bg-black text-white' : 'bg-white text-[#2C7FFF]')
-                : isDark
-                  ? 'bg-white/20 text-white'
-                  : 'bg-[#03045E] text-white'
+                ? (isDark ? 'bg-black text-white border-black' : 'bg-white text-[#2C7FFF] border-white')
+                : (isDark 
+                  ? 'bg-white text-black border-white'
+                  : 'bg-gray-100 text-[#03045E] border-gray-200')
             }`}>
               {tab === 'All' 
                 ? applications.length 
@@ -222,24 +233,23 @@ export default function EmployerApplications({ profile, refreshStats }) {
         ))}
       </div>
       
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 px-6 sm:px-8">
+      <div className="flex flex-col gap-3 sm:gap-4">
         {filteredApplications.length > 0 ? (
           filteredApplications.map(app => (
-            <div key={app.application_id} className={`relative overflow-hidden p-5 md:p-8 rounded-2xl md:rounded-3xl border-2 flex flex-col justify-between gap-4 md:gap-6 transition ${cardBg} ${isDark ? 'hover:border-white' : 'hover:border-[#2C7FFF]'}`}>
-              <div className={`absolute top-0 left-0 w-1.5 h-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></div>
-
-              <div className="flex-1 pl-2 md:pl-4 w-full min-w-0">
-                <div className="flex flex-col gap-2 md:gap-3 mb-3 md:mb-4">
-                  <h3 className={`text-base md:text-2xl font-black leading-tight ${pageText}`}>{app.firstname} {app.lastname}</h3>
-                  <span className={`px-3 md:px-4 py-1 md:py-1.5 rounded-md md:rounded-full text-[9px] md:text-[11px] font-black uppercase tracking-wider self-start ${getStatusColor(app.application_status)}`}>
+            <div key={app.application_id} className={`p-4 sm:p-6 rounded-[15px] border-2 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 ${cardBg}`}>
+              
+              <div className="flex-1">
+                <div className="flex items-center gap-2 sm:gap-3 mb-1 flex-wrap">
+                  <h3 className={`text-base sm:text-xl font-bold ${pageText}`}>{app.firstname} {app.lastname}</h3>
+                  <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-[15px] text-[9px] sm:text-[11px] font-bold uppercase tracking-wider border-2 ${getStatusColor(app.application_status)}`}>
                     {app.application_status}
                   </span>
                 </div>
-                <p className={`text-xs md:text-base font-bold leading-tight ${muted}`}>Applied for: <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>{app.job_title}</span></p>
-                <p className={`text-[10px] md:text-sm font-bold mt-2 ${subtle}`}>Date: {new Date(app.applied_at).toLocaleDateString()}</p>
+                <p className={`text-xs sm:text-sm font-semibold ${muted}`}>Applied for: <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>{app.job_title}</span></p>
+                <p className={`text-[10px] sm:text-xs font-medium mt-1 ${subtle}`}>Date: {new Date(app.applied_at).toLocaleDateString()}</p>
               </div>
 
-              <div className="w-full mt-auto">
+              <div className="w-full md:w-auto">
                 <button 
                   onClick={() => {
                     setSelectedApp(app);
@@ -250,19 +260,11 @@ export default function EmployerApplications({ profile, refreshStats }) {
                         updateStatus(app.application_id, 'Under Review', null, false);
                     }
                   }} 
-                  className={`w-full px-4 md:px-6 py-3 md:py-4 text-xs md:text-base font-black rounded-lg md:rounded-xl transition-all cursor-pointer border-2 ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'border-[var(--color-primary,#2C7FFF)] hover:opacity-90'}`}
-                  style={isDark ? {} : {
-                    color: 'var(--color-text, #03045E)',
-                    backgroundColor: 'var(--color-card, #ffffff)'
-                  }}
-                  onMouseEnter={isDark ? undefined : (e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--color-primary, #2C7FFF)';
-                    e.currentTarget.style.color = 'var(--color-button-text, #ffffff)';
-                  }}
-                  onMouseLeave={isDark ? undefined : (e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--color-card, #ffffff)';
-                    e.currentTarget.style.color = 'var(--color-text, #03045E)';
-                  }}
+                  className={`w-full md:w-auto px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-[15px] cursor-pointer border-2 ${
+                    isDark
+                      ? 'bg-black text-white border-white'
+                      : 'bg-white text-[#03045E] border-gray-200'
+                  }`}
                 >
                   View Details
                 </button>
@@ -271,7 +273,11 @@ export default function EmployerApplications({ profile, refreshStats }) {
             </div>
           ))
         ) : (
-          <div className={`p-8 md:p-10 text-center font-black border-2 border-dashed rounded-2xl md:rounded-3xl col-span-2 md:col-span-3 ${isDark ? 'text-white/70 border-white bg-black' : 'text-[#03045E]/70 border-[#03045E] bg-[#F4F4F4]'}`}>
+          <div className={`p-6 sm:p-10 text-center font-bold border-2 border-dashed rounded-[15px] text-sm sm:text-base ${
+            isDark 
+              ? 'text-white/70 border-white bg-black' 
+              : 'text-[#03045E]/70 border-gray-200 bg-white'
+          }`}>
             No {activeTab !== 'All' ? activeTab.toLowerCase() : ''} applications found.
           </div>
         )}
@@ -279,203 +285,213 @@ export default function EmployerApplications({ profile, refreshStats }) {
 
       {selectedApp && (
         <div
-          className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
+          className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto flex flex-col border-2 ${isDark ? 'bg-black border-white text-white' : 'bg-white border-[#03045E] text-[#03045E]'}`}>
-            <div className={`absolute top-0 left-0 w-1.5 h-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></div>
-
-            <div className={`relative px-3 md:px-8 pt-6 md:pt-8 pb-4 md:pb-6 border-b-2 pl-5 md:pl-10 ${dividerColor}`}>
-              <div className="flex justify-between items-start gap-4 flex-wrap">
-                <div className="flex items-center gap-3 md:gap-4 min-w-0">
-                  <div className={`w-10 h-10 md:w-16 md:h-16 rounded-xl md:rounded-2xl flex items-center justify-center font-black text-sm md:text-xl shrink-0 border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}>
-                    {(selectedApp.firstname?.[0] || '').toUpperCase()}{(selectedApp.lastname?.[0] || '').toUpperCase()}
-                  </div>
-                  <div className="min-w-0">
-                    <h2 className={`text-base md:text-3xl font-black tracking-tight truncate ${pageText}`}>
-                      {selectedApp.firstname} {selectedApp.lastname}
-                    </h2>
-                    <p className={`text-[10px] md:text-sm font-bold mt-0.5 ${muted}`}>
-                      Applying for: <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>{selectedApp.job_title}</span>
-                    </p>
-                  </div>
-                </div>
-                <span className={`px-2 md:px-4 py-1 md:py-2 rounded-full text-[9px] md:text-xs font-black uppercase tracking-wider shrink-0 ${getStatusColor(selectedApp.application_status)}`}>
-                  {selectedApp.application_status}
-                </span>
+          <div className={`p-4 sm:p-8 rounded-[15px] max-w-5xl w-full max-h-[90vh] overflow-y-auto flex flex-col border-2 ${
+            isDark ? 'bg-black border-white text-white' : 'bg-white border-gray-200 text-[#03045E]'
+          }`}>
+            
+            <div className={`flex flex-col sm:flex-row justify-between items-start gap-2 sm:gap-0 mb-4 sm:mb-6 pb-4 sm:pb-6 border-b-2 ${dividerColor}`}>
+              <div>
+                <h2 className={`text-xl sm:text-3xl font-extrabold ${pageText}`}>{selectedApp.firstname} {selectedApp.lastname}</h2>
+                <p className={`text-xs sm:text-base font-semibold mt-1 ${muted}`}>Applying for: <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>{selectedApp.job_title}</span></p>
               </div>
+              <span className={`px-3 sm:px-4 py-1 sm:py-2 rounded-[15px] text-[10px] sm:text-sm font-bold border-2 ${getStatusColor(selectedApp.application_status)}`}>
+                {selectedApp.application_status}
+              </span>
             </div>
 
-            <div className="px-3 md:px-8 py-4 md:py-6 flex flex-col gap-3 md:gap-6">
-
-              <div className="grid grid-cols-2 gap-2 md:gap-6">
-                <div className={`p-2.5 md:p-5 rounded-lg md:rounded-2xl border-2 ${softPanel}`}>
-                  <h4 className={`text-[8px] md:text-[10px] font-black uppercase tracking-[0.15em] mb-2 md:mb-4 ${subtle}`}>Contact Information</h4>
-                  <div className="flex flex-col gap-2 md:gap-3">
-                    <div className="flex items-center gap-2 md:gap-3">
-                      <div className={`w-6 h-6 md:w-9 md:h-9 rounded-md md:rounded-xl flex items-center justify-center shrink-0 ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF]/15 text-[#2C7FFF]'}`}>
-                        <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <span className={`text-[9px] md:text-sm font-bold truncate ${pageText}`}>{selectedApp.email}</span>
-                    </div>
-                    <div className="flex items-center gap-2 md:gap-3">
-                      <div className={`w-6 h-6 md:w-9 md:h-9 rounded-md md:rounded-xl flex items-center justify-center shrink-0 ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF]/15 text-[#2C7FFF]'}`}>
-                        <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                        </svg>
-                      </div>
-                      <span className={`text-[9px] md:text-sm font-bold ${pageText}`}>{selectedApp.phone || 'Not provided'}</span>
-                    </div>
-                  </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mb-6">
+              
+              <div className="flex flex-col gap-4 sm:gap-6">
+                <div>
+                  <h4 className={`text-[10px] sm:text-xs font-extrabold uppercase tracking-wider mb-2 ${subtle}`}>Contact Information</h4>
+                  <p className={`text-xs sm:text-base font-semibold flex items-center gap-2 ${pageText}`}>
+                    <svg className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <span className="break-all">{selectedApp.email}</span>
+                  </p>
+                  <p className={`text-xs sm:text-base font-semibold flex items-center gap-2 mt-1.5 ${pageText}`}>
+                    <svg className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                    <span>{selectedApp.phone || 'Not provided'}</span>
+                  </p>
                 </div>
 
-                <div className={`p-2.5 md:p-5 rounded-lg md:rounded-2xl border-2 ${softPanel}`}>
-                  <h4 className={`text-[8px] md:text-[10px] font-black uppercase tracking-[0.15em] mb-2 md:mb-4 ${subtle}`}>Disability Profile</h4>
-                  <p className={`text-[9px] md:text-sm font-bold ${pageText}`}>
+                <div>
+                  <h4 className={`text-[10px] sm:text-xs font-extrabold uppercase tracking-wider mb-2 ${subtle}`}>Disability Profile</h4>
+                  <p className={`text-xs sm:text-base font-semibold p-2.5 sm:p-3.5 rounded-[15px] border-2 ${softPanel} ${pageText}`}>
                     {selectedApp.disability_type || 'Not specified'}
                   </p>
                 </div>
+
+                <div>
+                  <h4 className={`text-[10px] sm:text-xs font-extrabold uppercase tracking-wider mb-3 sm:mb-4 ${subtle}`}>Application Documents</h4>
+                  <div className="flex flex-col gap-3 sm:gap-4">
+                    {selectedApp.resume_path ? (
+                      <a 
+                        href={`http://localhost:5001${selectedApp.resume_path}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-base font-bold rounded-[15px] border-2 ${
+                          isDark 
+                            ? 'bg-white text-black border-white' 
+                            : 'bg-[#03045E] text-white border-[#03045E]'
+                        }`}
+                      >
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span>View Attached Resume</span>
+                      </a>
+                    ) : (
+                      <p className={`text-xs sm:text-sm font-semibold p-2.5 sm:p-3 rounded-[15px] border-2 text-center ${
+                        isDark 
+                          ? 'text-white bg-black border-white' 
+                          : 'text-[#03045E] bg-white border-gray-200'
+                      }`}>
+                        No resume file was attached.
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 md:gap-6">
-                <div className={`p-2.5 md:p-5 rounded-lg md:rounded-2xl border-2 ${softPanel}`}>
-                  <h4 className={`text-[8px] md:text-[10px] font-black uppercase tracking-[0.15em] mb-2 md:mb-4 ${subtle}`}>Verified Skills</h4>
-                  <div className="flex flex-wrap gap-1 md:gap-2">
+              <div className="flex flex-col gap-4 sm:gap-6">
+                <div>
+                  <h4 className={`text-[10px] sm:text-xs font-extrabold uppercase tracking-wider mb-2 ${subtle}`}>Verified Skills</h4>
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {selectedApp.skills ? 
                       (typeof selectedApp.skills === 'string' ? JSON.parse(selectedApp.skills) : selectedApp.skills).map((skill, i) => (
-                        <span key={i} className={`px-1.5 md:px-3 py-0.5 md:py-1 text-[8px] md:text-xs font-black rounded-md md:rounded-lg border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#2C7FFF] text-white border-[#2C7FFF]'}`}>
+                        <span key={i} className={`px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-[15px] border-2 ${
+                          isDark 
+                            ? 'bg-black text-white border-white' 
+                            : 'bg-white text-[#03045E] border-gray-200'
+                        }`}>
                           {skill}
                         </span>
                       ))
-                    : <span className={`text-[9px] md:text-sm ${subtle}`}>No skills listed</span>}
+                    : <span className={`text-xs sm:text-sm ${subtle}`}>No skills listed</span>}
                   </div>
                 </div>
 
-                <div className={`p-2.5 md:p-5 rounded-lg md:rounded-2xl border-2 ${softPanel}`}>
-                  <h4 className={`text-[8px] md:text-[10px] font-black uppercase tracking-[0.15em] mb-2 md:mb-4 ${subtle}`}>Requested Accommodations</h4>
-                  <div className="flex flex-wrap gap-1 md:gap-2">
+                <div>
+                  <h4 className={`text-[10px] sm:text-xs font-extrabold uppercase tracking-wider mb-2 ${subtle}`}>Requested Accommodations</h4>
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {selectedApp.accommodations_needed ? 
                       (typeof selectedApp.accommodations_needed === 'string' ? JSON.parse(selectedApp.accommodations_needed) : selectedApp.accommodations_needed).map((acc, i) => (
-                        <span key={i} className={`px-1.5 md:px-3 py-0.5 md:py-1 text-[8px] md:text-xs font-black rounded-md md:rounded-lg border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-[#F4F4F4] text-[#03045E] border-[#03045E]'}`}>
+                        <span key={i} className={`px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-[15px] border-2 ${
+                          isDark 
+                            ? 'bg-black text-white border-white' 
+                            : 'bg-white text-[#03045E] border-gray-200'
+                        }`}>
                           {acc}
                         </span>
                       ))
-                    : <span className={`text-[9px] md:text-sm ${subtle}`}>None requested</span>}
+                    : <span className={`text-xs sm:text-sm ${subtle}`}>None requested</span>}
                   </div>
                 </div>
-              </div>
 
-              <div className={`p-2.5 md:p-5 rounded-lg md:rounded-2xl border-2 ${softPanel}`}>
-                <h4 className={`text-[8px] md:text-[10px] font-black uppercase tracking-[0.15em] mb-2 md:mb-4 ${subtle}`}>Application Documents</h4>
-                
-                <div className="flex flex-col gap-2 md:gap-4">
-                  {selectedApp.resume_path ? (
-                    <a 
-                      href={`http://localhost:5001${selectedApp.resume_path}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`inline-flex items-center gap-2 px-3 md:px-5 py-2 md:py-3 font-black rounded-lg md:rounded-xl transition border-2 self-start text-[9px] md:text-base ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
-                    >
-                      <svg className="w-3.5 h-3.5 md:w-5 md:h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <span>View Attached Resume</span>
-                    </a>
-                  ) : (
-                    <p className={`text-[9px] md:text-sm font-bold p-2 md:p-3 rounded-lg md:rounded-xl border-2 inline-block self-start ${isDark ? 'text-white/70 bg-black border-white/40' : 'text-[#03045E]/70 bg-[#F4F4F4] border-[#03045E]/40'}`}>
-                      No resume file was attached to this application.
+                {selectedApp.cover_letter && selectedApp.cover_letter.trim() !== '' && (
+                  <div className={`p-3 sm:p-5 rounded-[15px] border-2 ${softPanel}`}>
+                    <h5 className={`text-[10px] sm:text-xs font-extrabold uppercase tracking-wider mb-2 ${subtle}`}>Cover Letter / Message</h5>
+                    <p className={`text-xs sm:text-sm font-medium whitespace-pre-wrap leading-relaxed ${pageText}`}>
+                      {selectedApp.cover_letter}
                     </p>
-                  )}
-
-                  {selectedApp.cover_letter && selectedApp.cover_letter.trim() !== '' && (
-                    <div className={`p-2.5 md:p-4 rounded-lg md:rounded-xl border-2 ${isDark ? 'bg-black border-white/40' : 'bg-white border-[#03045E]/30'}`}>
-                      <h5 className={`text-[8px] md:text-[10px] font-black uppercase tracking-[0.15em] mb-1 md:mb-2 ${subtle}`}>Cover Letter / Message</h5>
-                      <p className={`text-[9px] md:text-sm font-semibold whitespace-pre-wrap leading-relaxed ${pageText}`}>
-                        {selectedApp.cover_letter}
-                      </p>
-                    </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
-
             </div>
 
-            <div className={`px-3 md:px-8 py-4 md:py-6 border-t-2 w-full ${dividerColor}`}>
+            <div className={`mt-auto pt-4 sm:pt-6 border-t-2 w-full ${dividerColor}`}>
               {nextSteps.isOpen ? (
-                <div className="flex flex-col gap-2 md:gap-3">
-                  <label className={`text-[10px] md:text-sm font-black ${pageText}`}>
+                <div className="flex flex-col gap-3">
+                  <label className={`text-xs sm:text-sm font-bold ${pageText}`}>
                     Provide Next Steps for the Applicant (for {nextSteps.status} status)
                   </label>
                   <textarea
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
                     placeholder="e.g., We would love to invite you for an interview on Monday at 10 AM. Here is the Google Meet link..."
-                    className={`w-full p-3 md:p-4 border-2 rounded-xl md:rounded-2xl outline-none min-h-[80px] md:min-h-[100px] text-[11px] md:text-sm resize-none font-semibold transition ${isDark ? 'border-white bg-black focus:bg-black text-white placeholder-white/40 focus:border-white' : 'border-[#03045E] bg-[#F4F4F4] focus:bg-white text-[#03045E] placeholder-[#03045E]/40 focus:border-[#2C7FFF]'}`}
+                    className={`w-full p-3 sm:p-4 border-2 rounded-[15px] outline-none min-h-[80px] sm:min-h-[100px] text-xs sm:text-sm resize-none font-semibold ${
+                      isDark 
+                        ? 'border-white bg-black text-white placeholder-white/40' 
+                        : 'border-gray-200 bg-white text-[#03045E] placeholder-[#03045E]/40'
+                    }`}
                   />
-                  <div className="flex justify-end gap-2 md:gap-3 mt-2">
+                  <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 mt-2">
                     <button
                       onClick={() => { setNextSteps({ isOpen: false, status: '' }); setMessageText(''); }}
-                      className={`px-4 md:px-6 py-2 md:py-3 font-black rounded-lg md:rounded-xl transition cursor-pointer border-2 text-[10px] md:text-sm ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-white text-[#03045E] border-[#03045E] hover:bg-[#F4F4F4]'}`}
+                      className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 text-xs sm:text-sm font-bold rounded-[15px] cursor-pointer border-2 ${
+                        isDark 
+                          ? 'bg-black text-white border-white' 
+                          : 'bg-white text-[#03045E] border-gray-200'
+                      }`}
                     >
                       Cancel
                     </button>
                     <button
                       onClick={() => updateStatus(selectedApp.application_id, nextSteps.status, messageText, true, true)}
-                      className={`px-4 md:px-6 py-2 md:py-3 font-black rounded-lg md:rounded-xl transition cursor-pointer border-2 text-[10px] md:text-sm ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+                      className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 text-xs sm:text-sm font-bold rounded-[15px] cursor-pointer border-2 ${
+                        isDark 
+                          ? 'bg-white text-black border-white' 
+                          : 'bg-[#03045E] text-white border-[#03045E]'
+                      }`}
                     >
                       Confirm & Send
                     </button>
                   </div>
                 </div>
               ) : (
-                <div className="flex justify-between items-center w-full flex-wrap gap-2 md:gap-3">
+                <div className="flex flex-col sm:flex-row justify-between items-center w-full gap-3 sm:gap-0">
                   <button 
                     onClick={() => setSelectedApp(null)} 
-                    className={`px-4 md:px-6 py-2 md:py-3 font-black rounded-lg md:rounded-xl transition cursor-pointer border-2 text-[10px] md:text-sm ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-white text-[#03045E] border-[#03045E] hover:bg-[#F4F4F4]'}`}
+                    className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold rounded-[15px] cursor-pointer border-2 ${
+                      isDark 
+                        ? 'bg-black text-white border-white' 
+                        : 'bg-white text-[#03045E] border-gray-200'
+                    }`}
                   >
                     Close Window
                   </button>
                   
                   {selectedApp.application_status !== 'Hired' && selectedApp.application_status !== 'Rejected' ? (
-                    <div className="flex flex-wrap gap-2 md:gap-3">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
                       <button 
                         onClick={() => updateStatus(selectedApp.application_id, 'Rejected', null, true, true)} 
-                        className={`px-4 md:px-6 py-2 md:py-3 font-black rounded-lg md:rounded-xl transition-all cursor-pointer border-2 text-[10px] md:text-sm ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'border-[var(--color-primary,#2C7FFF)] hover:opacity-90'}`}
-                        style={isDark ? {} : {
-                          color: 'var(--color-text, #03045E)',
-                          backgroundColor: 'var(--color-card, #ffffff)'
-                        }}
+                        className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold rounded-[15px] cursor-pointer border-2 bg-white text-red-600 border-red-500"
                       >
                         Reject
                       </button>
                       
                       <button 
                         onClick={() => setNextSteps({ isOpen: true, status: 'Shortlisted' })} 
-                        className={`px-4 md:px-6 py-2 md:py-3 font-black rounded-lg md:rounded-xl transition-all cursor-pointer border-2 text-[10px] md:text-sm ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'border-[var(--color-primary,#2C7FFF)] hover:opacity-90'}`}
-                        style={isDark ? {} : {
-                          color: 'var(--color-button-text, #ffffff)',
-                          backgroundColor: 'var(--color-primary, #2C7FFF)'
-                        }}
+                        className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold rounded-[15px] cursor-pointer border-2 ${
+                          isDark 
+                            ? 'bg-black text-white border-white' 
+                            : 'bg-white text-[#03045E] border-gray-200'
+                        }`}
                       >
                         Shortlist
                       </button>
                       
                       <button 
                         onClick={() => setNextSteps({ isOpen: true, status: 'Hired' })} 
-                        className={`px-4 md:px-6 py-2 md:py-3 font-black rounded-lg md:rounded-xl transition-all cursor-pointer border-2 text-[10px] md:text-sm ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'border-[var(--color-primary,#03045E)] hover:opacity-90'}`}
-                        style={isDark ? {} : {
-                          color: 'var(--color-button-text, #ffffff)',
-                          backgroundColor: 'var(--color-primary, #03045E)'
-                        }}
+                        className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold rounded-[15px] cursor-pointer border-2 ${
+                          isDark 
+                            ? 'bg-black text-emerald-400 border-emerald-500' 
+                            : 'bg-white text-emerald-700 border-emerald-500'
+                        }`}
                       >
                         Hire Applicant
                       </button>
                     </div>
                   ) : (
-                    <div className={`px-3 md:px-4 py-2 rounded-lg md:rounded-xl border-2 ${isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#03045E]'}`}>
-                      <p className={`text-[10px] md:text-sm font-black italic ${pageText}`}>
+                    <div className={`w-full sm:w-auto px-3 sm:px-4 py-2 rounded-[15px] border-2 text-center ${isDark ? 'bg-black border-white' : 'bg-white border-gray-200'}`}>
+                      <p className={`text-xs sm:text-sm font-bold italic ${pageText}`}>
                         Application finalized as <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>{selectedApp.application_status}</span>.
                       </p>
                     </div>
@@ -493,40 +509,33 @@ export default function EmployerApplications({ profile, refreshStats }) {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative w-full max-w-sm rounded-[2rem] border-2 overflow-hidden ${isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#2C7FFF]'}`}>
-            <div className={`h-2 w-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
-
-            <div className="px-8 pt-10 pb-8 flex flex-col items-center text-center">
-              <div className="relative mb-6">
-                <div className={`absolute inset-0 rounded-full animate-ping ${isDark ? 'bg-white/20' : 'bg-[#2C7FFF]/20'}`} />
-                <div className={`relative w-20 h-20 rounded-full flex items-center justify-center ${isDark ? 'bg-white/20' : 'bg-[#2C7FFF]/15'}`}>
-                  <div className={`w-14 h-14 rounded-full ${getAlertBadgeStyle(statusAlert.tone)} flex items-center justify-center`}>
+          <div className={`relative w-full max-w-md rounded-[15px] shadow-2xl border-2 overflow-hidden animate-in zoom-in-95 duration-300 bg-white ${statusAlert.tone === 'rejected' ? 'border-red-500/30' : 'border-[#2C7FFF]/30'}`}>
+            <div className="px-6 sm:px-8 pt-6 sm:pt-8 pb-5 sm:pb-7 flex flex-col items-center text-center">
+              <div className="relative mb-4 sm:mb-5">
+                <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-full flex items-center justify-center ${statusAlert.tone === 'rejected' ? 'bg-red-100' : 'bg-[#2C7FFF]/10'}`}>
+                  <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-lg ${getAlertBadgeStyle(statusAlert.tone)} shadow-black/10`}>
                     {renderAlertIcon(statusAlert.tone)}
                   </div>
                 </div>
-                <div className={`absolute -top-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center border-2 ${isDark ? 'bg-white border-black' : 'bg-[#03045E] border-[#F4F4F4]'}`}>
-                  <svg className={`w-3.5 h-3.5 ${isDark ? 'text-black' : 'text-white'}`} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true">
+                <div className={`absolute -top-1 -right-1 w-5 h-5 sm:w-7 sm:h-7 rounded-full flex items-center justify-center border-2 bg-[#03045E] border-white`}>
+                  <svg className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
               </div>
 
-              <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 border-2 ${isDark ? 'text-white bg-black border-white' : 'text-[#03045E] bg-white border-[#2C7FFF]'}`}>
-                {getAlertPillLabel(statusAlert.tone)}
-              </span>
-
-              <h2 className={`text-2xl font-black tracking-tight mb-2 ${pageText}`}>
+              <h2 className="text-lg sm:text-2xl font-black text-[#03045E] tracking-tight mb-2">
                 {statusAlert.title}
               </h2>
-              <p className={`text-sm font-bold leading-relaxed mb-6 max-w-xs ${muted}`}>
+              <p className="text-xs sm:text-sm font-semibold text-[#03045E]/70 leading-relaxed mb-4 sm:mb-6">
                 {statusAlert.subtitle}
               </p>
 
               <button
                 onClick={() => setShowStatusAlert(false)}
-                className={`w-full py-3.5 rounded-2xl font-black text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+                className={`w-full py-3 sm:py-3.5 rounded-[15px] font-black text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all cursor-pointer ${getAlertBadgeStyle(statusAlert.tone)} text-white hover:opacity-90`}
               >
-                Got it
+                Got it!
               </button>
             </div>
           </div>

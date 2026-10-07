@@ -1,11 +1,14 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { AccessibilityContext } from '../../context/AccessibilityContext';
+import { useColorPalette } from '../../context/ColorPaletteContext';
 
 export default function EmployerPostJob({ profile, refreshData, setActiveTab }) {
   const { mode } = useContext(AccessibilityContext);
+  const { paletteKey } = useColorPalette();
   const isContrast = mode && typeof mode === 'string' && mode.toLowerCase().includes('contrast');
   const isDarkMode = mode && typeof mode === 'string' && (mode.toLowerCase().includes('dark') || mode.toLowerCase().includes('comfort'));
   const isDark = isContrast || isDarkMode;
+  const isHighContrastOrDarkComfort = paletteKey === 'highContrast' || paletteKey === 'darkComfort';
 
   const [jobTitle, setJobTitle] = useState('');
   const [jobDescription, setJobDescription] = useState('');
@@ -14,7 +17,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
   const [selectedAccommodations, setSelectedAccommodations] = useState([]);
   const [currentAccommodation, setCurrentAccommodation] = useState('');
   const [salaryRange, setSalaryRange] = useState('');
-  const [salaryError, setSalaryError] = useState(''); // Real-time error state
+  const [salaryError, setSalaryError] = useState('');
   const [selectedBenefits, setSelectedBenefits] = useState([]);
   const [currentBenefit, setCurrentBenefit] = useState('');
   const [selectedDisabilities, setSelectedDisabilities] = useState([]);
@@ -23,10 +26,9 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [publishedJobTitle, setPublishedJobTitle] = useState('');
 
-  // NEW: Bulletproof real-time validation watcher
   useEffect(() => {
     if (salaryRange.trim() === '') {
-      setSalaryError(''); // Clear error if empty (undisclosed is allowed)
+      setSalaryError('');
     } else if (!salaryRange.includes('-')) {
       setSalaryError('Requires a hyphen separator (e.g., 20,000 - 30,000)');
     } else {
@@ -37,7 +39,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
       if (!hasNumberLeft || !hasNumberRight) {
         setSalaryError('Requires amounts on both sides of the hyphen');
       } else {
-        setSalaryError(''); // Valid format
+        setSalaryError('');
       }
     }
   }, [salaryRange]);
@@ -213,279 +215,216 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
 
   const pageText = isDark ? 'text-white' : 'text-[#03045E]';
   const muted = isDark ? 'text-white/70' : 'text-[#03045E]/70';
-  const subtle = isDark ? 'text-white/50' : 'text-[#03045E]/50';
-  const cardBg = isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#03045E]';
-  const formBg = isDark ? 'bg-black border-white' : 'bg-white border-[#03045E]';
-  const sectionBg = isDark ? 'bg-black border-white/40' : 'bg-[#F4F4F4] border-[#03045E]/30';
-  const pillBg = isDark ? 'text-white bg-black border-white' : 'text-[#03045E] bg-white border-[#03045E]';
-  const inputCls = isDark
-    ? 'w-full p-4 border-2 border-white rounded-2xl bg-black text-white placeholder-white/40 font-semibold focus:outline-none focus:border-white transition-all'
-    : 'w-full p-4 border-2 border-[#03045E] rounded-2xl bg-[#F4F4F4] text-[#03045E] placeholder-[#03045E]/40 font-semibold focus:outline-none focus:border-[#2C7FFF] focus:bg-white transition-all';
-  const inputSmallCls = isDark
-    ? 'w-full p-3 border-2 border-white rounded-xl bg-black text-white placeholder-white/40 font-semibold focus:outline-none focus:border-white transition-all'
-    : 'w-full p-3 border-2 border-[#03045E] rounded-xl bg-[#F4F4F4] text-[#03045E] placeholder-[#03045E]/40 font-semibold focus:outline-none focus:border-[#2C7FFF] focus:bg-white transition-all';
-  const chipContainer = isDark ? 'bg-black border-white' : 'bg-white border-[#03045E]';
-<<<<<<< HEAD
-  const divider = isDark ? 'border-white' : 'border-[#03045E]';
-=======
->>>>>>> origin/salary-update
-  const disabBox = isDark ? 'bg-black border-white' : 'bg-white border-[#2C7FFF]';
-
-  const recommendationBtnStyle = isDark ? {
-    color: '#ffffff',
-    backgroundColor: '#000000',
-    borderColor: '#ffffff'
-  } : {
-    color: 'var(--color-text, #03045E)',
-    backgroundColor: 'var(--color-card, #ffffff)',
-    borderColor: 'var(--color-primary, #2C7FFF)'
-  };
-
-  const SectionHeader = ({ num, title, subtitle, icon }) => (
-    <div className="flex items-start gap-3 md:gap-4 mb-4 md:mb-5">
-      <div className={`w-9 h-9 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0 border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}>
-        <span className="w-5 h-5 md:w-6 md:h-6 [&>svg]:w-full [&>svg]:h-full">{icon}</span>
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1">
-          <span className={`text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`}>Sec {num}</span>
-          <div className={`h-px flex-1 max-w-[40px] ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></div>
-        </div>
-        <h3 className={`text-sm md:text-xl font-black tracking-tight leading-tight ${pageText}`}>{title}</h3>
-        {subtitle && <p className={`text-[10px] md:text-xs font-semibold mt-0.5 hidden md:block ${muted}`}>{subtitle}</p>}
-      </div>
-    </div>
-  );
+  const cardBg = isDark ? 'bg-black border-white' : 'bg-white border-gray-200';
+  const softBg = isDark ? 'bg-black border-white' : 'bg-white border-gray-200';
+  const inputCls = isContrast
+    ? 'w-full p-2.5 sm:p-4 border-2 border-white rounded-[10px] bg-black text-white font-semibold placeholder:text-gray-400 focus:outline-none focus:border-white transition-all text-sm sm:text-base'
+    : isDarkMode
+      ? 'w-full p-2.5 sm:p-4 border-2 border-white rounded-[10px] bg-black text-white font-semibold placeholder:text-gray-400 focus:outline-none focus:border-white transition-all text-sm sm:text-base'
+      : 'w-full p-2.5 sm:p-4 border-2 border-gray-200 rounded-[10px] bg-white text-[#03045E] font-semibold placeholder:text-gray-400 focus:outline-none focus:border-gray-200 transition-all text-sm sm:text-base';
+  const inputSmCls = isContrast
+    ? 'w-full p-2 sm:p-3 border-2 border-white rounded-[10px] bg-black text-white font-semibold placeholder:text-gray-400 focus:outline-none focus:border-white transition-all text-xs sm:text-sm'
+    : isDarkMode
+      ? 'w-full p-2 sm:p-3 border-2 border-white rounded-[10px] bg-black text-white font-semibold placeholder:text-gray-400 focus:outline-none focus:border-white transition-all text-xs sm:text-sm'
+      : 'w-full p-2 sm:p-3 border-2 border-gray-200 rounded-[10px] bg-white text-[#03045E] font-semibold placeholder:text-gray-400 focus:outline-none focus:border-gray-200 transition-all text-xs sm:text-sm';
+  const chipContainer = isDark
+    ? 'flex flex-wrap gap-1.5 sm:gap-2 mt-2 p-2 sm:p-3 bg-black rounded-[10px] border-2 border-white'
+    : 'flex flex-wrap gap-1.5 sm:gap-2 mt-2 p-2 sm:p-3 bg-white rounded-[10px] border-2 border-gray-200';
+  const suggestionBtn = isDark
+    ? 'px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-bold rounded-[10px] border-2 bg-black text-white border-white'
+    : 'px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-bold rounded-[10px] border-2 bg-white text-[#03045E] border-gray-200';
+  const divider = isDark ? 'border-white' : 'border-gray-200';
 
   return (
-    <div className="animate-fadeIn max-w-7xl mx-auto pb-10">
-
-      <div className={`relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 p-6 sm:p-8 rounded-3xl border-2 ${cardBg}`}>
-        <div className={`absolute top-0 left-0 w-1.5 h-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></div>
-        <div className={`absolute -top-20 -right-20 w-64 h-64 rounded-full ${isDark ? 'bg-white/10' : 'bg-[#2C7FFF]/10'}`}></div>
-        <div className={`absolute -bottom-20 right-20 w-40 h-40 rounded-full ${isDark ? 'bg-white/5' : 'bg-[#03045E]/5'}`}></div>
-
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <span className={`text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full border-2 ${isDark ? 'text-white bg-black border-white' : 'text-[#03045E] bg-white border-[#2C7FFF]'}`}>Job Management</span>
-            <span className={`text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full flex items-center gap-1.5 border-2 ${pillBg}`}>
-              <span className={`w-2 h-2 rounded-full animate-pulse ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></span>
-              Smart Engine
+    <div className="animate-fadeIn max-w-7xl mx-auto pb-6 sm:pb-10 px-1 sm:px-0">
+      
+      <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 backdrop-blur-md p-4 sm:p-6 rounded-[10px] shadow-[0_10px_30px_rgba(3,4,94,0.06)] border-2 ${cardBg}`}>
+        <div>
+          <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-1.5 flex-wrap">
+            <span className={`text-[10px] sm:text-xs font-extrabold px-2 sm:px-3 py-0.5 sm:py-1 rounded-[10px] uppercase tracking-wider border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#2C7FFF] border-gray-200'}`}>Job Management</span>
+            <span className={`text-[10px] sm:text-xs font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-[10px] flex items-center gap-1 sm:gap-1.5 border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-gray-200'}`}>
+              <span className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full animate-pulse ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></span> Smart Engine Enabled
             </span>
           </div>
-          <h1 className={`text-3xl sm:text-4xl font-black tracking-tight ${pageText}`}>Create a Job Posting</h1>
-          <p className={`text-sm font-bold mt-2 max-w-xl ${muted}`}>Publish targeted opportunities with guaranteed accommodations for <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>{profile.company_name}</span>.</p>
+          <h1 className={`text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight ${pageText}`}>Create a Job Posting</h1>
+          <p className={`text-xs sm:text-sm font-semibold mt-0.5 ${muted}`}>
+            Publish targeted opportunities with guaranteed accommodations for <span className={`font-bold ${pageText}`}>{profile.company_name}</span>.
+          </p>
         </div>
       </div>
 
       {statusMessage.text && (
-        <div className={`relative overflow-hidden p-5 mb-6 rounded-2xl font-black text-center border-2 ${statusMessage.type === 'success' ? (isDark ? 'bg-white text-black border-white' : 'bg-[#2C7FFF] text-white border-[#2C7FFF]') : (isDark ? 'bg-black text-white border-white' : 'bg-[#03045E] text-white border-[#03045E]')}`}>
-          <div className="flex items-center justify-center gap-2">
-            {statusMessage.type === 'success' ? (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-            ) : (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-            )}
-            <span>{statusMessage.text}</span>
-          </div>
+        <div className={`p-3 sm:p-4 mb-4 sm:mb-6 rounded-[10px] font-bold text-center border-2 text-sm sm:text-base ${
+          statusMessage.type === 'success'
+            ? (isDark ? 'bg-black text-white border-white' : 'bg-white text-[#2C7FFF] border-gray-200')
+            : (isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-gray-200')
+        }`}>
+          {statusMessage.text}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className={`relative p-3 md:p-10 rounded-[1.5rem] md:rounded-[2rem] border-2 grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-8 ${formBg}`} style={{ borderLeftWidth: '8px', borderLeftColor: isDark ? '#ffffff' : '#2C7FFF' }}>
-
-        <div className={`flex flex-col gap-4 md:gap-6 p-3 md:p-6 rounded-xl md:rounded-2xl border-2 ${sectionBg}`}>
-          <SectionHeader 
-            num="01" 
-            title="Basic Information" 
-            subtitle="Give your job posting a clear, focused identity."
-            icon={
-              <svg fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            }
-          />
-
-          <div className="flex flex-col gap-2">
-            <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>
-              Job Title <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>*</span>
+      <form onSubmit={handleSubmit} className={`p-4 sm:p-8 rounded-[10px] shadow-sm border-2 flex flex-col gap-6 sm:gap-8 ${cardBg}`}>
+        
+        <div className="flex flex-col gap-3 sm:gap-4">
+          <div className="flex flex-col gap-1.5 sm:gap-2">
+            <label className={`text-xs sm:text-sm font-extrabold flex items-center gap-1.5 sm:gap-2 uppercase tracking-wider ${pageText}`}>
+              <svg className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+              Job Title <span className={isDark ? 'text-white' : 'text-red-500'}>*</span>
             </label>
             <input 
               type="text" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} required
               placeholder="e.g. Remote Data Specialist"
-              className={`${inputCls} !p-2.5 md:!p-4 !text-xs md:!text-base`}
+              className={inputCls}
             />
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>
-              Full Job Description <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>*</span>
+          <div className="flex flex-col gap-1.5 sm:gap-2">
+            <label className={`text-xs sm:text-sm font-extrabold flex items-center gap-1.5 sm:gap-2 uppercase tracking-wider ${pageText}`}>
+              <svg className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+              Full Job Description <span className={isDark ? 'text-white' : 'text-red-500'}>*</span>
             </label>
             <textarea 
               value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} required rows="5"
               placeholder="Describe the role responsibilities and expectations..."
-              className={`${inputCls} resize-none !p-2.5 md:!p-4 !text-xs md:!text-base`}
+              className={`${inputCls} resize-none`}
             ></textarea>
           </div>
         </div>
 
-        <div className={`flex flex-col gap-4 md:gap-6 p-3 md:p-6 rounded-xl md:rounded-2xl border-2 ${sectionBg}`}>
-          <SectionHeader 
-            num="02" 
-            title="Compensation & Perks" 
-            subtitle="Specify salary expectations and added value."
-            icon={
-              <svg fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            }
-          />
+        <hr className={divider} />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-<<<<<<< HEAD
-=======
-            
->>>>>>> origin/salary-update
-            <div className="flex flex-col gap-2">
-              <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>Salary Range</label>
-              <input
-                type="text" 
-                value={salaryRange} 
-                onChange={(e) => setSalaryRange(e.target.value)}
-                placeholder="e.g. ₱20,000 - ₱30,000 / month"
-<<<<<<< HEAD
-                className={`${inputSmallCls} !p-2.5 md:!p-3 !text-xs md:!text-base`}
-              />
-              <p className={`text-[8px] md:text-[10px] font-bold ${subtle}`}>Leave blank if undisclosed.</p>
-=======
-                className={`${inputSmallCls} ${salaryError ? '!border-red-500 !text-red-500 focus:!border-red-500' : ''} !p-2.5 md:!p-3 !text-xs md:!text-base`}
-                style={salaryError ? { backgroundColor: isDark ? '#000000' : '#F4F4F4' } : {}}
-              />
-              {salaryError ? (
-                <p className="text-[9px] md:text-[10px] font-black text-red-500 mt-0.5">{salaryError}</p>
-              ) : (
-                <p className={`text-[8px] md:text-[10px] font-bold ${subtle}`}>Leave blank if undisclosed.</p>
-              )}
->>>>>>> origin/salary-update
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+          <div className="flex flex-col gap-2 sm:gap-3">
+            <label className={`text-xs sm:text-sm font-extrabold uppercase tracking-wider ${pageText}`}>
+              Salary Range
+            </label>
+            <p className={`text-[10px] sm:text-xs font-semibold mb-1 ${muted}`}>Leave blank if undisclosed.</p>
+            <input
+              type="text" value={salaryRange} onChange={(e) => setSalaryRange(e.target.value)}
+              placeholder="e.g. ₱20,000 - ₱30,000 / month"
+              className={`w-full p-2 sm:p-3 border-2 rounded-[10px] font-semibold focus:outline-none transition-all text-xs sm:text-sm ${
+                salaryError
+                  ? (isDark ? 'border-white text-white bg-black' : 'border-red-500 text-red-500 bg-white')
+                  : isContrast
+                    ? 'border-white bg-black text-white placeholder:text-gray-400 focus:border-white'
+                    : isDarkMode
+                      ? 'border-white bg-black text-white placeholder:text-gray-400 focus:border-white'
+                      : 'border-gray-200 bg-white text-[#03045E] placeholder:text-gray-400 focus:border-gray-200'
+              }`}
+            />
+            {salaryError && (
+              <p className={`text-[10px] sm:text-xs font-black ${isDark ? 'text-white' : 'text-red-500'}`}>{salaryError}</p>
+            )}
+          </div>
 
-            <div className="flex flex-col gap-2">
-              <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>Benefits</label>
-              <input
-                type="text" value={currentBenefit} onChange={(e) => setCurrentBenefit(e.target.value)} onKeyDown={handleBenefitKeyDown}
-                placeholder="Type + press Enter (e.g. HMO)"
-                className={`${inputSmallCls} !p-2.5 md:!p-3 !text-xs md:!text-base`}
-              />
-              {selectedBenefits.length > 0 && (
-                <div className={`flex flex-wrap gap-1.5 md:gap-2 mt-1 p-2 md:p-3 rounded-lg md:rounded-xl border-2 ${chipContainer}`}>
-                  {selectedBenefits.map(benefit => (
-                    <span key={benefit} className={`inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-0.5 md:py-1 text-[9px] md:text-xs font-black rounded-full ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF] text-white'}`}>
-                      {benefit} <button type="button" onClick={() => removeBenefit(benefit)} className={`font-black ml-0.5 cursor-pointer ${isDark ? 'hover:text-black/60' : 'hover:text-[#03045E]'}`}>✕</button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
+          <div className="flex flex-col gap-2 sm:gap-3">
+            <label className={`text-xs sm:text-sm font-extrabold uppercase tracking-wider ${pageText}`}>
+              Benefits
+            </label>
+            <p className={`text-[10px] sm:text-xs font-semibold mb-1 ${muted}`}>Type a benefit and press <strong>Enter</strong> to add it.</p>
+            <input
+              type="text" value={currentBenefit} onChange={(e) => setCurrentBenefit(e.target.value)} onKeyDown={handleBenefitKeyDown}
+              placeholder="e.g. HMO, 13th Month Pay..."
+              className={inputSmCls}
+            />
+            {selectedBenefits.length > 0 && (
+              <div className={chipContainer}>
+                {selectedBenefits.map(benefit => (
+                  <span key={benefit} className={`inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-[10px] border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-gray-200'}`}>
+                    {benefit} <button type="button" onClick={() => removeBenefit(benefit)} className={`font-bold ml-0.5 transition ${isDark ? 'text-white hover:text-red-500' : 'text-[#03045E] hover:text-red-500'}`}>✕</button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
-        <div className={`flex flex-col gap-4 md:gap-6 p-3 md:p-6 rounded-xl md:rounded-2xl border-2 ${sectionBg}`}>
-          <SectionHeader 
-            num="03" 
-            title="Skills & Accommodations" 
-            subtitle="Match with candidates who have the right skills and support needs."
-            icon={
-              <svg fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-              </svg>
-            }
-          />
+        <hr className={divider} />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <div className="flex flex-col gap-2">
-              <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>
-                Required Skills <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>*</span>
-              </label>
-              <input
-                type="text" value={currentSkill} onChange={(e) => setCurrentSkill(e.target.value)} onKeyDown={handleSkillKeyDown}
-                placeholder="Type + press Enter (e.g. Python)"
-                className={`${inputSmallCls} !p-2.5 md:!p-3 !text-xs md:!text-base`}
-              />
-              {filteredSkills.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 md:gap-2 mt-1">
-                  {filteredSkills.map(suggestion => (
-                    <button
-                      key={suggestion}
-                      type="button"
-                      onClick={() => addSkill(suggestion)}
-                      className="px-2 md:px-3 py-1 md:py-1.5 text-[9px] md:text-xs font-black rounded-md md:rounded-lg border-2 transition cursor-pointer hover:opacity-90"
-                      style={recommendationBtnStyle}
-                    >
-                      + {suggestion}
-                    </button>
-                  ))}
-                </div>
-              )}
-              {selectedSkills.length > 0 && (
-                <div className={`flex flex-wrap gap-1.5 md:gap-2 mt-1 p-2 md:p-3 rounded-lg md:rounded-xl border-2 ${chipContainer}`}>
-                  {selectedSkills.map(skill => (
-                    <span key={skill} className={`inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-0.5 md:py-1 text-[9px] md:text-xs font-black rounded-full ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF] text-white'}`}>
-                      {skill} <button type="button" onClick={() => removeSkill(skill)} className={`font-black ml-0.5 cursor-pointer ${isDark ? 'hover:text-black/60' : 'hover:text-[#03045E]'}`}>✕</button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+          <div className="flex flex-col gap-2 sm:gap-3">
+            <label className={`text-xs sm:text-sm font-extrabold uppercase tracking-wider ${pageText}`}>
+              Required Skills <span className={isDark ? 'text-white' : 'text-red-500'}>*</span>
+            </label>
+            <p className={`text-[10px] sm:text-xs font-semibold mb-1 ${muted}`}>Type a skill and press <strong>Enter</strong> to add it.</p>
+            <input
+              type="text" value={currentSkill} onChange={(e) => setCurrentSkill(e.target.value)} onKeyDown={handleSkillKeyDown}
+              placeholder="e.g. Python, Graphic Design..."
+              className={inputSmCls}
+            />
+            {filteredSkills.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-1">
+                {filteredSkills.map(suggestion => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    onClick={() => addSkill(suggestion)}
+                    className={suggestionBtn}
+                  >
+                    + {suggestion}
+                  </button>
+                ))}
+              </div>
+            )}
+            {selectedSkills.length > 0 && (
+              <div className={chipContainer}>
+                {selectedSkills.map(skill => (
+                  <span key={skill} className={`inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-[10px] border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-gray-200'}`}>
+                    {skill} <button type="button" onClick={() => removeSkill(skill)} className={`font-bold ml-0.5 transition ${isDark ? 'text-white hover:text-red-500' : 'text-[#03045E] hover:text-red-500'}`}>✕</button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
 
-            <div className="flex flex-col gap-2">
-              <label className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider ${subtle}`}>
-                Guaranteed Accommodations
-              </label>
-              <input
-                type="text" value={currentAccommodation} onChange={(e) => setCurrentAccommodation(e.target.value)} onKeyDown={handleAccommodationKeyDown}
-                placeholder="Type + press Enter (e.g. Remote Work)"
-                className={`${inputSmallCls} !p-2.5 md:!p-3 !text-xs md:!text-base`}
-              />
-              {filteredAccommodations.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 md:gap-2 mt-1">
-                  {filteredAccommodations.map(suggestion => (
-                    <button
-                      key={suggestion}
-                      type="button"
-                      onClick={() => addAccommodation(suggestion)}
-                      className="px-2 md:px-3 py-1 md:py-1.5 text-[9px] md:text-xs font-black rounded-md md:rounded-lg border-2 transition cursor-pointer hover:opacity-90"
-                      style={recommendationBtnStyle}
-                    >
-                      + {suggestion}
-                    </button>
-                  ))}
-                </div>
-              )}
-              {selectedAccommodations.length > 0 && (
-                <div className={`flex flex-wrap gap-1.5 md:gap-2 mt-1 p-2 md:p-3 rounded-lg md:rounded-xl border-2 ${chipContainer}`}>
-                  {selectedAccommodations.map(acc => (
-                    <span key={acc} className={`inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-0.5 md:py-1 text-[9px] md:text-xs font-black rounded-full ${isDark ? 'bg-white text-black' : 'bg-[#2C7FFF] text-white'}`}>
-                      {acc} <button type="button" onClick={() => removeAccommodation(acc)} className={`font-black ml-0.5 cursor-pointer ${isDark ? 'hover:text-black/60' : 'hover:text-[#03045E]'}`}>✕</button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
+          <div className="flex flex-col gap-2 sm:gap-3">
+            <label className={`text-xs sm:text-sm font-extrabold uppercase tracking-wider ${pageText}`}>
+              Guaranteed Accommodations
+            </label>
+            <p className={`text-[10px] sm:text-xs font-semibold mb-1 ${muted}`}>Type an accommodation and press <strong>Enter</strong> to add it.</p>
+            <input
+              type="text" value={currentAccommodation} onChange={(e) => setCurrentAccommodation(e.target.value)} onKeyDown={handleAccommodationKeyDown}
+              placeholder="e.g. Wheelchair Access, Screen Reader..."
+              className={inputSmCls}
+            />
+            {filteredAccommodations.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-1">
+                {filteredAccommodations.map(suggestion => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    onClick={() => addAccommodation(suggestion)}
+                    className={suggestionBtn}
+                  >
+                    + {suggestion}
+                  </button>
+                ))}
+              </div>
+            )}
+            {selectedAccommodations.length > 0 && (
+              <div className={chipContainer}>
+                {selectedAccommodations.map(acc => (
+                  <span key={acc} className={`inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-[10px] border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-gray-200'}`}>
+                    {acc} <button type="button" onClick={() => removeAccommodation(acc)} className={`font-bold ml-0.5 transition ${isDark ? 'text-white hover:text-red-500' : 'text-[#03045E] hover:text-red-500'}`}>✕</button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
-        <div className={`flex flex-col gap-3 md:gap-5 p-3 md:p-6 rounded-xl md:rounded-2xl border-2 ${disabBox}`}>
-          <SectionHeader 
-            num="04" 
-            title="Accepted Disabilities" 
-            subtitle="Select the conditions this workplace is fully equipped and prepared to support."
-            icon={
-              <svg fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            }
-          />
+        <hr className={divider} />
 
-          <div className="flex flex-wrap gap-1.5 md:gap-2.5 mt-1">
+        <div className={`flex flex-col gap-3 sm:gap-4 p-3 sm:p-5 rounded-[10px] border-2 ${softBg}`}>
+          <div>
+            <label className={`text-xs sm:text-sm font-extrabold flex items-center gap-1.5 sm:gap-2 uppercase tracking-wider ${pageText}`}>
+              <svg className={`w-4 h-4 sm:w-5 sm:h-5 ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              Accepted Disabilities <span className={isDark ? 'text-white' : 'text-red-500'}>*</span>
+            </label>
+            <p className={`text-[10px] sm:text-xs font-semibold mt-1 ${muted}`}>Select the specific conditions this workplace is fully equipped and prepared to support.</p>
+          </div>
+          
+          <div className="flex flex-wrap gap-1.5 sm:gap-3 mt-1 sm:mt-2">
             {availableDisabilities.map((disability) => {
               const isSelected = selectedDisabilities.includes(disability);
               return (
@@ -493,141 +432,92 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
                   type="button"
                   key={disability}
                   onClick={() => toggleSelection(disability, selectedDisabilities, setSelectedDisabilities)}
-                  className={`px-2 md:px-4 py-1.5 md:py-2.5 rounded-md md:rounded-xl text-[9px] md:text-sm font-black border-2 transition cursor-pointer flex items-center gap-1 md:gap-2 ${
+                  className={`px-2 sm:px-4 py-1 sm:py-2 rounded-[10px] text-[10px] sm:text-sm font-bold border-2 transition-colors ${
                     isSelected
-                      ? (isDark ? 'bg-white border-white' : 'bg-[var(--color-primary,#2C7FFF)] border-[var(--color-primary,#2C7FFF)] shadow-md')
-                      : (isDark ? 'bg-black border-white hover:bg-white hover:text-black' : 'bg-[var(--color-card,#ffffff)] border-[var(--color-primary,#2C7FFF)] text-[var(--color-text,#03045E)] hover:bg-[var(--color-primary,#2C7FFF)] hover:text-[var(--color-button-text,#ffffff)]')
+                      ? (isDark ? 'bg-white text-black border-white' : (isHighContrastOrDarkComfort ? 'bg-[#2C7FFF] !text-white border-[#2C7FFF]' : 'bg-[#2C7FFF] text-white border-[#2C7FFF]'))
+                      : (isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-gray-200')
                   }`}
-                  style={isDark ? {
-                    color: isSelected ? '#000000' : '#ffffff',
-                    backgroundColor: isSelected ? '#ffffff' : '#000000',
-                    borderColor: '#ffffff'
-                  } : {
-                    color: isSelected ? 'var(--color-button-text, #ffffff)' : 'var(--color-text, #03045E)',
-                    backgroundColor: isSelected ? 'var(--color-primary, #2C7FFF)' : 'var(--color-card, #ffffff)',
-                    borderColor: 'var(--color-primary, #2C7FFF)'
-                  }}
                 >
-                  <span className="font-black">{disability}</span>
-                  <span className="font-black">{isSelected ? '✓' : '+'}</span>
+                  {disability} {isSelected ? '✓' : '+'}
                 </button>
               );
             })}
           </div>
         </div>
 
-        <div className={`flex flex-col sm:flex-row gap-3 pt-2 col-span-2 md:col-span-2`}>
-          <button
-            type="button" onClick={() => setActiveTab('overview')}
-            className={`flex-1 py-3 md:py-4 font-black text-sm md:text-base rounded-xl md:rounded-2xl border-2 transition cursor-pointer ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-white text-[#03045E] border-[#03045E] hover:bg-[#F4F4F4]'}`}
-          >
-            Cancel
-          </button>
-
-          <button
-            type="submit" disabled={isLoading}
-            className={`flex-[2] py-3 md:py-4 font-black text-sm md:text-base rounded-xl md:rounded-2xl border-2 transition disabled:opacity-50 flex justify-center items-center gap-2 cursor-pointer ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
-          >
-            {isLoading ? 'Publishing Job...' : 'Publish Job Posting'}
-            {!isLoading && (
-              <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            )}
-          </button>
-        </div>
+        <button
+          type="submit"
+          disabled={isLoading}
+          className={`w-full py-3 sm:py-4 text-sm sm:text-base font-extrabold rounded-[10px] shadow-md transition-all disabled:opacity-50 mt-2 flex justify-center items-center gap-1.5 sm:gap-2 cursor-pointer border-2 ${
+            isHighContrastOrDarkComfort
+              ? 'bg-[#2C7FFF] !text-white border-[#2C7FFF] hover:bg-white hover:text-[#2C7FFF]'
+              : (isDark
+                ? 'bg-white text-black border-white hover:bg-black hover:text-white'
+                : 'bg-[#03045E] text-white border-gray-200 hover:bg-[#2C7FFF] hover:border-[#2C7FFF]')
+          }`}
+        >
+          {isLoading ? 'Publishing Job...' : 'Publish Job Posting'}
+          {!isLoading && <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>}
+        </button>
       </form>
 
       {showSuccessAlert && (
         <div
-          className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[0.5px] animate-in fade-in transition-all duration-300"
-          style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(255, 255, 255, 0.6)', filter: 'none' }}
+          className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
+          style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div
-            className="relative w-full max-w-md rounded-[2rem] shadow-[0_25px_60px_rgba(3,4,94,0.35)] border-2 overflow-hidden transform animate-in zoom-in-95 duration-300"
-            style={{
-              backgroundColor: (isContrast || isDarkMode) ? '#000000' : 'var(--color-card, #ffffff)',
-              borderColor: (isContrast || isDarkMode) ? '#ffffff' : 'var(--color-border, rgba(3,4,94,0.2))'
-            }}
-          >
-            <div
-              className="h-1.5 w-full"
-              style={{ backgroundColor: (isContrast || isDarkMode) ? '#ffffff' : 'var(--color-primary, #2c7fff)' }}
-            ></div>
+          <div className={`relative w-full max-w-sm rounded-[2rem] border-2 overflow-hidden ${isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#2C7FFF]'}`}>
+            <div className={`h-2 w-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
 
-            <div className={`absolute top-0 right-0 w-40 h-40 rounded-full ${isDark ? 'bg-white/15' : 'bg-[#2C7FFF]/10'} -mr-16 -mt-16 pointer-events-none`}></div>
-            <div className={`absolute bottom-0 left-0 w-32 h-32 rounded-full ${isDark ? 'bg-white/10' : 'bg-[#03045E]/5'} -ml-12 -mb-12 pointer-events-none`}></div>
-
-            <div className="relative px-8 pt-10 pb-8 flex flex-col items-center text-center">
-              <div className="relative mb-6">
-                <div className={`absolute inset-0 rounded-full ${isDark ? 'bg-white/20' : 'bg-[#2C7FFF]/15'} animate-ping`} />
-                <div className={`relative w-24 h-24 rounded-full flex items-center justify-center ${isDark ? 'bg-white/10 border-2 border-white' : 'bg-[#2C7FFF]/10 border-2 border-[#2C7FFF]'}`}>
-                  <div
-                    className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg"
-                    style={{ backgroundColor: isDark ? '#ffffff' : 'var(--color-primary, #2C7FFF)' }}
-                  >
-                    <svg className="w-9 h-9" style={{ color: isDark ? '#000000' : '#ffffff' }} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+            <div className="px-6 sm:px-8 pt-8 sm:pt-10 pb-6 sm:pb-8 flex flex-col items-center text-center">
+              <div className="relative mb-4 sm:mb-6">
+                <div className={`absolute inset-0 rounded-full animate-ping ${isDark ? 'bg-white/20' : 'bg-[#2C7FFF]/20'}`} />
+                <div className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center ${isDark ? 'bg-white/20' : 'bg-[#2C7FFF]/15'}`}>
+                  <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}>
+                    <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="#ffffff" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
                 </div>
-                <div
-                  className="absolute -top-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center border-2"
-                  style={{
-                    backgroundColor: (isContrast || isDarkMode) ? '#000000' : 'var(--color-card, #ffffff)',
-                    borderColor: isDark ? '#ffffff' : 'var(--color-primary, #2C7FFF)'
-                  }}
-                >
-                  <svg className="w-4 h-4" style={{ color: isDark ? '#ffffff' : 'var(--color-primary, #2C7FFF)' }} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                <div className={`absolute -top-1 -right-1 w-5 h-5 sm:w-7 sm:h-7 rounded-full flex items-center justify-center border-2 ${isDark ? 'bg-white border-black' : 'bg-[#03045E] border-[#F4F4F4]'}`}>
+                  <svg className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-white" fill="none" stroke="#ffffff" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                   </svg>
                 </div>
               </div>
 
-              <span
-                className={`inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full mb-3 border-2 ${isDark ? 'text-white bg-black border-white' : 'text-[#03045E] bg-white border-[#2C7FFF]'}`}
-              >
-                <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></span>
+              <span className={`inline-block px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-2 sm:mb-3 border-2 ${isDark ? 'text-white bg-black border-white' : 'text-[#03045E] bg-white border-[#2C7FFF]'}`}>
                 Job Posted
               </span>
 
-              <h2
-                className="text-2xl sm:text-3xl font-black tracking-tight mb-2"
-                style={{ color: (isContrast || isDarkMode) ? '#ffffff' : 'var(--color-text, #03045E)' }}
-              >
+              <h2 className={`text-xl sm:text-2xl font-black tracking-tight mb-1.5 sm:mb-2 ${pageText}`}>
                 Posting is Live!
               </h2>
-
-              <p
-                className="text-sm font-semibold leading-relaxed mb-6 max-w-xs"
-                style={{ color: (isContrast || isDarkMode) ? 'rgba(255,255,255,0.9)' : 'var(--color-text, #03045E)', opacity: (isContrast || isDarkMode) ? 1 : 0.75 }}
-              >
-                <span className="font-black" style={{ color: isDark ? '#ffffff' : 'var(--color-primary, #2C7FFF)' }}>"{publishedJobTitle}"</span> has been published successfully and is now visible to matching candidates.
+              <p className={`text-xs sm:text-sm font-semibold leading-relaxed mb-4 sm:mb-5 max-w-xs ${muted}`}>
+                <span className={`font-black ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`}>"{publishedJobTitle}"</span> has been published successfully and is now visible to matching candidates.
               </p>
 
-              <div
-                className={`w-full rounded-2xl p-4 border-2 mb-6 ${isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#2C7FFF]'}`}
-              >
+              <div className={`w-full rounded-2xl p-3 sm:p-4 border-2 mb-4 sm:mb-6 ${isDark ? 'bg-black border-white' : 'bg-white border-[#2C7FFF]'}`}>
                 <div className="flex items-center justify-between">
-                  <span className={`text-[10px] font-black uppercase tracking-wider ${isDark ? 'text-white/60' : 'text-[#03045E]/60'}`}>Status</span>
-                  <span className="text-[10px] font-black uppercase tracking-wider" style={{ color: isDark ? '#ffffff' : 'var(--color-primary, #2C7FFF)' }}>Active</span>
+                  <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-wider ${isDark ? 'text-white/60' : 'text-[#03045E]/60'}`}>Status</span>
+                  <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-wider ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`}>Active</span>
                 </div>
-                <div className={`h-px my-3 ${isDark ? 'bg-white/40' : 'bg-[#03045E]/15'}`}></div>
+                <div className={`h-px my-2 sm:my-3 ${isDark ? 'bg-white/40' : 'bg-[#03045E]/15'}`}></div>
                 <div className="flex items-center justify-between">
-                  <span className={`text-[10px] font-black uppercase tracking-wider ${isDark ? 'text-white/60' : 'text-[#03045E]/60'}`}>Posted</span>
-                  <span className={`text-[10px] font-black uppercase tracking-wider ${isDark ? 'text-white' : 'text-[#03045E]'}`}>
+                  <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-wider ${isDark ? 'text-white/60' : 'text-[#03045E]/60'}`}>Posted</span>
+                  <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-wider ${pageText}`}>
                     {new Date().toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5 mb-4">
-                <span className={`w-2 h-2 rounded-full animate-bounce ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
-                <span className={`w-2 h-2 rounded-full animate-bounce ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} style={{ animationDelay: '150ms' }} />
-                <span className={`w-2 h-2 rounded-full animate-bounce ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} style={{ animationDelay: '300ms' }} />
+              <div className="flex items-center gap-1.5 mb-3 sm:mb-4">
+                <span className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full animate-bounce ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
+                <span className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full animate-bounce ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} style={{ animationDelay: '150ms' }} />
+                <span className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full animate-bounce ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} style={{ animationDelay: '300ms' }} />
               </div>
 
-              <p className={`text-xs font-bold ${isDark ? 'text-white/50' : 'text-[#03045E]/50'}`}>
+              <p className={`text-[10px] sm:text-xs font-bold ${isDark ? 'text-white/50' : 'text-[#03045E]/50'}`}>
                 Redirecting you to dashboard...
               </p>
             </div>

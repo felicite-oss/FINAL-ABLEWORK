@@ -86,53 +86,117 @@ function GlobalOverlays() {
   );
 }
 
-function App() {
+function AdminRouteReset() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!location.pathname.includes('/admin')) return;
+
+    const root = document.documentElement;
+
+    root.classList.remove(
+      'palette-default',
+      'palette-deuteranopia',
+      'palette-protanopia',
+      'palette-tritanopia',
+      'palette-highContrast',
+      'palette-warmTone',
+      'palette-coolTone',
+      'palette-darkComfort',
+      'palette-monochrome',
+      'theme-Standard',
+      'theme-Dark',
+      'theme-Assist',
+      'dark-mode',
+      'standard',
+      'talkback-active',
+      'font-normal',
+      'font-large',
+      'font-xlarge'
+    );
+
+    const varsToReset = [
+      'primary', 'primarySoft', 'accent', 'accentSoft',
+      'background', 'surface', 'surfaceMuted', 'border',
+      'text', 'textMuted', 'textSubtle',
+      'success', 'successText',
+      'warning', 'warningText',
+      'error', 'errorText',
+      'info', 'button-text'
+    ];
+
+    varsToReset.forEach((key) => {
+      root.style.removeProperty(`--color-${key}`);
+    });
+  }, [location.pathname]);
+
+  return null;
+}
+
+function AppRoutes() {
+  const location = useLocation();
+
+  if (location.pathname.includes('/admin')) {
+    return (
+      <>
+        <AdminRouteReset />
+        <Routes>
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        </Routes>
+      </>
+    );
+  }
+
   return (
     <AccessibilityProvider>
       <ColorPaletteProvider>
-        <Router>
-          <div className="min-h-screen bg-[var(--bg-primary)] transition-colors duration-300 relative">
-            
-            <a
-              href="#main-content"
-              className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:bg-[#2C7FFF] focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:outline-none"
-            >
-              Skip to main content
-            </a>
+        <div className="min-h-screen bg-[var(--bg-primary)] transition-colors duration-300 relative">
+          
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:bg-[#2C7FFF] focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:outline-none"
+          >
+            Skip to main content
+          </a>
 
-            <RouteFocusManager />
+          <RouteFocusManager />
 
-            <GlobalOverlays />
+          <GlobalOverlays />
 
-            <main 
-              id="main-content" 
-              role="main" 
-              aria-label="Main Application Content" 
-              tabIndex="-1" 
-              className="outline-none h-full w-full focus:outline-none"
-            >
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register-select" element={<RegisterSelect />} />
-                <Route path="/register/applicant" element={<ApplicantRegister />} />
-                <Route path="/register/employer" element={<EmployerRegister />} />
-                <Route path="/applicant-dashboard" element={<ApplicantDashboard />} />
-                <Route path="/employer-dashboard" element={<EmployerDashboard />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/policy" element={<Policy />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              </Routes>
-            </main>
+          <main 
+            id="main-content" 
+            role="main" 
+            aria-label="Main Application Content" 
+            tabIndex="-1" 
+            className="outline-none h-full w-full focus:outline-none"
+          >
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register-select" element={<RegisterSelect />} />
+              <Route path="/register/applicant" element={<ApplicantRegister />} />
+              <Route path="/register/employer" element={<EmployerRegister />} />
+              <Route path="/applicant-dashboard" element={<ApplicantDashboard />} />
+              <Route path="/employer-dashboard" element={<EmployerDashboard />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/policy" element={<Policy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+            </Routes>
+          </main>
 
-          </div>
-        </Router>
+        </div>
       </ColorPaletteProvider>
     </AccessibilityProvider>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppRoutes />
+    </Router>
   );
 }
 

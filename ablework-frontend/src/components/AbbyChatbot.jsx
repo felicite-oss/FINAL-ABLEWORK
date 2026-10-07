@@ -9,6 +9,7 @@ export default function AbbyChatbot() {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef(null);
+  const textareaRef = useRef(null);
 
 
   useEffect(() => {
@@ -16,6 +17,13 @@ export default function AbbyChatbot() {
       chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isOpen, isTyping]);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+    }
+  }, [input]);
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -74,9 +82,16 @@ export default function AbbyChatbot() {
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend(e);
+    }
+  };
+
   const formatText = (text) => {
     return text.split('\n').map((line, lineIndex) => (
-      <span key={lineIndex} className="block mb-1.5 last:mb-0">
+      <span key={lineIndex} className="block mb-1 sm:mb-1.5 last:mb-0">
         {line.split(/(\*\*.*?\*\*)/g).map((part, partIndex) => {
           if (part.startsWith('**') && part.endsWith('**')) {
             return <strong key={partIndex} className="font-bold text-[#03045E]">{part.slice(2, -2)}</strong>;
@@ -92,15 +107,15 @@ export default function AbbyChatbot() {
       
       {isOpen && (
         <div 
-          className="bg-[#f4f4f4] w-[calc(100vw-2rem)] max-w-sm sm:w-96 rounded-3xl shadow-2xl border-2 border-[#03045E]/20 flex flex-col overflow-hidden mb-3 animate-in fade-in slide-in-from-bottom-3 duration-200"
+          className="bg-[#f4f4f4] w-[calc(100vw-2rem)] max-w-sm sm:w-96 rounded-2xl sm:rounded-3xl shadow-2xl border-2 border-[#03045E]/20 flex flex-col overflow-hidden mb-3 animate-in fade-in slide-in-from-bottom-3 duration-200"
           style={{ height: 'min(500px, 70vh)' }}
           role="dialog"
           aria-label="Chat with Abby AI Assistant"
         >
         
-          <div className="bg-[#03045E] text-[#f4f4f4] px-5 py-4 flex justify-between items-center shrink-0 shadow-md z-10">
-            <h2 tabIndex="0" className="font-black text-[16px] tracking-tight flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-[#2C7FFF] flex items-center justify-center bg-[#f4f4f4] shrink-0 pointer-events-none shadow-sm" aria-hidden="true">
+          <div className="bg-[#03045E] text-[#f4f4f4] px-3 py-3 sm:px-5 sm:py-4 flex justify-between items-center shrink-0 shadow-md z-10">
+            <h2 tabIndex="0" className="font-black text-sm sm:text-[16px] tracking-tight flex items-center gap-2 sm:gap-3">
+              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full overflow-hidden border-2 border-[#2C7FFF] flex items-center justify-center bg-[#f4f4f4] shrink-0 pointer-events-none shadow-sm" aria-hidden="true">
                 <video 
                   src={abbyVideo} 
                   autoPlay 
@@ -117,7 +132,7 @@ export default function AbbyChatbot() {
             <button 
               onClick={() => setIsOpen(false)}
               aria-label="Close chat window"
-              className="text-[#f4f4f4] hover:bg-[#2C7FFF]/30 rounded-full w-8 h-8 flex items-center justify-center font-black transition-colors cursor-pointer text-lg"
+              className="text-[#f4f4f4] hover:bg-[#2C7FFF]/30 rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center font-black transition-colors cursor-pointer text-sm sm:text-lg"
             >
               ✕
             </button>
@@ -125,14 +140,14 @@ export default function AbbyChatbot() {
 
         
           <div 
-            className="flex-1 p-4 min-h-0 overflow-y-auto flex flex-col gap-4 bg-[#f4f4f4]"
+            className="flex-1 p-2.5 sm:p-4 min-h-0 overflow-y-auto flex flex-col gap-2.5 sm:gap-4 bg-[#f4f4f4]"
             aria-live="polite"
           >
             {messages.map((msg, index) => (
               <div 
                 key={index}
                 tabIndex="0" 
-                className={`max-w-[88%] px-4 py-3 text-[14px] font-semibold leading-relaxed shadow-sm ${
+                className={`max-w-[88%] px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-[14px] font-semibold leading-relaxed shadow-sm ${
                   msg.sender === 'user' 
                     ? 'bg-[#2C7FFF] text-[#f4f4f4] self-end rounded-2xl rounded-br-sm' 
                     : 'bg-white border-2 border-[#03045E]/10 text-[#03045E] self-start rounded-2xl rounded-bl-sm'
@@ -144,11 +159,11 @@ export default function AbbyChatbot() {
 
           
             {isTyping && (
-              <div tabIndex="0" className="bg-white border-2 border-[#03045E]/10 text-[#03045E] self-start px-4 py-3 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-1.5 animate-pulse">
-                <span className="text-xs font-bold text-[#03045E]/70 mr-1">Abby is thinking</span>
-                <div className="w-1.5 h-1.5 bg-[#2C7FFF] rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                <div className="w-1.5 h-1.5 bg-[#2C7FFF] rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                <div className="w-1.5 h-1.5 bg-[#2C7FFF] rounded-full animate-bounce"></div>
+              <div tabIndex="0" className="bg-white border-2 border-[#03045E]/10 text-[#03045E] self-start px-3 py-2 sm:px-4 sm:py-3 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-1.5 animate-pulse">
+                <span className="text-[10px] sm:text-xs font-bold text-[#03045E]/70 mr-1">Abby is thinking</span>
+                <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-[#2C7FFF] rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-[#2C7FFF] rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-[#2C7FFF] rounded-full animate-bounce"></div>
               </div>
             )}
 
@@ -158,22 +173,24 @@ export default function AbbyChatbot() {
        
           <form 
             onSubmit={handleSend} 
-            className="p-3 border-t-2 border-[#03045E]/10 bg-white flex gap-2 shrink-0 items-center shadow-inner"
+            className="p-2.5 sm:p-3 border-t-2 border-[#03045E]/10 bg-white flex gap-1.5 sm:gap-2 shrink-0 items-end shadow-inner"
           >
-            <input
-              type="text"
+            <textarea
+              ref={textareaRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
               disabled={isTyping}
+              rows={1}
               placeholder={isTyping ? "Abby is generating response..." : "Ask Abby something..."}
               aria-label="Type your message to Abby"
-              className="flex-1 min-w-0 px-4 py-2.5 border-2 border-[#03045E]/20 rounded-xl focus:border-[#2C7FFF] focus:ring-1 focus:ring-[#2C7FFF] outline-none text-[#03045E] bg-[#f4f4f4] font-semibold text-sm transition-all disabled:opacity-50"
+              className="flex-1 min-w-0 px-3 py-2 sm:px-4 sm:py-2.5 border-2 border-[#03045E]/20 rounded-xl focus:border-[#2C7FFF] focus:ring-1 focus:ring-[#2C7FFF] outline-none text-[#03045E] bg-[#f4f4f4] font-semibold text-xs sm:text-sm transition-all disabled:opacity-50 resize-none overflow-y-auto max-h-[120px] leading-relaxed"
             />
             <button 
               type="submit"
               aria-label="Send message"
               disabled={!input.trim() || isTyping}
-              className="bg-[#2C7FFF] text-[#f4f4f4] px-5 py-2.5 rounded-xl font-bold hover:bg-[#03045E] transition-colors cursor-pointer text-sm whitespace-nowrap shrink-0 disabled:opacity-50 disabled:cursor-not-allowed shadow-md border-2 border-[#2C7FFF] hover:border-[#03045E]"
+              className="bg-[#2C7FFF] text-[#f4f4f4] px-3 py-2 sm:px-5 sm:py-2.5 rounded-xl font-bold hover:bg-[#03045E] transition-colors cursor-pointer text-xs sm:text-sm whitespace-nowrap shrink-0 disabled:opacity-50 disabled:cursor-not-allowed shadow-md border-2 border-[#2C7FFF] hover:border-[#03045E]"
             >
               Send
             </button>
@@ -188,7 +205,7 @@ export default function AbbyChatbot() {
           aria-label="Open chat with Abby AI Assistant"
           aria-haspopup="dialog"
           aria-expanded={isOpen}
-          className="bg-[#2C7FFF] text-[#f4f4f4] w-16 h-16 rounded-full shadow-[0_8px_16px_rgba(44,127,255,0.4)] hover:shadow-2xl flex items-center justify-center overflow-hidden hover:scale-105 transition-transform cursor-pointer border-[3px] border-[#03045E] relative p-0 pointer-events-auto"
+          className="bg-[#2C7FFF] text-[#f4f4f4] w-12 h-12 sm:w-16 sm:h-16 rounded-full shadow-[0_8px_16px_rgba(44,127,255,0.4)] hover:shadow-2xl flex items-center justify-center overflow-hidden hover:scale-105 transition-transform cursor-pointer border-[3px] border-[#03045E] relative p-0 pointer-events-auto"
           style={{ animation: 'sideToSideBounce 2.5s infinite ease-in-out' }}
         >
           <style>{`
