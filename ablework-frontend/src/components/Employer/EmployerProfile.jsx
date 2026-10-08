@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import { AccessibilityContext } from '../../context/AccessibilityContext';
 
 export default function EmployerSettings({ profile, refreshData }) {
@@ -13,10 +13,10 @@ export default function EmployerSettings({ profile, refreshData }) {
     industry: profile?.industry || '',
     email: profile?.email || '',
     latitude: profile?.latitude || '',
-    longitude: profile?.longitude || ''
+    longitude: profile?.longitude || '',
+    company_logo: profile?.company_logo || ''
   });
   
-  const [logoFile, setLogoFile] = useState(null);
   const [logoPreview, setLogoPreview] = useState(profile?.company_logo ? `http://localhost:5001${profile.company_logo}` : null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -31,7 +31,10 @@ export default function EmployerSettings({ profile, refreshData }) {
   const fileInputRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tempImagePreview, setTempImagePreview] = useState('');
-  const [selectedFile, setSelectedFile] = useState(null);
+  
+  // FIX: This physically holds the image file to send to the backend
+  const [profilePicFile, setProfilePicFile] = useState(null);
+  
   const [isUpdatingPicture, setIsUpdatingPicture] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState({ isOpen: false, message: '' });
 
@@ -60,18 +63,10 @@ export default function EmployerSettings({ profile, refreshData }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setLogoFile(file);
-      setLogoPreview(URL.createObjectURL(file)); 
-    }
-  };
-
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setSelectedFile(file);
+      setProfilePicFile(file); // Store actual file instantly
       const reader = new FileReader();
       reader.onloadend = () => {
         setTempImagePreview(reader.result);
@@ -80,22 +75,53 @@ export default function EmployerSettings({ profile, refreshData }) {
     }
   };
 
-  const handleConfirmChangePicture = () => {
-    if (!tempImagePreview) return;
+  // FIX: Instantly upload the logo when they click "Save Logo" in the modal
+  const handleConfirmChangePicture = async () => {
+    if (!tempImagePreview || !profilePicFile) return;
+    
     setIsUpdatingPicture(true);
-    setTimeout(() => {
-      if (tempImagePreview) {
-        setLogoPreview(tempImagePreview);
+
+    const submitData = new FormData();
+    submitData.append('company_name', formData.company_name);
+    submitData.append('company_description', formData.company_description);
+    submitData.append('industry', formData.industry);
+    submitData.append('email', formData.email);
+    submitData.append('latitude', formData.latitude);
+    submitData.append('longitude', formData.longitude);
+    submitData.append('company_logo', profilePicFile);
+
+    try {
+      const res = await fetch(`http://localhost:5001/api/employer/${profile.user_id}/settings`, {
+        method: 'PUT',
+        body: submitData 
+      });
+
+      if (res.ok) {
+        const responseData = await res.json();
+        
+        // Update states to reflect new DB URL
+        const newLogoUrl = responseData.logo_url ? `http://localhost:5001${responseData.logo_url}` : tempImagePreview;
+        setLogoPreview(newLogoUrl);
+        setFormData(prev => ({ ...prev, company_logo: responseData.logo_url }));
+        
+        setIsUpdatingPicture(false);
+        setIsModalOpen(false);
+        setProfilePicFile(null); // Reset
+        refreshData();
+        setSaveSuccess({ isOpen: true, message: 'Your company logo has been successfully updated.' });
+      } else {
+        setIsUpdatingPicture(false);
+        alert("Failed to upload logo.");
       }
+    } catch (err) {
       setIsUpdatingPicture(false);
-      setIsModalOpen(false);
-      setSelectedFile(null);
-    }, 2000);
+      alert("Server error while uploading logo.");
+    }
   };
 
   const handleCancelChangePicture = () => {
     setTempImagePreview('');
-    setSelectedFile(null);
+    setProfilePicFile(null);
     setIsModalOpen(false);
   };
 
@@ -136,6 +162,7 @@ export default function EmployerSettings({ profile, refreshData }) {
     }
   };
 
+  // Main Submit handler is now also converted to FormData
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -148,8 +175,8 @@ export default function EmployerSettings({ profile, refreshData }) {
     submitData.append('latitude', formData.latitude);
     submitData.append('longitude', formData.longitude);
     
-    if (logoFile) {
-      submitData.append('company_logo', logoFile);
+    if (profilePicFile) {
+      submitData.append('company_logo', profilePicFile);
     }
 
     try {

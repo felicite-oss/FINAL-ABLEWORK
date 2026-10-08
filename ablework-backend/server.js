@@ -7,7 +7,6 @@ const path = require('path');
 const helmet = require('helmet');
 require('dotenv').config();
 
-
 const isValidPassword = (password) => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
     return passwordRegex.test(password);
@@ -24,10 +23,8 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-
 async function sendNotification(userId, title, message, type) {
   try {
-    
     let inAppMessage = message.replace(/Please log in to your AbleWork dashboard for more details\./gi, '').trim();
     if (inAppMessage.endsWith('.')) {
       inAppMessage = inAppMessage.slice(0, -1); 
@@ -44,11 +41,9 @@ async function sendNotification(userId, title, message, type) {
       [userId ?? null, title ?? null, inAppMessage ?? null, type ?? 'general']
     );
 
-    
     const [users] = await db.execute("SELECT email FROM users WHERE id = ?", [userId ?? null]);
     
     if (users.length > 0 && users[0].email) {
-      
       try {
         await transporter.sendMail({
           from: '"AbleWork Notifications" <ableworksys5i@gmail.com>',
@@ -66,9 +61,7 @@ async function sendNotification(userId, title, message, type) {
 }
 
 const { OpenAI } = require('openai');
-
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -78,11 +71,9 @@ app.use(
   helmet.crossOriginResourcePolicy({ policy: "cross-origin" })
 );
 
-
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -97,7 +88,6 @@ const upload = multer({
     storage: storage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
     fileFilter: (req, file, cb) => {
-        // Enforce .jpg/.jpeg only for applicant PWD ID uploads
         if (file.fieldname === 'pwdDocument') {
             const ext = path.extname(file.originalname).toLowerCase();
             if (ext !== '.jpg' && ext !== '.jpeg') {
@@ -108,10 +98,7 @@ const upload = multer({
     }
 });
 
-
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-
 
 async function getUserLiveContext(userId, role) {
     let contextSummary = { role };
@@ -174,7 +161,6 @@ async function getUserLiveContext(userId, role) {
     return contextSummary;
 }
 
-
 // ---------------------------------------------------------
 // ROUTE: Abby AI Chatbot Engine (Powered by Gemini + RAG)
 // ---------------------------------------------------------
@@ -188,7 +174,6 @@ app.post('/api/chat', async (req, res) => {
             liveContext = await getUserLiveContext(userId, role);
         }
 
-    
         const systemInstruction = `
         You are Abby, the official AI assistant for AbleWork, a job application platform connecting Persons with Disabilities (PWD) to inclusive employers. 
         
@@ -234,19 +219,16 @@ app.post('/api/chat', async (req, res) => {
         4. Applying & Uploading Resumes: To upload a resume, the user MUST click on the specific job they want to apply for.
         5. Archived Jobs: If an employer archives a job, it completely disappears from the active UI.`;
 
-       
         const model = genAI.getGenerativeModel({ 
             model: "gemini-3-flash-preview", 
             systemInstruction 
         });
 
-        
         const formattedHistory = conversationHistory.map(turn => ({
             role: turn.sender === 'user' ? 'user' : 'model',
             parts: [{ text: turn.text }]
         }));
 
-       
         const chat = model.startChat({
             history: formattedHistory,
         });
@@ -260,7 +242,6 @@ app.post('/api/chat', async (req, res) => {
         res.status(500).json({ reply: "I'm having trouble connecting right now. Please check my API connection." });
     }
 });
-
 
 app.get('/api/jobs', async (req, res) => {
     try {
@@ -286,16 +267,13 @@ app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        
         const [users] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
         if (users.length === 0) return res.status(401).json({ error: "Invalid credentials." });
         const user = users[0];
 
-       
         const isMatch = await bcrypt.compare(password, user.password_hash);
         if (!isMatch) return res.status(401).json({ error: "Invalid credentials." });
 
-       
         res.status(200).json({ 
             message: "Login successful", 
             user: { 
@@ -339,7 +317,8 @@ app.get('/api/applicant/:id/profile', async (req, res) => {
                 a.workplace_independence, 
                 a.accommodations_needed, 
                 a.skills, 
-                a.pwd_document_path
+                a.pwd_document_path,
+                a.profile_picture
             FROM users u
             JOIN applicant_profiles a ON u.id = a.user_id
             WHERE u.id = ?
@@ -350,7 +329,6 @@ app.get('/api/applicant/:id/profile', async (req, res) => {
         }
 
         const profile = rows[0];
-
 
         let parsedSkills = [];
         let parsedAccommodations = [];
@@ -386,7 +364,6 @@ app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (re
         independence, disabilities, accommodations, skills 
     } = req.body;
 
-    // NEW: Strong Password Validation
     if (!isValidPassword(password)) {
         return res.status(400).json({ message: "Password must be at least 8 characters long, with an uppercase, lowercase, number, and special character." });
     }
@@ -472,7 +449,6 @@ app.post('/api/auth/register/employer', upload.single('verificationDocument'), a
         jobRole, address, latitude, longitude 
     } = req.body;
 
-    // NEW: Strong Password Validation
     if (!isValidPassword(password)) {
         return res.status(400).json({ message: "Password must be at least 8 characters long, with an uppercase, lowercase, number, and special character." });
     }
@@ -593,7 +569,6 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
 
         for (let job of jobs) {
             
-            // A. geofencing & distance score
             let distance = 0;
             let distanceScore = 40; 
 
@@ -612,19 +587,16 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
                 distanceScore = Math.max(0, 40 - ((distance / maxRadius) * 40));
             }
 
-            // B. accommodation 
             const jobAccommodations = safeParse(job.provided_accommodations).map(a => a.toLowerCase());
             const meetsAllNeeds = appAccommodations.every(need => jobAccommodations.includes(need));
             if (!meetsAllNeeds) continue; 
 
-            // C. disability match check
             const jobAcceptedDisabilities = safeParse(job.accepted_disabilities).map(d => d.toLowerCase());
             const isDisabilitySupported = appDisabilities.some(disability => 
                 jobAcceptedDisabilities.includes(disability)
             );
             if (jobAcceptedDisabilities.length > 0 && !isDisabilitySupported) continue;
 
-            // D. Skill Scoring
             const jobSkills = safeParse(job.required_skills).map(s => s.toLowerCase());
             let matchingSkillsCount = 0;
             
@@ -662,7 +634,6 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
 // ---------------------------------------------------------
 // ROUTE: SUBMIT A JOB APPLICATION (With Resume Upload)
 // ---------------------------------------------------------
-
 app.post('/api/applications/apply', upload.single('resume'), async (req, res) => {
 
     const { applicant_id, job_id, cover_letter } = req.body;
@@ -755,10 +726,10 @@ app.get('/api/employer/:id/profile', async (req, res) => {
     try {
         const [rows] = await db.execute(`
             SELECT u.email, 
-                    u.phone, 
-                    u.verification_status, 
-                    u.rejection_reason,
-                    u.rejection_timestamp,
+                   u.phone, 
+                   u.verification_status, 
+                   u.rejection_reason,
+                   u.rejection_timestamp,
                    e.company_name, e.industry, e.job_role, e.workplace_address,
                    e.company_description, e.latitude, e.longitude, e.company_logo 
             FROM users u
@@ -799,7 +770,6 @@ app.get('/api/employer/:id/dashboard-stats', async (req, res) => {
              [employerId]
         );
 
-
         const [recentActivity] = await db.execute(
             `SELECT a.id, a.applied_at AS created_at, a.status, j.job_title, 
                     ap.firstname AS first_name, ap.lastname AS last_name
@@ -812,7 +782,6 @@ app.get('/api/employer/:id/dashboard-stats', async (req, res) => {
              [employerId]
         );
 
-
         const [recentApps] = await db.execute(
             `SELECT a.applied_at 
              FROM applications a
@@ -822,11 +791,9 @@ app.get('/api/employer/:id/dashboard-stats', async (req, res) => {
              [employerId]
         );
 
-
         const chartData = [];
         const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         
-
         for (let i = 6; i >= 0; i--) {
             const targetDate = new Date();
             targetDate.setDate(targetDate.getDate() - i);
@@ -844,7 +811,6 @@ app.get('/api/employer/:id/dashboard-stats', async (req, res) => {
             });
         }
 
-        
         res.status(200).json({
             activeJobs: activeJobs[0].count || 0,
             pendingApps: appStats[0].pending_count || 0,
@@ -889,13 +855,11 @@ app.post('/api/jobs/create', async (req, res) => {
     } = req.body;
 
     try {
-
         const [users] = await db.execute('SELECT verification_status FROM users WHERE id = ?', [employer_id]);
         
         if (users.length === 0 || users[0].verification_status !== 'Approved') {
             return res.status(403).json({ message: "You must be an approved employer to post jobs." });
         }
-
 
         const [result] = await db.execute(
             `INSERT INTO job_postings 
@@ -1039,6 +1003,7 @@ app.put('/api/jobs/:id', async (req, res) => {
         res.status(500).json({ message: "Server error updating job." });
     }
 });
+
 // ---------------------------------------------------------
 // ROUTE: ARCHIVE A JOB (Soft Delete)
 // ---------------------------------------------------------
@@ -1143,32 +1108,55 @@ app.put('/api/employer/:id/settings', upload.single('company_logo'), async (req,
 // ---------------------------------------------------------
 // ROUTE: UPDATE APPLICANT PROFILE
 // ---------------------------------------------------------
-app.put('/api/applicant/:id/profile', async (req, res) => {
+app.put('/api/applicant/:id/profile', upload.single('profile_picture'), async (req, res) => {
     const userId = req.params.id;
     const { 
         residential_address, latitude, longitude, travel_radius_km, 
         workplace_independence, accommodations_needed, skills, disability_type 
     } = req.body;
 
+    const profile_picture = req.file ? `/uploads/${req.file.filename}` : null;
+
     try {
-        await db.execute(
-            `UPDATE applicant_profiles 
-             SET residential_address = ?, latitude = ?, longitude = ?, travel_radius_km = ?, 
-                 workplace_independence = ?, accommodations_needed = ?, skills = ?, disability_type = ? 
-             WHERE user_id = ?`,
-            [
-                residential_address, 
-                latitude || null, 
-                longitude || null, 
-                travel_radius_km, 
-                workplace_independence, 
-                JSON.stringify(accommodations_needed), 
-                JSON.stringify(skills),
-                disability_type,
-                userId
-            ]
-        );
-        res.status(200).json({ message: "Profile updated successfully." });
+        if (profile_picture) {
+            await db.execute(
+                `UPDATE applicant_profiles 
+                 SET residential_address = ?, latitude = ?, longitude = ?, travel_radius_km = ?, 
+                     workplace_independence = ?, accommodations_needed = ?, skills = ?, disability_type = ?, profile_picture = ? 
+                 WHERE user_id = ?`,
+                [
+                    residential_address, 
+                    latitude || null, 
+                    longitude || null, 
+                    travel_radius_km, 
+                    workplace_independence, 
+                    accommodations_needed, 
+                    skills,                
+                    disability_type,
+                    profile_picture,
+                    userId
+                ]
+            );
+        } else {
+            await db.execute(
+                `UPDATE applicant_profiles 
+                 SET residential_address = ?, latitude = ?, longitude = ?, travel_radius_km = ?, 
+                     workplace_independence = ?, accommodations_needed = ?, skills = ?, disability_type = ? 
+                 WHERE user_id = ?`,
+                [
+                    residential_address, 
+                    latitude || null, 
+                    longitude || null, 
+                    travel_radius_km, 
+                    workplace_independence, 
+                    accommodations_needed, 
+                    skills,                
+                    disability_type,
+                    userId
+                ]
+            );
+        }
+        res.status(200).json({ message: "Profile updated successfully.", profile_picture });
     } catch (error) {
         console.error("Profile Update Error:", error.message);
         res.status(500).json({ message: "Server error updating profile." });
@@ -1180,8 +1168,9 @@ app.put('/api/applicant/:id/profile', async (req, res) => {
 // =========================================================
 app.get('/api/admin/stats', async (req, res) => {
     try {
-        const [applicantCount] = await db.execute(`SELECT COUNT(*) as count FROM users WHERE role = 'applicant'`);
-        const [employerCount] = await db.execute(`SELECT COUNT(*) as count FROM users WHERE role = 'employer'`);
+        const [applicantCount] = await db.execute(`SELECT COUNT(*) as count FROM applicant_profiles`);
+        const [employerCount] = await db.execute(`SELECT COUNT(*) as count FROM employer_profiles`);
+        
         const [activeJobs] = await db.execute(`SELECT COUNT(*) as count FROM job_postings WHERE status = 'Active'`);
         const [pendingEmpVerifications] = await db.execute(`SELECT COUNT(*) as count FROM users WHERE role = 'employer' AND verification_status = 'Pending'`);
         const [pendingAppVerifications] = await db.execute(`SELECT COUNT(*) as count FROM users WHERE role = 'applicant' AND verification_status = 'Pending'`);
@@ -1400,7 +1389,7 @@ app.post('/api/users/:id/resubmit', upload.single('document'), async (req, res) 
         }
 
         const [userRows] = await db.execute(`
-            SELECT verification_status, rejection_timestamp 
+            SELECT verification_status, rejection_timestamp, role 
             FROM users 
             WHERE id = ?
         `, [userId]);
@@ -1423,18 +1412,35 @@ app.post('/api/users/:id/resubmit', upload.single('document'), async (req, res) 
             }
         }
 
-        const filePath = req.file.path; 
+        const filePath = req.file ? req.file.path : null; 
+        if (!filePath) {
+            return res.status(400).json({ message: "No document file provided." });
+        }
+
+        // Dynamically update the correct table based on user role
+        if (user.role === 'applicant') {
+            await db.execute(`
+                UPDATE applicant_profiles 
+                SET pwd_document_path = ? 
+                WHERE user_id = ?
+            `, [filePath, userId]);
+        } else {
+            await db.execute(`
+                UPDATE employer_profiles 
+                SET verification_document = ? 
+                WHERE user_id = ?
+            `, [filePath, userId]);
+        }
         
         await db.execute(`
             UPDATE users 
-            SET verification_document = ?, 
-                verification_status = 'Pending', 
+            SET verification_status = 'Pending', 
                 rejection_reason = NULL, 
                 rejection_timestamp = NULL,
                 ip_address = ?,
                 reverification_attempts = reverification_attempts + 1
             WHERE id = ?
-        `, [filePath, clientIp, userId]);
+        `, [clientIp, userId]);
 
         res.status(200).json({ message: "Document resubmitted successfully. Your account is back under review." });
 
@@ -1605,7 +1611,6 @@ app.post('/api/users/:id/request-otp', async (req, res) => {
             [otpCode, expires, userId]
         );
 
-
         const subjectLine = type === 'email' ? 'Verify your new Email Address' : 'Verify your Password Change';
         const messageBody = `Hello!\n\nYour 6-digit AbleWork verification code is: ${otpCode}\n\nThis code will expire in 15 minutes. If you did not request this change, please ignore this email.`;
 
@@ -1698,14 +1703,12 @@ app.post('/api/auth/reset-password', async (req, res) => {
             return res.status(400).json({ message: "Recovery code has expired. Please request a new one." });
         }
 
-        // NEW: Strong Password Validation
         if (!isValidPassword(newPassword)) {
             return res.status(400).json({ message: "New password must be at least 8 characters long, with an uppercase, lowercase, number, and special character." });
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         
-        // Update password and clear OTP fields
         await db.execute(
             "UPDATE users SET password_hash = ?, otp_code = NULL, otp_expires = NULL WHERE id = ?",
             [hashedPassword, user.id]

@@ -26,6 +26,9 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [publishedJobTitle, setPublishedJobTitle] = useState('');
 
+  // NEW: Check if the user is fully verified
+  const isVerified = profile?.verification_status === 'Approved';
+
   useEffect(() => {
     if (salaryRange.trim() === '') {
       setSalaryError('');
@@ -263,6 +266,44 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
         </div>
       )}
 
+      {/* VERIFICATION REQUIRED LOCK SCREEN */}
+      {!isVerified ? (
+        <div className={`relative p-8 md:p-16 rounded-[2rem] border-2 flex flex-col items-center text-center overflow-hidden shadow-sm ${cardBg}`}>
+          <div className={`absolute -top-12 -right-12 w-40 h-40 rounded-full opacity-50 pointer-events-none ${isDark ? 'bg-white/10' : 'bg-[#2C7FFF]/10'}`}></div>
+          <div className={`absolute -bottom-10 -left-10 w-32 h-32 rounded-full opacity-50 pointer-events-none ${isDark ? 'bg-white/10' : 'bg-[#2C7FFF]/10'}`}></div>
+          
+          <div className={`relative w-20 h-20 md:w-24 md:h-24 rounded-[1.5rem] flex items-center justify-center mb-6 shadow-sm border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}>
+            <svg className="w-10 h-10 md:w-12 md:h-12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <div className={`absolute -top-2 -right-2 w-6 h-6 md:w-8 md:h-8 rounded-full border-4 flex items-center justify-center font-black text-xs shadow-md ${isDark ? 'bg-black border-white text-white' : 'bg-white border-[#03045E] text-[#03045E]'}`}>
+              !
+            </div>
+          </div>
+          
+          <h2 className={`text-2xl md:text-3xl font-black tracking-tight mb-3 ${pageText}`}>
+            Verification Required
+          </h2>
+          
+          <p className={`text-sm md:text-base font-bold max-w-lg leading-relaxed mb-6 ${muted}`}>
+            Your employer account is currently <span className="uppercase tracking-widest font-black underline underline-offset-4 decoration-2">{(profile?.verification_status || 'Pending')}</span>. 
+            You must wait for an administrator to approve your business permit before you can publish job opportunities.
+          </p>
+
+          <button 
+            onClick={() => setActiveTab('settings')}
+            className={`px-6 py-3 font-black text-sm uppercase tracking-wider rounded-xl border-2 transition-all cursor-pointer ${
+              isHighContrastOrDarkComfort
+                ? 'bg-[#2C7FFF] !text-white border-[#2C7FFF] hover:bg-white hover:text-[#2C7FFF]'
+                : (isDark
+                  ? 'bg-white text-black border-white hover:bg-black hover:text-white'
+                  : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]')
+            }`}
+          >
+            Check Verification Status
+          </button>
+        </div>
+      ) : (
       <form onSubmit={handleSubmit} className={`p-4 sm:p-8 rounded-[10px] shadow-sm border-2 flex flex-col gap-6 sm:gap-8 ${cardBg}`}>
         
         <div className="flex flex-col gap-3 sm:gap-4">
@@ -460,6 +501,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
           {!isLoading && <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>}
         </button>
       </form>
+      )}
 
       {showSuccessAlert && (
         <div

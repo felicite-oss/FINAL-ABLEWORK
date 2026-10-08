@@ -212,6 +212,18 @@ export default function ApplicantAccountSettings({ profile }) {
     e.preventDefault();
     if (!verificationDoc) return setVerStatus({ type: 'error', msg: 'Please select a file first.' });
 
+    // FIX: Enforce image type only (jpg, jpeg, png)
+    const validImageTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    if (!validImageTypes.includes(verificationDoc.type)) {
+      return setVerStatus({ type: 'error', msg: 'Only picture files (.jpg, .jpeg, .png) are allowed.' });
+    }
+
+    // FIX: Enforce 5MB size limit
+    const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
+    if (verificationDoc.size > maxSizeInBytes) {
+      return setVerStatus({ type: 'error', msg: 'File size exceeds the 5MB limit. Please choose a smaller image.' });
+    }
+
     setIsResubmitting(true);
     setVerStatus({ type: '', msg: '' });
 
@@ -299,7 +311,6 @@ export default function ApplicantAccountSettings({ profile }) {
   return (
     <div className="animate-fadeIn w-full space-y-6 sm:space-y-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] pb-10">
       
-      {/* Header - Adjusted margins and text sizes for mobile */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
         <div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#03045E]">
@@ -313,7 +324,7 @@ export default function ApplicantAccountSettings({ profile }) {
 
       <div className="flex flex-col gap-4 sm:gap-8">
         
-        {/* VERIFICATION SECTION - Adjusted padding and text for mobile */}
+        {/* VERIFICATION SECTION */}
         <div className={`bg-white rounded-2xl sm:rounded-[2rem] border shadow-md overflow-hidden transition-all duration-300 ${openSection === 'verification' ? 'border-[#2C7FFF]/40' : 'border-[#03045E]/20 hover:border-[#2C7FFF]/30'}`}>
           <button onClick={() => toggleSection('verification')} className="w-full p-4 sm:p-8 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer">
             <div className="text-left">
@@ -364,7 +375,7 @@ export default function ApplicantAccountSettings({ profile }) {
                   <div className="flex-1 bg-[#f4f4f4] p-4 sm:p-5 rounded-xl sm:rounded-[1.5rem] border border-[#03045E]/15 w-full">
                     <h3 className="text-xs sm:text-sm font-extrabold text-[#03045E] mb-1.5 sm:mb-2">Re-verify Account</h3>
                     <p className="text-[10px] sm:text-xs text-[#03045E]/70 mb-3 sm:mb-4 font-semibold">
-                      {canResubmit ? "Your cooldown has expired. Please upload a clear, valid PWD ID." : `Security lock active. You can upload a new document in ${daysLeft} days.`}
+                      {canResubmit ? "Your cooldown has expired. Please upload a clear, valid PWD ID image (Max 5MB)." : `Security lock active. You can upload a new document in ${daysLeft} days.`}
                     </p>
                     
                     {verStatus.msg && (
@@ -372,7 +383,14 @@ export default function ApplicantAccountSettings({ profile }) {
                     )}
 
                     <form onSubmit={handleResubmitVerification} className="flex flex-col gap-2 sm:gap-3">
-                      <input type="file" accept=".jpg,.jpeg,.png,.pdf" disabled={!canResubmit || isResubmitting} onChange={(e) => setVerificationDoc(e.target.files[0])} className="text-[10px] sm:text-xs text-[#03045E] file:mr-2 sm:file:mr-4 file:py-1.5 sm:file:py-2 file:px-3 sm:file:px-4 file:rounded-lg sm:file:rounded-xl file:border-0 file:text-[10px] sm:file:text-xs file:font-bold file:bg-[#03045E] file:text-white hover:file:bg-[#2C7FFF] disabled:opacity-50 cursor-pointer" />
+                      {/* FIX: Restricted input to images only (.jpg, .jpeg, .png) */}
+                      <input 
+                        type="file" 
+                        accept="image/jpeg,image/jpg,image/png" 
+                        disabled={!canResubmit || isResubmitting} 
+                        onChange={(e) => setVerificationDoc(e.target.files[0])} 
+                        className="text-[10px] sm:text-xs text-[#03045E] file:mr-2 sm:file:mr-4 file:py-1.5 sm:file:py-2 file:px-3 sm:file:px-4 file:rounded-lg sm:file:rounded-xl file:border-0 file:text-[10px] sm:file:text-xs file:font-bold file:bg-[#03045E] file:text-white hover:file:bg-[#2C7FFF] disabled:opacity-50 cursor-pointer" 
+                      />
                       {canResubmit && (
                         <button type="submit" disabled={isResubmitting || !verificationDoc} className="mt-1 sm:mt-2 py-2 sm:py-2.5 bg-[#03045E] hover:bg-[#2C7FFF] text-white font-extrabold text-xs sm:text-sm rounded-lg sm:rounded-xl transition disabled:opacity-50 shadow-sm cursor-pointer">
                           {isResubmitting ? 'Uploading...' : 'Submit New Document'}
@@ -386,7 +404,7 @@ export default function ApplicantAccountSettings({ profile }) {
           )}
         </div>
 
-        {/* EMAIL SECTION - Adjusted padding and text for mobile */}
+        {/* EMAIL SECTION */}
         <div className={`bg-white rounded-2xl sm:rounded-[2rem] border shadow-md overflow-hidden transition-all duration-300 ${openSection === 'email' ? 'border-[#2C7FFF]/40' : 'border-[#03045E]/20 hover:border-[#2C7FFF]/30'}`}>
           <button onClick={() => toggleSection('email')} className="w-full p-4 sm:p-8 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer">
             <div className="text-left">
@@ -438,7 +456,7 @@ export default function ApplicantAccountSettings({ profile }) {
           )}
         </div>
 
-        {/* PASSWORD SECTION - Adjusted padding and text for mobile */}
+        {/* PASSWORD SECTION */}
         <div className={`bg-white rounded-2xl sm:rounded-[2rem] border shadow-md overflow-hidden transition-all duration-300 ${openSection === 'password' ? 'border-[#2C7FFF]/40' : 'border-[#03045E]/20 hover:border-[#2C7FFF]/30'}`}>
           <button onClick={() => toggleSection('password')} className="w-full p-4 sm:p-8 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer">
             <div className="text-left">
@@ -563,7 +581,7 @@ export default function ApplicantAccountSettings({ profile }) {
           )}
         </div>
 
-        {/* DANGER ZONE - Adjusted padding and text for mobile */}
+        {/* DANGER ZONE */}
         <div className={`bg-white rounded-2xl sm:rounded-[2rem] border shadow-md overflow-hidden transition-all duration-300 ${openSection === 'danger' ? 'border-[#03045E]/40' : 'border-[#03045E]/20 hover:border-[#03045E]/30'}`}>
           <button onClick={() => toggleSection('danger')} className="w-full p-4 sm:p-8 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer">
             <div className="text-left">
@@ -587,7 +605,7 @@ export default function ApplicantAccountSettings({ profile }) {
                       : 'Temporarily hide your profile and applications. You can reactivate later.'}
                   </p>
                 </div>
-                    <button 
+                <button 
                   onClick={handleToggleDeactivation} 
                   className="px-4 sm:px-6 py-2 sm:py-2.5 font-extrabold text-xs sm:text-sm rounded-lg sm:rounded-xl whitespace-nowrap cursor-pointer bg-transparent border-2"
                   style={{ color: '#ff0000', borderColor: '#ff0000' }}
@@ -603,7 +621,7 @@ export default function ApplicantAccountSettings({ profile }) {
                   <h3 className="text-xs sm:text-sm font-extrabold" style={{ color: '#ff0000' }}>Delete Account</h3>
                   <p className="text-[10px] sm:text-xs mt-1 font-semibold" style={{ color: '#ff0000' }}>Permanently erase your data. This action cannot be undone.</p>
                 </div>
-                                <button onClick={() => setShowDeleteModal(true)} className="px-4 sm:px-6 py-2 sm:py-2.5 font-extrabold text-xs sm:text-sm rounded-lg sm:rounded-xl shadow-sm transition whitespace-nowrap cursor-pointer bg-transparent border-2" style={{ color: '#ff0000', borderColor: '#ff0000' }}>
+                <button onClick={() => setShowDeleteModal(true)} className="px-4 sm:px-6 py-2 sm:py-2.5 font-extrabold text-xs sm:text-sm rounded-lg sm:rounded-xl shadow-sm transition whitespace-nowrap cursor-pointer bg-transparent border-2" style={{ color: '#ff0000', borderColor: '#ff0000' }}>
                   Delete Account
                 </button>
               </div>
@@ -613,7 +631,7 @@ export default function ApplicantAccountSettings({ profile }) {
 
       </div>
 
-      {/* DELETE MODAL - Adjusted padding and text for mobile */}
+      {/* DELETE MODAL */}
       {showDeleteModal && (
         <div
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
@@ -655,7 +673,7 @@ export default function ApplicantAccountSettings({ profile }) {
         </div>
       )}
 
-      {/* EMAIL SUCCESS MODAL - Adjusted padding and text for mobile */}
+      {/* EMAIL SUCCESS MODAL */}
       {showEmailSuccess && (
         <div
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
@@ -699,7 +717,7 @@ export default function ApplicantAccountSettings({ profile }) {
         </div>
       )}
 
-      {/* PASSWORD SUCCESS MODAL - Adjusted padding and text for mobile */}
+      {/* PASSWORD SUCCESS MODAL */}
       {showPasswordSuccess && (
         <div
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
@@ -754,7 +772,7 @@ export default function ApplicantAccountSettings({ profile }) {
                 <button
                   onClick={() => setShowPasswordSuccess(false)}
                   style={{ color: isDarkMode ? '#000000' : '#ffffff' }}
-                  className="w-full py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-[#03045E] font-black text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all duration-300 cursor-pointer border-2 border-[#03045E]"
+                  className="w-full py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all duration-300 cursor-pointer border-2 border-[#03045E]"
                 >
                   Got it
                 </button>
@@ -764,7 +782,7 @@ export default function ApplicantAccountSettings({ profile }) {
         </div>
       )}
 
-      {/* DEACTIVATE MODAL - Adjusted padding and text for mobile */}
+      {/* DEACTIVATE MODAL */}
       {showDeactivateModal && (
         <div
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
@@ -869,7 +887,7 @@ export default function ApplicantAccountSettings({ profile }) {
                     : 'Your profile is now hidden. Log back in anytime to reactivate your account.'}
                 </p>
 
-                                <button
+                <button
                   onClick={() => setShowDeactivateModal(false)}
                   style={{ color: (isHighContrastOrDarkComfort || isColorVision) ? '#ffffff' : (isDarkMode ? '#000000' : '#03045E') }}
                   className={`w-full py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all duration-300 cursor-pointer border-2 ${isColorVision ? 'bg-[#B45309] border-[#B45309]' : 'bg-white border-white'}`}

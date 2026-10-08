@@ -705,37 +705,68 @@ export default function EmployerDashboard() {
             <div className="w-full flex-1 min-w-0 overflow-x-hidden">
 
               {isRejected && (
-                <div className={`mb-8 p-6 sm:p-8 border-2 rounded-[2rem] shadow-sm flex flex-col gap-5 animate-fadeIn ${dark ? 'bg-red-950 border-red-500' : 'bg-red-50 border-red-300'}`}>
+                <div 
+                  className={`mb-8 p-6 sm:p-8 border-2 rounded-[2rem] shadow-sm flex flex-col gap-5 animate-fadeIn transition-all`}
+                  style={{
+                    backgroundColor: dark ? '#1a0505' : 'rgba(239, 68, 68, 0.08)',
+                    borderColor: dark ? '#ef4444' : '#fca5a5'
+                  }}
+                >
                   <div className="flex items-start gap-4">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${dark ? 'bg-red-900 text-red-300' : 'bg-red-200 text-red-700'}`}>
+                    <div 
+                      className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{
+                        backgroundColor: dark ? '#ef4444' : '#fee2e2',
+                        color: dark ? '#000000' : '#b91c1c'
+                      }}
+                    >
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                     </div>
                     <div>
-                      <h2 className={`text-xl font-extrabold tracking-tight ${dark ? 'text-white' : 'text-red-900'}`}>Account Verification Failed</h2>
-                      <p className={`text-sm font-semibold mt-0.5 ${dark ? 'text-red-300' : 'text-red-700'}`}>Your platform access is currently suspended. Please review the admin feedback below.</p>
+                      <h2 className="text-xl font-black tracking-tight" style={{ color: dark ? '#ffffff' : '#991b1b' }}>Account Verification Failed</h2>
+                      <p className="text-sm font-bold mt-0.5" style={{ color: dark ? 'rgba(255,255,255,0.8)' : '#b91c1c' }}>Your platform access is currently suspended. Please review the admin feedback below.</p>
                     </div>
                   </div>
-                  <div className={`p-5 rounded-2xl border-2 shadow-inner ${dark ? 'bg-black border-red-500/50' : 'bg-white border-red-200'}`}>
-                    <h3 className={`text-xs font-extrabold uppercase tracking-wider mb-2 ${dark ? 'text-red-300' : 'text-red-700'}`}>Admin Feedback</h3>
-                    <p className={`text-sm font-bold ${dark ? 'text-white' : 'text-[#03045E]'}`}>{profile.rejection_reason || "Your verification document did not meet platform standards."}</p>
+                  
+                  <div 
+                    className="p-5 rounded-2xl border-2 shadow-inner backdrop-blur-md transition-all"
+                    style={{
+                      backgroundColor: (dark || isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.25)' : 'rgba(255, 255, 255, 0.26)',
+                      borderColor: (dark || isContrast || isDarkMode) ? 'rgba(239, 68, 68, 0.4)' : 'rgba(254, 202, 202, 0.99)'
+                    }}
+                  >
+                    <h3 className="text-xs font-black uppercase tracking-wider mb-2" style={{ color: (dark || isContrast || isDarkMode) ? '#fca5a5' : '#b91c1c' }}>Admin Feedback</h3>
+                    <p className="text-sm font-black" style={{ color: (dark || isContrast || isDarkMode) ? '#ffffff' : '#03045E' }}>
+                      {profile.rejection_reason || "Your verification document did not meet platform standards."}
+                    </p>
                   </div>
-                  <hr className={dark ? 'border-red-500/40' : 'border-red-300'} />
+                  
+                  <hr style={{ borderColor: dark ? 'rgba(239, 68, 68, 0.4)' : '#fca5a5' }} />
+                  
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                      <h3 className={`text-sm font-extrabold ${dark ? 'text-white' : 'text-red-900'}`}>Ready to try again?</h3>
+                      <h3 className="text-sm font-black" style={{ color: dark ? '#ffffff' : '#991b1b' }}>Ready to try again?</h3>
                       {!canResubmit ? (
-                        <p className={`text-xs font-semibold mt-1 ${dark ? 'text-red-300' : 'text-red-700'}`}>Due to security policies, you must wait <span className={`font-black ${dark ? 'text-white' : 'text-red-900'}`}>{daysLeft} days</span> before uploading a new document.</p>
+                        <p className="text-xs font-bold mt-1" style={{ color: dark ? 'rgba(255,255,255,0.7)' : '#b91c1c' }}>
+                          Due to security policies, you must wait <span className="font-black" style={{ color: dark ? '#ffffff' : '#7f1d1d' }}>{daysLeft} days</span> before uploading a new document.
+                        </p>
                       ) : (
-                        <p className={`text-xs font-semibold mt-1 ${dark ? 'text-emerald-300' : 'text-emerald-700'}`}>Your cooldown period has ended. You may now resubmit your documents.</p>
+                        <p className="text-xs font-bold mt-1" style={{ color: '#10b981' }}>Your cooldown period has ended. You may now resubmit your documents.</p>
                       )}
                     </div>
                     <button 
                       disabled={!canResubmit}
-                      onClick={() => setActiveTab('profile')}
-                      className={`px-6 py-3 rounded-xl font-extrabold text-sm transition-all shadow-sm flex items-center gap-2 ${canResubmit ? (dark ? 'bg-[#2C7FFF] hover:bg-white hover:text-black text-white cursor-pointer' : 'bg-red-700 hover:bg-red-800 text-white cursor-pointer') : (dark ? 'bg-zinc-900 text-white/40 cursor-not-allowed opacity-80' : 'bg-red-200 text-red-500 cursor-not-allowed opacity-80')}`}
+                      onClick={() => setActiveTab('settings')}
+                      className="px-6 py-3 rounded-xl font-black text-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+                      style={{
+                        backgroundColor: canResubmit ? '#ef4444' : (dark ? '#18181b' : '#f64c4c5c'),
+                        color: canResubmit ? '#ffffff' : (dark ? 'rgba(255, 255, 255, 0.72)' : '#f30606ff'),
+                        border: '2px solid',
+                        borderColor: canResubmit ? '#ef4444' : 'transparent'
+                      }}
                     >
                       {!canResubmit && <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>}
-                      {canResubmit ? 'Go to Profile to Resubmit' : `Locked for ${daysLeft} Days`}
+                      {canResubmit ? 'Go to Settings to Resubmit' : `Locked for ${daysLeft} Days`}
                     </button>
                   </div>
                 </div>

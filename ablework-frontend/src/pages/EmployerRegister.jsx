@@ -533,7 +533,7 @@ export default function EmployerRegister() {
                   className={`w-full text-[10px] sm:text-sm text-[#03045E] file:mr-4 file:py-2 file:px-4 file:rounded-[10px] file:border-2 file:border-[#03045E]/30 file:bg-white file:text-[#03045E] file:font-semibold cursor-pointer ${isAccessibilityDarkMode ? '[&::file-selector-button]:!text-black' : isDefaultDarkMode ? '[&::file-selector-button]:!text-black' : ''}`}
                   required
                   title="Please upload your company registration document. Max size 5MB."
-                  aria-label="Company registration document upload. Please upload a clear copy of your DTI, SEC, or Mayor's Permit. Max size 5 Megabytes."
+                  aria-label="Company registration document upload. Please upload a clear copy of your DTI, SEC, Business Permit, or Mayor's Permit. Max size 5 Megabytes."
                 />
                 <p className="text-[10px] sm:text-xs text-[#03045E]/70 mt-2 font-semibold">
                   Supported formats: .pdf, .jpg, .jpeg, .png (Max size: 5MB)

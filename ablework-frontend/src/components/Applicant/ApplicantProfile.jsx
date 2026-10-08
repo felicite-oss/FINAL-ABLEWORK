@@ -62,7 +62,10 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
   const fileInputRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tempImagePreview, setTempImagePreview] = useState('');
-  const [selectedFile, setSelectedFile] = useState(null);
+  
+  // This physically holds the image file to send to the backend
+  const [profilePicFile, setProfilePicFile] = useState(null);
+  
   const [locationAlert, setLocationAlert] = useState({ isOpen: false, type: '', title: '', message: '', latitude: '', longitude: '' });
   const [saveSuccess, setSaveSuccess] = useState({ isOpen: false, message: '' });
 
@@ -93,7 +96,6 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
     profile_picture: profile?.profile_picture || profile?.avatar_url || localStorage.getItem('profile_picture') || ''
   });
 
-
   useEffect(() => {
     const savedPic = localStorage.getItem('profile_picture');
     const currentPic = profile?.profile_picture || profile?.avatar_url || savedPic;
@@ -117,7 +119,7 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setSelectedFile(file);
+      setProfilePicFile(file); // Store the actual file immediately
       const reader = new FileReader();
       reader.onloadend = () => {
         setTempImagePreview(reader.result);
@@ -126,36 +128,78 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
     }
   };
 
-  const handleConfirmChangePicture = () => {
-    if (!tempImagePreview) return;
-    
+  // FIX: Make the modal instantly upload the file to the database to prevent NULL errors
+  const handleConfirmChangePicture = async () => {
+    if (!tempImagePreview || !profilePicFile) return;
+
     setIsUpdatingPicture(true);
 
+    // Package the form data instantly
+    const submitData = new FormData();
+    submitData.append('residential_address', formData.residential_address || '');
+    submitData.append('latitude', formData.latitude || '');
+    submitData.append('longitude', formData.longitude || '');
+    submitData.append('travel_radius_km', Number(formData.travel_radius_km) || 5);
+    submitData.append('workplace_independence', formData.workplace_independence || '');
+    submitData.append('disability_type', selectedDisabilities.join(', '));
+    submitData.append('skills', JSON.stringify(skills));
+    submitData.append('accommodations_needed', JSON.stringify(accommodations));
+    submitData.append('profile_picture', profilePicFile);
 
-    setTimeout(() => {
-      if (tempImagePreview) {
-        setFormData(prev => ({ ...prev, profile_picture: tempImagePreview }));
+    try {
+      const res = await fetch(`http://localhost:5001/api/applicant/${profile?.user_id}/profile`, {
+        method: 'PUT',
+        body: submitData
+      });
+
+      if (res.ok) {
+        const responseData = await res.json();
         
-        localStorage.setItem('profile_picture', tempImagePreview);
+        // Update states with the new database URL
+        setFormData(prev => ({ ...prev, profile_picture: responseData.profile_picture }));
+        localStorage.setItem('profile_picture', responseData.profile_picture);
         window.dispatchEvent(new Event('storage'));
         
         if (setProfile) {
           setProfile(prev => ({ 
             ...(prev || {}), 
-            profile_picture: tempImagePreview, 
-            avatar_url: tempImagePreview 
+            profile_picture: responseData.profile_picture, 
+            avatar_url: responseData.profile_picture 
           }));
         }
+
+        setIsUpdatingPicture(false);
+        setIsModalOpen(false);
+        setProfilePicFile(null); // Reset
+        setSaveSuccess({ isOpen: true, message: 'Your avatar has been successfully saved.' });
+        refreshData();
+      } else {
+        setIsUpdatingPicture(false);
+        setLocationAlert({
+          isOpen: true,
+          type: 'error',
+          title: 'Upload Failed',
+          message: 'Failed to upload profile picture. Please try again.',
+          latitude: '',
+          longitude: ''
+        });
       }
+    } catch (err) {
       setIsUpdatingPicture(false);
-      setIsModalOpen(false);
-      setSelectedFile(null);
-    }, 2000);
+      setLocationAlert({
+        isOpen: true,
+        type: 'error',
+        title: 'Server Error',
+        message: 'Server error while uploading image.',
+        latitude: '',
+        longitude: ''
+      });
+    }
   };
 
   const handleCancelChangePicture = () => {
     setTempImagePreview('');
-    setSelectedFile(null);
+    setProfilePicFile(null);
     setIsModalOpen(false);
   };
 
@@ -250,36 +294,62 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
     }
   };
 
+  const getProfileImageSrc = () => {
+    if (formData.profile_picture) {
+      if (formData.profile_picture.startsWith('data:') || formData.profile_picture.startsWith('blob:') || formData.profile_picture.startsWith('http')) {
+        return formData.profile_picture;
+      }
+      return `http://localhost:5001${formData.profile_picture}`;
+    }
+    return null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const payload = {
-      residential_address: formData.residential_address,
-      latitude: formData.latitude,
-      longitude: formData.longitude,
-      travel_radius_km: Number(formData.travel_radius_km),
-      workplace_independence: formData.workplace_independence,
-      disability_type: selectedDisabilities.join(', '),
-      skills: skills,
-      accommodations_needed: accommodations,
-      profile_picture: formData.profile_picture,
-      avatar_url: formData.profile_picture
-    };
+    const submitData = new FormData();
+    submitData.append('residential_address', formData.residential_address || '');
+    submitData.append('latitude', formData.latitude || '');
+    submitData.append('longitude', formData.longitude || '');
+    submitData.append('travel_radius_km', Number(formData.travel_radius_km) || 5);
+    submitData.append('workplace_independence', formData.workplace_independence || '');
+    submitData.append('disability_type', selectedDisabilities.join(', '));
+    submitData.append('skills', JSON.stringify(skills));
+    submitData.append('accommodations_needed', JSON.stringify(accommodations));
+
+    if (profilePicFile) {
+      submitData.append('profile_picture', profilePicFile);
+    }
 
     try {
       const res = await fetch(`http://localhost:5001/api/applicant/${profile?.user_id}/profile`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: submitData
       });
 
       if (res.ok) {
+        const responseData = await res.json();
         if (setProfile) {
-          setProfile(prev => ({ ...(prev || {}), ...payload }));
+          setProfile(prev => ({ 
+            ...(prev || {}), 
+            residential_address: formData.residential_address,
+            latitude: formData.latitude,
+            longitude: formData.longitude,
+            travel_radius_km: formData.travel_radius_km,
+            workplace_independence: formData.workplace_independence,
+            disability_type: selectedDisabilities.join(', '),
+            skills: skills,
+            accommodations_needed: accommodations,
+            profile_picture: responseData.profile_picture || formData.profile_picture
+          }));
         }
-        localStorage.setItem('profile_picture', formData.profile_picture);
-        window.dispatchEvent(new Event('storage'));
+        
+        if (responseData.profile_picture) {
+            localStorage.setItem('profile_picture', responseData.profile_picture);
+            window.dispatchEvent(new Event('storage'));
+        }
+        
         setSaveSuccess({ isOpen: true, message: 'Your profile has been updated successfully. All changes are now live.' });
         refreshData(); 
       } else {
@@ -319,14 +389,13 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
         `}</style>
       )}
 
-      {/* PROFILE HEADER - Adjusted padding, margin, and flex direction for mobile */}
       <div className="mb-6 sm:mb-10 bg-[#f4f4f4] p-4 sm:p-8 rounded-2xl sm:rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border border-[#03045E]/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6">
         <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full">
           
           <div className="relative group shrink-0">
             <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-full overflow-hidden border-4 border-white shadow-md bg-white flex items-center justify-center text-[#03045E]">
               {formData.profile_picture ? (
-                <img src={formData.profile_picture} alt="Profile" className="w-full h-full object-cover" />
+                <img src={getProfileImageSrc()} alt="Profile" className="w-full h-full object-cover" />
               ) : (
                 <svg className="w-10 h-10 sm:w-12 sm:h-12 text-[#03045E]/40" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
@@ -337,7 +406,7 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
             <button
               type="button"
               onClick={() => {
-                setTempImagePreview(formData.profile_picture);
+                setTempImagePreview(getProfileImageSrc() || '');
                 setIsModalOpen(true);
               }}
               className="absolute bottom-0 right-0 p-2 sm:p-2.5 bg-[#2C7FFF] text-white rounded-full shadow-lg cursor-pointer border-2 border-white"
@@ -351,7 +420,7 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
 
           <div className="text-center sm:text-left">
             <h1 className="text-xl sm:text-3xl font-extrabold text-[#03045E] tracking-tight">
-              {profile?.full_name || profile?.name || 'Applicant Profile'}
+              {profile?.full_name || profile?.name || profile?.firstname || 'Applicant Profile'}
             </h1>
             <p className="text-xs sm:text-sm font-semibold text-[#03045E] mt-1">
               Manage your personal settings, avatar, and smart match parameters
@@ -360,8 +429,6 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
         </div>
       </div>
 
-  
-      {/* MODAL: UPDATE AVATAR - Adjusted padding and sizes for mobile */}
       {isModalOpen && (
         <div
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
@@ -466,7 +533,6 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
         </div>
       )}
 
-      {/* MODAL: LOCATION ALERT - Adjusted padding and sizes for mobile */}
       {locationAlert.isOpen && (
         <div
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
@@ -529,22 +595,21 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
         </div>
       )}
 
-      {/* MODAL: SAVE SUCCESS - Adjusted padding and sizes for mobile */}
       {saveSuccess.isOpen && (
         <div
-          className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
+          className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
           <div className={`relative w-full max-w-sm rounded-2xl sm:rounded-[2rem] border-2 overflow-hidden ${isDarkScreen ? 'bg-black border-[#2C7FFF]' : 'bg-[#F4F4F4] border-[#2C7FFF]'}`}>
-            <div className="h-2 w-full bg-[#2C7FFF]" />
+            <div className="h-1.5 sm:h-2 w-full bg-[#2C7FFF]" />
 
             <div className="px-5 pt-8 pb-6 sm:px-8 sm:pt-10 sm:pb-8 flex flex-col items-center text-center">
               <div className="relative mb-5 sm:mb-6">
                 <div className="absolute inset-0 rounded-full bg-[#2C7FFF]/20 animate-ping" />
                 <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#2C7FFF]/15 flex items-center justify-center">
                   <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#2C7FFF] flex items-center justify-center">
-                    <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke={isDarkMode ? '#000000' : '#ffffff'} viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                    <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke={isDarkMode ? '#000000' : '#ffffff'} strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
                 </div>
@@ -575,7 +640,6 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
         
-        {/* LEFT COLUMN: PROFESSIONAL PROFILE - Adjusted padding and text sizes for mobile */}
         <div className="flex flex-col gap-4 sm:gap-6 p-4 sm:p-8 bg-[#f4f4f4] rounded-2xl sm:rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.04)] border border-[#03045E]/20 h-fit transition-all duration-300 hover:shadow-[0_20px_40px_rgba(3,4,94,0.08)]">
           <div className="flex items-center gap-2 sm:gap-3 border-b border-[#03045E]/20 pb-3 sm:pb-4">
             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white text-[#2C7FFF] border border-[#03045E]/10 flex items-center justify-center shrink-0">
@@ -706,7 +770,6 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: MATCH RADIUS & LOCATION - Adjusted padding and text sizes for mobile */}
         <div className="flex flex-col gap-4 sm:gap-6 p-4 sm:p-8 bg-[#f4f4f4] rounded-2xl sm:rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.04)] border border-[#03045E]/20 h-fit transition-all duration-300 hover:shadow-[0_20px_40px_rgba(3,4,94,0.08)]">
           <div className="flex items-center gap-2 sm:gap-3 border-b border-[#03045E]/20 pb-3 sm:pb-4">
             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white text-[#2C7FFF] border border-[#03045E]/10 flex items-center justify-center shrink-0">
