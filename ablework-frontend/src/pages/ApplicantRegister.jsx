@@ -10,6 +10,8 @@ import darkLogo from '../assets/DARK MODE.png';
 import backgroundImg from '../assets/BG.png';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import { API_BASE_URL } from '../config';
+
 let DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow,
@@ -134,7 +136,7 @@ export default function ApplicantRegister() {
   useEffect(() => {
     const fetchPopularSkills = async () => {
       try {
-        const response = await fetch('http://localhost:5001/api/skills/popular');
+        const response = await fetch(`${API_BASE_URL}/api/skills/popular`);
         if (response.ok) {
           const popularSkills = await response.json();
           const combinedSkills = Array.from(new Set([...popularSkills, ...defaultAvailable, ...defaultExtended]));
@@ -248,7 +250,7 @@ export default function ApplicantRegister() {
     formData.append('pwdDocument', pwdFile);
 
     try {
-      const response = await fetch('http://localhost:5001/api/auth/register/applicant', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register/applicant`, {
         method: 'POST',
         body: formData,
       });
