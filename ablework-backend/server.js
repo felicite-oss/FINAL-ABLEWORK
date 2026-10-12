@@ -60,7 +60,7 @@ async function sendNotification(userId, title, message, type) {
   }
 }
 
-const { OpenAI } = require('openai');
+
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
