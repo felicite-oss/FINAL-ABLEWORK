@@ -423,7 +423,7 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
   const selectedIndependence = INDEPENDENCE_OPTIONS.find(o => o.value === formData.workplace_independence);
 
   return (
-    <div className="max-w-6xl relative pb-12 animate-in fade-in duration-300 text-[#03045E]">
+    <div className="w-full relative pb-12 animate-in fade-in duration-300 text-[#03045E]">
       {isDarkScreen && (
         <style>{`
           #skills-input::placeholder,

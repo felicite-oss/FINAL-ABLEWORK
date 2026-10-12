@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import headerLogo from '../assets/LIGHT MODE.png';
-import NotificationsButton from '../components/Admin/NotificationsButton';
 import ProfileMenu from '../components/Admin/ProfileMenu';
 import SettingsModal from '../components/Admin/SettingsModal';
 import DarkModeToggle from '../components/Admin/DarkModeToggle';
@@ -22,6 +21,7 @@ export default function AdminDashboard() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showDesktopSidebar, setShowDesktopSidebar] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [adminUser, setAdminUser] = useState(null);
   const [isDark, setIsDark] = useState(false);
   const [isAnalyticsExpanded, setIsAnalyticsExpanded] = useState(false);
@@ -264,6 +264,8 @@ const handleToggleDark = () => {
   const cardBg = isDark ? 'bg-black' : 'bg-white';
   const surfaceBg = isDark ? 'bg-black' : 'bg-[#f4f4f4]';
   const bdrMain = isDark ? 'border-white/20' : 'border-[#03045E]/15';
+
+  const pendingCount = (stats?.pendingEmployers || 0) + (stats?.pendingApplicants || 0);
 
   const confirmBarColor = confirmPopup.type === 'approve' ? 'bg-[#10B981]' :
     confirmPopup.type === 'restore' ? 'bg-[#2C7FFF]' :
@@ -513,8 +515,101 @@ const handleToggleDark = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-1 sm:gap-2 md:gap-3 flex-shrink-0">
-            <NotificationsButton pendingCount={(stats?.pendingEmployers || 0) + (stats?.pendingApplicants || 0)} />
+          <div className="flex items-center gap-1 sm:gap-2 md:gap-3 flex-shrink-0 relative z-[60]">
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowNotifications((prev) => !prev)}
+                aria-label="Notifications"
+                aria-pressed={showNotifications}
+                className={`relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl ${cardBg} ${txtMain} border-2 ${bdrMain} shadow-sm cursor-pointer transition-all duration-200 shrink-0`}
+              >
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                {pendingCount > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#DC2626] text-white text-[9px] font-black flex items-center justify-center border-2 border-white">
+                    {pendingCount > 99 ? '99+' : pendingCount}
+                  </span>
+                )}
+              </button>
+
+              {showNotifications && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)}></div>
+                  <div className={`fixed sm:absolute right-3 sm:right-0 left-3 sm:left-auto top-16 sm:top-full sm:mt-3 w-auto sm:w-80 rounded-2xl sm:rounded-3xl border-2 shadow-[0_20px_50px_rgba(3,4,94,0.25)] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 max-h-[calc(100vh-5rem)] overflow-y-auto ${isDark ? 'bg-black border-white' : 'bg-white border-[#03045E]/20'}`}>
+                    <div className={`px-4 py-3 border-b-2 ${isDark ? 'border-white/20' : 'border-[#03045E]/10'}`}>
+                      <h3 className={`text-sm font-black tracking-tight ${txtMain}`}>Notifications</h3>
+                      <p className={`text-[10px] font-bold ${txtMuted}`}>
+                        {pendingCount > 0 ? `${pendingCount} pending item${pendingCount !== 1 ? 's' : ''}` : 'You are all caught up'}
+                      </p>
+                    </div>
+                    <div className="p-3">
+                      {pendingCount > 0 ? (
+                        <div className="flex flex-col gap-2">
+                          {stats?.pendingEmployers > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setActiveTab('Employers');
+                                setListFilter('Pending');
+                                setShowNotifications(false);
+                              }}
+                              className={`w-full text-left p-3 rounded-xl border-2 transition-all cursor-pointer ${isDark ? 'bg-black border-white/20 hover:border-white' : 'bg-[#f4f4f4] border-[#f59e0b]/30 hover:border-[#f59e0b]'}`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border-2 ${isDark ? 'bg-black text-white border-white/40' : 'bg-[#FEF3C7] text-[#B45309] border-[#f59e0b]'}`}>
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                  </svg>
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className={`text-xs font-black ${txtMain}`}>Pending Employers</p>
+                                  <p className={`text-[10px] font-bold ${txtMuted}`}>{stats.pendingEmployers} awaiting verification</p>
+                                </div>
+                              </div>
+                            </button>
+                          )}
+                          {stats?.pendingApplicants > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setActiveTab('Applicants');
+                                setListFilter('Pending');
+                                setShowNotifications(false);
+                              }}
+                              className={`w-full text-left p-3 rounded-xl border-2 transition-all cursor-pointer ${isDark ? 'bg-black border-white/20 hover:border-white' : 'bg-[#f4f4f4] border-[#f59e0b]/30 hover:border-[#f59e0b]'}`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border-2 ${isDark ? 'bg-black text-white border-white/40' : 'bg-[#FEF3C7] text-[#B45309] border-[#f59e0b]'}`}>
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                  </svg>
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className={`text-xs font-black ${txtMain}`}>Pending Applicants</p>
+                                  <p className={`text-[10px] font-bold ${txtMuted}`}>{stats.pendingApplicants} awaiting verification</p>
+                                </div>
+                              </div>
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="py-6 flex flex-col items-center text-center">
+                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-2 border-2 ${isDark ? 'bg-white/10 text-white border-white/30' : 'bg-[#10B981]/15 text-[#10B981] border-[#10B981]/30'}`}>
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                          <p className={`text-xs font-black ${txtMain}`}>All caught up!</p>
+                          <p className={`text-[10px] font-bold mt-0.5 ${txtMuted}`}>No pending verifications</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
 
             <div className="hidden md:block">
               <DarkModeToggle isDark={isDark} onToggle={handleToggleDark} />
@@ -532,7 +627,7 @@ const handleToggleDark = () => {
             </div>
 
             <button
-              className={`md:hidden flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl ${cardBg} ${txtMain} border-2 ${bdrMain} shadow-sm cursor-pointer transition-all duration-200 shrink-0`}
+              className={`md:hidden relative z-[60] flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl ${cardBg} ${txtMain} border-2 ${bdrMain} shadow-sm cursor-pointer transition-all duration-200 shrink-0`}
               onClick={() => setIsOpen(!isOpen)}
             >
               {isOpen ? (
@@ -639,13 +734,13 @@ const handleToggleDark = () => {
         </div>
       </header>
 
-      <button
-        onClick={() => setShowDesktopSidebar((prev) => !prev)}
-        aria-label="Toggle sidebar"
-        aria-expanded={showDesktopSidebar}
-        title={showDesktopSidebar ? 'Hide navigation' : 'Show navigation'}
-        className={`hidden md:flex fixed top-[4.5rem] left-4 z-40 w-11 h-11 items-center justify-center rounded-2xl border-2 shadow-md transition-all duration-200 cursor-pointer ${cardBg} ${txtMain} ${bdrMain}`}
-      >
+    <button
+  onClick={() => setShowDesktopSidebar((prev) => !prev)}
+  aria-label="Toggle sidebar"
+  aria-expanded={showDesktopSidebar}
+  title={showDesktopSidebar ? 'Hide navigation' : 'Show navigation'}
+  className={`hidden md:flex fixed top-[4.5rem] left-4 z-[60] w-11 h-11 items-center justify-center rounded-2xl border-2 shadow-lg transition-all duration-200 cursor-pointer ${isDark ? 'bg-white text-black border-white hover:bg-white/90' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+>
         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
           {showDesktopSidebar ? (
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -1076,7 +1171,7 @@ const handleToggleDark = () => {
                               {user.userType}
                             </span>
                             <span
-                              className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[8px] sm:text-[10px] font-black tracking-wider uppercase border}`}
+                              className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[8px] sm:text-[10px] font-black tracking-wider uppercase border`}
                               style={{
   backgroundColor: user.account_status === 'Disabled' ? 'rgba(220,38,38,0.1)' :
     user.verification_status === 'Approved' ? 'rgba(16,185,129,0.1)' :
