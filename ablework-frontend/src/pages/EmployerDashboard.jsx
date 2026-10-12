@@ -11,6 +11,7 @@ import EmployerAccountSettings from '../components/Employer/EmployerAccountSetti
 import { EmployerPolicy, EmployerTerms, EmployerContact, EmployerFooter } from '../components/Employer/EmployerFooterPages';
 import headerLogo from '../assets/LIGHT MODE.png';
 import darkHeaderLogo from '../assets/DARK MODE.png';
+import { API_BASE_URL } from '../config';
 
 export default function EmployerDashboard() {
   const navigate = useNavigate();
@@ -60,19 +61,19 @@ export default function EmployerDashboard() {
 
     const fetchData = async () => {
       try {
-        const profileRes = await fetch(`http://localhost:5001/api/employer/${storedUser.id}/profile`);
+        const profileRes = await fetch(`${API_BASE_URL}/api/employer/${storedUser.id}/profile`);
         const profileData = await profileRes.json();
         if (profileRes.ok) setProfile({ ...profileData, user_id: storedUser.id });
 
-        const jobsRes = await fetch(`http://localhost:5001/api/employer/${storedUser.id}/jobs`);
+        const jobsRes = await fetch(`${API_BASE_URL}/api/employer/${storedUser.id}/jobs`);
         const jobsData = await jobsRes.json();
         if (jobsRes.ok) setJobs(jobsData);
 
-        const statsRes = await fetch(`http://localhost:5001/api/employer/${storedUser.id}/dashboard-stats`);
+        const statsRes = await fetch(`${API_BASE_URL}/api/employer/${storedUser.id}/dashboard-stats`);
         const statsData = await statsRes.json();
         if (statsRes.ok) setStats(statsData);
 
-        const notifRes = await fetch(`http://localhost:5001/api/users/${storedUser.id}/notifications`);
+        const notifRes = await fetch(`${API_BASE_URL}/api/users/${storedUser.id}/notifications`);
         const notifData = await notifRes.json();
         if (notifRes.ok) setNotifications(notifData);
 
@@ -90,13 +91,13 @@ export default function EmployerDashboard() {
   const refreshJobsAndStats = async () => {
     if(!profile) return;
     try {
-      const profileRes = await fetch(`http://localhost:5001/api/employer/${profile.user_id}/profile`);
+      const profileRes = await fetch(`${API_BASE_URL}/api/employer/${profile.user_id}/profile`);
       if (profileRes.ok) setProfile({ ...await profileRes.json(), user_id: profile.user_id });
 
-      const jobsRes = await fetch(`http://localhost:5001/api/employer/${profile.user_id}/jobs`);
+      const jobsRes = await fetch(`${API_BASE_URL}/api/employer/${profile.user_id}/jobs`);
       if (jobsRes.ok) setJobs(await jobsRes.json());
       
-      const statsRes = await fetch(`http://localhost:5001/api/employer/${profile.user_id}/dashboard-stats`);
+      const statsRes = await fetch(`${API_BASE_URL}/api/employer/${profile.user_id}/dashboard-stats`);
       if (statsRes.ok) setStats(await statsRes.json());
     } catch(err) {
       console.error("Failed to refresh data", err);
@@ -135,7 +136,7 @@ export default function EmployerDashboard() {
 
   const handleMarkAsRead = async (notifId) => {
     try {
-      const res = await fetch(`http://localhost:5001/api/notifications/${notifId}/read`, { method: 'PUT' });
+      const res = await fetch(`${API_BASE_URL}/api/notifications/${notifId}/read`, { method: 'PUT' });
       if (res.ok) {
         setNotifications(notifications.map(n => n.id === notifId ? { ...n, is_read: 1 } : n));
       }
@@ -356,7 +357,7 @@ export default function EmployerDashboard() {
               title="Profile Menu"
             >
               {profile?.company_logo ? (
-                <img src={`http://localhost:5001${profile.company_logo}`} alt="Company Logo" className="w-full h-full object-cover" />
+                <img src={`${API_BASE_URL}${profile.company_logo}`} alt="Company Logo" className="w-full h-full object-cover" />
               ) : (
                 <div className={`w-full h-full flex items-center justify-center font-black text-sm ${isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white'}`}>
                   {profile?.company_name ? profile.company_name.charAt(0).toUpperCase() : 'E'}
@@ -371,7 +372,7 @@ export default function EmployerDashboard() {
                     <div className="relative shrink-0">
                       <div className={`w-14 h-14 rounded-2xl overflow-hidden border-2 border-[#2C7FFF] shadow-md`}>
                         {profile?.company_logo ? (
-                          <img src={`http://localhost:5001${profile.company_logo}`} alt="Company Logo" className="w-full h-full object-cover" />
+                          <img src={`${API_BASE_URL}${profile.company_logo}`} alt="Company Logo" className="w-full h-full object-cover" />
                         ) : (
                           <div className={`w-full h-full flex items-center justify-center font-black text-lg ${isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white'}`}>
                             {profile?.company_name ? profile.company_name.charAt(0).toUpperCase() : 'E'}
@@ -494,7 +495,7 @@ export default function EmployerDashboard() {
                 >
                   <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-bold overflow-hidden shadow-md flex-shrink-0 border-2 ${dark ? 'bg-[#2C7FFF] text-white border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}>
                     {profile?.company_logo ? (
-                      <img src={`http://localhost:5001${profile.company_logo}`} alt="Company Logo" className="w-full h-full object-cover" />
+                      <img src={`${API_BASE_URL}${profile.company_logo}`} alt="Company Logo" className="w-full h-full object-cover" />
                     ) : (
                       <span>{profile?.company_name ? profile.company_name.charAt(0).toUpperCase() : 'E'}</span>
                     )}
