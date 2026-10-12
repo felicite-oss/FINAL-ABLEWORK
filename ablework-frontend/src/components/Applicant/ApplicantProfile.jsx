@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import { API_BASE_URL } from '../../config';
 
 let DefaultIcon = L.icon({
     iconUrl: icon,
@@ -192,7 +193,7 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
     submitData.append('profile_picture', profilePicFile);
 
     try {
-      const res = await fetch(`http://localhost:5001/api/applicant/${profile?.user_id}/profile`, {
+      const res = await fetch(`${API_BASE_URL}/api/applicant/${profile?.user_id}/profile`, {
         method: 'PUT',
         body: submitData
       });
@@ -343,7 +344,7 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
       if (formData.profile_picture.startsWith('data:') || formData.profile_picture.startsWith('blob:') || formData.profile_picture.startsWith('http')) {
         return formData.profile_picture;
       }
-      return `http://localhost:5001${formData.profile_picture}`;
+      return `${API_BASE_URL}${formData.profile_picture}`;
     }
     return null;
   };
@@ -367,7 +368,7 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
     }
 
     try {
-      const res = await fetch(`http://localhost:5001/api/applicant/${profile?.user_id}/profile`, {
+      const res = await fetch(`${API_BASE_URL}/${profile?.user_id}/profile`, {
         method: 'PUT',
         body: submitData
       });

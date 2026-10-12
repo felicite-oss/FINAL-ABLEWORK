@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AccessibilityContext } from '../../context/AccessibilityContext';
 import { useColorPalette } from '../../context/ColorPaletteContext';
+import { API_BASE_URL } from '../../config';
 
 export default function EmployerApplications({ profile, refreshStats }) {
   const { mode } = useContext(AccessibilityContext);
@@ -23,7 +24,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
 
   const fetchApplications = async () => {
     try {
-      const res = await fetch(`http://localhost:5001/api/employer/${profile.user_id}/applications`);
+      const res = await fetch(`${API_BASE_URL}/api/employer/${profile.user_id}/applications`);
       if (res.ok) {
         const data = await res.json();
         setApplications(data);
@@ -44,7 +45,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
     const jobTitle = selectedApp?.job_title || 'the position';
 
     try {
-      const res = await fetch(`http://localhost:5001/api/applications/${applicationId}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/applications/${applicationId}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -338,7 +339,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
                   <div className="flex flex-col gap-3 sm:gap-4">
                     {selectedApp.resume_path ? (
                       <a 
-                        href={`http://localhost:5001${selectedApp.resume_path}`}
+                        href={`${API_BASE_URL}${selectedApp.resume_path}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className={`inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-base font-bold rounded-[15px] border-2 ${
