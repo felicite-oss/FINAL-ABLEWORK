@@ -5,6 +5,7 @@ import headerLogo from '../assets/LIGHT MODE.png';
 import ProfileMenu from '../components/Admin/ProfileMenu';
 import SettingsModal from '../components/Admin/SettingsModal';
 import DarkModeToggle from '../components/Admin/DarkModeToggle';
+import { API_BASE_URL } from '../config';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -89,10 +90,10 @@ const handleToggleDark = () => {
   const fetchAdminData = async (silent = false) => {
     if (!silent) setIsLoading(true);
     try {
-      const statsRes = await fetch('http://localhost:5001/api/admin/stats');
-      const chartRes = await fetch('http://localhost:5001/api/admin/analytics/annual');
-      const empRes = await fetch('http://localhost:5001/api/admin/employers/all');
-      const appRes = await fetch('http://localhost:5001/api/admin/applicants/all'); 
+      const statsRes = await fetch(`${API_BASE_URL}/api/admin/stats`);
+      const chartRes = await fetch(`${API_BASE_URL}/api/admin/analytics/annual`);
+      const empRes = await fetch(`${API_BASE_URL}/api/admin/employers/all`);
+      const appRes = await fetch(`${API_BASE_URL}/api/admin/applicants/all`); 
       
       if (statsRes.ok) setStats(await statsRes.json());
       if (chartRes.ok) setChartData(await chartRes.json());
@@ -133,7 +134,7 @@ const handleToggleDark = () => {
 
   const handleVerification = async (userId, newStatus, reason = null) => {
     try {
-      const res = await fetch(`http://localhost:5001/api/admin/users/${userId}/verify`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/verify`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus, rejection_reason: reason })
@@ -211,7 +212,7 @@ const handleToggleDark = () => {
 
   const handleAccountStatus = async (userId, newStatus) => {
     try {
-      const res = await fetch(`http://localhost:5001/api/admin/users/${userId}/account-status`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/account-status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ account_status: newStatus })
@@ -1390,13 +1391,13 @@ const handleToggleDark = () => {
                         {pwdModal.user.pwd_document_path ? (
                           pwdModal.user.pwd_document_path.match(/\.(jpeg|jpg|png|gif)$/i) ? (
                             <img
-                              src={`http://localhost:5001/uploads/${pwdModal.user.pwd_document_path.replace(/^uploads[\\/]/, '')}`}
+                              src={`${API_BASE_URL}/uploads/${pwdModal.user.pwd_document_path.replace(/^uploads[\\/]/, '')}`}
                               alt="Applicant PWD ID"
                               className="max-h-full max-w-full object-contain rounded-xl shadow-md"
                             />
                           ) : (
                             <iframe
-                              src={`http://localhost:5001/uploads/${pwdModal.user.pwd_document_path.replace(/^uploads[\\/]/, '')}`}
+                              src={`${API_BASE_URL}/uploads/${pwdModal.user.pwd_document_path.replace(/^uploads[\\/]/, '')}`}
                               title="PWD ID Document PDF"
                               className="w-full h-full rounded-xl"
                             ></iframe>
@@ -1494,13 +1495,13 @@ const handleToggleDark = () => {
                       {employerModal.user.verification_document ? (
                         employerModal.user.verification_document.match(/\.(jpeg|jpg|png|gif)$/i) ? (
                           <img
-                            src={`http://localhost:5001/uploads/${employerModal.user.verification_document.replace(/^uploads[\\/]/, '')}`}
+                            src={`${API_BASE_URL}/uploads/${employerModal.user.verification_document.replace(/^uploads[\\/]/, '')}`}
                             alt="Business Verification Document"
                             className="max-h-full max-w-full object-contain rounded-xl shadow-md"
                           />
                         ) : (
                           <iframe
-                            src={`http://localhost:5001/uploads/${employerModal.user.verification_document.replace(/^uploads[\\/]/, '')}`}
+                            src={`${API_BASE_URL}/uploads/${employerModal.user.verification_document.replace(/^uploads[\\/]/, '')}`}
                             title="Business Document PDF"
                             className="w-full h-full rounded-xl"
                           ></iframe>
