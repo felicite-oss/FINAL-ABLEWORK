@@ -5,6 +5,7 @@ import { useColorPalette } from '../context/ColorPaletteContext';
 import lightLogo from '../assets/LIGHT MODE.png';
 import darkLogo from '../assets/DARK MODE.png';
 import backgroundImg from '../assets/BG.png';
+import { API_BASE_URL } from '../config'; 
 
 export default function EmployerRegister() {
   const { mode } = useContext(AccessibilityContext);
@@ -119,7 +120,7 @@ export default function EmployerRegister() {
     }
 
     try {
-      const response = await fetch('http://localhost:5001/api/auth/register/employer', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register/employer`, {
         method: 'POST',
         body: formData,
       });
