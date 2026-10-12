@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AccessibilityContext } from '../../context/AccessibilityContext';
 import { useColorPalette } from '../../context/ColorPaletteContext';
+import { API_BASE_URL } from '../../config';
 
 export default function ApplicantAccountSettings({ profile }) {
   const navigate = useNavigate();
@@ -80,7 +81,7 @@ export default function ApplicantAccountSettings({ profile }) {
     setEmailStatus({ type: '', msg: '' });
     
     try {
-      const response = await fetch(`http://localhost:5001/api/users/${profile.user_id}/request-otp`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/${profile.user_id}/request-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email, type: 'email' }) 
@@ -108,7 +109,7 @@ export default function ApplicantAccountSettings({ profile }) {
     setIsUpdatingEmail(true);
 
     try {
-      const response = await fetch(`http://localhost:5001/api/applicant/${profile.user_id}/credentials`, {
+      const response = await fetch(`${API_BASE_URL}/api/applicant/${profile.user_id}/credentials`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp: emailOtp })
@@ -146,7 +147,7 @@ export default function ApplicantAccountSettings({ profile }) {
 
     try {
       const [response] = await Promise.all([
-        fetch(`http://localhost:5001/api/users/${profile.user_id}/request-otp`, {
+        fetch(`${API_BASE_URL}/api/users/${profile.user_id}/request-otp`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: profile?.email, type: 'password' }) 
@@ -178,7 +179,7 @@ export default function ApplicantAccountSettings({ profile }) {
     setIsUpdatingPassword(true);
 
     try {
-      const response = await fetch(`http://localhost:5001/api/applicant/${profile.user_id}/credentials`, {
+      const response = await fetch(`${API_BASE_URL}/api/applicant/${profile.user_id}/credentials`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentPassword, newPassword, otp: passwordOtp })
@@ -231,7 +232,7 @@ export default function ApplicantAccountSettings({ profile }) {
     formData.append('document', verificationDoc);
 
     try {
-      const response = await fetch(`http://localhost:5001/api/users/${profile.user_id}/resubmit`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/${profile.user_id}/resubmit`, {
         method: 'POST',
         body: formData
       });
@@ -262,7 +263,7 @@ export default function ApplicantAccountSettings({ profile }) {
 
     try {
       const [res] = await Promise.all([
-        fetch(`http://localhost:5001/api/users/${profile.user_id}/toggle-status`, { 
+        fetch(`${API_BASE_URL}/api/users/${profile.user_id}/toggle-status`, { 
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: deactivateTargetState ? 'activate' : 'deactivate' })
@@ -286,7 +287,7 @@ export default function ApplicantAccountSettings({ profile }) {
     setDangerStatus({ type: '', msg: '' });
 
     try {
-      const res = await fetch(`http://localhost:5001/api/users/${profile.user_id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/users/${profile.user_id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: deletePassword })
@@ -360,7 +361,7 @@ export default function ApplicantAccountSettings({ profile }) {
                   
                   <div className="mt-3 sm:mt-4">
                     <a
-                      href={`http://localhost:5001/${profile?.pwd_document_path?.replace(/\\/g, '/')}`}
+                      href={`${API_BASE_URL}/${profile?.pwd_document_path?.replace(/\\/g, '/')}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-extrabold text-[#2C7FFF] hover:underline"
