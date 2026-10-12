@@ -37,6 +37,7 @@ export default function AdminDashboard() {
   const [approveModal, setApproveModal] = useState({ isOpen: false, userId: null });
   const [disableModal, setDisableModal] = useState({ isOpen: false, userId: null });
   const [restoreModal, setRestoreModal] = useState({ isOpen: false, userId: null });
+  const [confirmPopup, setConfirmPopup] = useState({ isOpen: false, type: null, userId: null, reason: null, loading: false });
 
   const [approveLoading, setApproveLoading] = useState(false);
   const [disableLoading, setDisableLoading] = useState(false);
@@ -184,11 +185,28 @@ const handleToggleDark = () => {
       alert("Please provide a reason for rejection.");
       return;
     }
-    setRejectLoading(true);
-    setTimeout(() => {
-      handleVerification(rejectModal.userId, 'Rejected', rejectModal.reason);
-      setRejectLoading(false);
-    }, 2000);
+    setConfirmPopup({ isOpen: true, type: 'reject', userId: rejectModal.userId, reason: rejectModal.reason, loading: false });
+  };
+
+  const executeConfirmedAction = async () => {
+    const { type, userId, reason } = confirmPopup;
+    setConfirmPopup(prev => ({ ...prev, loading: true }));
+    await new Promise(r => setTimeout(r, 400));
+    try {
+      if (type === 'approve') {
+        await handleVerification(userId, 'Approved');
+      } else if (type === 'reject') {
+        await handleVerification(userId, 'Rejected', reason);
+      } else if (type === 'disable') {
+        await handleAccountStatus(userId, 'Disabled');
+      } else if (type === 'restore') {
+        await handleAccountStatus(userId, 'Active');
+      } else if (type === 'cancel') {
+        setRejectModal({ isOpen: false, userId: null, reason: '' });
+      }
+    } finally {
+      setConfirmPopup({ isOpen: false, type: null, userId: null, reason: null, loading: false });
+    }
   };
 
   const handleAccountStatus = async (userId, newStatus) => {
@@ -246,6 +264,22 @@ const handleToggleDark = () => {
   const cardBg = isDark ? 'bg-black' : 'bg-white';
   const surfaceBg = isDark ? 'bg-black' : 'bg-[#f4f4f4]';
   const bdrMain = isDark ? 'border-white/20' : 'border-[#03045E]/15';
+
+  const confirmBarColor = confirmPopup.type === 'approve' ? 'bg-[#10B981]' :
+    confirmPopup.type === 'restore' ? 'bg-[#2C7FFF]' :
+    confirmPopup.type === 'cancel' ? 'bg-[#f59e0b]' : 'bg-[#DC2626]';
+
+  const confirmAccentBorder = confirmPopup.type === 'approve' ? 'border-[#10B981]' :
+    confirmPopup.type === 'restore' ? 'border-[#2C7FFF]' :
+    confirmPopup.type === 'cancel' ? 'border-[#f59e0b]' : 'border-[#DC2626]';
+
+  const confirmAccentText = confirmPopup.type === 'approve' ? 'text-[#10B981]' :
+    confirmPopup.type === 'restore' ? 'text-[#2C7FFF]' :
+    confirmPopup.type === 'cancel' ? 'text-[#f59e0b]' : 'text-[#DC2626]';
+
+  const confirmAccentBg = confirmPopup.type === 'approve' ? 'bg-[#10B981]' :
+    confirmPopup.type === 'restore' ? 'bg-[#2C7FFF]' :
+    confirmPopup.type === 'cancel' ? 'bg-[#f59e0b]' : 'bg-[#DC2626]';
 
   return (
     <div className={`min-h-screen flex flex-col ${isDark ? 'bg-black text-white' : 'bg-[#f4f4f4] text-[#03045E]'} selection:bg-[#2C7FFF] selection:text-white relative overflow-x-clip w-full max-w-[100vw] no-scrollbar ${ready ? 'transition-colors duration-300' : 'transition-none'}`}>
@@ -365,6 +399,101 @@ const handleToggleDark = () => {
                   className={`flex-1 py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 ${isDark ? 'text-white border-white hover:bg-white hover:text-black' : 'text-[#DC2626] border-[#DC2626]'}`}
                 >
                   Yes, Logout
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmPopup.isOpen && (
+        <div
+          className="fixed inset-0 z-[99999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
+          style={{ backgroundColor: 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
+        >
+          <div className={`relative w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${isDark ? 'bg-black border-white' : `bg-white ${confirmAccentBorder}`} border-2`}>
+            <div className={`h-2 w-full ${isDark ? 'bg-white' : confirmBarColor}`} />
+
+            <div className="relative px-8 pt-10 pb-8 flex flex-col items-center text-center">
+              <div className="relative mb-5">
+                <div className={`w-24 h-24 rounded-full flex items-center justify-center bg-transparent border-4 ${isDark ? 'border-white' : confirmAccentBorder}`}>
+                  {confirmPopup.type === 'approve' && (
+                    <svg className={`w-12 h-12 ${isDark ? 'text-white' : confirmAccentText}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )}
+                  {confirmPopup.type === 'reject' && (
+                    <svg className={`w-12 h-12 ${isDark ? 'text-white' : confirmAccentText}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )}
+                  {confirmPopup.type === 'disable' && (
+                    <svg className={`w-12 h-12 ${isDark ? 'text-white' : confirmAccentText}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                    </svg>
+                  )}
+                  {confirmPopup.type === 'restore' && (
+                    <svg className={`w-12 h-12 ${isDark ? 'text-white' : confirmAccentText}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                  )}
+                  {confirmPopup.type === 'cancel' && (
+                    <svg className={`w-12 h-12 ${isDark ? 'text-white' : confirmAccentText}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  )}
+                </div>
+                <div className={`absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${isDark ? 'bg-white text-black' : 'bg-[#03045E] text-white'}`}>!</div>
+              </div>
+
+              <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 border-2 ${isDark ? 'text-white bg-transparent border-white' : `bg-transparent ${confirmAccentBorder} ${confirmAccentText}`}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${isDark ? 'bg-white' : confirmAccentBg}`}></span>
+                Notice
+              </span>
+
+              <h2 className={`text-3xl font-black tracking-tight mb-2 ${txtMain}`}>
+                {confirmPopup.type === 'approve' ? 'Approve this account?' :
+                 confirmPopup.type === 'reject' ? 'Reject this application?' :
+                 confirmPopup.type === 'disable' ? 'Disable this account?' :
+                 confirmPopup.type === 'restore' ? 'Restore this account?' :
+                 'Cancel this action?'}
+              </h2>
+              <p className={`text-sm font-bold leading-relaxed mb-8 max-w-xs ${txtMuted}`}>
+                {confirmPopup.type === 'approve' ? 'This user will be granted full access to the platform.' :
+                 confirmPopup.type === 'reject' ? 'The user will be notified and placed on a 7-day reapplication cooldown.' :
+                 confirmPopup.type === 'disable' ? 'This user will immediately lose access to the platform.' :
+                 confirmPopup.type === 'restore' ? 'This user will regain access to the platform.' :
+                 'Your input will be discarded and nothing will be saved.'}
+              </p>
+
+              <div className="flex flex-row gap-3 w-full">
+                <button
+                  onClick={() => setConfirmPopup({ isOpen: false, type: null, userId: null, reason: null, loading: false })}
+                  disabled={confirmPopup.loading}
+                  className={`flex-1 py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 disabled:opacity-50 ${isDark ? 'text-white border-white hover:bg-white hover:text-black' : 'text-[#03045E] border-[#03045E]'}`}
+                >
+                  No, Cancel
+                </button>
+                <button
+                  onClick={executeConfirmedAction}
+                  disabled={confirmPopup.loading}
+                  className={`flex-1 py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 disabled:opacity-70 flex items-center justify-center gap-2 ${isDark ? 'text-white border-white hover:bg-white hover:text-black' : `${confirmAccentText} ${confirmAccentBorder}`}`}
+                >
+                  {confirmPopup.loading ? (
+                    <>
+                      <svg className="w-4 h-4 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                      </svg>
+                      Processing...
+                    </>
+                  ) : (
+                    confirmPopup.type === 'approve' ? 'Yes, Approve' :
+                    confirmPopup.type === 'reject' ? 'Yes, Reject' :
+                    confirmPopup.type === 'disable' ? 'Yes, Disable' :
+                    confirmPopup.type === 'restore' ? 'Yes, Restore' :
+                    'Yes, Cancel'
+                  )}
                 </button>
               </div>
             </div>
@@ -947,21 +1076,21 @@ const handleToggleDark = () => {
                               {user.userType}
                             </span>
                             <span
-                              className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[8px] sm:text-[10px] font-black tracking-wider uppercase border ${isDark ? 'bg-black text-white border-white' : ''}`}
-                              style={!isDark ? {
-                                backgroundColor: user.account_status === 'Disabled' ? 'rgba(220,38,38,0.1)' :
-                                  user.verification_status === 'Approved' ? 'rgba(16,185,129,0.1)' :
-                                  user.verification_status === 'Rejected' ? 'rgba(220,38,38,0.1)' :
-                                  'rgba(245,158,11,0.1)',
-                                color: user.account_status === 'Disabled' ? '#f87171' :
-                                  user.verification_status === 'Approved' ? '#34d399' :
-                                  user.verification_status === 'Rejected' ? '#f87171' :
-                                  '#fbbf24',
-                                borderColor: user.account_status === 'Disabled' ? '#dc2626' :
-                                  user.verification_status === 'Approved' ? '#10b981' :
-                                  user.verification_status === 'Rejected' ? '#dc2626' :
-                                  '#f59e0b'
-                              } : {}}
+                              className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[8px] sm:text-[10px] font-black tracking-wider uppercase border}`}
+                              style={{
+  backgroundColor: user.account_status === 'Disabled' ? 'rgba(220,38,38,0.1)' :
+    user.verification_status === 'Approved' ? 'rgba(16,185,129,0.1)' :
+    user.verification_status === 'Rejected' ? 'rgba(220,38,38,0.1)' :
+    'rgba(245,158,11,0.1)',
+  color: user.account_status === 'Disabled' ? '#f87171' :
+    user.verification_status === 'Approved' ? '#34d399' :
+    user.verification_status === 'Rejected' ? '#f87171' :
+    '#fbbf24',
+  borderColor: user.account_status === 'Disabled' ? '#dc2626' :
+    user.verification_status === 'Approved' ? '#10b981' :
+    user.verification_status === 'Rejected' ? '#dc2626' :
+    '#f59e0b'
+}}
                             >
                               {user.account_status === 'Disabled' ? 'Disabled' : (user.verification_status || 'Pending')}
                             </span>
@@ -1050,7 +1179,7 @@ const handleToggleDark = () => {
                                 <>
                                   <button
                                     onClick={() => setRejectModal({ isOpen: true, userId: user.user_id, reason: '' })}
-                                    className={`flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-2 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 transition cursor-pointer shadow-sm flex items-center justify-center gap-1.5 ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-red-50 text-red-700 border-red-600'}`}
+                                    className={`flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-2 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 transition cursor-pointer shadow-sm flex items-center justify-center gap-1.5 bg-[#FEE2E2] text-[#B91C1C] border-[#DC2626]`}
                                   >
                                     <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path>
@@ -1058,8 +1187,8 @@ const handleToggleDark = () => {
                                     <span className="whitespace-nowrap">Reject</span>
                                   </button>
                                   <button
-                                    onClick={() => setApproveModal({ isOpen: true, userId: user.user_id })}
-                                    className={`flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-2 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 shadow-sm transition cursor-pointer flex items-center justify-center gap-1.5 ${isDark ? 'bg-white text-black border-white hover:bg-white/90' : 'bg-[#10b981] text-white border-[#10b981]'}`}
+                                    onClick={() => setConfirmPopup({ isOpen: true, type: 'approve', userId: user.user_id, reason: null, loading: false })}
+                                    className={`flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-2 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 shadow-sm transition cursor-pointer flex items-center justify-center gap-1.5 bg-[#10b981] text-white border-[#10b981]`}
                                   >
                                     <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path>
@@ -1070,8 +1199,8 @@ const handleToggleDark = () => {
                               )}
                               {listFilter === 'Approved' && (
                                 <button
-                                  onClick={() => setDisableModal({ isOpen: true, userId: user.user_id })}
-                                  className={`flex-1 min-w-0 py-2 sm:py-2.5 px-3 sm:px-4 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 shadow-sm cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-red-50 text-red-700 border-red-600'}`}
+                                  onClick={() => setConfirmPopup({ isOpen: true, type: 'disable', userId: user.user_id, reason: null, loading: false })}
+                                  className={`flex-1 min-w-0 py-2 sm:py-2.5 px-3 sm:px-4 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 shadow-sm cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 bg-[#FEE2E2] text-[#B91C1C] border-[#DC2626]`}
                                 >
                                   <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
@@ -1081,8 +1210,8 @@ const handleToggleDark = () => {
                               )}
                               {listFilter === 'Rejected' && (
                                 <button
-                                  onClick={() => setApproveModal({ isOpen: true, userId: user.user_id })}
-                                  className={`flex-1 min-w-0 py-2 sm:py-2.5 px-3 sm:px-4 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 shadow-sm transition cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${isDark ? 'bg-white text-black border-white hover:bg-white/90' : 'bg-emerald-50 text-emerald-700 border-emerald-600'}`}
+                                  onClick={() => setConfirmPopup({ isOpen: true, type: 'approve', userId: user.user_id, reason: null, loading: false })}
+                                  className={`flex-1 min-w-0 py-2 sm:py-2.5 px-3 sm:px-4 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 shadow-sm transition cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 bg-[#D1FAE5] text-[#047857] border-[#10B981]`}
                                 >
                                   <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -1092,8 +1221,8 @@ const handleToggleDark = () => {
                               )}
                               {listFilter === 'Disabled' && (
                                 <button
-                                  onClick={() => setRestoreModal({ isOpen: true, userId: user.user_id })}
-                                  className={`flex-1 min-w-0 py-2 sm:py-2.5 px-3 sm:px-4 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 shadow-sm cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${isDark ? 'bg-white text-black border-white hover:bg-white/90' : 'bg-[#2C7FFF] text-white border-[#2C7FFF]'}`}
+                                  onClick={() => setConfirmPopup({ isOpen: true, type: 'restore', userId: user.user_id, reason: null, loading: false })}
+                                  className={`flex-1 min-w-0 py-2 sm:py-2.5 px-3 sm:px-4 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 shadow-sm cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 bg-[#2C7FFF] text-white border-[#2C7FFF]`}
                                 >
                                   <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -1189,13 +1318,17 @@ const handleToggleDark = () => {
                             setPwdModal({ isOpen: false, user: null });
                             setRejectModal({ isOpen: true, userId: userId, reason: '' });
                           }}
-                          className={`flex-1 py-3 sm:py-3.5 font-black text-xs sm:text-sm rounded-xl border-2 transition cursor-pointer shadow-sm flex items-center justify-center gap-2 ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-red-50 text-red-700 border-red-600'}`}
+                          className={`flex-1 py-3 sm:py-3.5 font-black text-xs sm:text-sm rounded-xl border-2 transition cursor-pointer shadow-sm flex items-center justify-center gap-2 bg-[#FEE2E2] text-[#B91C1C] border-[#DC2626]`}
                         >
                           ✕ Reject & Cooldown
                         </button>
                         <button
-                          onClick={() => setApproveModal({ isOpen: true, userId: pwdModal.user.user_id })}
-                          className={`flex-1 py-3 sm:py-3.5 font-black text-xs sm:text-sm rounded-xl border-2 shadow-md transition cursor-pointer flex items-center justify-center gap-2 ${isDark ? 'bg-white text-black border-white hover:bg-white/90' : 'bg-[#10b981] text-white border-[#10b981]'}`}
+                          onClick={() => {
+                            const userId = pwdModal.user.user_id;
+                            setPwdModal({ isOpen: false, user: null });
+                            setConfirmPopup({ isOpen: true, type: 'approve', userId: userId, reason: null, loading: false });
+                          }}
+                          className={`flex-1 py-3 sm:py-3.5 font-black text-xs sm:text-sm rounded-xl border-2 shadow-md transition cursor-pointer flex items-center justify-center gap-2 bg-[#10b981] text-white border-[#10b981]`}
                         >
                           ✓ Approve PWD ID
                         </button>
@@ -1289,13 +1422,17 @@ const handleToggleDark = () => {
                           setEmployerModal({ isOpen: false, user: null });
                           setRejectModal({ isOpen: true, userId: userId, reason: '' });
                         }}
-                        className={`flex-1 py-3.5 font-black text-sm rounded-xl border-2 transition cursor-pointer shadow-sm flex items-center justify-center gap-2 ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-red-50 text-red-700 border-red-600'}`}
+                        className={`flex-1 py-3.5 font-black text-sm rounded-xl border-2 transition cursor-pointer shadow-sm flex items-center justify-center gap-2 bg-[#FEE2E2] text-[#B91C1C] border-[#DC2626]`}
                       >
                         ✕ Reject & Cooldown
                       </button>
                       <button
-                        onClick={() => setApproveModal({ isOpen: true, userId: employerModal.user.user_id })}
-                        className={`flex-1 py-3.5 font-black text-sm rounded-xl border-2 shadow-md transition cursor-pointer flex items-center justify-center gap-2 ${isDark ? 'bg-white text-black border-white hover:bg-white/90' : 'bg-[#10b981] text-white border-[#10b981]'}`}
+                        onClick={() => {
+                          const userId = employerModal.user.user_id;
+                          setEmployerModal({ isOpen: false, user: null });
+                          setConfirmPopup({ isOpen: true, type: 'approve', userId: userId, reason: null, loading: false });
+                        }}
+                        className={`flex-1 py-3.5 font-black text-sm rounded-xl border-2 shadow-md transition cursor-pointer flex items-center justify-center gap-2 bg-[#10b981] text-white border-[#10b981]`}
                       >
                         ✓ Approve Employer Permit
                       </button>
@@ -1316,7 +1453,7 @@ const handleToggleDark = () => {
                   style={{ borderColor: isDark ? '#ffffff' : '#dc2626' }}
                 >
                   <div>
-                    <h2 className="text-xl font-black tracking-tight" style={{ color: isDark ? '#ffffff' : '#f87171' }}>Reject Application & Cooldown</h2>
+                    <h2 className="text-xl font-black tracking-tight" style={{ color: isDark ? '#ffffff' : '#DC2626' }}>Reject Application & Cooldown</h2>
                     <p className={`text-xs sm:text-sm font-bold mt-1 ${txtMuted}`}>Select a document issue. A 7-day reapplication cooldown will be automatically applied.</p>
                   </div>
                   
@@ -1333,7 +1470,7 @@ const handleToggleDark = () => {
                         type="button"
                         disabled={rejectLoading}
                         onClick={() => setRejectModal({ ...rejectModal, reason: standardReason })}
-                        className={`text-left px-3 py-2 text-xs font-black rounded-xl border-2 transition cursor-pointer disabled:opacity-50 ${isDark ? 'bg-black text-white border-white/50 hover:bg-white hover:text-black' : 'bg-red-50 text-red-700 border-red-600'}`}
+                        className={`text-left px-3 py-2 text-xs font-black rounded-xl border-2 cursor-pointer disabled:opacity-50 bg-[#FEE2E2] text-[#B91C1C] border-[#DC2626]`}
                       >
                         + {standardReason.split('.')[0]}
                       </button>
@@ -1351,15 +1488,15 @@ const handleToggleDark = () => {
                   <div className="flex gap-3 mt-2">
                     <button 
                       disabled={rejectLoading}
-                      onClick={() => setRejectModal({ isOpen: false, userId: null, reason: '' })}
-                      className={`flex-1 py-3 ${surfaceBg} ${txtMain} font-black text-sm rounded-xl border-2 ${isDark ? 'border-white/20 hover:bg-white/10' : 'border-[#03045E]/20 hover:bg-[#03045E]/10'} transition cursor-pointer disabled:opacity-50`}
+                      onClick={() => setConfirmPopup({ isOpen: true, type: 'cancel', userId: rejectModal.userId, reason: null, loading: false })}
+                      className={`flex-1 py-3 ${surfaceBg} ${txtMain} font-black text-sm rounded-xl border-2 ${isDark ? 'border-white/20' : 'border-[#03045E]/20'} cursor-pointer disabled:opacity-50`}
                     >
                       Cancel
                     </button>
                     <button 
                       disabled={rejectLoading}
                       onClick={submitRejection}
-                      className={`flex-1 py-3 font-black text-sm rounded-xl border-2 shadow-md transition flex justify-center items-center gap-2 cursor-pointer disabled:opacity-80 ${isDark ? 'bg-white text-black border-white hover:bg-white/90' : 'bg-[#dc2626] text-white border-[#dc2626]'}`}
+                      className={`flex-1 py-3 font-black text-sm rounded-xl border-2 shadow-md transition flex justify-center items-center gap-2 cursor-pointer disabled:opacity-80 bg-[#dc2626] text-white border-[#dc2626]`}
                     >
                       {rejectLoading ? (
                         <>
