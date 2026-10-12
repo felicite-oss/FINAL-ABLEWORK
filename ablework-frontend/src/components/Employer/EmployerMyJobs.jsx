@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { AccessibilityContext } from '../../context/AccessibilityContext';
 import { useColorPalette } from '../../context/ColorPaletteContext';
+import { API_BASE_URL } from '../../config';
 
 
 const parseToArray = (data) => {
@@ -190,7 +191,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
     };
 
     try {
-      const res = await fetch(`http://localhost:5001/api/jobs/${editingJob.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/jobs/${editingJob.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -226,7 +227,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
 
     try {
       const [res] = await Promise.all([
-        fetch(`http://localhost:5001/api/jobs/${archiveTarget.id}/archive`, { method: 'PUT' }),
+        fetch(`${API_BASE_URL}/api/jobs/${archiveTarget.id}/archive`, { method: 'PUT' }),
         new Promise(resolve => setTimeout(resolve, 2000))
       ]);
 
