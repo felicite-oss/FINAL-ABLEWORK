@@ -101,31 +101,6 @@ export const COLOR_PALETTES = {
       info: '#B7791F'
     }
   },
-  highContrast: {
-    name: 'High Contrast',
-    description: 'Maximum readability for low vision',
-    swatch: ['#000000', '#2c7fff', '#f4f4f4'],
-    colors: {
-      primary: '#FFFFFF',
-      primarySoft: 'rgba(255,255,255,0.8)',
-      accent: '#2c7fff',
-      accentSoft: 'rgba(44,127,255,0.2)',
-      background: '#000000',
-      surface: '#1A202C',
-      surfaceMuted: 'rgba(255,255,255,0.1)',
-      border: '#FFFFFF',
-      text: '#FFFFFF',
-      textMuted: 'rgba(255,255,255,0.8)',
-      textSubtle: 'rgba(255,255,255,0.6)',
-      success: '#FFFFFF',
-      successText: '#FFFFFF',
-      warning: '#FFFFFF',
-      warningText: '#FFFFFF',
-      error: '#FFFFFF',
-      errorText: '#FFFFFF',
-      info: '#2c7fff'
-    }
-  },
   warmTone: {
     name: 'Warm Tone',
     description: 'Soft warm colors for eye comfort',
@@ -174,31 +149,6 @@ export const COLOR_PALETTES = {
       error: '#DC2626',
       errorText: '#991B1B',
       info: '#0EA5E9'
-    }
-  },
-  darkComfort: {
-    name: 'Dark Comfort',
-    description: 'Low-light friendly dark palette',
-    swatch: ['#E2E8F0', '#60A5FA', '#1A202C'],
-    colors: {
-      primary: '#E2E8F0',
-      primarySoft: 'rgba(226,232,240,0.8)',
-      accent: '#60A5FA',
-      accentSoft: 'rgba(96,165,250,0.2)',
-      background: '#1A202C',
-      surface: '#2D3748',
-      surfaceMuted: 'rgba(226,232,240,0.06)',
-      border: 'rgba(226,232,240,0.2)',
-      text: '#F7FAFC',
-      textMuted: 'rgba(247,250,252,0.75)',
-      textSubtle: 'rgba(247,250,252,0.55)',
-      success: '#48BB78',
-      successText: '#9AE6B4',
-      warning: '#ECC94B',
-      warningText: '#FAF089',
-      error: '#FC8181',
-      errorText: '#FEB2B2',
-      info: '#63B3ED'
     }
   },
   monochrome: {
@@ -254,10 +204,8 @@ export function ColorPaletteProvider({ children }) {
       'palette-deuteranopia',
       'palette-protanopia',
       'palette-tritanopia',
-      'palette-highContrast',
       'palette-warmTone',
       'palette-coolTone',
-      'palette-darkComfort',
       'palette-monochrome'
     );
     root.classList.add(`palette-${paletteKey}`);

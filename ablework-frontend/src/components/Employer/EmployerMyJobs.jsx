@@ -252,7 +252,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
   );
 
   return (
-    <div className={`animate-fadeIn max-w-7xl mx-auto pb-6 sm:pb-10 relative px-1 sm:px-0 ${pageText}`}>
+    <div className={`animate-fadeIn max-w-9xl mx-auto pb-6 sm:pb-10 relative px-1 sm:px-0 ${pageText}`}>
       
       <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 backdrop-blur-md p-4 sm:p-6 rounded-2xl sm:rounded-3xl border-2 ${panelBg}`}>
         <div>

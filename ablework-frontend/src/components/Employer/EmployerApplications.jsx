@@ -186,7 +186,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
   if (isLoading) return <div className={`p-6 sm:p-10 font-bold text-sm sm:text-base ${pageText}`}>Loading applicants...</div>;
 
   return (
-    <div className={`animate-fadeIn max-w-7xl mx-auto pb-6 sm:pb-10 relative px-1 sm:px-0 ${pageText}`}>
+    <div className={`animate-fadeIn max-w-9xl mx-auto pb-6 sm:pb-10 relative px-1 sm:px-0 ${pageText}`}>
       <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 backdrop-blur-md p-4 sm:p-6 rounded-[15px] border-2 ${panelBg}`}>
         <div>
           <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-1.5 flex-wrap">
@@ -200,37 +200,42 @@ export default function EmployerApplications({ profile, refreshStats }) {
         </div>
       </div>
       
-      <div className={`grid grid-cols-2 sm:flex sm:flex-row gap-2 sm:gap-4 p-3 sm:p-6 mb-6 sm:mb-8 rounded-[15px] border-2 ${panelBg}`}>
-        {tabs.map(tab => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`w-full sm:w-auto sm:flex-1 flex items-center justify-center px-2 sm:px-4 py-2 sm:py-2.5 text-[10px] sm:text-sm font-bold rounded-[15px] whitespace-nowrap transition-all cursor-pointer border-2 ${
-              activeTab === tab
-                ? (isHighContrastOrDarkComfort
-                    ? (isDark ? 'bg-white text-black border-white' : 'bg-[#2C7FFF] !text-white border-[#2C7FFF]')
-                    : isDark
-                      ? 'bg-white text-black border-white'
-                      : 'bg-[#2C7FFF] text-white border-[#2C7FFF]')
-                : (isDark
-                  ? 'bg-black text-white/70 border-white/40 hover:bg-white hover:text-black hover:border-white'
-                  : 'bg-white text-[#03045E] border-gray-200 hover:bg-gray-100')
-            }`}
-          >
-            <span>{tab}</span>
-            <span className={`ml-1 sm:ml-2 min-w-[20px] sm:min-w-[24px] inline-flex items-center justify-center px-1 sm:px-2 py-0.5 rounded-[15px] text-[9px] sm:text-[11px] font-black border-2 ${
-              activeTab === tab 
-                ? (isDark ? 'bg-black text-white border-black' : 'bg-white text-[#2C7FFF] border-white')
-                : (isDark 
-                  ? 'bg-white text-black border-white'
-                  : 'bg-gray-100 text-[#03045E] border-gray-200')
-            }`}>
-              {tab === 'All' 
-                ? applications.length 
-                : applications.filter(a => a.application_status === tab).length}
-            </span>
-          </button>
-        ))}
+                     <div className={`flex gap-1 p-1 sm:gap-2 sm:p-2 rounded-xl sm:rounded-[15px] border-2 w-full overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] ${panelBg}`}>
+        {tabs.map(tab => {
+          const count = tab === 'All' 
+            ? applications.length 
+            : applications.filter(a => a.application_status === tab).length;
+          return (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex-1 min-w-0 px-1.5 py-1 sm:px-4 sm:py-2.5 rounded-lg sm:rounded-xl font-extrabold text-[8px] sm:text-sm whitespace-nowrap transition-all flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 cursor-pointer ${
+                activeTab === tab
+                  ? (isHighContrastOrDarkComfort
+                      ? (isDark ? 'bg-white text-black shadow-md' : 'bg-[#2C7FFF] !text-white shadow-md')
+                      : isDark
+                        ? 'bg-white text-black shadow-md'
+                        : 'bg-[#2C7FFF] text-white shadow-md')
+                  : (isDark
+                    ? 'text-white/70 hover:bg-white hover:text-black'
+                    : 'text-[#03045E]/70 hover:bg-white hover:text-[#03045E]')
+              }`}
+            >
+              <span className="truncate w-full text-center">{tab}</span>
+              {count > 0 && (
+                <span className={`px-1 py-0 sm:px-1.5 sm:py-0.5 rounded-full text-[7px] sm:text-[10px] font-black shrink-0 ${
+                  activeTab === tab 
+                    ? (isDark ? 'bg-black text-white' : 'bg-white text-[#2C7FFF]')
+                    : (isDark 
+                      ? 'bg-white text-black'
+                      : 'bg-[#03045E]/10 text-[#03045E]')
+                }`}>
+                  {count}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
       
       <div className="flex flex-col gap-3 sm:gap-4">

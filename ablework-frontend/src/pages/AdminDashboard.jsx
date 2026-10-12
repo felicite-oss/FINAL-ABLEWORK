@@ -11,7 +11,7 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Overview');
   const [listFilter, setListFilter] = useState('Pending'); 
-  const [overviewFilter, setOverviewFilter] = useState('All'); // NEW: State for overview tabs
+  const [overviewFilter, setOverviewFilter] = useState('All');
   const [isOpen, setIsOpen] = useState(false); 
   const [stats, setStats] = useState(null);
   const [chartData, setChartData] = useState([]);
@@ -23,6 +23,13 @@ export default function AdminDashboard() {
   const [showDesktopSidebar, setShowDesktopSidebar] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
   const [adminUser, setAdminUser] = useState(null);
+  const [isDark, setIsDark] = useState(false);
+  const [isAnalyticsExpanded, setIsAnalyticsExpanded] = useState(false);
+  const [ready, setReady] = useState(false);
+  
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 10;
 
   const [pwdModal, setPwdModal] = useState({ isOpen: false, user: null });
   const [employerModal, setEmployerModal] = useState({ isOpen: false, user: null });
@@ -36,6 +43,48 @@ export default function AdminDashboard() {
   const [rejectLoading, setRejectLoading] = useState(false);
   const [restoreLoading, setRestoreLoading] = useState(false);
 
+useEffect(() => {
+  const id = requestAnimationFrame(() => setReady(true));
+
+  let cancelled = false;
+  const forceLight = () => {
+    if (cancelled) return;
+    const root = document.documentElement;
+    root.classList.remove('dark-mode', 'dark', 'theme-Dark');
+    root.setAttribute('data-theme', 'light');
+    setIsDark(false);
+  };
+
+  forceLight();
+  const t1 = setTimeout(forceLight, 0);
+  const t2 = setTimeout(forceLight, 50);
+  const t3 = setTimeout(forceLight, 150);
+  const t4 = setTimeout(forceLight, 400);
+
+  return () => {
+    cancelled = true;
+    cancelAnimationFrame(id);
+    clearTimeout(t1);
+    clearTimeout(t2);
+    clearTimeout(t3);
+    clearTimeout(t4);
+  };
+}, []);
+
+const handleToggleDark = () => {
+  setIsDark(prev => {
+    const next = !prev;
+    const root = document.documentElement;
+    if (next) {
+      root.classList.add('dark-mode');
+      root.setAttribute('data-theme', 'dark');
+    } else {
+      root.classList.remove('dark-mode');
+      root.setAttribute('data-theme', 'light');
+    }
+    return next;
+  });
+};
   const fetchAdminData = async (silent = false) => {
     if (!silent) setIsLoading(true);
     try {
@@ -66,6 +115,11 @@ export default function AdminDashboard() {
     setAdminUser(user);
     fetchAdminData();
   }, [navigate]);
+
+  // Reset page when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [overviewFilter]);
 
   const handleLogout = () => {
     setShowLogoutConfirm(false);
@@ -174,7 +228,6 @@ export default function AdminDashboard() {
 
   const allUsers = [...employers.map(e => ({ ...e, userType: 'Employer' })), ...applicants.map(a => ({ ...a, userType: 'Applicant' }))];
 
-  // NEW: Filter logic for the Overview section
   const filteredOverviewUsers = allUsers.filter(user => {
     if (overviewFilter === 'All') return true;
     if (overviewFilter === 'Disabled') return user.account_status === 'Disabled';
@@ -182,39 +235,51 @@ export default function AdminDashboard() {
     return user.verification_status === overviewFilter;
   });
 
+  // Pagination Calculations
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredOverviewUsers.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(filteredOverviewUsers.length / usersPerPage);
+
+  const txtMain = isDark ? 'text-white' : 'text-[#03045E]';
+  const txtMuted = isDark ? 'text-white/70' : 'text-[#03045E]/70';
+  const cardBg = isDark ? 'bg-black' : 'bg-white';
+  const surfaceBg = isDark ? 'bg-black' : 'bg-[#f4f4f4]';
+  const bdrMain = isDark ? 'border-white/20' : 'border-[#03045E]/15';
+
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--color-surface,#f4f4f4)] text-[var(--color-text,#03045E)] selection:bg-[var(--color-primary,#2C7FFF)] selection:text-[var(--color-button-text,#ffffff)] relative overflow-x-clip w-full max-w-[100vw]">
+    <div className={`min-h-screen flex flex-col ${isDark ? 'bg-black text-white' : 'bg-[#f4f4f4] text-[#03045E]'} selection:bg-[#2C7FFF] selection:text-white relative overflow-x-clip w-full max-w-[100vw] no-scrollbar ${ready ? 'transition-colors duration-300' : 'transition-none'}`}>
       
       {isLoggingOut && (
         <div
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className="relative w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 bg-white border-2 border-[#2C7FFF]">
-            <div className="h-2 w-full bg-[#2C7FFF]" />
+          <div className={`relative w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${isDark ? 'bg-black border-white' : 'bg-white border-[#2C7FFF]'} border-2`}>
+            <div className={`h-2 w-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
             <div className="relative px-8 pt-10 pb-8 flex flex-col items-center text-center">
               <div className="relative mb-5">
-                <div className="w-24 h-24 rounded-full flex items-center justify-center bg-transparent border-4 border-[#2C7FFF]">
-                  <svg className="w-12 h-12 animate-spin text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <div className={`w-24 h-24 rounded-full flex items-center justify-center bg-transparent border-4 ${isDark ? 'border-white' : 'border-[#2C7FFF]'}`}>
+                  <svg className={`w-12 h-12 animate-spin ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
                 </div>
-                <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold bg-[#03045E] text-white">✓</div>
+                <div className={`absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${isDark ? 'bg-white text-black' : 'bg-[#03045E] text-white'}`}>✓</div>
               </div>
-              <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 border-2 text-[#2C7FFF] bg-transparent border-[#2C7FFF]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
+              <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 border-2 ${isDark ? 'text-white bg-transparent border-white' : 'text-[#2C7FFF] bg-transparent border-[#2C7FFF]'}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${isDark ? 'bg-white' : 'bg-[#10B981]'}`}></span>
                 Notice
               </span>
-              <h2 className="text-3xl font-black tracking-tight mb-2 text-[#03045E]">
+              <h2 className={`text-3xl font-black tracking-tight mb-2 ${txtMain}`}>
                 Logging Out...
               </h2>
-              <p className="text-sm font-bold leading-relaxed mb-8 max-w-xs text-[#03045E]/80">
+              <p className={`text-sm font-bold leading-relaxed mb-8 max-w-xs ${txtMuted}`}>
                 Please wait while we secure your account and end the session.
               </p>
               <div className="flex items-center gap-1.5" aria-label="Logging out">
-                <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-pulse" />
-                <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-pulse [animation-delay:150ms]" />
-                <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-pulse [animation-delay:300ms]" />
+                <span className={`w-2 h-2 rounded-full animate-pulse ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
+                <span className={`w-2 h-2 rounded-full animate-pulse [animation-delay:150ms] ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
+                <span className={`w-2 h-2 rounded-full animate-pulse [animation-delay:300ms] ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
               </div>
             </div>
           </div>
@@ -226,32 +291,32 @@ export default function AdminDashboard() {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className="relative w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 bg-white border-2 border-[#2C7FFF]">
-            <div className="h-2 w-full bg-[#2C7FFF]" />
+          <div className={`relative w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${isDark ? 'bg-black border-white' : 'bg-white border-[#2C7FFF]'} border-2`}>
+            <div className={`h-2 w-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
             <div className="relative px-8 pt-10 pb-8 flex flex-col items-center text-center">
               <div className="relative mb-5">
-                <div className="w-24 h-24 rounded-full flex items-center justify-center bg-transparent border-4 border-[#2C7FFF]">
-                  <svg className="w-12 h-12 animate-spin text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <div className={`w-24 h-24 rounded-full flex items-center justify-center bg-transparent border-4 ${isDark ? 'border-white' : 'border-[#2C7FFF]'}`}>
+                  <svg className={`w-12 h-12 animate-spin ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                   </svg>
                 </div>
-                <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold bg-[#03045E] text-white">✓</div>
+                <div className={`absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${isDark ? 'bg-white text-black' : 'bg-[#03045E] text-white'}`}>✓</div>
               </div>
-              <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 border-2 text-[#2C7FFF] bg-transparent border-[#2C7FFF]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
+              <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 border-2 ${isDark ? 'text-white bg-transparent border-white' : 'text-[#2C7FFF] bg-transparent border-[#2C7FFF]'}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${isDark ? 'bg-white' : 'bg-[#10B981]'}`}></span>
                 Notice
               </span>
-              <h2 className="text-3xl font-black tracking-tight mb-2 text-[#03045E]">
+              <h2 className={`text-3xl font-black tracking-tight mb-2 ${txtMain}`}>
                 Loading Workspace...
               </h2>
-              <p className="text-sm font-bold leading-relaxed mb-8 max-w-xs text-[#03045E]/80">
+              <p className={`text-sm font-bold leading-relaxed mb-8 max-w-xs ${txtMuted}`}>
                 Please wait while we set up your dashboard and analytics.
               </p>
               <div className="flex items-center gap-1.5" aria-label="Loading">
-                <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-pulse" />
-                <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-pulse [animation-delay:150ms]" />
-                <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-pulse [animation-delay:300ms]" />
+                <span className={`w-2 h-2 rounded-full animate-pulse ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
+                <span className={`w-2 h-2 rounded-full animate-pulse [animation-delay:150ms] ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
+                <span className={`w-2 h-2 rounded-full animate-pulse [animation-delay:300ms] ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
               </div>
             </div>
           </div>
@@ -263,41 +328,41 @@ export default function AdminDashboard() {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className="relative w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 bg-white border-2 border-[#2C7FFF]">
-            <div className="h-2 w-full bg-[#2C7FFF]" />
+          <div className={`relative w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${isDark ? 'bg-black border-white' : 'bg-white border-[#2C7FFF]'} border-2`}>
+            <div className={`h-2 w-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
 
             <div className="relative px-8 pt-10 pb-8 flex flex-col items-center text-center">
               <div className="relative mb-5">
-                <div className="w-24 h-24 rounded-full flex items-center justify-center bg-transparent border-4 border-[#2C7FFF]">
-                  <svg className="w-12 h-12 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <div className={`w-24 h-24 rounded-full flex items-center justify-center bg-transparent border-4 ${isDark ? 'border-white' : 'border-[#2C7FFF]'}`}>
+                  <svg className={`w-12 h-12 ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
                   </svg>
                 </div>
-                <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold bg-[#03045E] text-white">!</div>
+                <div className={`absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${isDark ? 'bg-white text-black' : 'bg-[#03045E] text-white'}`}>!</div>
               </div>
 
-              <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 border-2 text-[#2C7FFF] bg-transparent border-[#2C7FFF]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
+              <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 border-2 ${isDark ? 'text-white bg-transparent border-white' : 'text-[#2C7FFF] bg-transparent border-[#2C7FFF]'}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${isDark ? 'bg-white' : 'bg-[#10B981]'}`}></span>
                 Notice
               </span>
 
-              <h2 className="text-3xl font-black tracking-tight mb-2 text-[#03045E]">
+              <h2 className={`text-3xl font-black tracking-tight mb-2 ${txtMain}`}>
                 Are you sure to logout?
               </h2>
-              <p className="text-sm font-bold leading-relaxed mb-8 max-w-xs text-[#03045E]/80">
+              <p className={`text-sm font-bold leading-relaxed mb-8 max-w-xs ${txtMuted}`}>
                 You will be signed out of your account and returned to the login page.
               </p>
 
               <div className="flex flex-row gap-3 w-full">
                 <button
                   onClick={() => setShowLogoutConfirm(false)}
-                  className="flex-1 py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 text-[#03045E] border-[#03045E]"
+                  className={`flex-1 py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 ${isDark ? 'text-white border-white hover:bg-white hover:text-black' : 'text-[#16a34a] border-[#16a34a]'}`}
                 >
                   No, Stay
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="flex-1 py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 text-[#03045E] border-[#03045E]"
+                  className={`flex-1 py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 ${isDark ? 'text-white border-white hover:bg-white hover:text-black' : 'text-[#DC2626] border-[#DC2626]'}`}
                 >
                   Yes, Logout
                 </button>
@@ -307,7 +372,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      <header className="w-full bg-[var(--color-card,#ffffff)] border-b-2 border-[var(--color-border,rgba(3,4,94,0.15))] fixed top-0 left-0 z-50 transition-all duration-300 shadow-sm">
+      <header className={`w-full ${cardBg} border-b-2 ${bdrMain} fixed top-0 left-0 z-50 transition-all duration-300 shadow-sm`}>
         <div className="w-full h-16 px-2 sm:px-4 md:pr-8 flex items-center justify-between max-w-[1700px] mx-auto box-border gap-2">
           <div className="flex items-center gap-2 sm:gap-3 md:gap-6 min-w-0 flex-shrink overflow-hidden">
             <div className="flex items-center flex-shrink min-w-0 cursor-pointer overflow-hidden py-1" onClick={() => setActiveTab('Overview')}>
@@ -322,18 +387,23 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-1 sm:gap-2 md:gap-3 flex-shrink-0">
             <NotificationsButton pendingCount={(stats?.pendingEmployers || 0) + (stats?.pendingApplicants || 0)} />
 
-            <DarkModeToggle />
+            <div className="hidden md:block">
+              <DarkModeToggle isDark={isDark} onToggle={handleToggleDark} />
+            </div>
 
-            <ProfileMenu
-              adminUser={adminUser}
-              isLoggingOut={isLoggingOut}
-              onLogoutClick={() => setShowLogoutConfirm(true)}
-              onSettingsClick={() => setShowSettings(true)}
-              onProfileClick={() => setShowSettings(true)}
-            />
+            <div className="hidden md:block">
+              <ProfileMenu
+                adminUser={adminUser}
+                isLoggingOut={isLoggingOut}
+                onLogoutClick={() => setShowLogoutConfirm(true)}
+                onSettingsClick={() => setShowSettings(true)}
+                onProfileClick={() => setShowSettings(true)}
+                 isDark={isDark}
+              />
+            </div>
 
             <button
-              className="md:hidden flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[var(--color-card,#ffffff)] text-[var(--color-text,#03045E)] border-2 border-[var(--color-border,rgba(3,4,94,0.2))] shadow-sm cursor-pointer hover:bg-[var(--color-primary,#03045E)] hover:text-[var(--color-button-text,#ffffff)] transition-all duration-200 shrink-0"
+              className={`md:hidden flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl ${cardBg} ${txtMain} border-2 ${bdrMain} shadow-sm cursor-pointer transition-all duration-200 shrink-0`}
               onClick={() => setIsOpen(!isOpen)}
             >
               {isOpen ? (
@@ -350,80 +420,90 @@ export default function AdminDashboard() {
         </div>
 
         <div
-          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out bg-[var(--color-card,#ffffff)] border-b-2 border-[var(--color-border,rgba(3,4,94,0.2))] ${
+          className={`md:hidden absolute top-full left-0 w-full overflow-hidden transition-all duration-300 ease-in-out ${cardBg} border-b-2 ${bdrMain} z-40 ${
             isOpen ? 'max-h-[600px] opacity-100 shadow-xl' : 'max-h-0 opacity-0'
           }`}
         >
           <div className="w-full">
-            <nav className="flex flex-col px-3 sm:px-6 py-4 sm:py-6 gap-3 text-[15px] sm:text-[16px] font-bold text-[var(--color-text,#03045E)]">
+            <nav className={`flex flex-col px-2.5 pt-2.5 pb-2.5 gap-2 sm:px-3 sm:pt-3 sm:pb-3 sm:gap-2.5 ${isDark ? 'text-white' : 'text-[#03045E]'}`}>
               {[
-                { id: 'Overview', label: 'Overview', desc: 'Dashboard summary' },
-                { id: 'Employers', label: 'Employers', desc: 'Manage companies' },
-                { id: 'Applicants', label: 'Applicants', desc: 'Manage job seekers' }
+                { id: 'Overview', label: 'Overview', desc: 'Dashboard summary', icon: (
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                )},
+                { id: 'Employers', label: 'Employers', desc: 'Manage companies', icon: (
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                )},
+                { id: 'Applicants', label: 'Applicants', desc: 'Manage job seekers', icon: (
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                )},
+                { id: 'Profile', label: 'Profile', desc: 'Account settings', icon: (
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                )}
               ].map((tab) => {
                 const isActive = activeTab === tab.id;
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => { setActiveTab(tab.id); setListFilter('Pending'); setIsOpen(false); }}
-                    className={`relative flex items-center gap-3.5 text-left pl-4 pr-3.5 py-3.5 rounded-2xl font-extrabold transition-all duration-300 capitalize cursor-pointer border-2 group overflow-hidden ${
+                    onClick={() => { 
+                      if (tab.id === 'Profile') {
+                        setShowSettings(true);
+                        setIsOpen(false);
+                      } else {
+                        setActiveTab(tab.id); 
+                        setListFilter('Pending'); 
+                        setIsOpen(false); 
+                      }
+                    }}
+                    className={`relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${
                       isActive
-                        ? 'bg-white text-[#03045E] border-[#03045E] shadow-md'
-                        : 'bg-white text-[#03045E] border-[#03045E]/25'
+                        ? `${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-[#03045E]'} shadow-md`
+                        : `${isDark ? 'bg-black text-white border-white/25' : 'bg-white text-[#03045E] border-[#03045E]/25'}`
                     }`}
                   >
                     {isActive && (
-                      <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>
+                      <span className={`absolute left-0 top-0 bottom-0 w-1.5 ${isDark ? 'bg-white' : 'bg-[#03045E]'}`}></span>
                     )}
-                    <div
-                      className={`p-2.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 ${
-                        isActive
-                          ? 'bg-[#03045E] text-white border-[#03045E]'
-                          : 'bg-[#03045E] text-white border-[#03045E]'
-                      }`}
-                    >
-                      {tab.id === 'Overview' && (
-                        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                      )}
-                      {tab.id === 'Employers' && (
-                        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                      )}
-                      {tab.id === 'Applicants' && (
-                        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                      )}
+                    <div className={`p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}>
+                      {tab.icon}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <span className={`text-[15px] tracking-wide font-black truncate block leading-tight ${isActive ? 'text-[#03045E]' : 'text-[#03045E]'}`}>{tab.label}</span>
-                      <span className={`text-[10px] font-bold uppercase tracking-widest block mt-0.5 truncate ${isActive ? 'text-[#03045E]/85' : 'text-[#03045E]/70'}`}>{tab.desc}</span>
+                      <span className={`text-[13px] tracking-wide font-black block leading-tight break-words ${isDark ? 'text-white' : 'text-[#03045E]'}`}>{tab.label}</span>
                     </div>
-                    <svg
-                      className={`w-4 h-4 shrink-0 transition-transform duration-300 ${isActive ? 'text-[#03045E]' : 'text-[#03045E]'}`}
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      viewBox="0 0 24 24"
-                    >
+                    <svg className={`w-3 h-3 shrink-0 transition-transform duration-300 ${isDark ? 'text-white' : 'text-[#03045E]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
                   </button>
                 );
               })}
-              <div className="h-0.5 bg-[var(--color-border,rgba(3,4,94,0.15))] my-1"></div>
-              <div className="flex items-center justify-between px-3.5 sm:px-4 py-2">
-                <span className="text-xs sm:text-sm font-bold text-[var(--color-text,#03045E)]">Dark Mode</span>
-                <DarkModeToggle />
+              <div className={`h-px my-0.5 ${isDark ? 'bg-white/15' : 'bg-[#03045E]/15'}`}></div>
+              <div className="flex items-center justify-between px-3 py-2.5">
+                <span className={`text-[13px] tracking-wide font-black ${isDark ? 'text-white' : 'text-[#03045E]'}`}>Dark Mode</span>
+                <DarkModeToggle isDark={isDark} onToggle={handleToggleDark} />
               </div>
-              <div className="h-0.5 bg-[var(--color-border,rgba(3,4,94,0.15))] my-1"></div>
+              <div className={`h-px my-0.5 ${isDark ? 'bg-white/15' : 'bg-[#03045E]/15'}`}></div>
               <button
                 disabled={isLoggingOut}
                 onClick={() => { setIsOpen(false); setShowLogoutConfirm(true); }}
-                style={{ color: '#DC2626', backgroundColor: '#FEE2E2', borderColor: '#FCA5A5' }}
-                className="flex items-center gap-3 px-3.5 sm:px-4 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-black border-2 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all cursor-pointer text-left shadow-sm disabled:opacity-50"
+                className={`relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isDark ? 'bg-black text-white border-white/40' : 'bg-white text-[#03045E] border-[#DC2626]/40'} disabled:opacity-50`}
               >
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                <div className={`p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#DC2626] text-white border-[#DC2626]'}`}>
+                  {isLoggingOut ? (
+                    <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                  ) : (
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                    </svg>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className={`text-[13px] tracking-wide font-black block leading-tight break-words ${isDark ? 'text-white' : 'text-[#DC2626]'}`}>{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
+                </div>
+                <svg className={`w-3 h-3 shrink-0 transition-transform duration-300 ${isDark ? 'text-white' : 'text-[#DC2626]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
-                <span className="truncate">Logout</span>
               </button>
             </nav>
           </div>
@@ -435,7 +515,7 @@ export default function AdminDashboard() {
         aria-label="Toggle sidebar"
         aria-expanded={showDesktopSidebar}
         title={showDesktopSidebar ? 'Hide navigation' : 'Show navigation'}
-        className={`hidden md:flex fixed top-[4.5rem] left-4 z-40 w-11 h-11 items-center justify-center rounded-2xl border-2 shadow-md transition-all duration-200 cursor-pointer bg-[var(--color-card,#ffffff)] text-[var(--color-text,#03045E)] border-[var(--color-border,rgba(3,4,94,0.15))]`}
+        className={`hidden md:flex fixed top-[4.5rem] left-4 z-40 w-11 h-11 items-center justify-center rounded-2xl border-2 shadow-md transition-all duration-200 cursor-pointer ${cardBg} ${txtMain} ${bdrMain}`}
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
           {showDesktopSidebar ? (
@@ -446,11 +526,11 @@ export default function AdminDashboard() {
         </svg>
       </button>
 
-      <div className={`flex flex-col w-full max-w-[1700px] mx-auto min-w-0 box-border pt-16 flex-1 transition-all duration-300 ${isOpen ? 'mt-[440px] md:mt-0' : ''}`}>
+      <div className="flex flex-col w-full max-w-[1700px] mx-auto min-w-0 box-border pt-16 flex-1 transition-all duration-300">
         <div className="flex flex-col md:flex-row flex-1 w-full min-w-0">
           
           {showDesktopSidebar && (
-          <aside className="!hidden md:!flex shrink-0 flex-col z-10 bg-[#f4f4f4] border-r-2 border-[#f4f4f4] !w-72 sticky top-16 h-[calc(100vh-4rem)] self-start shadow-[4px_0_24px_rgba(3,4,94,0.2)]">
+          <aside className={`!hidden md:!flex shrink-0 flex-col z-10 ${isDark ? 'bg-black border-r-2 border-white/20' : 'bg-[#f4f4f4] border-r-2 border-[#f4f4f4]'} !w-72 sticky top-16 h-[calc(100vh-4rem)] self-start shadow-[4px_0_24px_rgba(3,4,94,0.2)]`}>
             <div className="w-full flex flex-col h-full min-w-0">
               <nav className="flex-1 pl-4 pr-3 pt-20 pb-6 flex flex-col gap-3 overflow-y-auto">
                 {[
@@ -465,19 +545,15 @@ export default function AdminDashboard() {
                       onClick={() => { setActiveTab(tab.id); setListFilter('Pending'); }} 
                       className={`relative flex items-center gap-3.5 text-left pl-4 pr-3.5 py-3.5 rounded-2xl font-extrabold transition-all duration-300 capitalize cursor-pointer border-2 group overflow-hidden ${
                         isActive
-                          ? 'bg-white text-[#03045E] border-[#03045E] shadow-md'
-                          : 'bg-white text-[#03045E] border-[#03045E]/25'
+                          ? `${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-[#03045E]'} shadow-md`
+                          : `${isDark ? 'bg-black text-white border-white/25' : 'bg-white text-[#03045E] border-[#03045E]/25'}`
                       }`}
                     >
                       {isActive && (
-                        <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>
+                        <span className={`absolute left-0 top-0 bottom-0 w-1.5 ${isDark ? 'bg-white' : 'bg-[#03045E]'}`}></span>
                       )}
                       <div 
-                        className={`p-2.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 ${
-                          isActive
-                            ? 'bg-[#03045E] text-white border-[#03045E]'
-                            : 'bg-[#03045E] text-white border-[#03045E]'
-                        }`}
+                        className={`p-2.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}
                       >
                         {tab.id === 'Overview' && (
                           <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
@@ -490,11 +566,11 @@ export default function AdminDashboard() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <span className={`text-[15px] tracking-wide font-black truncate block leading-tight ${isActive ? 'text-[#03045E]' : 'text-[#03045E]'}`}>{tab.label}</span>
-                        <span className={`text-[10px] font-bold uppercase tracking-widest block mt-0.5 truncate ${isActive ? 'text-[#03045E]/85' : 'text-[#03045E]/70'}`}>{tab.desc}</span>
+                        <span className={`text-[15px] tracking-wide font-black truncate block leading-tight ${isDark ? 'text-white' : 'text-[#03045E]'}`}>{tab.label}</span>
+                        <span className={`text-[10px] font-bold uppercase tracking-widest block mt-0.5 truncate ${isDark ? 'text-white/70' : 'text-[#03045E]/70'}`}>{tab.desc}</span>
                       </div>
                       <svg 
-                        className={`w-4 h-4 shrink-0 transition-transform duration-300 ${isActive ? 'text-[#03045E]' : 'text-[#03045E]'}`}
+                        className={`w-4 h-4 shrink-0 transition-transform duration-300 ${isDark ? 'text-white' : 'text-[#03045E]'}`}
                         fill="none" 
                         stroke="currentColor" 
                         strokeWidth="2.5" 
@@ -506,16 +582,16 @@ export default function AdminDashboard() {
                   );
                 })}
 
-                <div className="mt-auto px-2 pt-6 flex items-center justify-between border-t-2 border-[#2C7FFF]/30">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-[#03045E]/40">AbleWork Admin</span>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-[#03045E]/40">v1.0</span>
+                <div className={`mt-auto px-2 pt-6 flex items-center justify-between border-t-2 ${isDark ? 'border-white/30' : 'border-[#2C7FFF]/30'}`}>
+                  <span className={`text-[10px] font-black uppercase tracking-widest ${isDark ? 'text-white/40' : 'text-[#03045E]/40'}`}>AbleWork Admin</span>
+                  <span className={`text-[10px] font-black uppercase tracking-widest ${isDark ? 'text-white/40' : 'text-[#03045E]/40'}`}>v1.0</span>
                 </div>
               </nav>
             </div>
           </aside>
           )}
 
-          <main className={`!flex-1 px-3 sm:px-4 md:px-5 pb-3 sm:pb-4 md:pb-5 pt-9 sm:pt-12 md:pt-14 relative w-full min-w-0 transition-all duration-300 flex flex-col box-border ${showDesktopSidebar ? '!md:ml-72' : ''}`}>
+          <main className={`!flex-1 px-3 sm:px-4 md:px-5 pb-3 sm:pb-4 md:pb-5 pt-0 relative w-full min-w-0 transition-all duration-300 flex flex-col box-border ${showDesktopSidebar ? '!md:ml-72' : ''} ${isDark ? 'bg-black' : ''}`}>
             {showSettings ? (
               <SettingsModal
                 isOpen={showSettings}
@@ -524,131 +600,256 @@ export default function AdminDashboard() {
               />
             ) : (
             <>
-            <div className="mb-6 border-b-2 border-[var(--color-border,rgba(3,4,94,0.15))] pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-3xl font-black text-[var(--color-text,#03045E)] tracking-tight">Admin Control Center</h1>
-                <p className="text-sm font-bold text-[var(--color-text,#03045E)]/70 mt-1">
-                  Manage platform integrity, verify documents, and control account access securely.
-                </p>
+            <div className={`sticky top-16 z-40 ${isDark ? 'bg-black' : 'bg-[#f4f4f4]'} flex flex-col`}>
+              <div className={`pt-9 sm:pt-12 md:pt-14 pb-5 border-b-2 ${isDark ? 'border-white/20' : 'border-[#03045E]/15'} flex flex-col sm:flex-row sm:items-center justify-between gap-4`}>
+                <div>
+                  <h1 className={`text-3xl font-black tracking-tight ${txtMain}`}>Admin Control Center</h1>
+                  <p className={`text-sm font-bold mt-1 ${txtMuted}`}>
+                    Manage platform integrity, verify documents, and control account access securely.
+                  </p>
+                </div>
               </div>
+
+              {(activeTab === 'Employers' || activeTab === 'Applicants') && (
+                <div className="pt-6 pb-2">
+                  <div className={`flex items-center gap-0.5 sm:gap-2 ${cardBg} p-1 sm:p-4 rounded-xl sm:rounded-[2rem] border-2 ${bdrMain} w-full shadow-md overflow-hidden`}>
+                    {['Pending', 'Approved', 'Rejected', 'Disabled'].map(filter => {
+                      const targetList = activeTab === 'Employers' ? employers : applicants;
+                      let count = 0;
+                      if (filter === 'Disabled') {
+                        count = targetList.filter(i => i.account_status === 'Disabled').length;
+                      } else {
+                        count = targetList.filter(i => i.verification_status === filter && i.account_status !== 'Disabled').length;
+                      }
+
+                      let activeBg = isDark ? '#ffffff' : '#03045E';
+                      let activeText = isDark ? '#000000' : '#ffffff';
+                      let inactiveText = isDark ? '#ffffff' : '#03045E';
+                      let badgeActiveBg = isDark ? 'rgba(0,0,0,0.15)' : '#2C7FFF';
+                      let badgeActiveText = isDark ? '#000000' : '#ffffff';
+                      let badgeInactiveBg = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(3,4,94,0.1)';
+                      let badgeInactiveText = isDark ? '#ffffff' : '#03045E';
+
+                      if (filter === 'Pending') {
+                        activeBg = '#f59e0b';
+                        activeText = '#ffffff';
+                        inactiveText = isDark ? '#fbbf24' : '#b45309';
+                        badgeActiveBg = 'rgba(255,255,255,0.25)';
+                        badgeActiveText = '#ffffff';
+                        badgeInactiveBg = 'rgba(245,158,11,0.15)';
+                        badgeInactiveText = isDark ? '#fbbf24' : '#b45309';
+                      } else if (filter === 'Approved') {
+                        activeBg = '#10b981';
+                        activeText = '#ffffff';
+                        inactiveText = isDark ? '#34d399' : '#047857';
+                        badgeActiveBg = 'rgba(255,255,255,0.25)';
+                        badgeActiveText = '#ffffff';
+                        badgeInactiveBg = 'rgba(16,185,129,0.15)';
+                        badgeInactiveText = isDark ? '#34d399' : '#047857';
+                      } else if (filter === 'Rejected' || filter === 'Disabled') {
+                        activeBg = '#dc2626';
+                        activeText = '#ffffff';
+                        inactiveText = isDark ? '#f87171' : '#b91c1c';
+                        badgeActiveBg = 'rgba(255,255,255,0.25)';
+                        badgeActiveText = '#ffffff';
+                        badgeInactiveBg = 'rgba(220,38,38,0.15)';
+                        badgeInactiveText = isDark ? '#f87171' : '#b91c1c';
+                      }
+
+                      const isActive = listFilter === filter;
+
+                      return (
+                        <button
+                          key={filter}
+                          onClick={() => setListFilter(filter)}
+                          className={`flex-1 min-w-0 px-0.5 sm:px-4 py-1.5 sm:py-3 rounded-md sm:rounded-xl text-[8px] sm:text-sm font-black transition-all cursor-pointer flex items-center justify-center gap-0.5 sm:gap-2 tracking-tight sm:tracking-normal border-2 ${isActive && isDark ? 'border-white/20' : 'border-transparent'}`}
+                          style={{
+                            backgroundColor: isActive ? activeBg : 'transparent',
+                            color: isActive ? activeText : inactiveText
+                          }}
+                        >
+                          <span>{filter}</span>
+                          <span
+                            className="px-1 sm:px-2 py-0.5 rounded-full text-[7px] sm:text-[10px] font-black tracking-wider inline-flex items-center justify-center min-w-[12px] sm:min-w-[24px] shrink-0"
+                            style={{
+                              backgroundColor: isActive ? badgeActiveBg : badgeInactiveBg,
+                              color: isActive ? badgeActiveText : badgeInactiveText
+                            }}
+                          >
+                            {count}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             {activeTab === 'Overview' && stats && (
-              <div className="flex flex-col gap-6 animate-in fade-in duration-300">
-                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-                  <StatCard 
-                    title="Total Applicants" 
-                    value={stats.totalApplicants} 
-                    onClick={() => { setActiveTab('Applicants'); setListFilter('Approved'); }}
-                    color="blue"
-                    icon={
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                      </svg>
-                    } 
-                  />
-                  <StatCard 
-                    title="Total Employers" 
-                    value={stats.totalEmployers} 
-                    onClick={() => { setActiveTab('Employers'); setListFilter('Approved'); }}
-                    color="violet"
-                    icon={
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                      </svg>
-                    } 
-                  />
-                  <StatCard 
-                    title="Pending Employers" 
-                    value={stats.pendingEmployers} 
-                    onClick={() => { setActiveTab('Employers'); setListFilter('Pending'); }}
-                    color="amber"
-                    icon={
-                      <svg className={`w-6 h-6 ${stats.pendingEmployers > 0 ? 'animate-pulse' : ''}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                    } 
-                    alert={stats.pendingEmployers > 0} 
-                  />
-                  <StatCard 
-                    title="Pending Applicants" 
-                    value={stats.pendingApplicants} 
-                    onClick={() => { setActiveTab('Applicants'); setListFilter('Pending'); }}
-                    color="rose"
-                    icon={
-                      <svg className={`w-6 h-6 ${stats.pendingApplicants > 0 ? 'animate-pulse' : ''}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                    } 
-                    alert={stats.pendingApplicants > 0} 
-                  />
-                </div>
-
-                <div className="bg-[var(--color-card,#ffffff)] p-3 sm:p-8 rounded-2xl sm:rounded-[2rem] shadow-sm border-2 border-[var(--color-border,rgba(3,4,94,0.15))]">
-                  <div className="mb-4 sm:mb-6">
-                    <h2 className="text-base sm:text-xl font-black text-[var(--color-text,#03045E)] tracking-tight">Annual Platform Growth</h2>
-                    <p className="text-[10px] sm:text-xs font-bold text-[var(--color-text,#03045E)]/70 mt-0.5">Monthly registration volume for new users.</p>
+              <div className="flex flex-col gap-6 animate-in fade-in duration-300 mt-6">
+                <div className="flex flex-col lg:flex-row gap-6">
+                  <div className="w-full lg:w-1/3 grid grid-cols-2 lg:grid-cols-1 gap-4 sm:gap-5">
+                    <StatCard 
+                      title="Total Applicants" 
+                      value={stats.totalApplicants} 
+                      onClick={() => { setActiveTab('Applicants'); setListFilter('Approved'); }}
+                      color="default"
+                      isDark={isDark}
+                      icon={
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                      } 
+                    />
+                    <StatCard 
+                      title="Total Employers" 
+                      value={stats.totalEmployers} 
+                      onClick={() => { setActiveTab('Employers'); setListFilter('Approved'); }}
+                      color="default"
+                      isDark={isDark}
+                      icon={
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                      } 
+                    />
+                    <StatCard 
+                      title="Pending Employers" 
+                      value={stats.pendingEmployers} 
+                      onClick={() => { setActiveTab('Employers'); setListFilter('Pending'); }}
+                      color="pending"
+                      isDark={isDark}
+                      icon={
+                        <svg className={`w-6 h-6 ${stats.pendingEmployers > 0 ? 'animate-pulse' : ''}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                      } 
+                      alert={stats.pendingEmployers > 0} 
+                    />
+                    <StatCard 
+                      title="Pending Applicants" 
+                      value={stats.pendingApplicants} 
+                      onClick={() => { setActiveTab('Applicants'); setListFilter('Pending'); }}
+                      color="pending"
+                      isDark={isDark}
+                      icon={
+                        <svg className={`w-6 h-6 ${stats.pendingApplicants > 0 ? 'animate-pulse' : ''}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                      } 
+                      alert={stats.pendingApplicants > 0} 
+                    />
                   </div>
-                  <div className="h-[260px] sm:h-[400px] w-full -ml-2 sm:ml-0">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={chartData} margin={{ top: 10, right: 8, left: -20, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(3,4,94,0.1)" />
-                        <XAxis
-                          dataKey="name"
-                          axisLine={false}
-                          tickLine={false}
-                          tick={{ fill: 'var(--color-text, #03045E)', fontSize: 10, fontWeight: 700 }}
-                          dy={8}
-                          interval="preserveStartEnd"
-                        />
-                        <YAxis
-                          axisLine={false}
-                          tickLine={false}
-                          tick={{ fill: 'var(--color-text, #03045E)', fontSize: 10, fontWeight: 700 }}
-                          width={28}
-                          allowDecimals={false}
-                        />
-                        <Tooltip
-                          cursor={{ fill: 'rgba(44,127,255,0.1)' }}
-                          contentStyle={{
-                            borderRadius: '12px',
-                            border: '2px solid rgba(3,4,94,0.15)',
-                            boxShadow: '0 10px 25px rgba(3,4,94,0.1)',
-                            fontWeight: 'bold',
-                            color: '#03045E',
-                            fontSize: '11px',
-                            padding: '6px 10px'
-                          }}
-                        />
-                        <Legend
-                          iconType="circle"
-                          wrapperStyle={{ paddingTop: '12px', fontWeight: 'bold', fontSize: '11px' }}
-                        />
-                        <Bar
-                          dataKey="users"
-                          name="New Users"
-                          fill="var(--color-primary, #03045E)"
-                          radius={[4, 4, 0, 0]}
-                          maxBarSize={28}
-                        />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
 
-                <div className="bg-[var(--color-card,#ffffff)] p-4 sm:p-8 rounded-2xl sm:rounded-[2rem] shadow-sm border-2 border-[var(--color-border,rgba(3,4,94,0.15))] flex flex-col gap-4 sm:gap-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 border-b-2 border-[var(--color-border,rgba(3,4,94,0.1))] pb-3 sm:pb-4">
-                    <div>
-                      <h2 className="text-base sm:text-xl font-black text-[var(--color-text,#03045E)] tracking-tight leading-tight">All Registered Users Overview</h2>
-                      <p className="text-[10px] sm:text-xs font-bold text-[var(--color-text,#03045E)]/70 mt-1">Comprehensive list of all platform applicants and employers.</p>
+                  <div className={`w-full lg:w-2/3 ${cardBg} p-3 sm:p-8 rounded-2xl sm:rounded-[2rem] shadow-sm border-2 ${bdrMain} flex flex-col ${isAnalyticsExpanded ? 'fixed inset-4 z-[9999] h-auto' : ''}`}>
+                    <div className="mb-4 sm:mb-6 flex items-start justify-between gap-4">
+                      <div>
+                        <h2 className={`text-base sm:text-xl font-black tracking-tight ${txtMain}`}>Annual Platform Growth</h2>
+                        <p className={`text-[10px] sm:text-xs font-bold mt-0.5 ${txtMuted}`}>Monthly registration volume for new users.</p>
+                      </div>
+                      <button
+                        onClick={() => setIsAnalyticsExpanded(!isAnalyticsExpanded)}
+                        className={`p-2 rounded-xl border-2 ${bdrMain} ${txtMain} hover:bg-white/10 transition-all cursor-pointer shrink-0`}
+                        title={isAnalyticsExpanded ? 'Minimize' : 'Maximize'}
+                      >
+                        {isAnalyticsExpanded ? (
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" />
+                          </svg>
+                        ) : (
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 4.5l5.25 5.25M4.5 4.5H9M4.5 4.5V9m14.25-4.5l-5.25 5.25M19.5 4.5H15m4.5 0V9m-14.25 10.5l5.25-5.25M4.5 19.5H9m-4.5 0V15m14.25 4.5l-5.25-5.25M19.5 19.5H15m4.5 0V15" />
+                          </svg>
+                        )}
+                      </button>
                     </div>
-                    <span className="px-3 sm:px-4 py-1 sm:py-1.5 bg-[var(--color-primary,#03045E)]/10 text-[var(--color-text,#03045E)] font-black text-[10px] sm:text-xs rounded-lg sm:rounded-xl border border-[var(--color-border,rgba(3,4,94,0.2))] w-fit">
-                      Showing: {filteredOverviewUsers.length} Users
-                    </span>
+                    <div className={`${isAnalyticsExpanded ? 'flex-1' : 'h-[260px] sm:h-[400px]'} w-full -ml-2 sm:ml-0 transition-all duration-300`}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={chartData} margin={{ top: 10, right: 8, left: -20, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(3,4,94,0.1)'} />
+                          <XAxis
+                            dataKey="name"
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{ fill: isDark ? '#ffffff' : '#03045E', fontSize: 10, fontWeight: 700 }}
+                            dy={8}
+                            interval="preserveStartEnd"
+                          />
+                          <YAxis
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{ fill: isDark ? '#ffffff' : '#03045E', fontSize: 10, fontWeight: 700 }}
+                            width={28}
+                            allowDecimals={false}
+                          />
+                          <Tooltip
+                           cursor={{ fill: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(3,4,94,0.08)' }}
+                            contentStyle={{
+                              borderRadius: '12px',
+                              border: isDark ? '2px solid rgba(255,255,255,0.2)' : '2px solid rgba(3,4,94,0.15)',
+                              boxShadow: '0 10px 25px rgba(3,4,94,0.1)',
+                              fontWeight: 'bold',
+                              color: isDark ? '#ffffff' : '#03045E',
+                              backgroundColor: isDark ? '#000000' : '#ffffff',
+                              fontSize: '11px',
+                              padding: '6px 10px'
+                            }}
+                          />
+                          <Legend
+                            iconType="circle"
+                            wrapperStyle={{ paddingTop: '12px', fontWeight: 'bold', fontSize: '11px', color: isDark ? '#ffffff' : '#03045E' }}
+                          />
+                          <Bar
+                            dataKey="users"
+                            name="New Users"
+                           fill={isDark ? '#ffffff' : 'currentColor'}
+                            radius={[4, 4, 0, 0]}
+                            maxBarSize={28}
+                          />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={`${cardBg} p-4 sm:p-8 rounded-2xl sm:rounded-[2rem] shadow-sm border-2 ${bdrMain} flex flex-col gap-4 sm:gap-6`}>
+                  <div className={`flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4 border-b-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/10'} pb-3 sm:pb-4`}>
+                    <div>
+                      <h2 className={`text-base sm:text-xl font-black tracking-tight leading-tight ${txtMain}`}>All Registered Users Overview</h2>
+                      <p className={`text-[10px] sm:text-xs font-bold mt-1 ${txtMuted}`}>Comprehensive list of all platform applicants and employers.</p>
+                    </div>
+                    <div className="flex flex-col items-end gap-2 shrink-0">
+                      <span className={`px-3 sm:px-4 py-1 sm:py-1.5 ${isDark ? 'bg-white/10 text-white border-white/20' : 'bg-[#03045E]/10 text-[#03045E] border-[#03045E]/20'} font-black text-[10px] sm:text-xs rounded-lg sm:rounded-xl border w-fit`}>
+                        Showing: {currentUsers.length} of {filteredOverviewUsers.length} Users
+                      </span>
+                      {totalPages > 1 && (
+                        <div className="flex flex-col gap-1 items-end">
+                          <span className={`text-[10px] font-bold ${isDark ? 'text-white/70' : 'text-[#03045E]/70'}`}>
+                            Page {currentPage} of {totalPages}
+                          </span>
+                          <div className="flex flex-col gap-1">
+                            <button
+                              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                              disabled={currentPage === 1}
+                              className={`px-4 py-1.5 rounded-lg font-black text-[10px] uppercase tracking-wider transition-all cursor-pointer border-2 disabled:opacity-50 disabled:cursor-not-allowed ${isDark ? 'bg-black text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/30'}`}
+                            >
+                              Previous
+                            </button>
+                            <button
+                              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                              disabled={currentPage === totalPages}
+                              className={`px-4 py-1.5 rounded-lg font-black text-[10px] uppercase tracking-wider transition-all cursor-pointer border-2 disabled:opacity-50 disabled:cursor-not-allowed ${isDark ? 'bg-black text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/30'}`}
+                            >
+                              Next
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
-                  {/* NEW FILTER TABS FOR OVERVIEW */}
-                  <div className="flex items-center gap-0.5 sm:gap-2 bg-[var(--color-surface,#f4f4f4)] p-1 sm:p-2 rounded-xl sm:rounded-2xl border-2 border-[var(--color-border,rgba(3,4,94,0.1))] w-full overflow-x-auto mb-2">
+                  <div className={`flex items-center gap-0.5 sm:gap-2 ${surfaceBg} p-1 sm:p-2 rounded-xl sm:rounded-2xl border-2 ${isDark ? 'border-white/10' : 'border-[#03045E]/10'} w-full overflow-x-auto mb-2`}>
                     {['All', 'Pending', 'Approved', 'Rejected', 'Disabled'].map(filter => {
                       let count = 0;
                       if (filter === 'All') {
@@ -659,42 +860,40 @@ export default function AdminDashboard() {
                         count = allUsers.filter(i => i.verification_status === filter && i.account_status !== 'Disabled').length;
                       }
 
-                      const isRedFilter = filter === 'Rejected' || filter === 'Disabled';
-                      const isGreenFilter = filter === 'Approved';
-                      const isAllFilter = filter === 'All';
+                      const isStatus = filter === 'Pending' || filter === 'Approved' || filter === 'Rejected' || filter === 'Disabled';
 
-                      let activeBg = '#03045E';
-                      let activeText = '#ffffff';
-                      let inactiveText = '#03045E';
-                      let badgeActiveBg = '#2C7FFF';
-                      let badgeActiveText = '#ffffff';
-                      let badgeInactiveBg = 'rgba(3,4,94,0.1)';
-                      let badgeInactiveText = '#03045E';
+                      let activeBg = isDark ? '#ffffff' : '#03045E';
+                      let activeText = isDark ? '#000000' : '#ffffff';
+                      let inactiveText = isDark ? '#ffffff' : '#03045E';
+                      let badgeActiveBg = isDark ? 'rgba(0,0,0,0.15)' : '#2C7FFF';
+                      let badgeActiveText = isDark ? '#000000' : '#ffffff';
+                      let badgeInactiveBg = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(3,4,94,0.1)';
+                      let badgeInactiveText = isDark ? '#ffffff' : '#03045E';
 
-                      if (isRedFilter) {
-                        activeBg = '#dc2626';
+                      if (filter === 'Pending') {
+                        activeBg = '#f59e0b';
                         activeText = '#ffffff';
-                        inactiveText = '#dc2626';
+                        inactiveText = isDark ? '#fbbf24' : '#b45309';
                         badgeActiveBg = 'rgba(255,255,255,0.25)';
                         badgeActiveText = '#ffffff';
-                        badgeInactiveBg = 'rgba(220,38,38,0.15)';
-                        badgeInactiveText = '#b91c1c';
-                      } else if (isGreenFilter) {
+                        badgeInactiveBg = 'rgba(245,158,11,0.15)';
+                        badgeInactiveText = isDark ? '#fbbf24' : '#b45309';
+                      } else if (filter === 'Approved') {
                         activeBg = '#10b981';
                         activeText = '#ffffff';
-                        inactiveText = '#047857';
+                        inactiveText = isDark ? '#34d399' : '#047857';
                         badgeActiveBg = 'rgba(255,255,255,0.25)';
                         badgeActiveText = '#ffffff';
                         badgeInactiveBg = 'rgba(16,185,129,0.15)';
-                        badgeInactiveText = '#047857';
-                      } else if (isAllFilter) {
-                        activeBg = '#2C7FFF';
+                        badgeInactiveText = isDark ? '#34d399' : '#047857';
+                      } else if (filter === 'Rejected' || filter === 'Disabled') {
+                        activeBg = '#dc2626';
                         activeText = '#ffffff';
-                        inactiveText = '#2C7FFF';
+                        inactiveText = isDark ? '#f87171' : '#b91c1c';
                         badgeActiveBg = 'rgba(255,255,255,0.25)';
                         badgeActiveText = '#ffffff';
-                        badgeInactiveBg = 'rgba(44,127,255,0.15)';
-                        badgeInactiveText = '#2C7FFF';
+                        badgeInactiveBg = 'rgba(220,38,38,0.15)';
+                        badgeInactiveText = isDark ? '#f87171' : '#b91c1c';
                       }
 
                       const isActive = overviewFilter === filter;
@@ -703,7 +902,7 @@ export default function AdminDashboard() {
                         <button
                           key={filter}
                           onClick={() => setOverviewFilter(filter)}
-                          className="flex-1 min-w-0 px-2 sm:px-4 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl text-[9px] sm:text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap"
+                          className={`flex-1 min-w-0 px-2 sm:px-4 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl text-[9px] sm:text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap border-2 ${isActive && isDark ? 'border-white/20' : 'border-transparent'}`}
                           style={{
                             backgroundColor: isActive ? activeBg : 'transparent',
                             color: isActive ? activeText : inactiveText
@@ -725,49 +924,44 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="flex flex-col gap-2.5 sm:gap-3 max-h-[500px] overflow-y-auto pr-1">
-                    {filteredOverviewUsers.length > 0 ? (
-                      filteredOverviewUsers.map((user) => (
-                        <div key={user.user_id} className={`p-3 sm:p-5 rounded-xl sm:rounded-2xl bg-[var(--color-surface,#f4f4f4)] border-2 border-[var(--color-border,rgba(3,4,94,0.15))] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 hover:border-[var(--color-primary,#2C7FFF)] transition-all ${user.account_status === 'Disabled' ? 'opacity-70' : ''}`}>
+                    {currentUsers.length > 0 ? (
+                      currentUsers.map((user) => (
+                        <div key={user.user_id} className={`p-3 sm:p-5 rounded-xl sm:rounded-2xl ${surfaceBg} border-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/15'} flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 transition-all ${user.account_status === 'Disabled' ? 'opacity-70' : ''}`}>
 
                           <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 w-full sm:w-auto">
-                            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-[var(--color-primary,#03045E)] text-[var(--color-button-text,#ffffff)] flex items-center justify-center font-black text-xs sm:text-sm shrink-0 shadow-sm">
+                            <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl ${isDark ? 'bg-white text-black' : 'bg-[#03045E] text-white'} flex items-center justify-center font-black text-xs sm:text-sm shrink-0 shadow-sm`}>
                               {user.userType === 'Employer' ? (user.company_name?.[0] || 'E') : (user.firstname?.[0] || 'A')}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <h4 className="text-xs sm:text-sm font-black text-[var(--color-text,#03045E)] truncate">
+                              <h4 className={`text-xs sm:text-sm font-black truncate ${txtMain}`}>
                                 {user.userType === 'Employer' ? user.company_name : `${user.firstname} ${user.lastname}`}
                               </h4>
-                              <p className="text-[10px] sm:text-xs font-bold text-[var(--color-text,#03045E)]/70 truncate">{user.email}</p>
+                              <p className={`text-[10px] sm:text-xs font-bold truncate ${txtMuted}`}>{user.email}</p>
                             </div>
                           </div>
 
                           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 w-full sm:w-auto justify-start sm:justify-end flex-wrap">
                             <span
-                              className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[8px] sm:text-[10px] font-black tracking-wider uppercase border"
-                              style={{
-                                backgroundColor: user.userType === 'Employer' ? 'rgba(44,127,255,0.15)' : 'rgba(59,130,246,0.15)',
-                                color: user.userType === 'Employer' ? '#2c7fff' : '#1d4ed8',
-                                borderColor: user.userType === 'Employer' ? '#2c7fff' : '#3b82f6'
-                              }}
+                              className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[8px] sm:text-[10px] font-black tracking-wider uppercase border ${isDark ? 'bg-white/10 text-white border-white/20' : 'bg-[#03045E]/10 text-[#03045E] border-[#03045E]/20'}`}
                             >
                               {user.userType}
                             </span>
                             <span
-                              className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[8px] sm:text-[10px] font-black tracking-wider uppercase border"
-                              style={{
+                              className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[8px] sm:text-[10px] font-black tracking-wider uppercase border ${isDark ? 'bg-black text-white border-white' : ''}`}
+                              style={!isDark ? {
                                 backgroundColor: user.account_status === 'Disabled' ? 'rgba(220,38,38,0.1)' :
                                   user.verification_status === 'Approved' ? 'rgba(16,185,129,0.1)' :
                                   user.verification_status === 'Rejected' ? 'rgba(220,38,38,0.1)' :
                                   'rgba(245,158,11,0.1)',
-                                color: user.account_status === 'Disabled' ? '#b91c1c' :
-                                  user.verification_status === 'Approved' ? '#047857' :
-                                  user.verification_status === 'Rejected' ? '#b91c1c' :
-                                  '#b45309',
+                                color: user.account_status === 'Disabled' ? '#f87171' :
+                                  user.verification_status === 'Approved' ? '#34d399' :
+                                  user.verification_status === 'Rejected' ? '#f87171' :
+                                  '#fbbf24',
                                 borderColor: user.account_status === 'Disabled' ? '#dc2626' :
                                   user.verification_status === 'Approved' ? '#10b981' :
                                   user.verification_status === 'Rejected' ? '#dc2626' :
                                   '#f59e0b'
-                              }}
+                              } : {}}
                             >
                               {user.account_status === 'Disabled' ? 'Disabled' : (user.verification_status || 'Pending')}
                             </span>
@@ -775,7 +969,7 @@ export default function AdminDashboard() {
                         </div>
                       ))
                     ) : (
-                      <div className="p-8 text-center text-xs font-bold text-[var(--color-text,#03045E)]/70">No {overviewFilter.toLowerCase()} users found.</div>
+                      <div className={`p-8 text-center text-xs font-bold ${txtMuted}`}>No {overviewFilter.toLowerCase()} users found.</div>
                     )}
                   </div>
                 </div>
@@ -783,104 +977,31 @@ export default function AdminDashboard() {
             )}
 
             {(activeTab === 'Employers' || activeTab === 'Applicants') && (
-              <div className="flex flex-col gap-3 sm:gap-6 animate-in fade-in duration-300">
-
-                <div className="flex items-center gap-0.5 sm:gap-2 bg-[var(--color-card,#ffffff)] p-1 sm:p-4 rounded-xl sm:rounded-[2rem] border-2 border-[var(--color-border,rgba(3,4,94,0.15))] w-full shadow-sm overflow-hidden">
-                  {['Pending', 'Approved', 'Rejected', 'Disabled'].map(filter => {
-                    const targetList = activeTab === 'Employers' ? employers : applicants;
-                    let count = 0;
-                    if (filter === 'Disabled') {
-                      count = targetList.filter(i => i.account_status === 'Disabled').length;
-                    } else {
-                      count = targetList.filter(i => i.verification_status === filter && i.account_status !== 'Disabled').length;
-                    }
-
-                    const isRedFilter = filter === 'Rejected' || filter === 'Disabled';
-                    const isGreenFilter = filter === 'Approved';
-
-                    let activeBg = '#03045E';
-                    let activeText = '#ffffff';
-                    let inactiveText = '#03045E';
-                    let badgeActiveBg = '#2C7FFF';
-                    let badgeActiveText = '#ffffff';
-                    let badgeInactiveBg = 'rgba(3,4,94,0.1)';
-                    let badgeInactiveText = '#03045E';
-
-                    if (isRedFilter) {
-                      activeBg = '#dc2626';
-                      activeText = '#ffffff';
-                      inactiveText = '#dc2626';
-                      badgeActiveBg = 'rgba(255,255,255,0.25)';
-                      badgeActiveText = '#ffffff';
-                      badgeInactiveBg = 'rgba(220,38,38,0.15)';
-                      badgeInactiveText = '#b91c1c';
-                    } else if (isGreenFilter) {
-                      activeBg = '#10b981';
-                      activeText = '#ffffff';
-                      inactiveText = '#047857';
-                      badgeActiveBg = 'rgba(255,255,255,0.25)';
-                      badgeActiveText = '#ffffff';
-                      badgeInactiveBg = 'rgba(16,185,129,0.15)';
-                      badgeInactiveText = '#047857';
-                    }
-
-                    const isActive = listFilter === filter;
-
-                    return (
-                      <button
-                        key={filter}
-                        onClick={() => setListFilter(filter)}
-                        className="flex-1 min-w-0 px-0.5 sm:px-4 py-1.5 sm:py-3 rounded-md sm:rounded-xl text-[8px] sm:text-sm font-black transition-all cursor-pointer flex items-center justify-center gap-0.5 sm:gap-2 tracking-tight sm:tracking-normal"
-                        style={{
-                          backgroundColor: isActive ? activeBg : 'transparent',
-                          color: isActive ? activeText : inactiveText
-                        }}
-                      >
-                        <span>{filter}</span>
-                        <span
-                          className="px-1 sm:px-2 py-0.5 rounded-full text-[7px] sm:text-[10px] font-black tracking-wider inline-flex items-center justify-center min-w-[12px] sm:min-w-[24px] shrink-0"
-                          style={{
-                            backgroundColor: isActive ? badgeActiveBg : badgeInactiveBg,
-                            color: isActive ? badgeActiveText : badgeInactiveText
-                          }}
-                        >
-                          {count}
-                        </span>
-                      </button>
-                    )
-                  })}
-                </div>
-
+              <div className="flex flex-col gap-3 sm:gap-6 animate-in fade-in duration-300 mt-6">
                 <div className="flex flex-col gap-2.5 sm:gap-4">
                   {filterList(activeTab === 'Employers' ? employers : applicants).length > 0 ? (
                     filterList(activeTab === 'Employers' ? employers : applicants).map(user => (
-                      <div key={user.user_id} className={`bg-[var(--color-card,#ffffff)] p-3 sm:p-7 rounded-2xl sm:rounded-[2rem] shadow-sm border-2 border-[var(--color-border,rgba(3,4,94,0.15))] flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-6 transition-all hover:shadow-md hover:border-[var(--color-primary,#2C7FFF)]/40 ${listFilter === 'Disabled' ? 'opacity-70 bg-[var(--color-surface,#f4f4f4)]/50' : ''}`}>
+                      <div key={user.user_id} className={`${cardBg} p-3 sm:p-7 rounded-2xl sm:rounded-[2rem] shadow-sm border-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/15'} flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-6 transition-all hover:shadow-md ${listFilter === 'Disabled' ? 'opacity-70' : ''}`}>
 
                         <div className="flex items-start gap-2.5 sm:gap-4 flex-1 min-w-0 w-full">
                           <div
-                            className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 border-2 font-black text-sm sm:text-lg"
-                            style={{
-                              backgroundColor: activeTab === 'Employers' ? 'rgba(44,127,255,0.1)' : 'rgba(59,130,246,0.1)',
-                              color: activeTab === 'Employers' ? '#2c7fff' : '#1d4ed8',
-                              borderColor: activeTab === 'Employers' ? '#2c7fff' : '#3b82f6'
-                            }}
+                            className={`w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 border-2 font-black text-sm sm:text-lg ${isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}
                           >
                             {activeTab === 'Employers' ? (user.company_name?.[0] || 'E') : (user.firstname?.[0] || 'A')}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="text-sm sm:text-xl font-black text-[var(--color-text,#03045E)] tracking-tight truncate">
+                            <h3 className={`text-sm sm:text-xl font-black tracking-tight truncate ${txtMain}`}>
                               {activeTab === 'Employers' ? user.company_name : `${user.firstname} ${user.lastname}`}
                             </h3>
-                            <div className="flex flex-wrap items-center gap-1 sm:gap-2 text-[9px] sm:text-sm font-bold text-[var(--color-text,#03045E)]/70 mt-1">
-                              <span className="bg-[var(--color-surface,#f4f4f4)] px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg border border-[var(--color-border,rgba(3,4,94,0.1))]">
-                                {activeTab === 'Employers' ? 'Industry:' : 'Disability:'} <strong className="text-[var(--color-text,#03045E)]">{activeTab === 'Employers' ? (user.industry || 'N/A') : (user.disability_type || 'N/A')}</strong>
+                            <div className={`flex flex-wrap items-center gap-1 sm:gap-2 text-[9px] sm:text-sm font-bold mt-1 ${txtMuted}`}>
+                              <span className={`${surfaceBg} px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg border ${isDark ? 'border-white/10' : 'border-[#03045E]/10'}`}>
+                                {activeTab === 'Employers' ? 'Industry:' : 'Disability:'} <strong className={txtMain}>{activeTab === 'Employers' ? (user.industry || 'N/A') : (user.disability_type || 'N/A')}</strong>
                               </span>
                               <span className="hidden sm:inline">•</span>
-                              <span className="truncate w-full sm:w-auto">Email: <strong className="text-[var(--color-text,#03045E)]">{user.email}</strong></span>
+                              <span className="truncate w-full sm:w-auto">Email: <strong className={txtMain}>{user.email}</strong></span>
                             </div>
                             <div
-                              className="flex items-center gap-1 sm:gap-1.5 text-[8px] sm:text-[11px] font-black uppercase tracking-wider mt-1 sm:mt-2.5"
-                              style={{ color: activeTab === 'Employers' ? '#2c7fff' : '#1d4ed8' }}
+                              className={`flex items-center gap-1 sm:gap-1.5 text-[8px] sm:text-[11px] font-black uppercase tracking-wider mt-1 sm:mt-2.5 ${isDark ? 'text-white/70' : 'text-[#03045E]/70'}`}
                             >
                               <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -895,12 +1016,7 @@ export default function AdminDashboard() {
                             {activeTab === 'Employers' && user.verification_document && (
                               <button
                                 onClick={() => setEmployerModal({ isOpen: true, user: user })}
-                                className="flex-1 min-w-0 text-center px-2 sm:px-4 py-2 sm:py-2.5 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 transition flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm cursor-pointer"
-                                style={{
-                                  backgroundColor: 'rgba(44,127,255,0.1)',
-                                  color: '#2c7fff',
-                                  borderColor: '#2c7fff'
-                                }}
+                                className={`flex-1 min-w-0 text-center px-2 sm:px-4 py-2 sm:py-2.5 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 transition flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm cursor-pointer ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-[#2C7FFF]/10 text-[#2c7fff] border-[#2c7fff]'}`}
                               >
                                 <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -912,12 +1028,7 @@ export default function AdminDashboard() {
                             {activeTab === 'Applicants' && user.pwd_document_path && (
                               <button
                                 onClick={() => setPwdModal({ isOpen: true, user: user })}
-                                className="flex-1 min-w-0 text-center px-2 sm:px-4 py-2 sm:py-2.5 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 transition flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm cursor-pointer"
-                                style={{
-                                  backgroundColor: 'rgba(44,127,255,0.1)',
-                                  color: '#2c7fff',
-                                  borderColor: '#2c7fff'
-                                }}
+                                className={`flex-1 min-w-0 text-center px-2 sm:px-4 py-2 sm:py-2.5 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 transition flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm cursor-pointer ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-[#2C7FFF]/10 text-[#2c7fff] border-[#2c7fff]'}`}
                               >
                                 <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path>
@@ -927,7 +1038,7 @@ export default function AdminDashboard() {
                             )}
 
                             {(!user.verification_document && !user.pwd_document_path) && (
-                              <div className="flex-1 min-w-0 text-center px-2 sm:px-4 py-2 sm:py-2.5 bg-[var(--color-surface,#f4f4f4)] text-[var(--color-text,#03045E)]/50 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 border-[var(--color-border,rgba(3,4,94,0.1))] flex items-center justify-center gap-1.5 sm:gap-2">
+                              <div className={`flex-1 min-w-0 text-center px-2 sm:px-4 py-2 sm:py-2.5 ${surfaceBg} ${isDark ? 'text-white/50 border-white/10' : 'text-[#03045E]/50 border-[#03045E]/10'} font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 flex items-center justify-center gap-1.5 sm:gap-2`}>
                                 No Document Attached
                               </div>
                             )}
@@ -939,43 +1050,28 @@ export default function AdminDashboard() {
                                 <>
                                   <button
                                     onClick={() => setRejectModal({ isOpen: true, userId: user.user_id, reason: '' })}
-                                    className="flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-2 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 transition cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
-                                    style={{
-                                      backgroundColor: 'rgba(220,38,38,0.1)',
-                                      color: '#b91c1c',
-                                      borderColor: '#dc2626'
-                                    }}
+                                    className={`flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-2 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 transition cursor-pointer shadow-sm flex items-center justify-center gap-1.5 ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-red-50 text-red-700 border-red-600'}`}
                                   >
                                     <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path>
                                     </svg>
-                                    <span className="truncate">Reject</span>
+                                    <span className="whitespace-nowrap">Reject</span>
                                   </button>
                                   <button
                                     onClick={() => setApproveModal({ isOpen: true, userId: user.user_id })}
-                                    className="flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-2 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 shadow-sm transition cursor-pointer flex items-center justify-center gap-1.5"
-                                    style={{
-                                      backgroundColor: '#10b981',
-                                      color: '#ffffff',
-                                      borderColor: '#10b981'
-                                    }}
+                                    className={`flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-2 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 shadow-sm transition cursor-pointer flex items-center justify-center gap-1.5 ${isDark ? 'bg-white text-black border-white hover:bg-white/90' : 'bg-[#10b981] text-white border-[#10b981]'}`}
                                   >
                                     <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path>
                                     </svg>
-                                    <span className="truncate">Approve</span>
+                                    <span className="whitespace-nowrap">Approve</span>
                                   </button>
                                 </>
                               )}
                               {listFilter === 'Approved' && (
                                 <button
                                   onClick={() => setDisableModal({ isOpen: true, userId: user.user_id })}
-                                  className="flex-1 min-w-0 py-2 sm:py-2.5 px-3 sm:px-4 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 shadow-sm cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2"
-                                  style={{
-                                    backgroundColor: 'rgba(220,38,38,0.1)',
-                                    color: '#b91c1c',
-                                    borderColor: '#dc2626'
-                                  }}
+                                  className={`flex-1 min-w-0 py-2 sm:py-2.5 px-3 sm:px-4 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 shadow-sm cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-red-50 text-red-700 border-red-600'}`}
                                 >
                                   <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
@@ -986,28 +1082,18 @@ export default function AdminDashboard() {
                               {listFilter === 'Rejected' && (
                                 <button
                                   onClick={() => setApproveModal({ isOpen: true, userId: user.user_id })}
-                                  className="flex-1 min-w-0 py-2 sm:py-2.5 px-3 sm:px-4 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 shadow-sm transition cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2"
-                                  style={{
-                                    backgroundColor: 'rgba(16,185,129,0.1)',
-                                    color: '#047857',
-                                    borderColor: '#10b981'
-                                  }}
+                                  className={`flex-1 min-w-0 py-2 sm:py-2.5 px-3 sm:px-4 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 shadow-sm transition cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${isDark ? 'bg-white text-black border-white hover:bg-white/90' : 'bg-emerald-50 text-emerald-700 border-emerald-600'}`}
                                 >
                                   <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                   </svg>
-                                  <span className="truncate">Approve (Re-evaluate)</span>
+                                  <span className="whitespace-nowrap">Approve (Re-evaluate)</span>
                                 </button>
                               )}
                               {listFilter === 'Disabled' && (
                                 <button
                                   onClick={() => setRestoreModal({ isOpen: true, userId: user.user_id })}
-                                  className="flex-1 min-w-0 py-2 sm:py-2.5 px-3 sm:px-4 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 shadow-sm cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2"
-                                  style={{
-                                    backgroundColor: '#2C7FFF',
-                                    color: '#ffffff',
-                                    borderColor: '#2C7FFF'
-                                  }}
+                                  className={`flex-1 min-w-0 py-2 sm:py-2.5 px-3 sm:px-4 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 shadow-sm cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${isDark ? 'bg-white text-black border-white hover:bg-white/90' : 'bg-[#2C7FFF] text-white border-[#2C7FFF]'}`}
                                 >
                                   <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -1021,14 +1107,14 @@ export default function AdminDashboard() {
                       </div>
                     ))
                   ) : (
-                    <div className="p-8 sm:p-16 text-center border-2 border-dashed border-[var(--color-border,rgba(3,4,94,0.2))] rounded-2xl sm:rounded-[2rem] bg-[var(--color-card,#ffffff)] shadow-sm flex flex-col items-center justify-center">
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[var(--color-primary,#2C7FFF)]/15 text-[var(--color-primary,#2C7FFF)] rounded-2xl flex items-center justify-center mb-3 sm:mb-4 border-2 border-[var(--color-primary,#2C7FFF)]/30">
+                    <div className={`p-8 sm:p-16 text-center border-2 border-dashed ${isDark ? 'border-white/20 bg-black' : 'border-[#03045E]/20 bg-white'} rounded-2xl sm:rounded-[2rem] shadow-sm flex flex-col items-center justify-center`}>
+                      <div className={`w-12 h-12 sm:w-14 sm:h-14 ${isDark ? 'bg-white/10 text-white border-white/30' : 'bg-[#2C7FFF]/15 text-[#2C7FFF] border-[#2C7FFF]/30'} rounded-2xl flex items-center justify-center mb-3 sm:mb-4 border-2`}>
                         <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
                         </svg>
                       </div>
-                      <p className="text-sm sm:text-base font-black text-[var(--color-text,#03045E)]">No {listFilter.toLowerCase()} {activeTab.toLowerCase()} found.</p>
-                      <p className="text-[10px] sm:text-xs font-bold text-[var(--color-text,#03045E)]/70 mt-1">Check back later for new registrations in this category.</p>
+                      <p className={`text-sm sm:text-base font-black ${txtMain}`}>No {listFilter.toLowerCase()} {activeTab.toLowerCase()} found.</p>
+                      <p className={`text-[10px] sm:text-xs font-bold mt-1 ${txtMuted}`}>Check back later for new registrations in this category.</p>
                     </div>
                   )}
                 </div>
@@ -1040,43 +1126,43 @@ export default function AdminDashboard() {
                 className="fixed inset-0 z-[9999999] flex items-center justify-center p-2 sm:p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300 overflow-y-auto"
                 style={{ backgroundColor: 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
               >
-                <div className="bg-[var(--color-card,#ffffff)] rounded-[2rem] sm:rounded-[2.5rem] w-full max-w-[95vw] sm:max-w-7xl my-4 sm:my-0 shadow-[0_25px_60px_rgba(3,4,94,0.4)] border-2 border-[var(--color-border,rgba(3,4,94,0.2))] flex flex-col overflow-hidden h-auto max-h-[95vh] sm:h-[90vh]">
+                <div className={`${cardBg} rounded-[2rem] sm:rounded-[2.5rem] w-full max-w-[95vw] sm:max-w-7xl my-4 sm:my-0 shadow-[0_25px_60px_rgba(3,4,94,0.4)] border-2 ${isDark ? 'border-white/20' : 'border-[#03045E]/20'} flex flex-col overflow-hidden h-auto max-h-[95vh] sm:h-[90vh]`}>
                   
-                  <div className="px-3 sm:px-6 py-3 sm:py-4 bg-[var(--color-surface,#f4f4f4)] border-b-2 border-[var(--color-border,rgba(3,4,94,0.15))] flex items-center justify-between shrink-0 gap-2">
+                  <div className={`px-3 sm:px-6 py-3 sm:py-4 ${surfaceBg} border-b-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/15'} flex items-center justify-between shrink-0 gap-2`}>
                     <div className="min-w-0 flex-1">
-                      <h2 className="text-xs sm:text-lg md:text-xl font-black text-[var(--color-text,#03045E)] tracking-tight truncate">
+                      <h2 className={`text-xs sm:text-lg md:text-xl font-black tracking-tight truncate ${txtMain}`}>
                         PWD ID Verification: {pwdModal.user.firstname} {pwdModal.user.lastname}
                       </h2>
-                      <p className="text-[9px] sm:text-xs font-bold text-[var(--color-text,#03045E)]/70 truncate">
+                      <p className={`text-[9px] sm:text-xs font-bold truncate ${txtMuted}`}>
                         Review applicant PWD ID and cross-reference with the official portal.
                       </p>
                     </div>
                     <button
                       onClick={() => setPwdModal({ isOpen: false, user: null })}
-                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[var(--color-card,#ffffff)] text-[var(--color-text,#03045E)] border-2 border-[var(--color-border,rgba(3,4,94,0.2))] flex items-center justify-center font-black hover:bg-[var(--color-primary,#03045E)] hover:text-[var(--color-button-text,#ffffff)] transition cursor-pointer shrink-0 text-xs sm:text-base"
+                      className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full ${cardBg} ${txtMain} border-2 ${isDark ? 'border-white/20 hover:bg-white hover:text-black' : 'border-[#03045E]/20 hover:bg-[#03045E] hover:text-white'} flex items-center justify-center font-black transition cursor-pointer shrink-0 text-xs sm:text-base`}
                     >
                       ✕
                     </button>
                   </div>
 
-                  <div className="flex-1 flex flex-col lg:grid lg:grid-cols-3 lg:divide-x-2 divide-[var(--color-border,rgba(3,4,94,0.15))] overflow-y-auto lg:overflow-hidden">
+                  <div className={`flex-1 flex flex-col lg:grid lg:grid-cols-3 lg:divide-x-2 ${isDark ? 'divide-white/15' : 'divide-[#03045E]/15'} overflow-y-auto lg:overflow-hidden`}>
                     
-                    <div className="lg:col-span-2 flex flex-col bg-[var(--color-card,#ffffff)] p-3 sm:p-6 gap-3 sm:gap-6 lg:h-full lg:overflow-y-auto">
+                    <div className={`lg:col-span-2 flex flex-col ${cardBg} p-3 sm:p-6 gap-3 sm:gap-6 lg:h-full lg:overflow-y-auto`}>
                       <div className="flex items-center justify-between shrink-0 gap-2 flex-wrap">
-                        <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[var(--color-text,#03045E)]">Applicant Uploaded ID</span>
+                        <span className={`text-[10px] sm:text-xs font-black uppercase tracking-wider ${txtMain}`}>Applicant Uploaded ID</span>
                         <span 
-                          className="px-2 sm:px-3 py-1 rounded-lg text-[10px] sm:text-xs font-black border whitespace-nowrap"
-                          style={{
+                          className={`px-2 sm:px-3 py-1 rounded-lg text-[10px] sm:text-xs font-black border whitespace-nowrap ${isDark ? 'bg-white/10 text-white border-white/30' : ''}`}
+                          style={!isDark ? {
                             backgroundColor: 'rgba(59,130,246,0.1)',
                             color: '#1d4ed8',
                             borderColor: '#3b82f6'
-                          }}
+                          } : {}}
                         >
                           Disability: {pwdModal.user.disability_type || 'N/A'}
                         </span>
                       </div>
 
-                      <div className="min-h-[200px] sm:min-h-[350px] lg:flex-1 bg-[var(--color-surface,#f4f4f4)] rounded-2xl border-2 border-[var(--color-border,rgba(3,4,94,0.15))] overflow-hidden flex items-center justify-center relative shadow-inner p-2">
+                      <div className={`min-h-[200px] sm:min-h-[350px] lg:flex-1 ${surfaceBg} rounded-2xl border-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/15'} overflow-hidden flex items-center justify-center relative shadow-inner p-2`}>
                         {pwdModal.user.pwd_document_path ? (
                           pwdModal.user.pwd_document_path.match(/\.(jpeg|jpg|png|gif)$/i) ? (
                             <img
@@ -1092,34 +1178,24 @@ export default function AdminDashboard() {
                             ></iframe>
                           )
                         ) : (
-                          <p className="text-sm font-bold text-[var(--color-text,#03045E)]/50">No document uploaded.</p>
+                          <p className={`text-sm font-bold ${txtMuted}`}>No document uploaded.</p>
                         )}
                       </div>
 
-                      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4 border-t-2 border-[var(--color-border,rgba(3,4,94,0.1))] shrink-0">
+                      <div className={`flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4 border-t-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/10'} shrink-0`}>
                         <button
                           onClick={() => {
                             const userId = pwdModal.user.user_id;
                             setPwdModal({ isOpen: false, user: null });
                             setRejectModal({ isOpen: true, userId: userId, reason: '' });
                           }}
-                          className="flex-1 py-3 sm:py-3.5 font-black text-xs sm:text-sm rounded-xl border-2 transition cursor-pointer shadow-sm flex items-center justify-center gap-2"
-                          style={{
-                            backgroundColor: 'rgba(220,38,38,0.1)',
-                            color: '#b91c1c',
-                            borderColor: '#dc2626'
-                          }}
+                          className={`flex-1 py-3 sm:py-3.5 font-black text-xs sm:text-sm rounded-xl border-2 transition cursor-pointer shadow-sm flex items-center justify-center gap-2 ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-red-50 text-red-700 border-red-600'}`}
                         >
                           ✕ Reject & Cooldown
                         </button>
                         <button
                           onClick={() => setApproveModal({ isOpen: true, userId: pwdModal.user.user_id })}
-                          className="flex-1 py-3 sm:py-3.5 font-black text-xs sm:text-sm rounded-xl border-2 shadow-md transition cursor-pointer flex items-center justify-center gap-2"
-                          style={{
-                            backgroundColor: '#10b981',
-                            color: '#ffffff',
-                            borderColor: '#10b981'
-                          }}
+                          className={`flex-1 py-3 sm:py-3.5 font-black text-xs sm:text-sm rounded-xl border-2 shadow-md transition cursor-pointer flex items-center justify-center gap-2 ${isDark ? 'bg-white text-black border-white hover:bg-white/90' : 'bg-[#10b981] text-white border-[#10b981]'}`}
                         >
                           ✓ Approve PWD ID
                         </button>
@@ -1127,26 +1203,21 @@ export default function AdminDashboard() {
 
                     </div>
 
-                    <div className="lg:col-span-1 flex flex-col bg-[var(--color-surface,#f4f4f4)]/50 p-3 sm:p-6 justify-center items-center text-center lg:h-full lg:overflow-y-auto">
+                    <div className={`lg:col-span-1 flex flex-col ${surfaceBg} p-3 sm:p-6 justify-center items-center text-center lg:h-full lg:overflow-y-auto`}>
                       <div 
-                        className="w-10 h-10 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center mb-2 sm:mb-4 border shadow-sm"
-                        style={{
-                          backgroundColor: 'rgba(59,130,246,0.1)',
-                          color: '#1d4ed8',
-                          borderColor: '#3b82f6'
-                        }}
+                        className={`w-10 h-10 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center mb-2 sm:mb-4 border shadow-sm ${isDark ? 'bg-white/10 text-white border-white/30' : 'bg-[#2C7FFF]/15 text-[#2C7FFF] border-[#2C7FFF]/30'}`}
                       >
                         <svg className="w-5 h-5 sm:w-7 sm:h-7" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
                         </svg>
                       </div>
-                      <h3 className="text-xs sm:text-base font-black text-[var(--color-text,#03045E)] mb-1 sm:mb-2">DOH Verification Portal</h3>
-                      <p className="text-[10px] sm:text-xs font-bold text-[var(--color-text,#03045E)]/70 mb-3 sm:mb-6 leading-relaxed px-2 sm:px-0">
+                      <h3 className={`text-xs sm:text-base font-black mb-1 sm:mb-2 ${txtMain}`}>DOH Verification Portal</h3>
+                      <p className={`text-[10px] sm:text-xs font-bold mb-3 sm:mb-6 leading-relaxed px-2 sm:px-0 ${txtMuted}`}>
                         Government security policies prevent direct website embedding. Open the portal in a side-by-side view to cross-check details.
                       </p>
                       <button
                         onClick={handleDohPortalLaunch}
-                        className="w-full py-2.5 sm:py-3.5 bg-[var(--color-primary,#03045E)] text-[var(--color-button-text,#ffffff)] font-black text-[10px] sm:text-xs uppercase tracking-wider rounded-xl shadow-md hover:bg-[var(--color-primary,#2C7FFF)] transition flex items-center justify-center gap-2 cursor-pointer"
+                        className={`w-full py-2.5 sm:py-3.5 ${isDark ? 'bg-white text-black hover:bg-white/90' : 'bg-[#03045E] text-white hover:bg-[#2C7FFF]'} font-black text-[10px] sm:text-xs uppercase tracking-wider rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer`}
                       >
                         Launch Portal ↗
                       </button>
@@ -1162,41 +1233,36 @@ export default function AdminDashboard() {
                 className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
                 style={{ backgroundColor: 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
               >
-                <div className="bg-[var(--color-card,#ffffff)] rounded-[2.5rem] w-full max-w-4xl h-[85vh] shadow-[0_25px_60px_rgba(3,4,94,0.4)] border-2 border-[var(--color-border,rgba(3,4,94,0.2))] flex flex-col overflow-hidden">
+                <div className={`${cardBg} rounded-[2.5rem] w-full max-w-4xl h-[85vh] shadow-[0_25px_60px_rgba(3,4,94,0.4)] border-2 ${isDark ? 'border-white/20' : 'border-[#03045E]/20'} flex flex-col overflow-hidden`}>
                   
-                  <div className="px-6 py-4 bg-[var(--color-surface,#f4f4f4)] border-b-2 border-[var(--color-border,rgba(3,4,94,0.15))] flex items-center justify-between shrink-0">
+                  <div className={`px-6 py-4 ${surfaceBg} border-b-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/15'} flex items-center justify-between shrink-0`}>
                     <div>
-                      <h2 className="text-lg sm:text-xl font-black text-[var(--color-text,#03045E)] tracking-tight">
+                      <h2 className={`text-lg sm:text-xl font-black tracking-tight ${txtMain}`}>
                         Business Registration: {employerModal.user.company_name}
                       </h2>
-                      <p className="text-xs font-bold text-[var(--color-text,#03045E)]/70">
+                      <p className={`text-xs font-bold ${txtMuted}`}>
                         Review company registration permit or DTI/SEC document.
                       </p>
                     </div>
                     <button
                       onClick={() => setEmployerModal({ isOpen: false, user: null })}
-                      className="w-10 h-10 rounded-full bg-[var(--color-card,#ffffff)] text-[var(--color-text,#03045E)] border-2 border-[var(--color-border,rgba(3,4,94,0.2))] flex items-center justify-center font-black hover:bg-[var(--color-primary,#03045E)] hover:text-[var(--color-button-text,#ffffff)] transition cursor-pointer"
+                      className={`w-10 h-10 rounded-full ${cardBg} ${txtMain} border-2 ${isDark ? 'border-white/20 hover:bg-white hover:text-black' : 'border-[#03045E]/20 hover:bg-[#03045E] hover:text-white'} flex items-center justify-center font-black transition cursor-pointer`}
                     >
                       ✕
                     </button>
                   </div>
 
-                  <div className="flex-1 flex flex-col bg-[var(--color-card,#ffffff)] p-6 gap-6 overflow-hidden">
+                  <div className={`flex-1 flex flex-col ${cardBg} p-6 gap-6 overflow-hidden`}>
                     <div className="flex items-center justify-between shrink-0">
-                      <span className="text-xs font-black uppercase tracking-wider text-[var(--color-text,#03045E)]">Uploaded Verification File</span>
+                      <span className={`text-xs font-black uppercase tracking-wider ${txtMain}`}>Uploaded Verification File</span>
                       <span 
-                        className="px-3 py-1 rounded-lg text-xs font-black border"
-                        style={{
-                          backgroundColor: 'rgba(139,92,246,0.1)',
-                          color: '#6d28d9',
-                          borderColor: '#8b5cf6'
-                        }}
+                        className={`px-3 py-1 rounded-lg text-xs font-black border ${isDark ? 'bg-white/10 text-white border-white/30' : 'bg-[#8b5cf6]/10 text-[#6d28d9] border-[#8b5cf6]'}`}
                       >
                         Industry: {employerModal.user.industry || 'N/A'}
                       </span>
                     </div>
 
-                    <div className="flex-1 bg-[var(--color-surface,#f4f4f4)] rounded-2xl border-2 border-[var(--color-border,rgba(3,4,94,0.15))] overflow-hidden flex items-center justify-center relative shadow-inner p-2">
+                    <div className={`flex-1 ${surfaceBg} rounded-2xl border-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/15'} overflow-hidden flex items-center justify-center relative shadow-inner p-2`}>
                       {employerModal.user.verification_document ? (
                         employerModal.user.verification_document.match(/\.(jpeg|jpg|png|gif)$/i) ? (
                           <img
@@ -1212,34 +1278,24 @@ export default function AdminDashboard() {
                           ></iframe>
                         )
                       ) : (
-                        <p className="text-sm font-bold text-[var(--color-text,#03045E)]/50">No document uploaded.</p>
+                        <p className={`text-sm font-bold ${txtMuted}`}>No document uploaded.</p>
                       )}
                     </div>
 
-                    <div className="flex gap-3 pt-2 border-t-2 border-[var(--color-border,rgba(3,4,94,0.1))] shrink-0">
+                    <div className={`flex gap-3 pt-2 border-t-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/10'} shrink-0`}>
                       <button
                         onClick={() => {
                           const userId = employerModal.user.user_id;
                           setEmployerModal({ isOpen: false, user: null });
                           setRejectModal({ isOpen: true, userId: userId, reason: '' });
                         }}
-                        className="flex-1 py-3.5 font-black text-sm rounded-xl border-2 transition cursor-pointer shadow-sm flex items-center justify-center gap-2"
-                        style={{
-                          backgroundColor: 'rgba(220,38,38,0.1)',
-                          color: '#b91c1c',
-                          borderColor: '#dc2626'
-                        }}
+                        className={`flex-1 py-3.5 font-black text-sm rounded-xl border-2 transition cursor-pointer shadow-sm flex items-center justify-center gap-2 ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-red-50 text-red-700 border-red-600'}`}
                       >
                         ✕ Reject & Cooldown
                       </button>
                       <button
                         onClick={() => setApproveModal({ isOpen: true, userId: employerModal.user.user_id })}
-                        className="flex-1 py-3.5 font-black text-sm rounded-xl border-2 shadow-md transition cursor-pointer flex items-center justify-center gap-2"
-                        style={{
-                          backgroundColor: '#10b981',
-                          color: '#ffffff',
-                          borderColor: '#10b981'
-                        }}
+                        className={`flex-1 py-3.5 font-black text-sm rounded-xl border-2 shadow-md transition cursor-pointer flex items-center justify-center gap-2 ${isDark ? 'bg-white text-black border-white hover:bg-white/90' : 'bg-[#10b981] text-white border-[#10b981]'}`}
                       >
                         ✓ Approve Employer Permit
                       </button>
@@ -1256,12 +1312,12 @@ export default function AdminDashboard() {
                 style={{ backgroundColor: 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
               >
                 <div 
-                  className="bg-[var(--color-card,#ffffff)] rounded-[2rem] w-full max-w-lg p-6 sm:p-8 shadow-[0_25px_60px_rgba(3,4,94,0.3)] border-2 flex flex-col gap-5"
-                  style={{ borderColor: '#dc2626' }}
+                  className={`${cardBg} rounded-[2rem] w-full max-w-lg p-6 sm:p-8 shadow-[0_25px_60px_rgba(3,4,94,0.3)] border-2 flex flex-col gap-5`}
+                  style={{ borderColor: isDark ? '#ffffff' : '#dc2626' }}
                 >
                   <div>
-                    <h2 className="text-xl font-black tracking-tight" style={{ color: '#b91c1c' }}>Reject Application & Cooldown</h2>
-                    <p className="text-xs sm:text-sm font-bold text-[var(--color-text,#03045E)]/70 mt-1">Select a document issue. A 7-day reapplication cooldown will be automatically applied.</p>
+                    <h2 className="text-xl font-black tracking-tight" style={{ color: isDark ? '#ffffff' : '#f87171' }}>Reject Application & Cooldown</h2>
+                    <p className={`text-xs sm:text-sm font-bold mt-1 ${txtMuted}`}>Select a document issue. A 7-day reapplication cooldown will be automatically applied.</p>
                   </div>
                   
                   <div className="flex flex-wrap gap-2">
@@ -1277,12 +1333,7 @@ export default function AdminDashboard() {
                         type="button"
                         disabled={rejectLoading}
                         onClick={() => setRejectModal({ ...rejectModal, reason: standardReason })}
-                        className="text-left px-3 py-2 text-xs font-black rounded-xl border-2 transition cursor-pointer disabled:opacity-50"
-                        style={{
-                          backgroundColor: 'rgba(220,38,38,0.1)',
-                          color: '#b91c1c',
-                          borderColor: '#dc2626'
-                        }}
+                        className={`text-left px-3 py-2 text-xs font-black rounded-xl border-2 transition cursor-pointer disabled:opacity-50 ${isDark ? 'bg-black text-white border-white/50 hover:bg-white hover:text-black' : 'bg-red-50 text-red-700 border-red-600'}`}
                       >
                         + {standardReason.split('.')[0]}
                       </button>
@@ -1294,26 +1345,21 @@ export default function AdminDashboard() {
                     value={rejectModal.reason}
                     onChange={(e) => setRejectModal({ ...rejectModal, reason: e.target.value })}
                     placeholder="Select a reason above or type a custom reason here..."
-                    className="w-full p-4 border-2 border-[var(--color-border,rgba(3,4,94,0.2))] rounded-2xl resize-none focus:outline-none focus:ring-2 transition min-h-[140px] text-sm font-bold text-[var(--color-text,#03045E)] leading-relaxed bg-[var(--color-surface,#f4f4f4)] disabled:opacity-50"
+                    className={`w-full p-4 border-2 ${isDark ? 'border-white/20 text-white placeholder-white/40 bg-black' : 'border-[#03045E]/20 text-[#03045E] placeholder-[#03045E]/40 bg-[#f4f4f4]'} rounded-2xl resize-none focus:outline-none focus:ring-2 transition min-h-[140px] text-sm font-bold leading-relaxed disabled:opacity-50`}
                   ></textarea>
                   
                   <div className="flex gap-3 mt-2">
                     <button 
                       disabled={rejectLoading}
                       onClick={() => setRejectModal({ isOpen: false, userId: null, reason: '' })}
-                      className="flex-1 py-3 bg-[var(--color-surface,#f4f4f4)] text-[var(--color-text,#03045E)] font-black text-sm rounded-xl border-2 border-[var(--color-border,rgba(3,4,94,0.2))] hover:bg-[var(--color-primary,#03045E)]/10 transition cursor-pointer disabled:opacity-50"
+                      className={`flex-1 py-3 ${surfaceBg} ${txtMain} font-black text-sm rounded-xl border-2 ${isDark ? 'border-white/20 hover:bg-white/10' : 'border-[#03045E]/20 hover:bg-[#03045E]/10'} transition cursor-pointer disabled:opacity-50`}
                     >
                       Cancel
                     </button>
                     <button 
                       disabled={rejectLoading}
                       onClick={submitRejection}
-                      className="flex-1 py-3 font-black text-sm rounded-xl border-2 shadow-md transition flex justify-center items-center gap-2 cursor-pointer disabled:opacity-80"
-                      style={{
-                        backgroundColor: '#dc2626',
-                        color: '#ffffff',
-                        borderColor: '#dc2626'
-                      }}
+                      className={`flex-1 py-3 font-black text-sm rounded-xl border-2 shadow-md transition flex justify-center items-center gap-2 cursor-pointer disabled:opacity-80 ${isDark ? 'bg-white text-black border-white hover:bg-white/90' : 'bg-[#dc2626] text-white border-[#dc2626]'}`}
                     >
                       {rejectLoading ? (
                         <>
@@ -1344,69 +1390,44 @@ export default function AdminDashboard() {
   );
 }
 
-function StatCard({ title, value, icon, alert, onClick, color = 'blue' }) {
+function StatCard({ title, value, icon, alert, onClick, color = 'default', isDark = false }) {
   const colorMap = {
-    blue: {
-      accent: '#1d4ed8',
-      soft: 'rgba(29,78,216,0.08)',
-      border: '#3b82f6',
-      alertSoft: 'rgba(29,78,216,0.14)',
-      alertBorder: '#3b82f6'
-    },
-    violet: {
-      accent: '#2c7fff',
-      soft: 'rgba(44,127,255,0.08)',
-      border: '#2c7fff',
-      alertSoft: 'rgba(44,127,255,0.14)',
-      alertBorder: '#2c7fff'
-    },
-    amber: {
-      accent: '#b45309',
-      soft: 'rgba(180,83,9,0.08)',
-      border: '#f59e0b',
-      alertSoft: 'rgba(180,83,9,0.14)',
-      alertBorder: '#f59e0b'
-    },
-    rose: {
-      accent: '#be123c',
-      soft: 'rgba(190,18,60,0.08)',
-      border: '#dc2626',
-      alertSoft: 'rgba(190,18,60,0.14)',
-      alertBorder: '#dc2626'
+   default: {
+  accent: isDark ? '#ffffff' : '#03045E',
+  border: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(3,4,94,0.4)'
+},
+    pending: {
+      accent: isDark ? '#ffffff' : '#b45309',
+      border: isDark ? 'rgba(255,255,255,0.4)' : '#f59e0b'
     }
   };
 
-  const scheme = colorMap[color] || colorMap.blue;
-  const isAlert = Boolean(alert);
+  const scheme = colorMap[color] || colorMap.default;
 
   return (
     <div
       onClick={onClick}
-      className={`p-3 sm:p-7 rounded-2xl sm:rounded-[2rem] shadow-sm border-2 transition-all duration-200 ${onClick ? 'cursor-pointer hover:shadow-lg hover:-translate-y-0.5' : ''}`}
-      style={{
-        backgroundColor: 'var(--color-card, #ffffff)',
-        borderColor: 'var(--color-border, rgba(3,4,94,0.15))'
-      }}
+      className={`flex items-center justify-between p-4 sm:p-5 rounded-2xl shadow-sm border-2 transition-all duration-200 ${isDark ? 'bg-black border-white/15' : 'bg-white border-[#03045E]/15'} ${onClick ? 'cursor-pointer hover:shadow-lg hover:-translate-y-0.5' : ''}`}
     >
-      <div className="flex items-start justify-between gap-2 mb-2 sm:mb-4">
-        <h3 className="text-[10px] sm:text-xs font-black uppercase tracking-wider leading-tight" style={{ color: '#2c7fff' }}>
+      <div className="flex flex-col min-w-0">
+        <h3 className={`text-[10px] sm:text-xs font-black uppercase tracking-wider leading-tight ${isDark ? 'text-white/70' : 'text-[#03045E]/70'} truncate`}>
           {title}
         </h3>
-        <div
-          className="p-1.5 sm:p-2.5 rounded-lg sm:rounded-2xl border flex items-center justify-center shrink-0"
-          style={{
-            borderColor: scheme.border,
-            color: scheme.accent
-          }}
-        >
-          <div className="w-3.5 h-3.5 sm:w-6 sm:h-6 flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
-            {icon}
-          </div>
+        <p className={`text-2xl sm:text-3xl font-black tracking-tight leading-none ${isDark ? 'text-white' : 'text-[#03045E]'} mt-1`}>
+          {value}
+        </p>
+      </div>
+      <div
+        className="p-2 sm:p-3 rounded-xl border flex items-center justify-center shrink-0 ml-3"
+        style={{
+          borderColor: scheme.border,
+          color: scheme.accent
+        }}
+      >
+        <div className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+          {icon}
         </div>
       </div>
-      <p className="text-2xl sm:text-4xl font-black tracking-tight leading-none" style={{ color: '#2c7fff' }}>
-        {value}
-      </p>
     </div>
   );
 }

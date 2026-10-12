@@ -58,50 +58,90 @@ export default function RegisterSelect() {
         </div>
         <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 opacity-100 border-b border-[#03045E]/10 shadow-lg' : 'max-h-0 opacity-0'}`}>
           <div className="w-full bg-[#f4f4f4]">
-            <nav className={`flex flex-col px-3 pt-3 pb-3 gap-2.5 ${isAccessibilityMode ? 'text-white' : 'text-[#03045E]'} max-w-[1700px] mx-auto box-border`} aria-label="Mobile navigation">
-              <NavLink to="/" onClick={() => setIsOpen(false)} className="relative flex items-center gap-3 text-left px-3.5 py-3 rounded-xl text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
-                <div className="shrink-0 flex items-center justify-center border-none w-7 h-7 rounded-full overflow-hidden bg-[#03045E]/10 text-[#03045E]">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                  </svg>
-                </div>
-                <span className="leading-tight">Home</span>
+            <nav className={`flex flex-col px-2.5 pt-2.5 pb-2.5 gap-2 sm:px-3 sm:pt-3 sm:pb-3 sm:gap-2.5 ${isAccessibilityMode ? 'text-white' : 'text-[#03045E]'} max-w-[1700px] mx-auto`} aria-label="Mobile navigation">
+              <NavLink to="/" onClick={() => setIsOpen(false)} className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}>
+                {({ isActive }) => (
+                  <>
+                    {isActive && <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
+                    <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Home</span>
+                    </div>
+                    <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </>
+                )}
               </NavLink>
 
-              <NavLink to="/about" onClick={() => setIsOpen(false)} className="relative flex items-center gap-3 text-left px-3.5 py-3 rounded-xl text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
-                <div className="shrink-0 flex items-center justify-center border-none w-7 h-7 rounded-full overflow-hidden bg-[#03045E]/10 text-[#03045E]">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <span className="leading-tight">About Us</span>
+              <NavLink to="/about" onClick={() => setIsOpen(false)} className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}>
+                {({ isActive }) => (
+                  <>
+                    {isActive && <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
+                    <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">About Us</span>
+                    </div>
+                    <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </>
+                )}
               </NavLink>
 
-              <NavLink to="/policy" onClick={() => setIsOpen(false)} className="relative flex items-center gap-3 text-left px-3.5 py-3 rounded-xl text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
-                <div className="shrink-0 flex items-center justify-center border-none w-7 h-7 rounded-full overflow-hidden bg-[#03045E]/10 text-[#03045E]">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <span className="leading-tight">Policy</span>
+              <NavLink to="/policy" onClick={() => setIsOpen(false)} className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}>
+                {({ isActive }) => (
+                  <>
+                    {isActive && <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
+                    <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Policy</span>
+                    </div>
+                    <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </>
+                )}
               </NavLink>
 
-              <div className={`h-px my-0.5 ${isAccessibilityMode ? 'bg-white/30' : 'bg-[#03045E]/15'}`}></div>
+              <div className={`h-px my-0.5 ${isAccessibilityMode ? 'bg-[#2C7FFF]/30' : 'bg-[#03045E]/15'}`}></div>
 
-              <NavLink to="/login" onClick={() => setIsOpen(false)} className={`relative flex items-center gap-3 text-left px-3.5 py-3 rounded-xl text-[13px] font-black transition-all cursor-pointer border-2 overflow-hidden ${isAccessibilityMode ? 'bg-white text-black border-black' : 'bg-[#2C7FFF] text-white border-[#2C7FFF]'}`}>
-                <div className={`shrink-0 flex items-center justify-center border-none w-7 h-7 rounded-full overflow-hidden ${isAccessibilityMode ? 'bg-black/10 text-black' : 'bg-white/20 text-white'}`}>
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                  </svg>
-                </div>
-                <span className="leading-tight">Log In</span>
+              <NavLink to="/login" onClick={() => setIsOpen(false)} className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}>
+                {({ isActive }) => (
+                  <>
+                    {isActive && <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
+                    <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Log In</span>
+                    </div>
+                    <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </>
+                )}
               </NavLink>
             </nav>
           </div>
         </div>
       </header>
 
-      <div className={`flex-grow pt-16 sm:pt-24 pb-12 flex flex-col items-end justify-start p-4 sm:p-6 md:p-12 pr-6 sm:pr-10 md:pr-16 lg:pr-24 pl-4 md:pl-8 max-w-[1700px] mx-auto w-full box-border relative bg-no-repeat bg-cover bg-center md:bg-[size:1100px_auto] md:bg-[position:left_-50px_center] lg:md:bg-[position:left_-100px_center] xl:bg-left min-h-[100vh] md:min-h-[100vh] transition-all duration-300 ${isOpen ? 'mt-48 sm:mt-56' : 'mt-0'}`} style={{ backgroundImage: `url(${backgroundImg})` }}>
+      <div className={`flex-grow pt-16 sm:pt-24 pb-12 flex flex-col items-end justify-start p-4 sm:p-6 md:p-12 pr-6 sm:pr-10 md:pr-16 lg:pr-24 pl-4 md:pl-8 max-w-[1700px] mx-auto w-full box-border relative bg-no-repeat bg-cover bg-center md:bg-[size:1100px_auto] md:bg-[position:left_-50px_center] lg:md:bg-[position:left_-100px_center] xl:bg-left min-h-[100vh] md:min-h-[100vh] transition-all duration-300`} style={{ backgroundImage: `url(${backgroundImg})` }}>
         <div className={`w-full h-auto ${containerMaxWidth} ${containerPadding} ${containerMinHeight} ${isDarkActive ? 'bg-black text-white border-2 border-white' : `${ui.mainCardBg}`} backdrop-blur-md rounded-2xl sm:rounded-[2rem] shadow-xl flex flex-col items-center justify-center relative z-10 transition-all duration-300 mt-4 sm:mt-12 md:mt-16 ml-auto mr-0 md:mr-2 lg:mr-4 origin-top-right`}>
           <div className="text-center w-full max-w-lg mb-2 sm:mb-4">
             <span className={`inline-block py-1 px-2.5 sm:px-3 rounded-full ${isDarkActive ? 'bg-white text-black' : `${ui.badgeBg}`} font-bold text-[10px] sm:text-xs uppercase tracking-widest mb-1.5`}>Welcome to AbleWork</span>

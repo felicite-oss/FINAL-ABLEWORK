@@ -3,7 +3,6 @@ import { useColorPalette } from '../context/ColorPaletteContext';
 
 export default function ColorPalettePicker() {
   const { paletteKey, setPaletteKey, palettes } = useColorPalette();
-  const isHighContrast = paletteKey === 'highContrast';
 
   return (
     <div className="flex flex-col gap-2">
@@ -24,12 +23,8 @@ export default function ColorPalettePicker() {
               aria-label={`Select ${p.name} color palette`}
               className={`w-full flex flex-col items-center justify-center gap-1 sm:gap-1.5 px-1.5 py-2 sm:px-3 sm:py-3 rounded-xl text-center transition-all cursor-pointer border-2 ${
                 selected
-                  ? isHighContrast
-                    ? 'bg-[var(--color-surface)] border-[var(--color-text)] shadow-sm'
-                    : 'bg-[var(--color-accentSoft)] border-[var(--color-accent)] shadow-sm'
-                  : isHighContrast
-                    ? 'bg-[var(--color-surface)] border-[var(--color-border)] hover:border-[var(--color-text)]'
-                    : 'bg-[var(--color-surface)] border-[var(--color-border)] hover:border-[var(--color-accent)]'
+                  ? 'bg-[var(--color-accentSoft)] border-[var(--color-accent)] shadow-sm'
+                  : 'bg-[var(--color-surface)] border-[var(--color-border)] hover:border-[var(--color-accent)]'
               }`}
             >
               <div className="flex items-center gap-0.5 shrink-0">
@@ -43,7 +38,7 @@ export default function ColorPalettePicker() {
               </div>
               <div className="flex-1 min-w-0 w-full">
                 <p className="text-[9px] sm:text-[11px] font-black text-[var(--color-text)] truncate leading-tight">{p.name}</p>
-                <p className={`text-[7px] sm:text-[9px] font-bold truncate leading-tight mt-0.5 ${isHighContrast ? 'text-[var(--color-text)]' : 'text-[var(--color-textMuted)]'}`}>{p.description}</p>
+                <p className="text-[7px] sm:text-[9px] font-bold truncate leading-tight mt-0.5 text-[var(--color-textMuted)]">{p.description}</p>
               </div>
               {selected && (
                 <svg className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 shrink-0 text-[var(--color-accent)]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">

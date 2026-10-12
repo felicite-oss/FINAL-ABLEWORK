@@ -22,8 +22,99 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
   const isDark = isContrast || isDarkMode;
   const isHighContrastOrDarkComfort = paletteKey === 'highContrast' || paletteKey === 'darkComfort';
 
+  const [analyticsExpanded, setAnalyticsExpanded] = useState(false);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') setAnalyticsExpanded(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  useEffect(() => {
+    if (analyticsExpanded) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [analyticsExpanded]);
+
+  const renderChart = (expanded = false) => (
+    <>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 mb-1">
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm" style={{ backgroundColor: 'color-mix(in srgb, var(--color-primary, #2C7FFF) 15%, transparent)', border: '1px solid color-mix(in srgb, var(--color-primary, #2C7FFF) 30%, transparent)', color: 'var(--color-primary, #2C7FFF)' }}>
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <h3 className={`text-base sm:text-lg font-extrabold ${isDark ? 'text-white' : 'text-[#03045E]'}`}>Application Trends</h3>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className={`text-[10px] sm:text-xs font-bold ${isDark ? 'text-white bg-black border-white' : 'text-[#03045E] bg-[#f4f4f4] border-[#03045E]/20'} px-2 sm:px-3 py-0.5 sm:py-1 rounded-full border`}>Weekly Report</span>
+          <button
+            type="button"
+            onClick={() => setAnalyticsExpanded(prev => !prev)}
+            aria-label={analyticsExpanded ? 'Exit fullscreen analytics' : 'Expand analytics to fullscreen'}
+            title={analyticsExpanded ? 'Exit fullscreen' : 'Expand analytics'}
+            className="relative flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-full bg-white/95 backdrop-blur-md shadow-[0_4px_20px_rgba(3,4,94,0.15)] border border-[#03045E]/15 cursor-pointer"
+          >
+            <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#2C7FFF]/10 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shrink-0">
+              {analyticsExpanded ? (
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                </svg>
+              )}
+            </span>
+            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E] whitespace-nowrap">
+              {analyticsExpanded ? 'Exit' : 'Expand'}
+            </span>
+          </button>
+        </div>
+      </div>
+      <p className={`text-[10px] sm:text-sm font-semibold ${isDark ? 'text-gray-300' : 'text-[#03045E]/80'} mb-4 sm:mb-6`}>Volume of candidate applications received over the last 7 days.</p>
+      
+      <div className={`flex-1 w-full ${expanded ? 'h-[calc(100vh-200px)]' : 'h-full'} min-h-[180px] sm:min-h-[200px]`}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={stats.chartData || mockChartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? '#ffffff' : '#03045E'} strokeOpacity={0.15} />
+            <XAxis 
+              dataKey="name" 
+              tick={{ fontSize: expanded ? 14 : 10, fill: (isDark || isHighContrastOrDarkComfort) ? '#ffffff' : '#03045E', fontWeight: 'bold' }} 
+              axisLine={false} 
+              tickLine={false} 
+              dy={10} 
+            />
+            <YAxis 
+              tick={{ fontSize: expanded ? 14 : 10, fill: (isDark || isHighContrastOrDarkComfort) ? '#ffffff' : '#03045E', fontWeight: 'bold' }} 
+              axisLine={false} 
+              tickLine={false} 
+            />
+            <Tooltip 
+              cursor={{ fill: 'var(--color-primary, #2C7FFF)', opacity: 0.1 }}
+              contentStyle={{ borderRadius: '16px', border: isDark ? '2px solid #ffffff' : '1px solid rgba(3,4,94,0.1)', boxShadow: '0 10px 30px rgba(3,4,94,0.1)', backgroundColor: isDark ? '#000000' : '#fff', color: isDark ? '#ffffff' : '#03045E', fontWeight: 'bold', fontSize: expanded ? '16px' : '12px' }}
+            />
+            <Bar 
+              dataKey="applications" 
+              fill={isDark ? '#ffffff' : 'var(--color-primary, #2C7FFF)'} 
+              radius={[8, 8, 8, 8]} 
+              barSize={expanded ? 60 : 28} 
+              animationDuration={1500} 
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </>
+  );
+
   return (
-    <div className="animate-fadeIn max-w-7xl mx-auto pb-6 sm:pb-10 px-1 sm:px-0">
+    <div className="animate-fadeIn max-w-9xl mx-auto pb-6 sm:pb-10 px-1 sm:px-0">
       
       <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 ${isDark ? 'bg-black border-white' : 'bg-[#f4f4f4]/90 border-[#03045E]/20'} backdrop-blur-md p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border`}>
         <div>
@@ -38,131 +129,93 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
         </div>
       </div>
       
-   
-      <div className="grid grid-cols-3 md:grid-cols-3 gap-1.5 sm:gap-6 mb-6 sm:mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         
-        <button
-          type="button"
-          onClick={() => setActiveTab && setActiveTab('jobs')}
-          className={`text-left relative overflow-hidden p-1.5 sm:p-6 rounded-xl sm:rounded-3xl ${isDark ? 'bg-black border-white' : 'bg-[#f4f4f4] border-[#03045E]/20'} shadow-[0_10px_30px_rgba(3,4,94,0.06)] border flex flex-col sm:flex-row items-center justify-between group transition-all duration-300 cursor-pointer`}
-        >
-          <div className="absolute top-0 right-0 w-16 sm:w-32 h-16 sm:h-32 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 10%, transparent), transparent)' }}></div>
-          <div className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-4 relative z-10 w-full">
-            <div className="w-6 h-6 sm:w-16 sm:h-16 rounded-lg sm:rounded-2xl flex items-center justify-center shadow-sm group-hover:rotate-6 transition-transform shrink-0" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 15%, transparent), color-mix(in srgb, var(--color-primary, #2C7FFF) 25%, transparent))', border: '1px solid color-mix(in srgb, var(--color-primary, #2C7FFF) 30%, transparent)', color: 'var(--color-primary, #2C7FFF)' }}>
-              <svg className="w-3 h-3 sm:w-8 sm:h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-              </svg>
-            </div>
-            <div className="text-center sm:text-left">
-              <div className="flex items-center justify-center sm:justify-start gap-0.5 sm:gap-1.5 mb-0 sm:mb-1">
-                <span className="w-1 h-1 sm:w-2 sm:h-2 rounded-full" style={{ backgroundColor: 'var(--color-primary, #2C7FFF)' }}></span>
-                <p className={`text-[7px] sm:text-xs font-bold tracking-wider ${isDark ? 'text-gray-300' : 'text-[#03045E]/80'} uppercase leading-tight`}>Active Postings</p>
-              </div>
-              <p className={`text-sm sm:text-3xl lg:text-4xl font-black ${isDark ? 'text-white' : 'text-[#03045E]'} tracking-tight`}>{stats.activeJobs}</p>
-            </div>
-          </div>
-        </button>
-
-
-        <button
-          type="button"
-          onClick={() => setActiveTab && setActiveTab('applications')}
-          className={`text-left relative overflow-hidden p-1.5 sm:p-6 rounded-xl sm:rounded-3xl ${isDark ? 'bg-black border-white' : 'bg-[#f4f4f4] border-[#03045E]/20'} shadow-[0_10px_30px_rgba(3,4,94,0.06)] border flex flex-col sm:flex-row items-center justify-between group transition-all duration-300 cursor-pointer`}
-        >
-          <div className="absolute top-0 right-0 w-16 sm:w-32 h-16 sm:h-32 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 10%, transparent), transparent)' }}></div>
-          <div className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-4 relative z-10 w-full">
-            <div className="w-6 h-6 sm:w-16 sm:h-16 rounded-lg sm:rounded-2xl flex items-center justify-center shadow-sm group-hover:rotate-6 transition-transform shrink-0" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 15%, transparent), color-mix(in srgb, var(--color-primary, #2C7FFF) 25%, transparent))', border: '1px solid color-mix(in srgb, var(--color-primary, #2C7FFF) 30%, transparent)', color: 'var(--color-primary, #2C7FFF)' }}>
-              <svg className="w-3 h-3 sm:w-8 sm:h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div className="text-center sm:text-left">
-              <div className="flex items-center justify-center sm:justify-start gap-0.5 sm:gap-1.5 mb-0 sm:mb-1">
-                <span className="w-1 h-1 sm:w-2 sm:h-2 rounded-full" style={{ backgroundColor: 'var(--color-primary, #2C7FFF)' }}></span>
-                <p className={`text-[7px] sm:text-xs font-bold tracking-wider ${isDark ? 'text-gray-300' : 'text-[#03045E]/80'} uppercase leading-tight`}>Pending Review</p>
-              </div>
-              <p className={`text-sm sm:text-3xl lg:text-4xl font-black ${isDark ? 'text-white' : 'text-[#03045E]'} tracking-tight`}>{stats.pendingApps}</p>
-            </div>
-          </div>
-        </button>
-
-
-        <button
-          type="button"
-          onClick={() => setActiveTab && setActiveTab('applications')}
-          className={`text-left relative overflow-hidden p-1.5 sm:p-6 rounded-xl sm:rounded-3xl ${isDark ? 'bg-black border-white' : 'bg-[#f4f4f4] border-[#03045E]/20'} shadow-[0_10px_30px_rgba(3,4,94,0.06)] border flex flex-col sm:flex-row items-center justify-between group transition-all duration-300 cursor-pointer`}
-        >
-          <div className="absolute top-0 right-0 w-16 sm:w-32 h-16 sm:h-32 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 10%, transparent), transparent)' }}></div>
-          <div className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-4 relative z-10 w-full">
-            <div className="w-6 h-6 sm:w-16 sm:h-16 rounded-lg sm:rounded-2xl flex items-center justify-center shadow-sm group-hover:rotate-6 transition-transform shrink-0" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 15%, transparent), color-mix(in srgb, var(--color-primary, #2C7FFF) 25%, transparent))', border: '1px solid color-mix(in srgb, var(--color-primary, #2C7FFF) 30%, transparent)', color: 'var(--color-primary, #2C7FFF)' }}>
-              <svg className="w-3 h-3 sm:w-8 sm:h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-              </svg>
-            </div>
-            <div className="text-center sm:text-left">
-              <div className="flex items-center justify-center sm:justify-start gap-0.5 sm:gap-1.5 mb-0 sm:mb-1">
-                <span className="w-1 h-1 sm:w-2 sm:h-2 rounded-full" style={{ backgroundColor: 'var(--color-primary, #2C7FFF)' }}></span>
-                <p className={`text-[7px] sm:text-xs font-bold tracking-wider ${isDark ? 'text-gray-300' : 'text-[#03045E]/80'} uppercase leading-tight`}>Shortlisted</p>
-              </div>
-              <p className={`text-sm sm:text-3xl lg:text-4xl font-black ${isDark ? 'text-white' : 'text-[#03045E]'} tracking-tight`}>{stats.shortlistedApps}</p>
-            </div>
-          </div>
-        </button>
-
-      </div>
-
-
-      <div className="grid grid-cols-1 gap-6 sm:gap-8">
-        
-
-        <div className={`p-4 sm:p-8 rounded-2xl sm:rounded-3xl ${isDark ? 'bg-black border-white' : 'bg-[#f4f4f4] border-[#03045E]/20'} shadow-[0_10px_30px_rgba(3,4,94,0.06)] border flex flex-col h-[380px] sm:h-[440px] relative`}>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 mb-1">
-            <div className="flex items-center gap-2 sm:gap-2.5">
-              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm" style={{ backgroundColor: 'color-mix(in srgb, var(--color-primary, #2C7FFF) 15%, transparent)', border: '1px solid color-mix(in srgb, var(--color-primary, #2C7FFF) 30%, transparent)', color: 'var(--color-primary, #2C7FFF)' }}>
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        <div className="lg:col-span-1 grid grid-cols-3 gap-2 sm:gap-4 lg:flex lg:flex-col lg:gap-6">
+          
+          <button
+            type="button"
+            onClick={() => setActiveTab && setActiveTab('jobs')}
+            className={`text-left relative overflow-hidden p-2 sm:p-6 rounded-xl sm:rounded-3xl ${isDark ? 'bg-black border-white' : 'bg-[#f4f4f4] border-[#03045E]/20'} shadow-[0_10px_30px_rgba(3,4,94,0.06)] border flex flex-col lg:flex-row items-center justify-between group transition-all duration-300 cursor-pointer`}
+          >
+            <div className="absolute top-0 right-0 w-16 sm:w-32 h-16 sm:h-32 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 10%, transparent), transparent)' }}></div>
+            <div className="flex flex-col lg:flex-row items-center gap-1.5 sm:gap-4 relative z-10 w-full">
+              <div className="w-7 h-7 sm:w-16 sm:h-16 rounded-lg sm:rounded-2xl flex items-center justify-center shadow-sm group-hover:rotate-6 transition-transform shrink-0" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 15%, transparent), color-mix(in srgb, var(--color-primary, #2C7FFF) 25%, transparent))', border: '1px solid color-mix(in srgb, var(--color-primary, #2C7FFF) 30%, transparent)', color: 'var(--color-primary, #2C7FFF)' }}>
+                <svg className="w-3.5 h-3.5 sm:w-8 sm:h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                 </svg>
               </div>
-              <h3 className={`text-base sm:text-lg font-extrabold ${isDark ? 'text-white' : 'text-[#03045E]'}`}>Application Trends</h3>
+              <div className="text-center lg:text-left flex-1 min-w-0">
+                <div className="flex items-center justify-center lg:justify-start gap-1 sm:gap-1.5 mb-0.5 sm:mb-1">
+                  <span className="w-1 h-1 sm:w-2 sm:h-2 rounded-full" style={{ backgroundColor: 'var(--color-primary, #2C7FFF)' }}></span>
+                  <p className={`text-[7px] sm:text-xs font-bold tracking-wider ${isDark ? 'text-gray-300' : 'text-[#03045E]/80'} uppercase leading-tight truncate`}>Active Postings</p>
+                </div>
+                <p className={`text-base sm:text-4xl font-black ${isDark ? 'text-white' : 'text-[#03045E]'} tracking-tight`}>{stats.activeJobs}</p>
+              </div>
             </div>
-            <span className={`text-[10px] sm:text-xs font-bold ${isDark ? 'text-white bg-black border-white' : 'text-[#03045E] bg-[#f4f4f4] border-[#03045E]/20'} px-2 sm:px-3 py-0.5 sm:py-1 rounded-full border`}>Weekly Report</span>
-          </div>
-          <p className={`text-[10px] sm:text-sm font-semibold ${isDark ? 'text-gray-300' : 'text-[#03045E]/80'} mb-4 sm:mb-6`}>Volume of candidate applications received over the last 7 days.</p>
-          
-       
-          <div className="flex-1 w-full h-full min-h-[180px] sm:min-h-[200px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={stats.chartData || mockChartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? '#ffffff' : '#03045E'} strokeOpacity={0.15} />
-                <XAxis 
-                  dataKey="name" 
-                  tick={{ fontSize: 10, fill: (isDark || isHighContrastOrDarkComfort) ? '#ffffff' : '#03045E', fontWeight: 'bold' }} 
-                  axisLine={false} 
-                  tickLine={false} 
-                  dy={10} 
-                />
-                <YAxis 
-                  tick={{ fontSize: 10, fill: (isDark || isHighContrastOrDarkComfort) ? '#ffffff' : '#03045E', fontWeight: 'bold' }} 
-                  axisLine={false} 
-                  tickLine={false} 
-                />
-                <Tooltip 
-                  cursor={{ fill: 'var(--color-primary, #2C7FFF)', opacity: 0.1 }}
-                  contentStyle={{ borderRadius: '16px', border: isDark ? '2px solid #ffffff' : '1px solid rgba(3,4,94,0.1)', boxShadow: '0 10px 30px rgba(3,4,94,0.1)', backgroundColor: isDark ? '#000000' : '#fff', color: isDark ? '#ffffff' : '#03045E', fontWeight: 'bold', fontSize: '12px' }}
-                />
-                <Bar 
-                  dataKey="applications" 
-                  fill={isDark ? '#ffffff' : 'var(--color-primary, #2C7FFF)'} 
-                  radius={[8, 8, 8, 8]} 
-                  barSize={28} 
-                  animationDuration={1500} 
-                />
-              </BarChart>
-            </ResponsiveContainer>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab && setActiveTab('applications')}
+            className={`text-left relative overflow-hidden p-2 sm:p-6 rounded-xl sm:rounded-3xl ${isDark ? 'bg-black border-white' : 'bg-[#f4f4f4] border-[#03045E]/20'} shadow-[0_10px_30px_rgba(3,4,94,0.06)] border flex flex-col lg:flex-row items-center justify-between group transition-all duration-300 cursor-pointer`}
+          >
+            <div className="absolute top-0 right-0 w-16 sm:w-32 h-16 sm:h-32 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 10%, transparent), transparent)' }}></div>
+            <div className="flex flex-col lg:flex-row items-center gap-1.5 sm:gap-4 relative z-10 w-full">
+              <div className="w-7 h-7 sm:w-16 sm:h-16 rounded-lg sm:rounded-2xl flex items-center justify-center shadow-sm group-hover:rotate-6 transition-transform shrink-0" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 15%, transparent), color-mix(in srgb, var(--color-primary, #2C7FFF) 25%, transparent))', border: '1px solid color-mix(in srgb, var(--color-primary, #2C7FFF) 30%, transparent)', color: 'var(--color-primary, #2C7FFF)' }}>
+                <svg className="w-3.5 h-3.5 sm:w-8 sm:h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="text-center lg:text-left flex-1 min-w-0">
+                <div className="flex items-center justify-center lg:justify-start gap-1 sm:gap-1.5 mb-0.5 sm:mb-1">
+                  <span className="w-1 h-1 sm:w-2 sm:h-2 rounded-full" style={{ backgroundColor: 'var(--color-primary, #2C7FFF)' }}></span>
+                  <p className={`text-[7px] sm:text-xs font-bold tracking-wider ${isDark ? 'text-gray-300' : 'text-[#03045E]/80'} uppercase leading-tight truncate`}>Pending Review</p>
+                </div>
+                <p className={`text-base sm:text-4xl font-black ${isDark ? 'text-white' : 'text-[#03045E]'} tracking-tight`}>{stats.pendingApps}</p>
+              </div>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab && setActiveTab('applications')}
+            className={`text-left relative overflow-hidden p-2 sm:p-6 rounded-xl sm:rounded-3xl ${isDark ? 'bg-black border-white' : 'bg-[#f4f4f4] border-[#03045E]/20'} shadow-[0_10px_30px_rgba(3,4,94,0.06)] border flex flex-col lg:flex-row items-center justify-between group transition-all duration-300 cursor-pointer`}
+          >
+            <div className="absolute top-0 right-0 w-16 sm:w-32 h-16 sm:h-32 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 10%, transparent), transparent)' }}></div>
+            <div className="flex flex-col lg:flex-row items-center gap-1.5 sm:gap-4 relative z-10 w-full">
+              <div className="w-7 h-7 sm:w-16 sm:h-16 rounded-lg sm:rounded-2xl flex items-center justify-center shadow-sm group-hover:rotate-6 transition-transform shrink-0" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 15%, transparent), color-mix(in srgb, var(--color-primary, #2C7FFF) 25%, transparent))', border: '1px solid color-mix(in srgb, var(--color-primary, #2C7FFF) 30%, transparent)', color: 'var(--color-primary, #2C7FFF)' }}>
+                <svg className="w-3.5 h-3.5 sm:w-8 sm:h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                </svg>
+              </div>
+              <div className="text-center lg:text-left flex-1 min-w-0">
+                <div className="flex items-center justify-center lg:justify-start gap-1 sm:gap-1.5 mb-0.5 sm:mb-1">
+                  <span className="w-1 h-1 sm:w-2 sm:h-2 rounded-full" style={{ backgroundColor: 'var(--color-primary, #2C7FFF)' }}></span>
+                  <p className={`text-[7px] sm:text-xs font-bold tracking-wider ${isDark ? 'text-gray-300' : 'text-[#03045E]/80'} uppercase leading-tight truncate`}>Shortlisted</p>
+                </div>
+                <p className={`text-base sm:text-4xl font-black ${isDark ? 'text-white' : 'text-[#03045E]'} tracking-tight`}>{stats.shortlistedApps}</p>
+              </div>
+            </div>
+          </button>
+
+        </div>
+
+        <div className="lg:col-span-2">
+          <div className={`p-4 sm:p-8 rounded-2xl sm:rounded-3xl ${isDark ? 'bg-black border-white' : 'bg-[#f4f4f4] border-[#03045E]/20'} shadow-[0_10px_30px_rgba(3,4,94,0.06)] border flex flex-col h-[380px] sm:h-full min-h-[380px] relative`}>
+            {renderChart(false)}
           </div>
         </div>
 
       </div>
+
+      {analyticsExpanded && (
+        <div className="fixed inset-0 z-[9999] bg-white">
+          <div className={`w-full h-full p-4 sm:p-8 ${isDark ? 'bg-black' : 'bg-[#f4f4f4]'} flex flex-col`}>
+            {renderChart(true)}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

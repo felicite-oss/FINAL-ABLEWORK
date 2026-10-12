@@ -43,18 +43,18 @@
 .theme-Dark,
 html.dark-mode {
   --color-primary: #ffffff !important;
-  --color-accent: #d4d4d4 !important;
+  --color-accent: #ffffffff !important;
   --color-background: #0a0a0a !important;
 
   --bg-primary: #0a0a0a !important;
   --bg-card: #1a1a1a !important;
   --text-primary: #ffffff !important;
-  --text-secondary: #d4d4d4 !important;
-  --border-accent: #a3a3a3 !important;
-  --btn-bg: #d4d4d4 !important;
+  --text-secondary: #ffffffff !important;
+  --border-accent: #ffffffff !important;
+  --btn-bg: #ffffffff !important;
   --btn-text: #000000 !important;
   --focus-ring: 3px solid #ffffff !important;
-  --accent: #d4d4d4 !important;
+  --accent: #ffffffff !important;
   --navy: #ffffff !important;
 
   --color-surface: #1a1a1a !important;
@@ -943,7 +943,7 @@ html.dark-mode [class*="to-"],
 
 html.dark-mode .recharts-cartesian-axis-tick text,
 .theme-Dark .recharts-cartesian-axis-tick text {
-  fill: #d4d4d4 !important;
+  fill: #ffffff !important;
 }
 
 html.dark-mode .recharts-legend-item-text,
@@ -1092,4 +1092,13 @@ html.dark-mode.palette-highContrast .register-btn *,
 html.dark-mode.palette-darkComfort .register-btn * {
   color: #000000 !important;
   -webkit-text-fill-color: #000000 !important;
+}
+
+html, body {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+::-webkit-scrollbar {
+  display: none;
 }

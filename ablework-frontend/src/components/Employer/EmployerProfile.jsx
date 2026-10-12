@@ -1,5 +1,38 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { AccessibilityContext } from '../../context/AccessibilityContext';
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
+function MapRecenter({ lat, lng }) {
+  const map = useMap();
+  useEffect(() => {
+    if (lat && lng) {
+      map.setView([lat, lng], map.getZoom());
+    }
+  }, [lat, lng, map]);
+  return null;
+}
+
+function MapInvalidator({ trigger }) {
+  const map = useMap();
+  useEffect(() => {
+    const timer = setTimeout(() => map.invalidateSize(), 300);
+    return () => clearTimeout(timer);
+  }, [trigger, map]);
+  return null;
+}
 
 export default function EmployerSettings({ profile, refreshData }) {
   const { mode } = useContext(AccessibilityContext);
@@ -32,11 +65,31 @@ export default function EmployerSettings({ profile, refreshData }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tempImagePreview, setTempImagePreview] = useState('');
   
-  // FIX: This physically holds the image file to send to the backend
   const [profilePicFile, setProfilePicFile] = useState(null);
   
   const [isUpdatingPicture, setIsUpdatingPicture] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState({ isOpen: false, message: '' });
+
+  const [mapExpanded, setMapExpanded] = useState(false);
+  const [satelliteView, setSatelliteView] = useState(false);
+  const [legendOpen, setLegendOpen] = useState(true);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') setMapExpanded(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  useEffect(() => {
+    if (mapExpanded) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [mapExpanded]);
 
   const pageBg = isDark ? 'bg-black' : 'bg-[#F4F4F4]';
   const pageText = isDark ? 'text-white' : 'text-[#03045E]';
@@ -66,7 +119,7 @@ export default function EmployerSettings({ profile, refreshData }) {
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setProfilePicFile(file); // Store actual file instantly
+      setProfilePicFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setTempImagePreview(reader.result);
@@ -75,7 +128,6 @@ export default function EmployerSettings({ profile, refreshData }) {
     }
   };
 
-  // FIX: Instantly upload the logo when they click "Save Logo" in the modal
   const handleConfirmChangePicture = async () => {
     if (!tempImagePreview || !profilePicFile) return;
     
@@ -99,14 +151,13 @@ export default function EmployerSettings({ profile, refreshData }) {
       if (res.ok) {
         const responseData = await res.json();
         
-        // Update states to reflect new DB URL
         const newLogoUrl = responseData.logo_url ? `http://localhost:5001${responseData.logo_url}` : tempImagePreview;
         setLogoPreview(newLogoUrl);
         setFormData(prev => ({ ...prev, company_logo: responseData.logo_url }));
         
         setIsUpdatingPicture(false);
         setIsModalOpen(false);
-        setProfilePicFile(null); // Reset
+        setProfilePicFile(null);
         refreshData();
         setSaveSuccess({ isOpen: true, message: 'Your company logo has been successfully updated.' });
       } else {
@@ -162,7 +213,6 @@ export default function EmployerSettings({ profile, refreshData }) {
     }
   };
 
-  // Main Submit handler is now also converted to FormData
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -198,8 +248,159 @@ export default function EmployerSettings({ profile, refreshData }) {
     }
   };
 
+  const renderMapInner = () => (
+    <>
+      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-[1000] flex flex-col gap-2">
+        <button
+          type="button"
+          onClick={() => setMapExpanded(prev => !prev)}
+          aria-label={mapExpanded ? 'Exit fullscreen map' : 'Expand map to fullscreen'}
+          title={mapExpanded ? 'Exit fullscreen' : 'Expand map'}
+          className="relative flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-full bg-white/95 backdrop-blur-md shadow-[0_4px_20px_rgba(3,4,94,0.15)] border border-[#03045E]/15 cursor-pointer"
+        >
+          <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#2C7FFF]/10 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shrink-0">
+            {mapExpanded ? (
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+              </svg>
+            )}
+          </span>
+          <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E] whitespace-nowrap">
+            {mapExpanded ? 'Exit' : 'Expand'}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setSatelliteView(prev => !prev)}
+          aria-label={satelliteView ? 'Switch to street view' : 'Switch to satellite view'}
+          title={satelliteView ? 'Street view' : 'Satellite view'}
+          className="relative flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-full bg-white/95 backdrop-blur-md shadow-[0_4px_20px_rgba(3,4,94,0.15)] border border-[#03045E]/15 cursor-pointer"
+        >
+          <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#2C7FFF]/10 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shrink-0">
+            {satelliteView ? (
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+            ) : (
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            )}
+          </span>
+          <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E] whitespace-nowrap">
+            {satelliteView ? 'Street' : 'Satellite'}
+          </span>
+        </button>
+      </div>
+
+      {mapExpanded && (
+        <div className="absolute top-3 left-16 sm:top-4 sm:left-20 z-[1000] bg-white/95 backdrop-blur-sm px-3 py-2 rounded-xl shadow-lg border border-[#03045E]/20">
+          <p className="text-[11px] font-black uppercase tracking-widest text-[#03045E] m-0">Office Location</p>
+        </div>
+      )}
+
+      <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-[1000]">
+        <div className="w-[200px] sm:w-[228px] bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-[#03045E]/20 overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setLegendOpen(open => !open)}
+            aria-expanded={legendOpen}
+            aria-controls="employer-map-legend-panel"
+            className="w-full flex items-center gap-2 px-3 py-2.5 cursor-pointer"
+          >
+            <span className="w-6 h-6 rounded-lg bg-[#f4f4f4] border border-[#03045E]/20 flex items-center justify-center text-[#2C7FFF] shrink-0">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+            </span>
+            <span className="flex-1 text-left text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E]">
+              Map Legend
+            </span>
+            <svg
+              className={`w-3.5 h-3.5 text-[#03045E] transition-transform duration-300 ${legendOpen ? 'rotate-180' : ''}`}
+              fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <div className={`grid transition-all duration-300 ease-out ${legendOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+            <div className="overflow-hidden">
+              <div id="employer-map-legend-panel" className="px-3 pb-3 flex flex-col gap-2">
+                <div className="h-px w-full bg-[#03045E]/10 mb-0.5"></div>
+
+                <div className="flex items-center gap-2.5">
+                  <span className="w-3 h-3 rounded-full bg-[#03045E] border-2 border-white shadow-sm shrink-0"></span>
+                  <span className="flex-1 text-[11px] font-bold text-[#03045E] leading-tight">Office Location</span>
+                </div>
+
+                <div className="flex items-center gap-2.5">
+                  <span className="w-3 h-3 rounded-full bg-[#2C7FFF] border-2 border-white shadow-sm shrink-0"></span>
+                  <span className="flex-1 text-[11px] font-bold text-[#03045E] leading-tight">Company Base</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <MapContainer 
+        center={[Number(formData.latitude), Number(formData.longitude)]} 
+        zoom={14} 
+        scrollWheelZoom={false} 
+        style={{ height: '100%', width: '100%', zIndex: 0 }}
+      >
+        {satelliteView ? (
+          <TileLayer
+            attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+          />
+        ) : (
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+        )}
+        
+        <Marker position={[Number(formData.latitude), Number(formData.longitude)]}>
+          <Popup>
+            <div className="p-0 min-w-[220px] rounded-2xl overflow-hidden bg-white shadow-xl">
+              <div className="h-1.5 w-full bg-[#03045E]"></div>
+              <div className="px-4 pt-3.5 pb-3">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-sm bg-[#03045E]">
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" /></svg>
+                    Office Base
+                  </span>
+                  <span className="w-2 h-2 rounded-full bg-[#03045E] animate-pulse"></span>
+                </div>
+                <h4 className="font-black text-[15px] text-[#03045E] leading-tight m-0 mb-1">Company Location</h4>
+                <p className="text-xs font-bold text-[#03045E]/70 m-0 leading-relaxed">
+                  {formData.company_name || 'Your office location'}
+                </p>
+              </div>
+            </div>
+          </Popup>
+        </Marker>
+
+        <Circle 
+          center={[Number(formData.latitude), Number(formData.longitude)]} 
+          radius={500} 
+          pathOptions={{ color: '#2C7FFF', fillColor: '#2C7FFF', fillOpacity: 0.15, weight: 2 }} 
+        />
+        <MapRecenter lat={Number(formData.latitude)} lng={Number(formData.longitude)} />
+        <MapInvalidator trigger={mapExpanded} />
+      </MapContainer>
+    </>
+  );
+
   return (
-    <div className={`min-h-screen ${pageBg} p-3 sm:p-8 rounded-3xl`}>
+    <div className="animate-fadeIn max-w-9xl mx-auto pb-6 sm:pb-10 px-1 sm:px-0">
       {!isDark && (
         <style>{`
           .employer-choose-file-input {
@@ -237,7 +438,6 @@ export default function EmployerSettings({ profile, refreshData }) {
           }
         `}</style>
       )}
-      <div className="max-w-6xl mx-auto relative">
        
         <div className={`mb-6 sm:mb-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 p-4 sm:p-8 rounded-2xl sm:rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border-2 ${cardBg}`}>
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full">
@@ -422,12 +622,18 @@ export default function EmployerSettings({ profile, refreshData }) {
               </button>
 
               {formData.latitude && formData.longitude && (
-                <div className={`rounded-xl sm:rounded-2xl overflow-hidden border-2 h-[160px] sm:h-[220px] relative pointer-events-none shadow-inner ${isDark ? 'border-white/40' : 'border-gray-200'}`}>
-                  <iframe 
-                    width="100%" height="100%" frameBorder="0" scrolling="no" marginHeight="0" marginWidth="0" 
-                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${Number(formData.longitude) - 0.05},${Number(formData.latitude) - 0.05},${Number(formData.longitude) + 0.05},${Number(formData.latitude) + 0.05}&layer=mapnik&marker=${formData.latitude},${formData.longitude}`}
-                  ></iframe>
-                </div>
+                !mapExpanded ? (
+                  <div className={`rounded-xl sm:rounded-2xl overflow-hidden border-2 h-[160px] sm:h-[220px] relative shadow-inner z-0 ${isDark ? 'border-white/40' : 'border-gray-200'}`}>
+                    {renderMapInner()}
+                  </div>
+                ) : (
+                  createPortal(
+                    <div className="fixed inset-0 z-[9999] bg-white">
+                      {renderMapInner()}
+                    </div>,
+                    document.body
+                  )
+                )
               )}
             </div>
 
@@ -458,7 +664,6 @@ export default function EmployerSettings({ profile, refreshData }) {
           </div>
 
         </form>
-      </div>
 
       {isModalOpen && (
         <div

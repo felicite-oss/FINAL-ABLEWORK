@@ -208,7 +208,7 @@ export default function EmployerRegister() {
         </div>
 
         <div
-          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out border-b-2 ${
+          className={`md:hidden absolute top-full left-0 w-full overflow-hidden transition-all duration-300 ease-in-out border-b-2 z-40 ${
             isContrast ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/20'
           } ${
             isOpen ? 'max-h-[500px] opacity-100 shadow-xl' : 'max-h-0 opacity-0'
@@ -217,31 +217,46 @@ export default function EmployerRegister() {
         >
           <div className={`w-full ${isContrast ? 'bg-black' : 'bg-white'}`}>
             <nav className={`flex flex-col px-2.5 pt-2.5 pb-2.5 gap-2 sm:px-3 sm:pt-3 sm:pb-3 sm:gap-2.5 ${isContrast ? 'text-white' : 'text-[#03045E]'}`} aria-label="Mobile navigation">
-              <Link to="/" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 sm:gap-3 text-left px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-xl text-xs sm:text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25 shadow-sm">
-                <div className="shrink-0 flex items-center justify-center border-none w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-[#03045E]/10 text-[#03045E]">
-                  <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <Link to="/" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
+                <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                   </svg>
                 </div>
-                <span className="leading-tight">Home</span>
+                <div className="flex-1 min-w-0">
+                  <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Home</span>
+                </div>
+                <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
               </Link>
 
-              <Link to="/about" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 sm:gap-3 text-left px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-xl text-xs sm:text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25 shadow-sm">
-                <div className="shrink-0 flex items-center justify-center border-none w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-[#03045E]/10 text-[#03045E]">
-                  <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <Link to="/about" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
+                <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <span className="leading-tight">About Us</span>
+                <div className="flex-1 min-w-0">
+                  <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">About Us</span>
+                </div>
+                <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
               </Link>
 
-              <Link to="/policy" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 sm:gap-3 text-left px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-xl text-xs sm:text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25 shadow-sm">
-                <div className="shrink-0 flex items-center justify-center border-none w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-[#03045E]/10 text-[#03045E]">
-                  <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <Link to="/policy" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
+                <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <span className="leading-tight">Policy</span>
+                <div className="flex-1 min-w-0">
+                  <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Policy</span>
+                </div>
+                <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
               </Link>
 
               <div className={`h-px my-0.5 ${isContrast ? 'bg-[#2C7FFF]/30' : 'bg-[#03045E]/15'}`}></div>
@@ -249,14 +264,24 @@ export default function EmployerRegister() {
               <NavLink
                 to="/login"
                 onClick={() => setIsOpen(false)}
-                className="relative flex items-center gap-2.5 sm:gap-3 text-left px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-xl text-xs sm:text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25 shadow-sm"
+                className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}
               >
-                <div className="shrink-0 flex items-center justify-center border-none w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-[#03045E]/10 text-[#03045E]">
-                  <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                  </svg>
-                </div>
-                <span className="leading-tight">Log In</span>
+                {({ isActive }) => (
+                  <>
+                    {isActive && <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
+                    <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Log In</span>
+                    </div>
+                    <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </>
+                )}
               </NavLink>
             </nav>
           </div>
@@ -264,7 +289,7 @@ export default function EmployerRegister() {
       </header>
 
       <div
-        className={`flex-1 min-h-0 pt-16 sm:pt-20 flex items-center justify-center px-3 sm:px-4 md:px-8 max-w-[1700px] mx-auto w-full box-border relative z-10 overflow-hidden transition-all duration-300 ${isOpen ? 'mt-48 sm:mt-56' : 'mt-0'}`}
+        className="flex-1 min-h-0 pt-16 sm:pt-20 flex items-center justify-center px-3 sm:px-4 md:px-8 max-w-[1700px] mx-auto w-full box-border relative z-10 overflow-hidden"
         role="region"
         aria-label="Employer registration area"
       >
@@ -272,7 +297,16 @@ export default function EmployerRegister() {
         <div className="w-full max-w-2xl min-w-0 h-[80vh] sm:h-[85vh] max-h-full flex flex-col bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-2xl border border-[#03045E]/10 overflow-hidden relative z-50 animate-fadeIn">
 
           <div className="flex-shrink-0 px-4 pt-5 pb-3 sm:px-6 sm:pt-6 sm:pb-4 border-b border-[#03045E]/10 bg-white/90">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <Link
+                to="/register-select"
+                aria-label="Go back to role selection"
+                className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-[#03045E]/10 text-[#03045E] shrink-0"
+              >
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+              </Link>
               <div className="min-w-0">
                 <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-[#03045E] break-words">
                   Employer Registration
@@ -281,15 +315,6 @@ export default function EmployerRegister() {
                   Create your company profile to start posting inclusive jobs
                 </p>
               </div>
-              <Link
-                to="/register-select"
-                aria-label="Go back to role selection"
-                className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-[#03045E]/10 text-[#03045E] shrink-0"
-              >
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                </svg>
-              </Link>
             </div>
           </div>
 

@@ -411,7 +411,7 @@ export default function EmployerAccountSettings({ profile }) {
   );
 
   return (
-    <div className={`animate-fadeIn max-w-7xl mx-auto pb-6 sm:pb-10 px-1 sm:px-0 ${pageText}`}>
+    <div className={`animate-fadeIn max-w-9xl mx-auto pb-6 sm:pb-10 px-1 sm:px-0 ${pageText}`}>
       
       <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 backdrop-blur-md p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border-2 ${panelBg}`}>
         <div>

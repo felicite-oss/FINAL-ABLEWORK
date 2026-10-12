@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -51,10 +51,40 @@ function MapRecenter({ lat, lng }) {
   return null;
 }
 
+function MapInvalidator({ trigger }) {
+  const map = useMap();
+  useEffect(() => {
+    const timer = setTimeout(() => map.invalidateSize(), 300);
+    return () => clearTimeout(timer);
+  }, [trigger, map]);
+  return null;
+}
+
 export default function ApplicantOverview({ profile, matchesCount, matches = [], jobs = [], applications = [], setActiveTab }) {
   const { mode } = useContext(AccessibilityContext);
   const isDarkMode = mode && typeof mode === 'string' && (mode.toLowerCase().includes('dark') || mode.toLowerCase().includes('comfort'));
   const isContrast = mode && typeof mode === 'string' && mode.toLowerCase().includes('contrast');
+
+  const [legendOpen, setLegendOpen] = useState(true);
+  const [mapExpanded, setMapExpanded] = useState(false);
+  const [satelliteView, setSatelliteView] = useState(false);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') setMapExpanded(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  useEffect(() => {
+    if (mapExpanded) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [mapExpanded]);
 
   const calculateProfileStrength = () => {
     let score = 50; 
@@ -76,6 +106,11 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
     const dist = getDistanceFromLatLonInKm(userLat, userLng, Number(job.latitude), Number(job.longitude));
     return dist !== null && dist <= radiusKm;
   });
+
+  const nearbyMatchCount = nearbyJobs.filter(job =>
+    matches.some(match => match.id === job.id)
+  ).length;
+  const nearbyOtherCount = nearbyJobs.length - nearbyMatchCount;
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -192,24 +227,168 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
               </span>
             </div>
             <h3 className="text-lg sm:text-xl font-extrabold text-[#03045E]">Job Discovery Map</h3>
-            <div className="text-[11px] sm:text-sm font-semibold text-[#03045E] mt-1.5 flex flex-row flex-wrap gap-x-3 gap-y-1">
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#10B981]"></span> Smart Matches</span> 
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#2C7FFF]"></span> Other Opportunities</span>
-            </div>
           </div>
         </div>
 
         {userLat && userLng ? (
-          <div className="h-[300px] sm:h-[400px] w-full rounded-[1rem] sm:rounded-[1.5rem] overflow-hidden border border-[#03045E]/20 z-0 relative shadow-inner">
+          <div className={mapExpanded
+            ? "fixed inset-0 z-[9999] bg-white rounded-none border-0"
+            : "h-[300px] sm:h-[400px] w-full rounded-[1rem] sm:rounded-[1.5rem] overflow-hidden border border-[#03045E]/20 z-0 relative shadow-inner"
+          }>
+            <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-[1000] flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => setMapExpanded(prev => !prev)}
+                aria-label={mapExpanded ? 'Exit fullscreen map' : 'Expand map to fullscreen'}
+                title={mapExpanded ? 'Exit fullscreen' : 'Expand map'}
+                className="relative flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-full bg-white/95 backdrop-blur-md shadow-[0_4px_20px_rgba(3,4,94,0.15)] border border-[#03045E]/15 cursor-pointer"
+              >
+                <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#2C7FFF]/10 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shrink-0">
+                  {mapExpanded ? (
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  ) : (
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                    </svg>
+                  )}
+                </span>
+                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E] whitespace-nowrap">
+                  {mapExpanded ? 'Exit' : 'Expand'}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSatelliteView(prev => !prev)}
+                aria-label={satelliteView ? 'Switch to street view' : 'Switch to satellite view'}
+                title={satelliteView ? 'Street view' : 'Satellite view'}
+                className="relative flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-full bg-white/95 backdrop-blur-md shadow-[0_4px_20px_rgba(3,4,94,0.15)] border border-[#03045E]/15 cursor-pointer"
+              >
+                <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#2C7FFF]/10 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shrink-0">
+                  {satelliteView ? (
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )}
+                </span>
+                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E] whitespace-nowrap">
+                  {satelliteView ? 'Street' : 'Satellite'}
+                </span>
+              </button>
+            </div>
+
+            {mapExpanded && (
+              <div className="absolute top-3 left-16 sm:top-4 sm:left-20 z-[1000] bg-white/95 backdrop-blur-sm px-3 py-2 rounded-xl shadow-lg border border-[#03045E]/20">
+                <p className="text-[11px] font-black uppercase tracking-widest text-[#03045E] m-0">Job Discovery Map</p>
+              </div>
+            )}
+
+            <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-[1000]">
+              <div className="w-[200px] sm:w-[228px] bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-[#03045E]/20 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setLegendOpen(open => !open)}
+                  aria-expanded={legendOpen}
+                  aria-controls="map-legend-panel"
+                  className="w-full flex items-center gap-2 px-3 py-2.5 cursor-pointer"
+                >
+                  <span className="w-6 h-6 rounded-lg bg-[#f4f4f4] border border-[#03045E]/20 flex items-center justify-center text-[#2C7FFF] shrink-0">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                    </svg>
+                  </span>
+                  <span className="flex-1 text-left text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E]">
+                    Map Legend
+                  </span>
+                  <svg
+                    className={`w-3.5 h-3.5 text-[#03045E] transition-transform duration-300 ${legendOpen ? 'rotate-180' : ''}`}
+                    fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                <div className={`grid transition-all duration-300 ease-out ${legendOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                  <div className="overflow-hidden">
+                    <div id="map-legend-panel" className="px-3 pb-3 flex flex-col gap-2">
+                      <div className="h-px w-full bg-[#03045E]/10 mb-0.5"></div>
+
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-3 h-3 rounded-full bg-[#10B981] border-2 border-white shadow-sm shrink-0"></span>
+                        <span className="flex-1 text-[11px] font-bold text-[#03045E] leading-tight">Smart Matches</span>
+                        <span className="text-[10px] font-black text-[#10B981] bg-[#10B981]/10 px-1.5 py-0.5 rounded-full min-w-[22px] text-center">
+                          {nearbyMatchCount}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-3 h-3 rounded-full bg-[#2C7FFF] border-2 border-white shadow-sm shrink-0"></span>
+                        <span className="flex-1 text-[11px] font-bold text-[#03045E] leading-tight">Other Opportunities</span>
+                        <span className="text-[10px] font-black text-[#2C7FFF] bg-[#2C7FFF]/10 px-1.5 py-0.5 rounded-full min-w-[22px] text-center">
+                          {nearbyOtherCount}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-3 h-3 rounded-full bg-[#03045E] border-2 border-white shadow-sm shrink-0"></span>
+                        <span className="flex-1 text-[11px] font-bold text-[#03045E] leading-tight">Your Home Base</span>
+                      </div>
+
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-3 h-3 rounded-full border-2 border-dashed border-[#03045E]/70 shrink-0"></span>
+                        <span className="flex-1 text-[11px] font-bold text-[#03045E] leading-tight">Search Radius</span>
+                        <span className="text-[10px] font-black text-[#03045E]/70 bg-[#f4f4f4] border border-[#03045E]/15 px-1.5 py-0.5 rounded-full">
+                          {radiusKm} km
+                        </span>
+                      </div>
+
+                      {nearbyJobs.length === 0 && (
+                        <p className="text-[10px] font-semibold text-[#03045E]/60 leading-snug pt-0.5">
+                          No jobs found inside your radius yet.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <MapContainer center={[userLat, userLng]} zoom={12} scrollWheelZoom={true} style={{ height: '100%', width: '100%', zIndex: 0 }}>
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
+              {satelliteView ? (
+                <TileLayer
+                  attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                />
+              ) : (
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+              )}
               
               <Marker position={[userLat, userLng]}>
-                <Popup className="font-bold text-[#03045E]">
-                  Your Home Location
+                <Popup>
+                  <div className="p-0 min-w-[220px] rounded-2xl overflow-hidden bg-white shadow-xl">
+                    <div className="h-1.5 w-full bg-[#03045E]"></div>
+                    <div className="px-4 pt-3.5 pb-3">
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-sm bg-[#03045E]">
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" /></svg>
+                          Home Base
+                        </span>
+                        <span className="w-2 h-2 rounded-full bg-[#03045E] animate-pulse"></span>
+                      </div>
+                      <h4 className="font-black text-[15px] text-[#03045E] leading-tight m-0 mb-1">Your Home Location</h4>
+                      <p className="text-xs font-bold text-[#03045E]/70 m-0 leading-relaxed">
+                        Jobs within {radiusKm} km of this address are shown on the map.
+                      </p>
+                    </div>
+                  </div>
                 </Popup>
               </Marker>
 
@@ -229,24 +408,52 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
                     icon={isMatch ? MatchJobIcon : OtherJobIcon}
                   >
                     <Popup>
-                      <div className="flex flex-col gap-1 min-w-[150px]">
-                        {isMatch && (
-                           <span className="px-2 py-0.5 bg-green-100 text-white text-[10px] font-extrabold rounded-full w-fit mb-1">★ SMART MATCH</span>
-                        )}
-                        <p className="font-extrabold text-[#03045E] text-sm leading-tight m-0">{job.job_title}</p>
-                        <p className="text-xs font-semibold text-gray-500 m-0 mb-1">{job.company_name}</p>
-                        <button 
-                          onClick={() => setActiveTab('explore-jobs')} 
-                          className={`mt-1 w-full py-1.5 text-white text-xs font-bold rounded-lg transition-colors cursor-pointer ${isMatch ? 'bg-green-600 hover:bg-green-700' : 'bg-[#2C7FFF] hover:bg-[#03045E]'}`}
-                        >
-                          View Job
-                        </button>
+                      <div className="p-0 min-w-[240px] rounded-2xl overflow-hidden bg-white shadow-xl">
+                        <div className="h-1.5 w-full" style={{ backgroundColor: isMatch ? '#10B981' : '#2C7FFF' }}></div>
+
+                        <div className="px-4 pt-3.5 pb-3">
+                          <div className="flex items-center justify-between gap-2 mb-3">
+                            <span
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-sm"
+                              style={{ backgroundColor: isMatch ? '#10B981' : '#2C7FFF' }}
+                            >
+                              {isMatch ? (
+                                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18.2 22 12 18.3 5.8 22l1.7-7.2L2 10l7.1-1.1L12 2z" /></svg>
+                              ) : (
+                                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" /></svg>
+                              )}
+                              {isMatch ? 'Smart Match' : 'Opportunity'}
+                            </span>
+                            <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: isMatch ? '#10B981' : '#2C7FFF' }}></span>
+                          </div>
+
+                          <h4 className="font-black text-[15px] text-[#03045E] leading-tight m-0 mb-1">{job.job_title}</h4>
+
+                          <div className="flex items-center gap-1.5 mb-3">
+                            <svg className="w-3.5 h-3.5 text-[#2C7FFF] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 12h.01M9 15h.01M9 18h.01M15 9h.01M15 12h.01M15 15h.01M15 18h.01" />
+                            </svg>
+                            <p className="text-xs font-bold text-[#03045E]/70 m-0 truncate">{job.company_name}</p>
+                          </div>
+
+                          <button
+                            onClick={() => setActiveTab('explore-jobs')}
+                            className="w-full py-2.5 text-white text-xs font-black rounded-xl cursor-pointer flex items-center justify-center gap-2 shadow-md"
+                            style={{ backgroundColor: isMatch ? '#10B981' : '#2C7FFF' }}
+                          >
+                            View Job Details
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                          </button>
+                        </div>
                       </div>
                     </Popup>
                   </Marker>
                 );
               })}
               <MapRecenter lat={userLat} lng={userLng} />
+              <MapInvalidator trigger={mapExpanded} />
             </MapContainer>
           </div>
         ) : (
@@ -258,7 +465,7 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
             <p className="text-xs sm:text-sm font-semibold text-[#03045E]/70 mt-1 max-w-xs sm:max-w-sm">
               Please update your home address in your profile settings to enable the Job Discovery Map.
             </p>
-            <button onClick={() => setActiveTab('settings')} className="mt-4 px-4 py-2 sm:px-5 sm:py-2.5 bg-[#2C7FFF] text-white font-bold text-xs sm:text-sm rounded-xl hover:bg-[#03045E] transition-colors shadow-sm cursor-pointer">
+            <button onClick={() => setActiveTab('settings')} className="mt-4 px-4 py-2 sm:px-5 sm:py-2.5 bg-[#2C7FFF] text-white font-bold text-xs sm:text-sm rounded-xl transition-colors shadow-sm cursor-pointer">
               Update Location
             </button>
           </div>
@@ -275,7 +482,7 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
               <h3 className="text-lg sm:text-xl font-extrabold text-[#03045E]">Recent Applications</h3>
               <p className="text-xs sm:text-sm font-semibold text-[#03045E] mt-1">Track your latest moves.</p>
             </div>
-            <button onClick={() => setActiveTab('tracker')} className="text-xs sm:text-sm font-extrabold text-[#2C7FFF] hover:underline flex items-center gap-1 cursor-pointer">
+            <button onClick={() => setActiveTab('tracker')} className="text-xs sm:text-sm font-extrabold text-[#2C7FFF] flex items-center gap-1 cursor-pointer">
               View All 
               <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
             </button>
@@ -284,7 +491,7 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
           <div className="flex-1 flex flex-col gap-3 sm:gap-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
             {recentApps.length > 0 ? (
               recentApps.map((app) => (
-                <div key={app.application_id} className="p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-[#03045E]/20 bg-[#f4f4f4] flex justify-between items-center hover:bg-white transition-all duration-200">
+                <div key={app.application_id} className="p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-[#03045E]/20 bg-[#f4f4f4] flex justify-between items-center">
                   <div className="flex items-center gap-3 sm:gap-4">
                     <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white shadow-sm flex items-center justify-center border border-[#03045E]/20 text-[#2C7FFF] font-extrabold text-sm sm:text-lg shrink-0">
                       {app.company_name.charAt(0)}
@@ -329,36 +536,15 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
             <p className="text-xs sm:text-sm font-semibold text-[#03045E] mb-4 sm:mb-6 max-w-[95%] sm:max-w-[90%] leading-relaxed">
               We've analyzed your skills and travel radius to pinpoint jobs tailored exactly for you.
             </p>
-            <button onClick={() => setActiveTab('explore-jobs')} className={`flex items-center justify-center gap-2 w-full px-4 sm:px-6 py-3 sm:py-3.5 bg-white border-2 border-[#2C7FFF] font-extrabold text-xs sm:text-sm rounded-xl transition-all duration-200 shadow-sm cursor-pointer text-[#03045E]`}>
+            <button onClick={() => setActiveTab('explore-jobs')} className={`flex items-center justify-center gap-2 w-full px-4 sm:px-6 py-3 sm:py-3.5 bg-white border-2 border-[#2C7FFF] font-extrabold text-xs sm:text-sm rounded-xl shadow-sm cursor-pointer text-[#03045E]`}>
               View Your Matches
               <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </button>
-          </div>
-
-
-          {/* Marketplace Card - Adjusted Padding & Fonts */}
-          <div className="p-5 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 flex flex-col justify-center flex-1">
-             <div className="mb-2 w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#f4f4f4] border border-[#03045E]/20 flex items-center justify-center text-[#03045E]">
-                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-             </div>
-             <h3 className="text-xl sm:text-2xl font-black mb-1.5 sm:mb-2 text-[#03045E] leading-tight">Explore the Marketplace</h3>
-             <p className="text-xs sm:text-sm font-semibold text-[#03045E] mb-4 sm:mb-6 max-w-[95%] sm:max-w-[90%] leading-relaxed">
-             Browse all available job postings from verified inclusive employers across the platform.
-             </p>
-             <button
-               onClick={() => setActiveTab('explore-jobs')}
-               className="flex items-center justify-center gap-2 w-full px-4 sm:px-6 py-3 sm:py-3.5 bg-white border-2 border-[#2C7FFF] font-extrabold text-xs sm:text-sm rounded-xl transition-all duration-200 shadow-sm cursor-pointer text-[#03045E]"
-             >
-                Explore All Jobs
-                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-             </button>
           </div>
 
         </div>
 
       </div>
     </div>
-  );
+  );A
 }

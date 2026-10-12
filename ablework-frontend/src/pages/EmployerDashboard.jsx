@@ -220,15 +220,17 @@ export default function EmployerDashboard() {
               </p>
 
               <div className="flex flex-row gap-2 sm:gap-3 w-full">
-                <button
+                                <button
                   onClick={() => setShowLogoutConfirm(false)}
-                  className={`flex-1 py-2.5 sm:py-4 rounded-xl sm:rounded-2xl font-black text-[11px] sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 ${(isContrast || isDarkMode) ? 'text-white border-white' : 'text-[#03045E] border-[#03045E]'}`}
+                  className={`flex-1 py-2.5 sm:py-4 rounded-xl sm:rounded-2xl font-black text-[11px] sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2`}
+                  style={{ color: '#16a34a', borderColor: '#16a34a' }}
                 >
                   No, Stay
                 </button>
                 <button
                   onClick={handleLogout}
-                  className={`flex-1 py-2.5 sm:py-4 rounded-xl sm:rounded-2xl font-black text-[11px] sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 ${(isContrast || isDarkMode) ? 'text-white border-white' : 'text-[#03045E] border-[#03045E]'}`}
+                  className={`flex-1 py-2.5 sm:py-4 rounded-xl sm:rounded-2xl font-black text-[11px] sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2`}
+                  style={{ color: '#DC2626', borderColor: '#DC2626' }}
                 >
                   Yes, Logout
                 </button>
@@ -478,11 +480,9 @@ export default function EmployerDashboard() {
             </button>
 
 
-            {showMobileMenu && (
-              <div
-                onClick={() => setShowMobileMenu(false)}
-                className={`absolute right-0 mt-3 w-[calc(100vw-3rem)] max-w-sm rounded-3xl shadow-2xl border-2 p-4 z-50 flex flex-col gap-3 animate-in fade-in slide-in-from-top-4 duration-200 ${dark ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/20'}`}
-              >
+            <div
+              className={`fixed left-2 right-2 top-16 sm:absolute sm:right-0 sm:left-auto sm:top-auto sm:mt-3 sm:w-[22rem] max-w-[calc(100vw-1rem)] rounded-2xl sm:rounded-3xl shadow-2xl border-2 p-3 sm:p-4 z-50 flex flex-col gap-2.5 sm:gap-3 overflow-hidden transition-all duration-300 ease-in-out ${dark ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/20'} ${showMobileMenu ? 'max-h-[calc(100vh-5rem)] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0 pointer-events-none'}`}
+            >
                 
   
                 <div 
@@ -490,9 +490,9 @@ export default function EmployerDashboard() {
                     setActiveTab('profile');
                     setShowMobileMenu(false);
                   }}
-                  className={`flex items-center gap-2.5 p-2.5 rounded-2xl cursor-pointer transition-all border-2 ${dark ? 'bg-zinc-900 border-white/30' : 'bg-[#f4f4f4] border-[#03045E]/10'}`}
+                  className={`flex items-center gap-2 sm:gap-2.5 p-2 sm:p-2.5 rounded-xl sm:rounded-2xl cursor-pointer transition-all border-2 shrink-0 ${dark ? 'bg-zinc-900 border-white/30' : 'bg-[#f4f4f4] border-[#03045E]/10'}`}
                 >
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold overflow-hidden shadow-md flex-shrink-0 border-2 ${dark ? 'bg-[#2C7FFF] text-white border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}>
+                  <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-bold overflow-hidden shadow-md flex-shrink-0 border-2 ${dark ? 'bg-[#2C7FFF] text-white border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}>
                     {profile?.company_logo ? (
                       <img src={`http://localhost:5001${profile.company_logo}`} alt="Company Logo" className="w-full h-full object-cover" />
                     ) : (
@@ -500,10 +500,10 @@ export default function EmployerDashboard() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={`text-xs font-extrabold truncate ${dark ? 'text-white' : 'text-[#03045E]'}`}>
+                    <p className={`text-[11px] sm:text-xs font-extrabold truncate ${dark ? 'text-white' : 'text-[#03045E]'}`}>
                       {profile?.company_name || profile?.contact_person || 'Employer'}
                     </p>
-                    <p className={`text-[10px] font-semibold ${dark ? 'text-[#2C7FFF]' : 'text-[#2C7FFF]'}`}>View & Edit Profile</p>
+                    <p className={`text-[9px] sm:text-[10px] font-semibold ${dark ? 'text-[#2C7FFF]' : 'text-[#2C7FFF]'}`}>View & Edit Profile</p>
                   </div>
                 </div>
 
@@ -513,13 +513,13 @@ export default function EmployerDashboard() {
                     setActiveTab('settings');
                     setShowMobileMenu(false);
                   }}
-                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-2xl font-bold transition-all text-xs w-full border-2 shadow-sm cursor-pointer ${
+                  className={`flex items-center gap-2 sm:gap-2.5 px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl font-bold transition-all text-[11px] sm:text-xs w-full border-2 shadow-sm cursor-pointer shrink-0 ${
                     activeTab === 'settings' 
                       ? 'bg-[#2C7FFF] text-white border-[#2C7FFF]' 
                       : (dark ? 'bg-zinc-900 text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/20')
                   }`}
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
@@ -527,7 +527,7 @@ export default function EmployerDashboard() {
                 </button>
 
 
-                <div className="flex flex-col gap-2 max-h-[50vh] overflow-y-auto pr-1">
+                <div className="flex flex-col gap-1.5 sm:gap-2 pr-0.5 sm:pr-1">
                   {[
                     { id: 'overview', label: 'Analytics Dashboard', icon: (
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -558,13 +558,13 @@ export default function EmployerDashboard() {
                             setActiveTab(tabItem.id);
                             setShowMobileMenu(false);
                         }} 
-                        className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold transition-all text-xs w-full relative group border-2 cursor-pointer text-left ${
+                        className={`flex items-center gap-2 sm:gap-2.5 px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-bold transition-all text-[11px] sm:text-xs w-full relative group border-2 cursor-pointer text-left shrink-0 ${
                             isActive 
                               ? (isContrast ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] shadow-md' : isDarkMode ? 'bg-[#03045E] text-white border-[#03045E] shadow-md' : 'bg-[#03045E] text-white border-[#03045E] shadow-md') 
                               : (dark ? 'bg-zinc-900 text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/20')
                         }`}
                       >
-                        <div className={`p-1.5 rounded-lg transition-all ${
+                        <div className={`p-1 sm:p-1.5 rounded-md sm:rounded-lg transition-all shrink-0 ${
                             isActive 
                               ? (isContrast ? 'bg-white text-[#2C7FFF]' : 'bg-white text-[#03045E]') 
                               : (dark ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white')
@@ -585,7 +585,7 @@ export default function EmployerDashboard() {
                     setShowLogoutConfirm(true);
                   }}
                   style={{ backgroundColor: '#FEE2E2', color: '#DC2626', borderColor: '#FCA5A5' }}
-                  className="w-full flex items-center justify-center gap-2 p-3 rounded-2xl font-extrabold text-xs transition-colors border-2 shadow-sm cursor-pointer disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl font-extrabold text-[11px] sm:text-xs transition-colors border-2 shadow-sm cursor-pointer disabled:opacity-50 shrink-0"
                 >
                     {isLoggingOut ? (
                       <svg className="w-4 h-4 flex-shrink-0 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -601,7 +601,6 @@ export default function EmployerDashboard() {
                 </button>
 
               </div>
-            )}
           </div>
         </div>
       </div>
@@ -628,11 +627,10 @@ export default function EmployerDashboard() {
       </button>
 
     
-      <div className={`flex flex-col md:flex-row flex-1 min-h-screen pt-20 transition-all duration-300 ${showMobileMenu ? 'mt-[540px] md:mt-0' : ''} ${dark ? 'bg-black' : ''}`}>
+      <div className={`flex flex-col md:flex-row flex-1 min-h-screen pt-20 transition-all duration-300 ${dark ? 'bg-black' : ''}`}>
         
 
-        {showDesktopSidebar && (
-        <aside className={`hidden md:flex w-72 flex-col z-10 border-r-2 px-4 pt-16 pb-4 justify-between shadow-sm flex-shrink-0 fixed top-16 left-0 h-[calc(100vh-4rem)] overflow-y-auto ${dark ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/15'}`}>
+        <aside className={`hidden md:flex w-72 flex-col z-10 border-r-2 px-4 pt-16 pb-4 justify-between shadow-sm flex-shrink-0 fixed top-16 left-0 h-[calc(100vh-4rem)] overflow-y-auto transition-transform duration-300 ease-in-out ${dark ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/15'} ${showDesktopSidebar ? 'translate-x-0' : '-translate-x-full'}`}>
           <nav className="flex flex-col space-y-3 w-full">
 
             {[
@@ -697,10 +695,9 @@ export default function EmployerDashboard() {
             })}
           </nav>
         </aside>
-        )}
 
 
-        <main className={`flex-1 p-3 pt-6 sm:p-6 sm:pt-10 md:p-10 md:pt-14 relative min-w-0 transition-all duration-300 flex flex-col box-border ${showDesktopSidebar ? 'md:ml-72' : ''} ${dark ? 'bg-black' : ''}`}>
+        <main className={`flex-1 p-3 pt-6 sm:p-6 sm:pt-10 md:p-10 md:pt-14 relative min-w-0 transition-all duration-300 ease-in-out flex flex-col box-border ${showDesktopSidebar ? 'md:ml-72' : 'md:ml-0'} ${dark ? 'bg-black' : ''}`}>
           <div className="flex items-start gap-4 w-full min-w-0">
             <div className="w-full flex-1 min-w-0 overflow-x-hidden">
 
@@ -787,7 +784,7 @@ export default function EmployerDashboard() {
       </div>
 
 
-      <div className={`transition-all duration-300 ${showDesktopSidebar ? 'md:ml-72' : ''}`}>
+      <div className={`transition-all duration-300 ease-in-out ${showDesktopSidebar ? 'md:ml-72' : 'md:ml-0'}`}>
         <EmployerFooter activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
       

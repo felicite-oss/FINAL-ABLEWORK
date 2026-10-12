@@ -25,6 +25,15 @@ function MapUpdater({ lat, lng }) {
   return null;
 }
 
+function MapInvalidator({ trigger }) {
+  const map = useMap();
+  useEffect(() => {
+    const timer = setTimeout(() => map.invalidateSize(), 300);
+    return () => clearTimeout(timer);
+  }, [trigger, map]);
+  return null;
+}
+
 const SKILL_RECOMMENDATIONS = [
   "Customer Service", "Microsoft Office", "Virtual Assistance", 
   "Problem Solving", "Graphic Design", "Node.js", "UI/UX Design", "Data Entry", "Time Management", "Teamwork"
@@ -40,6 +49,11 @@ const DISABILITY_OPTIONS = [
   "Deafness", "Blindness", "Low Vision", "Hard of Hearing", 
   "Color Blindness", "Paralysis", "Amputation", "Cerebral Palsy", 
   "Limited Fine Motor Skills", "Wheelchair User"
+];
+
+const INDEPENDENCE_OPTIONS = [
+  { value: 'Independent', label: 'Independent (Requires standard accommodations)', description: 'You can perform job duties with standard workplace adjustments.' },
+  { value: 'Supported', label: 'Supported (Requires a job coach or assistant)', description: 'You need on-site support or a job coach for daily tasks.' }
 ];
 
 export default function ApplicantProfile({ profile, refreshData, setProfile }) {
@@ -63,11 +77,34 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tempImagePreview, setTempImagePreview] = useState('');
   
-  // This physically holds the image file to send to the backend
   const [profilePicFile, setProfilePicFile] = useState(null);
   
   const [locationAlert, setLocationAlert] = useState({ isOpen: false, type: '', title: '', message: '', latitude: '', longitude: '' });
   const [saveSuccess, setSaveSuccess] = useState({ isOpen: false, message: '' });
+
+  const [independenceOpen, setIndependenceOpen] = useState(false);
+  const independenceRef = useRef(null);
+
+  const [mapExpanded, setMapExpanded] = useState(false);
+  const [satelliteView, setSatelliteView] = useState(false);
+  const [legendOpen, setLegendOpen] = useState(true);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') setMapExpanded(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  useEffect(() => {
+    if (mapExpanded) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [mapExpanded]);
 
   const parseInitialList = (data) => {
     if (!data) return [];
@@ -112,6 +149,16 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
     }
   }, [profile?.profile_picture, profile?.avatar_url]);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (independenceRef.current && !independenceRef.current.contains(event.target)) {
+        setIndependenceOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -119,7 +166,7 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setProfilePicFile(file); // Store the actual file immediately
+      setProfilePicFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setTempImagePreview(reader.result);
@@ -128,13 +175,11 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
     }
   };
 
-  // FIX: Make the modal instantly upload the file to the database to prevent NULL errors
   const handleConfirmChangePicture = async () => {
     if (!tempImagePreview || !profilePicFile) return;
 
     setIsUpdatingPicture(true);
 
-    // Package the form data instantly
     const submitData = new FormData();
     submitData.append('residential_address', formData.residential_address || '');
     submitData.append('latitude', formData.latitude || '');
@@ -155,7 +200,6 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
       if (res.ok) {
         const responseData = await res.json();
         
-        // Update states with the new database URL
         setFormData(prev => ({ ...prev, profile_picture: responseData.profile_picture }));
         localStorage.setItem('profile_picture', responseData.profile_picture);
         window.dispatchEvent(new Event('storage'));
@@ -170,7 +214,7 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
 
         setIsUpdatingPicture(false);
         setIsModalOpen(false);
-        setProfilePicFile(null); // Reset
+        setProfilePicFile(null);
         setSaveSuccess({ isOpen: true, message: 'Your avatar has been successfully saved.' });
         refreshData();
       } else {
@@ -375,6 +419,8 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
       setIsSubmitting(false);
     }
   };
+
+  const selectedIndependence = INDEPENDENCE_OPTIONS.find(o => o.value === formData.workplace_independence);
 
   return (
     <div className="max-w-6xl relative pb-12 animate-in fade-in duration-300 text-[#03045E]">
@@ -758,15 +804,71 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
 
           <div className="flex flex-col gap-1.5 sm:gap-2">
             <label className="text-xs sm:text-sm font-bold text-[#03045E]">Workplace Independence Level</label>
-            <select 
-              name="workplace_independence" value={formData.workplace_independence} onChange={handleChange} required
-              className="w-full p-3 sm:p-3.5 pl-3 sm:pl-4 bg-white rounded-xl sm:rounded-2xl text-[#03045E] transition-all font-medium text-xs sm:text-sm cursor-pointer"
-              style={{ borderWidth: '2px', borderStyle: 'solid', borderColor: 'var(--color-primary, #2C7FFF)', outline: 'none', boxShadow: 'none' }}
-            >
-              <option value="" disabled style={{ backgroundColor: '#ffffff', color: 'rgba(3,4,94,0.4)' }}>Select independence level</option>
-              <option value="Independent" style={{ backgroundColor: '#ffffff', color: '#03045E' }}>Independent (Requires standard accommodations)</option>
-              <option value="Supported" style={{ backgroundColor: '#ffffff', color: '#03045E' }}>Supported (Requires a job coach or assistant)</option>
-            </select>
+            <div className="relative" ref={independenceRef}>
+              <button
+                type="button"
+                onClick={() => setIndependenceOpen(!independenceOpen)}
+                className="w-full flex items-center justify-between gap-3 p-3 sm:p-3.5 pl-3 sm:pl-4 bg-white rounded-xl sm:rounded-2xl text-left text-[#03045E] transition-all font-medium text-xs sm:text-sm cursor-pointer border-2 border-[#2C7FFF] hover:border-[#03045E] focus:outline-none focus:ring-4 focus:ring-[#2C7FFF]/20"
+              >
+                <span className="flex items-center gap-2 sm:gap-3 min-w-0">
+                  <span className={`shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center ${formData.workplace_independence ? 'bg-[#2C7FFF]' : 'bg-[#f4f4f4]'}`}>
+  <svg
+    className="w-3.5 h-3.5 sm:w-4 sm:h-4"
+    style={{ color: isDarkScreen ? '#000000' : (formData.workplace_independence ? '#ffffff' : 'rgba(3,4,94,0.5)') }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    viewBox="0 0 24 24"
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+  </svg>
+</span>
+                  <span className="truncate font-bold">
+                    {selectedIndependence ? selectedIndependence.label : 'Select independence level'}
+                  </span>
+                </span>
+                <span className={`shrink-0 text-[#2C7FFF] transition-transform duration-200 ${independenceOpen ? 'rotate-180' : ''}`}>
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </span>
+              </button>
+
+              {independenceOpen && (
+                <div className="absolute z-50 mt-2 w-full rounded-2xl border-2 border-[#2C7FFF] bg-white shadow-[0_15px_40px_rgba(3,4,94,0.15)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                  {INDEPENDENCE_OPTIONS.map((option) => {
+                    const isSelected = formData.workplace_independence === option.value;
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => {
+                          setFormData({ ...formData, workplace_independence: option.value });
+                          setIndependenceOpen(false);
+                        }}
+                        className={`w-full flex items-start gap-3 p-3 sm:p-4 text-left transition-colors cursor-pointer border-b border-[#03045E]/10 last:border-b-0 ${
+                          isSelected ? 'bg-[#2C7FFF]/10' : 'bg-white hover:bg-[#f4f4f4]'
+                        }`}
+                      >
+                        <span className={`shrink-0 mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          isSelected ? 'border-[#2C7FFF] bg-[#2C7FFF]' : 'border-[#03045E]/30 bg-white'
+                        }`}>
+                          {isSelected && (
+                            <svg className="w-3 h-3" fill="none" stroke={isDarkMode ? '#000000' : '#ffffff'} strokeWidth="3" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </span>
+                        <span className="flex-1 min-w-0">
+                          <span className="block font-bold text-xs sm:text-sm text-[#03045E] leading-tight">{option.label}</span>
+                          <span className="block text-[10px] sm:text-xs font-semibold text-[#03045E]/60 mt-1 leading-snug">{option.description}</span>
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -825,24 +927,137 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
 
          
           {formData.latitude && formData.longitude && (
-            <div className="rounded-xl sm:rounded-2xl overflow-hidden border border-[#03045E]/20 h-[180px] sm:h-[220px] relative shadow-inner bg-gray-100 z-0">
+            <div className={mapExpanded
+              ? "fixed inset-0 z-[9999] bg-white rounded-none border-0"
+              : "rounded-xl sm:rounded-2xl overflow-hidden border border-[#03045E]/20 h-[180px] sm:h-[220px] relative shadow-inner bg-gray-100 z-0"
+            }>
+              <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-[1000] flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => setMapExpanded(prev => !prev)}
+                  aria-label={mapExpanded ? 'Exit fullscreen map' : 'Expand map to fullscreen'}
+                  title={mapExpanded ? 'Exit fullscreen' : 'Expand map'}
+                  className="relative flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-full bg-white/95 backdrop-blur-md shadow-[0_4px_20px_rgba(3,4,94,0.15)] border border-[#03045E]/15 cursor-pointer"
+                >
+                  <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#2C7FFF]/10 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shrink-0">
+                    {mapExpanded ? (
+                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    ) : (
+                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                      </svg>
+                    )}
+                  </span>
+                  <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E] whitespace-nowrap">
+                    {mapExpanded ? 'Exit' : 'Expand'}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSatelliteView(prev => !prev)}
+                  aria-label={satelliteView ? 'Switch to street view' : 'Switch to satellite view'}
+                  title={satelliteView ? 'Street view' : 'Satellite view'}
+                  className="relative flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-full bg-white/95 backdrop-blur-md shadow-[0_4px_20px_rgba(3,4,94,0.15)] border border-[#03045E]/15 cursor-pointer"
+                >
+                  <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#2C7FFF]/10 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shrink-0">
+                    {satelliteView ? (
+                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                      </svg>
+                    ) : (
+                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    )}
+                  </span>
+                  <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E] whitespace-nowrap">
+                    {satelliteView ? 'Street' : 'Satellite'}
+                  </span>
+                </button>
+              </div>
+
+              {mapExpanded && (
+                <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-[1000] bg-white/95 backdrop-blur-sm px-3 py-2 rounded-xl shadow-lg border border-[#03045E]/20">
+                  <p className="text-[11px] font-black uppercase tracking-widest text-[#03045E] m-0">Your Location</p>
+                </div>
+              )}
+
+              <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-[1000]">
+                <div className="w-[200px] sm:w-[228px] bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-[#03045E]/20 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setLegendOpen(open => !open)}
+                    aria-expanded={legendOpen}
+                    aria-controls="profile-map-legend-panel"
+                    className="w-full flex items-center gap-2 px-3 py-2.5 cursor-pointer"
+                  >
+                    <span className="w-6 h-6 rounded-lg bg-[#f4f4f4] border border-[#03045E]/20 flex items-center justify-center text-[#2C7FFF] shrink-0">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                      </svg>
+                    </span>
+                    <span className="flex-1 text-left text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E]">
+                      Map Legend
+                    </span>
+                    <svg
+                      className={`w-3.5 h-3.5 text-[#03045E] transition-transform duration-300 ${legendOpen ? 'rotate-180' : ''}`}
+                      fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  <div className={`grid transition-all duration-300 ease-out ${legendOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                    <div className="overflow-hidden">
+                      <div id="profile-map-legend-panel" className="px-3 pb-3 flex flex-col gap-2">
+                        <div className="h-px w-full bg-[#03045E]/10 mb-0.5"></div>
+
+                        <div className="flex items-center gap-2.5">
+                          <span className="w-3 h-3 rounded-full bg-[#03045E] border-2 border-white shadow-sm shrink-0"></span>
+                          <span className="flex-1 text-[11px] font-bold text-[#03045E] leading-tight">Your Home Base</span>
+                        </div>
+
+                        <div className="flex items-center gap-2.5">
+                          <span className="w-3 h-3 rounded-full bg-[#2C7FFF] border-2 border-white shadow-sm shrink-0"></span>
+                          <span className="flex-1 text-[11px] font-bold text-[#03045E] leading-tight">Search Radius</span>
+                          <span className="text-[10px] font-black text-[#2C7FFF] bg-[#2C7FFF]/10 border border-[#2C7FFF]/20 px-1.5 py-0.5 rounded-full">
+                            {formData.travel_radius_km} km
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <MapContainer 
                 center={[Number(formData.latitude), Number(formData.longitude)]} 
                 zoom={11} 
                 style={{ height: '100%', width: '100%', zIndex: 0 }}
                 scrollWheelZoom={false}
               >
-                <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution='&copy; OpenStreetMap contributors'
-                />
+                {satelliteView ? (
+                  <TileLayer
+                    attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                    url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                  />
+                ) : (
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; OpenStreetMap contributors'
+                  />
+                )}
                 <Marker position={[Number(formData.latitude), Number(formData.longitude)]} />
                 <Circle 
                   center={[Number(formData.latitude), Number(formData.longitude)]}
                   radius={Number(formData.travel_radius_km) * 1000} 
-                  pathOptions={{ color: '#2C7FFF', fillColor: '#2C7FFF', fillOpacity: 0.15, weight: 2 }}
+                  pathOptions={{ color: '#2C7FFF', fillColor: '#2C7FFF', fillOpacity: 0.15, weight: 2 }} 
                 />
                 <MapUpdater lat={Number(formData.latitude)} lng={Number(formData.longitude)} />
+                <MapInvalidator trigger={mapExpanded} />
               </MapContainer>
             </div>
           )}

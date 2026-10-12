@@ -118,59 +118,99 @@ function SiteHeader() {
       >
         <div className={`w-full ${isContrast ? 'bg-black' : 'bg-white'}`}>
           <nav className={`flex flex-col px-2.5 pt-2.5 pb-2.5 gap-2 sm:px-3 sm:pt-3 sm:pb-3 sm:gap-2.5 ${isContrast ? 'text-white' : 'text-[#03045E]'}`} aria-label="Mobile navigation">
-            <NavLink 
-              to="/" 
+            <NavLink
+              to="/"
               onClick={() => setIsOpen(false)}
-              className="relative flex items-center gap-2.5 sm:gap-3 text-left px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-xl text-xs sm:text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25 shadow-sm"
+              className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}
             >
-              <div className="shrink-0 flex items-center justify-center border-none w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-[#03045E]/10 text-[#03045E]">
-                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-              </div>
-              <span className="leading-tight">Home</span>
+              {({ isActive }) => (
+                <>
+                  {isActive && <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
+                  <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Home</span>
+                  </div>
+                  <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </>
+              )}
             </NavLink>
 
-            <NavLink 
-              to="/about" 
+            <NavLink
+              to="/about"
               onClick={() => setIsOpen(false)}
-              className="relative flex items-center gap-2.5 sm:gap-3 text-left px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-xl text-xs sm:text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25 shadow-sm"
+              className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}
             >
-              <div className="shrink-0 flex items-center justify-center border-none w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-[#03045E]/10 text-[#03045E]">
-                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <span className="leading-tight">About Us</span>
+              {({ isActive }) => (
+                <>
+                  {isActive && <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
+                  <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">About Us</span>
+                  </div>
+                  <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </>
+              )}
             </NavLink>
 
-            <NavLink 
-              to="/policy" 
+            <NavLink
+              to="/policy"
               onClick={() => setIsOpen(false)}
-              className="relative flex items-center gap-2.5 sm:gap-3 text-left px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-xl text-xs sm:text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25 shadow-sm"
+              className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}
             >
-              <div className="shrink-0 flex items-center justify-center border-none w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-[#03045E]/10 text-[#03045E]">
-                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <span className="leading-tight">Policy</span>
+              {({ isActive }) => (
+                <>
+                  {isActive && <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
+                  <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Policy</span>
+                  </div>
+                  <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </>
+              )}
             </NavLink>
 
             <div className={`h-px my-0.5 ${isContrast ? 'bg-[#2C7FFF]/30' : 'bg-[#03045E]/15'}`}></div>
 
-            <Link
+            <NavLink
               to="/login"
               onClick={() => setIsOpen(false)}
-              className="relative flex items-center gap-2.5 sm:gap-3 text-left px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-xl text-xs sm:text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25 shadow-sm"
+              className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}
             >
-              <div className="shrink-0 flex items-center justify-center border-none w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-[#03045E]/10 text-[#03045E]">
-                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                </svg>
-              </div>
-              <span className="leading-tight">Log In</span>
-            </Link>
+              {({ isActive }) => (
+                <>
+                  {isActive && <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
+                  <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Log In</span>
+                  </div>
+                  <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </>
+              )}
+            </NavLink>
           </nav>
         </div>
       </div>
@@ -193,6 +233,9 @@ export function Home() {
   const [userLocation, setUserLocation] = useState(null);
   const [isDetecting, setIsDetecting] = useState(false);
   const [locationError, setLocationError] = useState('');
+
+  const [satelliteView, setSatelliteView] = useState(false);
+  const [legendOpen, setLegendOpen] = useState(true);
 
   const defaultCenter = [10.6766, 122.9509];
 
@@ -259,6 +302,18 @@ export function Home() {
           .dark-mode-fix *:not(.hero-bg-img) {
             background-image: none !important;
           }
+          .dark-mode-fix .leaflet-popup,
+          .dark-mode-fix .leaflet-popup * {
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+            text-shadow: none !important;
+            stroke: #000000 !important;
+          }
+          .dark-mode-fix .leaflet-popup svg,
+          .dark-mode-fix .leaflet-popup svg * {
+            stroke: #000000 !important;
+            color: #000000 !important;
+          }
         `}</style>
       )}
 
@@ -309,11 +364,11 @@ export function Home() {
                   WELCOME TO ABLEWORK
                 </span>
 
-                <h1 data-hc-plain className={`text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight mb-4 sm:mb-6 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`} style={(isContrast || isDarkMode) ? { textShadow: 'none' } : { textShadow: '0 0 8px rgba(255,255,255,0.95), 0 0 16px rgba(255,255,255,0.85), 0 0 24px rgba(255,255,255,0.7), 0 2px 4px rgba(255,255,255,0.9)' }}>
+                <h1 data-hc-plain className={`text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight mb-4 sm:mb-6 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`} style={(isContrast || isDarkMode) ? { textShadow: 'none' } : undefined}>
                   Building an <span className={isContrast ? 'text-[var(--color-accent)]' : 'text-[#03045E]'}>Inclusive Workforce</span> for Everyone
                 </h1>
 
-                <p data-hc-plain className={`text-sm sm:text-lg font-semibold leading-relaxed mb-5 sm:mb-8 p-2.5 sm:p-3 rounded-xl ${isContrast ? 'text-[var(--color-text)] bg-[var(--color-surface)]/80 border border-[var(--color-border)]' : 'text-[#03045E] bg-[var(--color-surface)]/50'}`} style={(isContrast || isDarkMode) ? { textShadow: 'none' } : { textShadow: '0 0 8px rgba(255,255,255,0.95), 0 0 14px rgba(255,255,255,0.85), 0 0 24px rgba(255,255,255,0.7), 0 2px 4px rgba(255,255,255,0.9)' }}>
+                <p data-hc-plain className={`text-sm sm:text-lg font-semibold leading-relaxed mb-5 sm:mb-8 p-2.5 sm:p-3 rounded-xl ${isContrast ? 'text-[var(--color-text)] bg-[var(--color-surface)]/80 border border-[var(--color-border)]' : 'text-[#03045E] bg-[var(--color-surface)]/50'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_14px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`} style={(isContrast || isDarkMode) ? { textShadow: 'none' } : undefined}>
                   AbleWork helps persons with disabilities find suitable employment opportunities based on their unique skills, qualifications, and preferred locations.
                 </p>
 
@@ -344,22 +399,22 @@ export function Home() {
 
                 <div className={`grid grid-cols-3 gap-4 sm:gap-6 mt-8 sm:mt-12 pt-6 sm:pt-10 border-t ${isContrast ? 'border-[var(--color-border)]' : 'border-[#03045E]/20'}`}>
                   <div>
-                    <h4 className={`text-xl sm:text-3xl font-black ${isContrast ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'}`}>100%</h4>
-                    <p className={`text-[10px] sm:text-xs font-black uppercase tracking-wider mt-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Accessible</p>
+                    <h4 className={`text-xl sm:text-3xl font-black ${isContrast ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`}>100%</h4>
+                    <p className={`text-[10px] sm:text-xs font-black uppercase tracking-wider mt-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`}>Accessible</p>
                   </div>
                   <div>
-                    <h4 className={`text-xl sm:text-3xl font-black ${isContrast ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'}`}>24/7</h4>
-                    <p className={`text-[10px] sm:text-xs font-black uppercase tracking-wider mt-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Support</p>
+                    <h4 className={`text-xl sm:text-3xl font-black ${isContrast ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`}>24/7</h4>
+                    <p className={`text-[10px] sm:text-xs font-black uppercase tracking-wider mt-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`}>Support</p>
                   </div>
                   <div>
-                    <h4 className={`text-xl sm:text-3xl font-black ${isContrast ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'}`}>Secure</h4>
-                    <p className={`text-[10px] sm:text-xs font-black uppercase tracking-wider mt-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Platform</p>
+                    <h4 className={`text-xl sm:text-3xl font-black ${isContrast ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`}>Secure</h4>
+                    <p className={`text-[10px] sm:text-xs font-black uppercase tracking-wider mt-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`}>Platform</p>
                   </div>
                 </div>
               </div>
 
               <div className={`h-full flex flex-col justify-center rounded-xl sm:rounded-[2rem] p-4 sm:p-8 shadow-xl border ${isContrast ? 'bg-[var(--color-surface)]/70 border-[var(--color-border)] text-[var(--color-text)]' : 'bg-[var(--color-surface)]/70 border-[#03045E]/20 text-[#03045E]'}`}>
-                <h2 className={`text-lg sm:text-2xl font-black mb-4 sm:mb-6 tracking-tight flex items-center gap-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
+                <h2 className={`text-lg sm:text-2xl font-black mb-4 sm:mb-6 tracking-tight flex items-center gap-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`}>
                   <span className="w-3 h-3 rounded-full bg-[var(--color-accent)]"></span>
                   Why Choose AbleWork?
                 </h2>
@@ -426,25 +481,132 @@ export function Home() {
             )}
 
             <div className="h-[320px] sm:h-[480px] w-full rounded-2xl sm:rounded-[2rem] overflow-hidden border-2 border-[var(--color-border)] shadow-inner relative z-10">
+              <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-[1000] flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSatelliteView(prev => !prev)}
+                  aria-label={satelliteView ? 'Switch to street view' : 'Switch to satellite view'}
+                  title={satelliteView ? 'Street view' : 'Satellite view'}
+                  className="relative flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-full bg-white/95 backdrop-blur-md shadow-[0_4px_20px_rgba(3,4,94,0.15)] border border-[#03045E]/15 cursor-pointer"
+                >
+                  <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#2C7FFF]/10 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shrink-0">
+                    {satelliteView ? (
+                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                      </svg>
+                    ) : (
+                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    )}
+                  </span>
+                  <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E] whitespace-nowrap">
+                    {satelliteView ? 'Street' : 'Satellite'}
+                  </span>
+                </button>
+              </div>
+
+              <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-[1000]">
+                <div className="w-[200px] sm:w-[228px] bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-[#03045E]/20 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setLegendOpen(open => !open)}
+                    aria-expanded={legendOpen}
+                    aria-controls="home-map-legend-panel"
+                    className="w-full flex items-center gap-2 px-3 py-2.5 cursor-pointer"
+                  >
+                    <span className="w-6 h-6 rounded-lg bg-[#f4f4f4] border border-[#03045E]/20 flex items-center justify-center text-[#2C7FFF] shrink-0">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                      </svg>
+                    </span>
+                    <span className="flex-1 text-left text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E]">
+                      Map Legend
+                    </span>
+                    <svg
+                      className={`w-3.5 h-3.5 text-[#03045E] transition-transform duration-300 ${legendOpen ? 'rotate-180' : ''}`}
+                      fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  <div className={`grid transition-all duration-300 ease-out ${legendOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                    <div className="overflow-hidden">
+                      <div id="home-map-legend-panel" className="px-3 pb-3 flex flex-col gap-2">
+                        <div className="h-px w-full bg-[#03045E]/10 mb-0.5"></div>
+
+                        <div className="flex items-center gap-2.5">
+                          <span className="w-3 h-3 rounded-full bg-[#2C7FFF] border-2 border-white shadow-sm shrink-0"></span>
+                          <span className="flex-1 text-[11px] font-bold text-[#03045E] leading-tight">Active Job Pin</span>
+                          <span className="text-[10px] font-black text-[#2C7FFF] bg-[#2C7FFF]/10 px-1.5 py-0.5 rounded-full min-w-[22px] text-center">
+                            {mappedJobs.length}
+                          </span>
+                        </div>
+
+                        {userLocation && (
+                          <div className="flex items-center gap-2.5">
+                            <span className="w-3 h-3 rounded-full bg-[#10B981] border-2 border-white shadow-sm shrink-0"></span>
+                            <span className="flex-1 text-[11px] font-bold text-[#03045E] leading-tight">Your Location</span>
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-2.5">
+                          <span className="w-3 h-3 rounded-full border-2 border-dashed border-[#2C7FFF]/70 shrink-0"></span>
+                          <span className="flex-1 text-[11px] font-bold text-[#03045E] leading-tight">10 km Radius</span>
+                        </div>
+
+                        {mappedJobs.length === 0 && (
+                          <p className="text-[10px] font-semibold text-[#03045E]/60 leading-snug pt-0.5">
+                            No active jobs on the map yet.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <MapContainer 
                 center={userLocation ? [userLocation.lat, userLocation.lng] : defaultCenter} 
                 zoom={userLocation ? 12 : 10} 
                 scrollWheelZoom={false} 
                 style={{ height: '100%', width: '100%' }}
               >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
+                {satelliteView ? (
+                  <TileLayer
+                    attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                    url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                  />
+                ) : (
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                )}
 
                 {userLocation && (
                   <>
                     <MapRecenter lat={userLocation.lat} lng={userLocation.lng} />
                     <Marker position={[userLocation.lat, userLocation.lng]}>
                       <Popup>
-                        <div className="text-center p-1">
-                          <p className="font-black text-[#03045E] text-sm">📍 You are here</p>
-                          <p className="text-xs text-gray-500 font-semibold">Browsing nearby verified jobs</p>
+                        <div className="p-0 min-w-[240px] bg-black text-white rounded-2xl overflow-hidden shadow-2xl border-2 border-white">
+                          <div className="bg-white text-black px-3 py-1.5 flex items-center justify-between">
+                            <span className="text-[10px] font-black uppercase tracking-widest">Your Location</span>
+                            <span className="w-2 h-2 rounded-full bg-black animate-pulse"></span>
+                          </div>
+                          <div className="px-3 py-3 flex items-start gap-2">
+                            <div className="w-7 h-7 rounded-full bg-white text-black flex items-center justify-center shrink-0">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                              </svg>
+                            </div>
+                            <div>
+                              <p className="font-black text-sm text-white leading-tight">You are here</p>
+                              <p className="text-[11px] font-semibold text-white/80 mt-0.5">Browsing nearby verified jobs</p>
+                            </div>
+                          </div>
                         </div>
                       </Popup>
                     </Marker>
@@ -462,47 +624,58 @@ export function Home() {
                     position={[Number(job.latitude), Number(job.longitude)]}
                   >
                     <Popup>
-                      <div className="p-1 min-w-[200px] text-[#03045E]">
-                        <span className="inline-block px-2 py-0.5 bg-[#2C7FFF]/15 text-[#03045E] text-[10px] font-black rounded-md uppercase mb-1">
-                          Active Opening
-                        </span>
-                        <h4 className="font-black text-sm text-[#03045E] leading-tight">{job.job_title}</h4>
-                        <p className="text-xs font-extrabold text-[#2C7FFF] mb-2">{job.company_name}</p>
-                        
-                        <p className="text-xs text-gray-600 font-semibold mb-1">
-                          📍 {job.workplace_address || job.company_address || job.address || 'Address provided upon application'}
-                        </p>
-                        {job.salary_range && (
-                          <p className="text-xs text-emerald-700 font-black mb-3">
-                            💰 {job.salary_range}
-                          </p>
-                        )}
-                        
-                        <Link 
-                          to="/register-select"
-                          className="block text-center py-2 px-3 bg-[#03045E] text-white text-xs font-black rounded-lg hover:bg-[#2C7FFF] transition"
-                        >
-                          Apply / Register Now →
-                        </Link>
+                      <div className="p-0 min-w-[260px] bg-black text-white rounded-2xl overflow-hidden shadow-2xl border-2 border-white">
+                        <div className="bg-white text-black px-3 py-1.5 flex items-center justify-between">
+                          <span className="text-[10px] font-black uppercase tracking-widest">Active Opening</span>
+                          <span className="w-2 h-2 rounded-full bg-black animate-pulse"></span>
+                        </div>
+
+                        <div className="px-3 pt-3 pb-2">
+                          <h4 className="font-black text-base text-white leading-tight mb-1">{job.job_title}</h4>
+                          <p className="text-xs font-bold text-white/80 mb-3">{job.company_name}</p>
+
+                          <div className="space-y-2 mb-3">
+                            <div className="flex items-start gap-2">
+                              <div className="w-6 h-6 rounded-full bg-white text-black flex items-center justify-center shrink-0">
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                              </div>
+                              <p className="text-xs font-semibold text-white leading-snug">
+                                {job.workplace_address || job.company_address || job.address || 'Address provided upon application'}
+                              </p>
+                            </div>
+
+                            {job.salary_range && (
+                              <div className="flex items-start gap-2">
+                                <div className="w-6 h-6 rounded-full bg-white text-black flex items-center justify-center shrink-0">
+                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
+                                </div>
+                                <p className="text-xs font-black text-white leading-snug">{job.salary_range}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="px-3 pb-3">
+                          <Link 
+                            to="/register-select"
+                            className="block text-center py-2.5 px-3 bg-white text-black text-xs font-black rounded-xl hover:bg-neutral-200 transition flex items-center justify-center gap-2"
+                          >
+                            Apply / Register Now
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                          </Link>
+                        </div>
                       </div>
                     </Popup>
                   </Marker>
                 ))}
               </MapContainer>
-            </div>
-
-            <div className={`mt-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4 text-[10px] sm:text-xs font-bold ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/70'}`}>
-              <div className="flex items-center gap-3">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-full bg-[var(--color-accent)]"></span> Active Job Pin
-                </span>
-                {userLocation && (
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-3 h-3 rounded-full bg-emerald-500"></span> Your Location
-                  </span>
-                )}
-              </div>
-              <span>Showing {mappedJobs.length} live workplace positions</span>
             </div>
 
           </div>
@@ -597,73 +770,6 @@ export function Policy() {
   const { mode } = useContext(AccessibilityContext);
   const isContrast = mode && typeof mode === 'string' && mode.toLowerCase().includes('contrast');
 
-  const policySections = [
-    {
-      num: "01",
-      title: "Information We Collect",
-      desc: "We collect personal information reasonably necessary to facilitate inclusive employment matching, account verification, and secure platform operations, including personal identifiers, sensitive personal information such as PWD identification and disability type, professional credentials, and location data.",
-      icon: (
-        <svg className="w-6 h-6 text-[var(--color-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-      )
-    },
-    {
-      num: "02",
-      title: "Legal Basis and Purpose of Processing",
-      desc: "Information is processed based on explicit user consent and legitimate operational interests to authenticate credentials, enforce document verification, power the smart matching engine, and maintain system security in compliance with the Data Privacy Act of 2012.",
-      icon: (
-        <svg className="w-6 h-6 text-[var(--color-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg>
-      )
-    },
-    {
-      num: "03",
-      title: "Processing of Sensitive Personal Information",
-      desc: "Disability classifications and PWD ID documents are processed strictly to verify eligibility and ensure that matched workplaces meet necessary accommodations, stored securely and accessible exclusively to authorized administrators.",
-      icon: (
-        <svg className="w-6 h-6 text-[var(--color-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-      )
-    },
-    {
-      num: "04",
-      title: "Artificial Intelligence & Third-Party Services",
-      desc: "The platform interfaces with third-party providers like Google Gemini API for the ABBY conversational assistant, email dispatch services, and mapping services under strict data protection principles.",
-      icon: (
-        <svg className="w-6 h-6 text-[var(--color-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-      )
-    },
-    {
-      num: "05",
-      title: "Data Access, Disclosure, and Visibility",
-      desc: "Applicant profiles become accessible to specific employers upon job application submission. External disclosure is restricted unless legally mandated under Philippine jurisdiction.",
-      icon: (
-        <svg className="w-6 h-6 text-[var(--color-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-      )
-    },
-    {
-      num: "06",
-      title: "Data Storage and Security",
-      desc: "We implement organizational, physical, and technical security measures, including cryptographic hashing with bcrypt for passwords and isolated directory storage for verification documents.",
-      icon: (
-        <svg className="w-6 h-6 text-[var(--color-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-      )
-    },
-    {
-      num: "07",
-      title: "Data Retention and Account Deletion",
-      desc: "Data is retained during active participation. Users may deactivate profiles or request permanent account deletion via system settings to purge their records.",
-      icon: (
-        <svg className="w-6 h-6 text-[var(--color-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-      )
-    },
-    {
-      num: "08",
-      title: "User Rights under RA 10173",
-      desc: "Users are entitled to the right to be informed, access, rectify, erase or block data, and seek damages for unlawful data processing under the Data Privacy Act of 2012.",
-      icon: (
-        <svg className="w-6 h-6 text-[var(--color-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-      )
-    }
-  ];
-
   return (
     <PageLayout title="Privacy Policy">
       <div className="w-full">
@@ -673,35 +779,145 @@ export function Policy() {
             <span className="text-[var(--color-accent)] font-black text-[10px] sm:text-xs uppercase tracking-widest block mb-2">Transparency & Commitment</span>
             <h2 className={`text-lg sm:text-2xl font-black mb-2 sm:mb-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Your Privacy Matters to Us</h2>
             <p className={`text-xs sm:text-base font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'}`}>
-              At AbleWork, we safeguard your personal and sensitive data with uncompromising standards. Review our commitments below regarding how we collect, secure, and handle your information under the Data Privacy Act of 2012.
+              ABLEWORK ("the Platform", "we", "us") is dedicated to safeguarding the privacy and data security of all users, specifically Persons with Disabilities (PWDs) and participating employers. This Privacy Policy outlines our practices regarding the collection, use, storage, and protection of personal data in compliance with the Republic Act No. 10173, otherwise known as the Data Privacy Act of 2012 (DPA) of the Philippines, and its Implementing Rules and Regulations (IRR).
+            </p>
+            <p className={`text-xs sm:text-base font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'} mt-3`}>
+              By registering an account or accessing the platform, you acknowledge and consent to the data processing practices described herein.
             </p>
           </div>
 
-          <div className="space-y-5 sm:space-y-8">
-            {policySections.map((item, idx) => (
-              <div key={idx} className="flex items-start gap-3 sm:gap-5">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[var(--color-accentSoft)] flex items-center justify-center shrink-0 mt-1 shadow-inner">
-                  {item.icon}
+          <div className={`space-y-6 sm:space-y-8 text-sm sm:text-base leading-relaxed ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">1. Information We Collect</h3>
+              <p className="font-medium mb-3">
+                We collect only the personal information reasonably necessary to facilitate inclusive employment matching, account verification, and secure platform operations:
+              </p>
+              <div className="space-y-3 pl-2">
+                <div>
+                  <p className="font-bold mb-1">For Applicants (Job Seekers):</p>
+                  <ul className="list-disc pl-6 space-y-1 font-medium">
+                    <li><strong>Personal Identifiers:</strong> Full name, contact number, residential address, and email address.</li>
+                    <li><strong>Sensitive Personal Information (SPI):</strong> Birthdate, specific disability type/classification, required workplace accommodations, and uploaded government-issued PWD identification cards.</li>
+                    <li><strong>Professional Credentials:</strong> Educational background, skills, work preferences, and uploaded resumes/curriculum vitae.</li>
+                    <li><strong>Location Data:</strong> Approximate geographical coordinates (latitude and longitude) and user-defined travel radius preferences (in kilometers).</li>
+                  </ul>
                 </div>
-                <div className="space-y-1.5 sm:space-y-2 flex-1 min-w-0">
-                  <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-                    <span className="text-[10px] sm:text-xs font-black text-[var(--color-accent)] px-2 py-0.5 rounded-full bg-[var(--color-accentSoft)]">
-                      {item.num}
-                    </span>
-                    <h3 className={`text-base sm:text-xl font-black tracking-tight ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
-                      {item.title}
-                    </h3>
-                  </div>
-                  <p className={`text-xs sm:text-base font-semibold leading-6 sm:leading-7 ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'}`}>
-                    {item.desc}
-                  </p>
+                <div>
+                  <p className="font-bold mb-1">For Employers:</p>
+                  <ul className="list-disc pl-6 space-y-1 font-medium">
+                    <li><strong>Company & Representative Details:</strong> Company name, company description, industry classification, representative full name, business email, and contact number.</li>
+                    <li><strong>Verification Records:</strong> Uploaded business registration documents (e.g., DTI, SEC registration, or Mayor's/Business Permit).</li>
+                    <li><strong>Job Listing Data:</strong> Job vacancies, job descriptions, required skills, guaranteed workplace accommodations, and accepted disability types.</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-bold mb-1">System & Technical Metadata (All Users):</p>
+                  <p className="font-medium">Network Internet Protocol (IP) addresses, verification attempt logs, system security timestamps, accessibility settings (e.g., high-contrast theme, font scale), and in-app notification logs.</p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            </section>
 
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">2. Legal Basis and Purpose of Processing</h3>
+              <p className="font-medium mb-2">
+                In accordance with Sections 12 and 13 of the Data Privacy Act of 2012, personal and sensitive personal information is collected and processed based on explicit user consent and legitimate operational interests for the following purposes:
+              </p>
+              <ul className="list-disc pl-6 space-y-1 font-medium">
+                <li>Authenticating user credentials using cryptographic hashing (bcrypt).</li>
+                <li>Enforcing administrator document verification to maintain a verified, safe talent marketplace.</li>
+                <li>Powering the automated, rule-based Smart Matching Engine (evaluating skill alignments, accommodation guarantees, and Haversine distance calculations).</li>
+                <li>Enforcing system security protocols, such as cooldown intervals and network rate-limiting against fraudulent submissions.</li>
+                <li>Delivering transactional email notifications and One-Time Password (OTP) verifications via automated SMTP services.</li>
+                <li>Facilitating AI chatbot interactions through the ABBY assistant.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">3. Processing of Sensitive Personal Information (Disability & PWD Records)</h3>
+              <p className="font-medium">
+                Disability classifications and PWD ID documents are processed strictly to verify eligibility and ensure that matched workplaces meet necessary physical and sensory accommodations. PWD IDs and business verification files are stored in restricted server storage directories and are accessible exclusively to authorized system administrators for audit and approval purposes. Disability-related details are never sold, rented, or made visible to third-party advertising networks.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">4. Artificial Intelligence & Third-Party Service Providers</h3>
+              <p className="font-medium mb-2">
+                To deliver modern web capabilities, ABLEWORK interfaces with selected third-party service providers under data protection principles:
+              </p>
+              <ul className="list-disc pl-6 space-y-1 font-medium">
+                <li><strong>Google Gemini API:</strong> Powers the ABBY conversational assistant. Real-time account metadata (e.g., application count, current verification standing) is supplied contextually during active chat queries to provide dynamic help. No passwords, credentials, or official government documents are transmitted to the AI engine.</li>
+                <li><strong>Email Dispatch (Nodemailer / Google SMTP):</strong> Delivers automated system alerts, application updates, and security OTPs to user-registered email addresses.</li>
+                <li><strong>Mapping & Geolocation Services:</strong> Processes device-derived or user-selected coordinates to calculate distance scores relative to employer workplaces.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">5. Data Access, Disclosure, and Visibility</h3>
+              <ul className="list-disc pl-6 space-y-1 font-medium">
+                <li><strong>Between Users:</strong> When an applicant applies for an active job vacancy, their profile details (name, contact number, resume, skills, and accommodation requests) become accessible to that specific employer.</li>
+                <li><strong>Administrative Access:</strong> System administrators have role-restricted access to user directories, verification documents, and audit logs to approve accounts and manage operational integrity.</li>
+                <li><strong>Legal Compliance:</strong> We do not disclose personal information to external parties unless legally mandated by a valid subpoena, court order, or regulatory authority under Philippine jurisdiction.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">6. Data Storage, Security, and Protection Measures</h3>
+              <p className="font-medium mb-2">
+                ABLEWORK implements organizational, physical, and technical measures to protect stored data:
+              </p>
+              <ul className="list-disc pl-6 space-y-1 font-medium">
+                <li><strong>Cryptographic Protection:</strong> Passwords are mathematically hashed with unique cryptographic salts using bcrypt before database storage.</li>
+                <li><strong>Header & Transport Security:</strong> HTTP security headers (Helmet) and Cross-Origin Resource Sharing (CORS) rules protect API communication channels.</li>
+                <li><strong>Access Segregation:</strong> Verification documents and candidate resumes are isolated within designated upload directories linked only to validated database records.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">7. Data Retention and Account Deletion</h3>
+              <ul className="list-disc pl-6 space-y-1 font-medium">
+                <li>Personal data, application histories, and profile records are retained for the duration of the user's active participation on the platform.</li>
+                <li><strong>Account Deactivation:</strong> Users may deactivate their profile, rendering their account and job listings inactive (Disabled).</li>
+                <li><strong>Permanent Erasure:</strong> Users retain the right to request permanent account deletion via system settings. Account deletion permanently purges user profile records, application submissions, and authentication data from the production database upon password re-verification.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">8. User Rights under Republic Act No. 10173</h3>
+              <p className="font-medium mb-2">
+                As a data subject under the Philippine Data Privacy Act of 2012, you are entitled to:
+              </p>
+              <ul className="list-disc pl-6 space-y-1 font-medium">
+                <li><strong>Right to be Informed:</strong> The right to know how your personal and sensitive data is gathered, stored, and utilized.</li>
+                <li><strong>Right to Access:</strong> The right to review your registered data, job history, and application records.</li>
+                <li><strong>Right to Rectification:</strong> The right to update or correct inaccurate profile details and submit verification documents.</li>
+                <li><strong>Right to Erasure or Blocking:</strong> The right to deactivate or permanently delete your account records.</li>
+                <li><strong>Right to Damages:</strong> The right to seek indemnification for damages sustained due to inaccurate, incomplete, outdated, false, or unlawfully obtained personal data.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">9. Changes to This Privacy Policy</h3>
+              <p className="font-medium">
+                ABLEWORK reserves the right to revise this Privacy Policy to accommodate system improvements, algorithmic enhancements, or updates in legal statutes. Updates will be reflected directly on the platform with an updated effective date.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">10. Contact Information and Inquiries</h3>
+              <p className="font-medium mb-2">
+                For questions, data access requests, or privacy-related concerns regarding ABLEWORK, contact the project data custody team:
+              </p>
+              <ul className="list-disc pl-6 space-y-1 font-medium">
+                <li><strong>Platform:</strong> ABLEWORK Capstone Project</li>
+                <li><strong>Data Custody Team / Proponents:</strong> Paquio, Loueala Jean H., Pagado, Jesie Marie D., Astodillo, Felicite S., Gonzales, John Greg A., Gamboa, John Bryan T.</li>
+                <li><strong>Institution:</strong> STIWNU</li>
+                <li><strong>Official Support Email:</strong> ableworksys5i@gmail.com</li>
+              </ul>
+            </section>
+          </div>
+
+        </div>
       </div>
-    </div>
     </PageLayout>
   );
 }
@@ -710,81 +926,8 @@ export function Terms() {
   const { mode } = useContext(AccessibilityContext);
   const isContrast = mode && typeof mode === 'string' && mode.toLowerCase().includes('contrast');
 
-  const termsSections = [
-    {
-      num: "01",
-      title: "Acceptance of Terms",
-      desc: "By creating an account or using AbleWork, you confirm that you have read, understood, and agreed to these Terms and Conditions for applicants, employers, and administrators."
-    },
-    {
-      num: "02",
-      title: "Eligibility and User Accounts",
-      desc: "Users must provide accurate information, maintain single accounts, keep credentials secure, and adhere to platform regulations."
-    },
-    {
-      num: "03",
-      title: "Account Verification",
-      desc: "Applicants must submit valid PWD IDs and employers must submit business registration documents. Rejected verifications are subject to a mandatory 7-day security cooldown."
-    },
-    {
-      num: "04",
-      title: "Use of the System",
-      desc: "Users agree to use the system solely for lawful employment-related activities without submitting false information, distributing malicious code, or harassing others."
-    },
-    {
-      num: "05",
-      title: "Job Listings and Applications",
-      desc: "AbleWork provides employment assistance and job-matching services but does not guarantee employment, hiring decisions, or job availability."
-    },
-    {
-      num: "06",
-      title: "Job Matching and Recommendations",
-      desc: "Recommendations are based on user profiles and preferences. The matching algorithm strictly enforces requirements such as accommodation availability and travel radius filters."
-    },
-    {
-      num: "07",
-      title: "Accessibility Features",
-      desc: "Accessibility tools are provided to improve usability, though they may not satisfy every individual requirement."
-    },
-    {
-      num: "08",
-      title: "Chatbot and Automated Assistance",
-      desc: "The ABBY chatbot provides guidance via Google Gemini API. Responses are for general assistance and do not constitute binding legal agreements."
-    },
-    {
-      num: "09",
-      title: "Location Services",
-      desc: "Location data is utilized strictly for the travel radius matching algorithm when enabled by the user."
-    },
-    {
-      num: "10",
-      title: "Intellectual Property",
-      desc: "All system designs, interfaces, and software components are owned by the project proponents and protected under intellectual property rights."
-    },
-    {
-      num: "11",
-      title: "System Availability and Limitations",
-      desc: "The platform may occasionally experience service interruptions due to maintenance or technical issues without continuous availability guarantees."
-    },
-    {
-      num: "12",
-      title: "Account Suspension or Termination",
-      desc: "AbleWork reserves the right to suspend or terminate accounts that violate terms, provide fraudulent info, or misuse platform features."
-    },
-    {
-      num: "13",
-      title: "Changes to These Terms",
-      desc: "Terms may be updated periodically to reflect system improvements, security updates, or statutory requirements."
-    },
-    {
-      num: "14",
-      title: "Contact Information",
-      desc: "For questions regarding these terms, contact ableworksys5i@gmail.com or visit our office at Burgos Street, Barangay Villamonte, Bacolod City."
-    }
-  ];
-
   return (
-    <PageLayout title="Terms of Service">
+    <PageLayout title="Terms and Conditions">
       <div className="w-full">
         <div className={`p-4 sm:p-8 md:p-12 rounded-2xl sm:rounded-3xl border-2 backdrop-blur-sm ${isContrast ? 'bg-[var(--color-surface)]/50 text-[var(--color-text)] border-[var(--color-border)]' : 'bg-[var(--color-surface)]/50 text-[#03045E] border-white/40'}`}>
 
@@ -792,26 +935,144 @@ export function Terms() {
             <span className="text-[var(--color-accent)] font-black text-[10px] sm:text-xs uppercase tracking-widest block mb-2">User Guidelines</span>
             <h2 className={`text-lg sm:text-2xl font-black mb-2 sm:mb-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Platform Rules & Conditions</h2>
             <p className={`text-xs sm:text-base font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'}`}>
-              Please read these terms carefully before utilizing AbleWork. By interacting with our system, you commit to maintaining a secure, honest, and respectful community ecosystem for all job seekers and employers.
+              Welcome to ABLEWORK, a web-based employment assistance system designed to connect persons with disabilities (PWDs) with suitable employment opportunities and help employers manage job vacancies and applications. By accessing or using ABLEWORK, you agree to comply with these Terms and Conditions. If you do not agree with any part of these terms, please do not use the system.
             </p>
           </div>
 
-          <div className="space-y-5 sm:space-y-8">
-            {termsSections.map((item, idx) => (
-              <div key={idx} className="flex items-start gap-3 sm:gap-5">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[var(--color-accent)] text-[var(--color-background)] flex items-center justify-center font-black text-[10px] sm:text-xs shrink-0 shadow-md">
-                  {item.num}
-                </div>
-                <div className="space-y-1.5 sm:space-y-2 flex-1 min-w-0">
-                  <h3 className={`text-base sm:text-xl font-black tracking-tight ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
-                    {item.title}
-                  </h3>
-                  <p className={`text-xs sm:text-base font-semibold leading-6 sm:leading-7 ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'}`}>
-                    {item.desc}
-                  </p>
-                </div>
-              </div>
-            ))}
+          <div className={`space-y-6 sm:space-y-8 text-sm sm:text-base leading-relaxed ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">1. Acceptance of Terms</h3>
+              <p className="font-medium">
+                By creating an account or using ABLEWORK, you confirm that you have read, understood, and agreed to these Terms and Conditions. These terms apply to all applicants, employers, and authorized administrators using the platform.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">2. Eligibility and User Accounts</h3>
+              <p className="font-medium">
+                Applicants must provide accurate and truthful information during registration. Applicants should provide information relevant to their skills, qualifications, work preferences, and workplace accommodation needs. Employers must provide accurate company information and valid business or verification documents when required. Users are responsible for keeping their login credentials confidential. Each user should maintain only one account unless otherwise authorized by the system administrator. ABLEWORK reserves the right to suspend or disable accounts that contain false information, violate these terms, or pose a security risk.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">3. Account Verification</h3>
+              <p className="font-medium">
+                ABLEWORK requires applicants and employers to submit specific documents for account verification. Applicants must submit a valid PWD ID, and Employers must submit valid business registration documents (e.g., DTI, SEC, or Business Permit). Submitted documents must be authentic and belong to the account holder or registered organization. Administrators may review submitted documents before approving an account. An account may remain restricted or pending until verification is completed. In the event a verification document is rejected by an administrator, the account will be subject to a mandatory 7-day security cooldown before a new document can be submitted. The system also actively monitors and limits repeated failed verification attempts to prevent abuse. Verification does not guarantee employment, hiring, or acceptance of any application.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">4. Use of the System</h3>
+              <p className="font-medium mb-2">
+                Users agree to use ABLEWORK only for lawful employment-related purposes. Users must not:
+              </p>
+              <ul className="list-disc pl-6 space-y-1 font-medium">
+                <li>Submit false, misleading, or fraudulent information.</li>
+                <li>Post fake, discriminatory, or misleading job vacancies.</li>
+                <li>Use the system to harass, threaten, or discriminate against other users.</li>
+                <li>Access another person's account without permission.</li>
+                <li>Attempt to damage, disrupt, or gain unauthorized access to the system.</li>
+                <li>Upload harmful files, malicious code, or inappropriate content.</li>
+                <li>Collect or misuse another user's personal information.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">5. Job Listings and Applications</h3>
+              <p className="font-medium">
+                Employers are responsible for ensuring that their job postings are accurate, complete, and up to date. Applicants are responsible for reviewing job requirements before submitting an application. ABLEWORK provides employment assistance and job-matching services but does not guarantee that an applicant will be hired. Employers are responsible for their own recruitment process, interviews, and final hiring decisions. ABLEWORK does not guarantee the availability, legitimacy, or continued existence of every job opportunity unless it has been specifically verified by the system or its administrators. Applicants should independently verify important employment details before accepting a job offer.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">6. Job Matching and Recommendations</h3>
+              <p className="font-medium">
+                ABLEWORK provides job recommendations based on information such as user profiles, skills, qualifications, preferences, workplace requirements, and location. Recommendations are intended to assist users in finding potentially suitable opportunities but are not guarantees of employment or suitability. The matching algorithm strictly enforces specific requirements. If an employer cannot provide an applicant's required workplace accommodations, or if an applicant falls outside the employer's designated travel radius, the system will intentionally hide the job posting from that applicant to ensure safe and viable employment. Users should review the complete job description and determine whether the opportunity meets their needs. Location-based recommendations may depend on the accuracy of the location information provided or permitted by the user.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">7. Accessibility Features</h3>
+              <p className="font-medium">
+                ABLEWORK may provide accessibility features such as display themes, font-size adjustments, and color-blindness support. These features are intended to improve usability but may not meet every user's individual accessibility needs. Users are encouraged to report accessibility problems so the system can be improved.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">8. Chatbot and Automated Assistance</h3>
+              <p className="font-medium mb-2">
+                ABLEWORK includes ABBY, a chatbot that provides guidance and assistance during the job-search and application process.
+              </p>
+              <ul className="list-disc pl-6 space-y-1 font-medium">
+                <li>ABBY is powered by third-party Artificial Intelligence (Google Gemini). While the chatbot is configured to assist with platform navigation and job inquiries, AI-generated responses can occasionally be inaccurate. Users should not rely on ABBY for binding legal or employment agreements.</li>
+                <li>Chatbot responses are intended for general assistance and may not always be accurate or complete. Users should verify important employment, account, and application information through the appropriate source.</li>
+                <li>The chatbot does not make final hiring decisions.</li>
+                <li>Users should not share passwords, payment information, or other unnecessary sensitive information through the chatbot.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">9. Location Services</h3>
+              <p className="font-medium mb-2">
+                If enabled, ABLEWORK uses location-related information to provide nearby job recommendations and location-based services.
+              </p>
+              <ul className="list-disc pl-6 space-y-1 font-medium">
+                <li>Users may be asked to allow location access to utilize the Travel Radius feature, which filters job recommendations based on maximum geographical distance. This data is strictly used for the matching algorithm.</li>
+                <li>Location-based features may not function accurately if location access is disabled or unavailable.</li>
+                <li>Users should only enable location services when they are comfortable sharing the required location information.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">10. Intellectual Property</h3>
+              <p className="font-medium">
+                The ABLEWORK name, system design, interface, content, and software components are owned by the project proponents or their respective rights holders, unless otherwise stated. Users may not copy, reproduce, modify, distribute, or commercially use the system or its materials without proper authorization.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">11. System Availability and Limitations</h3>
+              <p className="font-medium">
+                ABLEWORK is provided as an employment assistance platform. The system may occasionally experience interruptions due to maintenance, technical issues, internet connectivity, or third-party services. The proponents do not guarantee that the system will always be available, error-free, or uninterrupted.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">12. Account Suspension or Termination</h3>
+              <p className="font-medium mb-2">
+                ABLEWORK may suspend, restrict, or terminate an account if the user:
+              </p>
+              <ul className="list-disc pl-6 space-y-1 font-medium">
+                <li>Violates these Terms and Conditions.</li>
+                <li>Provides false or fraudulent information.</li>
+                <li>Misuses personal data or system features.</li>
+                <li>Attempts unauthorized access.</li>
+                <li>Engages in harmful, abusive, or unlawful activities.</li>
+              </ul>
+              <p className="font-medium mt-2">
+                Users may contact the system administrator regarding account concerns or requests for account review.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">13. Changes to These Terms</h3>
+              <p className="font-medium">
+                ABLEWORK may update these Terms and Conditions when necessary to improve the system, address security concerns, or comply with applicable regulations and legal requirements. Continued use of the platform after such updates constitutes acceptance of the revised terms.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">14. Contact Information</h3>
+              <p className="font-medium mb-2">
+                For questions, concerns, or reports regarding these Terms and Conditions, please contact:
+              </p>
+              <ul className="list-disc pl-6 space-y-1 font-medium">
+                <li><strong>System Name:</strong> ABLEWORK</li>
+                <li><strong>Project Team:</strong> 5i</li>
+                <li><strong>Email:</strong> ableworksys5i@gmail.com</li>
+                <li><strong>Address:</strong> Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</li>
+              </ul>
+            </section>
           </div>
 
         </div>
@@ -1028,7 +1289,7 @@ function SimpleFooter() {
             </li>
             <li>
               <Link to="/terms" className={`transition-colors ${isContrast ? 'text-[var(--color-textMuted)] hover:text-[var(--color-accent)]' : 'text-[#03045E] hover:text-[#2C7FFF]'}`}>
-                Terms of Service
+                Terms & Conditions
               </Link>
             </li>
           </ul>
@@ -1069,10 +1330,10 @@ function Feature({ title, text }) {
         ✓
       </div>
       <div>
-        <h3 id={id} className={`text-sm sm:text-base font-black mb-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
+        <h3 id={id} className={`text-sm sm:text-base font-black mb-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`}>
           {title}
         </h3>
-        <p className={`text-xs sm:text-sm font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]'}`}>
+        <p className={`text-xs sm:text-sm font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`}>
           {text}
         </p>
       </div>
@@ -1132,6 +1393,9 @@ export default function ApplicantRegister() {
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  const [satelliteView, setSatelliteView] = useState(false);
+  const [legendOpen, setLegendOpen] = useState(true);
 
   const toggleSelection = (item, selectedArray, setSelectedArray) => {
     if (selectedArray.includes(item)) {
@@ -1470,11 +1734,91 @@ export default function ApplicantRegister() {
 
               {lat && lng ? (
                 <div className="h-48 w-full mt-2 rounded-xl overflow-hidden border border-[#03045E]/25 z-0 relative shadow-inner">
+                  <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-[1000] flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSatelliteView(prev => !prev)}
+                      aria-label={satelliteView ? 'Switch to street view' : 'Switch to satellite view'}
+                      title={satelliteView ? 'Street view' : 'Satellite view'}
+                      className="relative flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-full bg-white/95 backdrop-blur-md shadow-[0_4px_20px_rgba(3,4,94,0.15)] border border-[#03045E]/15 cursor-pointer"
+                    >
+                      <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#2C7FFF]/10 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shrink-0">
+                        {satelliteView ? (
+                          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                          </svg>
+                        ) : (
+                          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        )}
+                      </span>
+                      <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E] whitespace-nowrap">
+                        {satelliteView ? 'Street' : 'Satellite'}
+                      </span>
+                    </button>
+                  </div>
+
+                  <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-[1000]">
+                    <div className="w-[200px] sm:w-[228px] bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-[#03045E]/20 overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => setLegendOpen(open => !open)}
+                        aria-expanded={legendOpen}
+                        aria-controls="applicant-reg-map-legend-panel"
+                        className="w-full flex items-center gap-2 px-3 py-2.5 cursor-pointer"
+                      >
+                        <span className="w-6 h-6 rounded-lg bg-[#f4f4f4] border border-[#03045E]/20 flex items-center justify-center text-[#2C7FFF] shrink-0">
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                          </svg>
+                        </span>
+                        <span className="flex-1 text-left text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E]">
+                          Map Legend
+                        </span>
+                        <svg
+                          className={`w-3.5 h-3.5 text-[#03045E] transition-transform duration-300 ${legendOpen ? 'rotate-180' : ''}`}
+                          fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+
+                      <div className={`grid transition-all duration-300 ease-out ${legendOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                        <div className="overflow-hidden">
+                          <div id="applicant-reg-map-legend-panel" className="px-3 pb-3 flex flex-col gap-2">
+                            <div className="h-px w-full bg-[#03045E]/10 mb-0.5"></div>
+
+                            <div className="flex items-center gap-2.5">
+                              <span className="w-3 h-3 rounded-full bg-[#03045E] border-2 border-white shadow-sm shrink-0"></span>
+                              <span className="flex-1 text-[11px] font-bold text-[#03045E] leading-tight">Your Home Base</span>
+                            </div>
+
+                            <div className="flex items-center gap-2.5">
+                              <span className="w-3 h-3 rounded-full bg-[#2C7FFF] border-2 border-white shadow-sm shrink-0"></span>
+                              <span className="flex-1 text-[11px] font-bold text-[#03045E] leading-tight">Search Radius</span>
+                              <span className="text-[10px] font-black text-[#2C7FFF] bg-[#2C7FFF]/10 border border-[#2C7FFF]/20 px-1.5 py-0.5 rounded-full">
+                                {radius} km
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   <MapContainer center={[lat, lng]} zoom={11} scrollWheelZoom={false} style={{ height: '100%', width: '100%', zIndex: 0 }}>
-                    <TileLayer
-                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
+                    {satelliteView ? (
+                      <TileLayer
+                        attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                      />
+                    ) : (
+                      <TileLayer
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      />
+                    )}
                     <Marker position={[lat, lng]} />
                     <Circle center={[lat, lng]} radius={radius * 1000} pathOptions={{ color: '#2C7FFF', fillColor: '#2C7FFF', fillOpacity: 0.2, weight: 2 }} />
                     <MapRecenter lat={lat} lng={lng} />

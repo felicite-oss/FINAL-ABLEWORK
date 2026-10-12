@@ -94,7 +94,7 @@ function AdminRouteReset() {
 
     const root = document.documentElement;
 
-    root.classList.remove(
+    const classesToBlock = [
       'palette-default',
       'palette-deuteranopia',
       'palette-protanopia',
@@ -107,13 +107,12 @@ function AdminRouteReset() {
       'theme-Standard',
       'theme-Dark',
       'theme-Assist',
-      'dark-mode',
       'standard',
       'talkback-active',
       'font-normal',
       'font-large',
       'font-xlarge'
-    );
+    ];
 
     const varsToReset = [
       'primary', 'primarySoft', 'accent', 'accentSoft',
@@ -125,9 +124,13 @@ function AdminRouteReset() {
       'info', 'button-text'
     ];
 
+    root.classList.remove(...classesToBlock);
+    root.setAttribute('data-theme', 'light');
     varsToReset.forEach((key) => {
       root.style.removeProperty(`--color-${key}`);
     });
+    document.body.style.backgroundColor = '';
+    document.body.style.color = '';
   }, [location.pathname]);
 
   return null;
