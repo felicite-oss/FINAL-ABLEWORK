@@ -340,7 +340,7 @@ export default function ForgotPassword({ onClose }) {
       </header>
 
       <div
-        className={`flex-grow pt-16 pb-12 flex flex-col items-center md:items-end justify-center px-3 sm:pl-4 sm:pr-4 md:pr-12 lg:pr-16 md:pl-8 max-w-[1700px] mx-auto w-full box-border relative bg-no-repeat bg-cover bg-center md:bg-[size:1100px_auto] md:bg-left min-h-[110vh] md:min-h-[105vh] transition-all duration-300 ${isOpen ? 'mt-48 sm:mt-56' : 'mt-0'}`}
+        className="flex-grow pt-16 pb-12 flex flex-col items-center md:items-end justify-center px-3 sm:pl-4 sm:pr-4 md:pr-12 lg:pr-16 md:pl-8 max-w-[1700px] mx-auto w-full box-border relative bg-no-repeat bg-center bg-[size:600px_auto] md:bg-[size:1100px_auto] md:bg-left min-h-[110vh] md:min-h-[105vh] transition-all duration-300"
         style={{ backgroundImage: `url(${backgroundImg})` }}
       >
         <div
@@ -625,20 +625,20 @@ export default function ForgotPassword({ onClose }) {
       )}
 
       <footer
-        className={`py-8 sm:py-12 px-4 sm:px-6 mt-auto border-t-2 shadow-inner ${isContrast ? 'bg-black text-white border-white/20' : 'bg-[#f4f4f4] text-[#03045E] border-[#03045E]/20'}`}
+        className={`py-8 sm:py-12 px-4 sm:px-6 mt-auto border-t-2 shadow-inner bg-[#03045E] text-white ${isContrast ? 'border-white/20' : 'border-[#03045E]/20'}`}
       >
-        <div className={`max-w-[1700px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 pb-6 sm:pb-10 border-b ${isContrast ? 'border-white/10' : 'border-[#03045E]/10'}`}>
+        <div className={`max-w-[1700px] mx-auto grid grid-cols-3 md:grid-cols-4 gap-4 sm:gap-8 pb-6 sm:pb-10 border-b ${isContrast ? 'border-white/10' : 'border-[#03045E]/10'}`}>
           
-          <div className="col-span-2 md:col-span-1 space-y-2 sm:space-y-3">
+          <div className="col-span-3 md:col-span-1 space-y-2 sm:space-y-3">
             <img
-              src={isContrast ? darkLogo : lightLogo}
+              src={darkLogo}
               alt="AbleWork Logo"
               className="h-8 sm:h-10 w-auto object-contain"
             />
-            <p className={`text-xs sm:text-sm font-semibold leading-relaxed ${isContrast ? 'text-white/80' : 'text-[#03045E]'}`}>
+            <p className={`text-[10px] sm:text-sm font-semibold leading-relaxed text-white/85`}>
               Building an inclusive workforce and equal employment opportunities for everyone.
             </p>
-            <div className={`pt-1 sm:pt-2 flex items-center space-x-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider ${isContrast ? 'text-white/70' : 'text-[#03045E]'}`}>
+            <div className={`pt-1 sm:pt-2 flex items-center space-x-3 text-[8px] sm:text-xs font-bold uppercase tracking-wider text-white/70`}>
               <span> Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</span>
               <span></span>
               <span></span>
@@ -646,20 +646,20 @@ export default function ForgotPassword({ onClose }) {
           </div>
 
           <div>
-            <h4 className={`font-black text-sm sm:text-base mb-2 sm:mb-4 ${isContrast ? 'text-white' : 'text-[#03045E]'}`}>Quick Links</h4>
-            <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm font-semibold">
+            <h4 className={`font-black text-[11px] sm:text-base mb-2 sm:mb-4 text-white`}>Quick Links</h4>
+            <ul className="space-y-1.5 sm:space-y-2 text-[9px] sm:text-sm font-semibold">
               <li>
-                <Link to="/" className={`transition-colors ${isContrast ? 'text-white/80 hover:text-[#2C7FFF]' : 'text-[#03045E] hover:text-[#2C7FFF]'}`}>
+                <Link to="/" className={`transition-colors text-white/85 hover:text-[#7FB0FF]`}>
                   Home Dashboard
                 </Link>
               </li>
               <li>
-                <Link to="/about" className={`transition-colors ${isContrast ? 'text-white/80 hover:text-[#2C7FFF]' : 'text-[#03045E] hover:text-[#2C7FFF]'}`}>
+                <Link to="/about" className={`transition-colors text-white/85 hover:text-[#7FB0FF]`}>
                   About Our Mission
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className={`transition-colors ${isContrast ? 'text-white/80 hover:text-[#2C7FFF]' : 'text-[#03045E] hover:text-[#2C7FFF]'}`}>
+                <Link to="/contact" className={`transition-colors text-white/85 hover:text-[#7FB0FF]`}>
                   Contact Support
                 </Link>
               </li>
@@ -667,29 +667,29 @@ export default function ForgotPassword({ onClose }) {
           </div>
 
           <div>
-            <h4 className={`font-black text-sm sm:text-base mb-2 sm:mb-4 ${isContrast ? 'text-white' : 'text-[#03045E]'}`}>Legal & Support</h4>
-            <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm font-semibold">
+            <h4 className={`font-black text-[11px] sm:text-base mb-2 sm:mb-4 text-white`}>Legal & Support</h4>
+            <ul className="space-y-1.5 sm:space-y-2 text-[9px] sm:text-sm font-semibold">
               <li>
-                <Link to="/policy" className={`transition-colors ${isContrast ? 'text-white/80 hover:text-[#2C7FFF]' : 'text-[#03045E] hover:text-[#2C7FFF]'}`}>
+                <Link to="/policy" className={`transition-colors text-white/85 hover:text-[#7FB0FF]`}>
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link to="/terms" className={`transition-colors ${isContrast ? 'text-white/80 hover:text-[#2C7FFF]' : 'text-[#03045E] hover:text-[#2C7FFF]'}`}>
+                <Link to="/terms" className={`transition-colors text-white/85 hover:text-[#7FB0FF]`}>
                   Terms of Service
                 </Link>
               </li>
             </ul>
           </div>
 
-          <div className="col-span-2 md:col-span-1">
-            <h4 className={`font-black text-sm sm:text-base mb-2 sm:mb-4 ${isContrast ? 'text-white' : 'text-[#03045E]'}`}>Get Started</h4>
-            <p className={`text-xs sm:text-sm font-semibold mb-2 sm:mb-4 ${isContrast ? 'text-white/80' : 'text-[#03045E]'}`}>
+          <div>
+            <h4 className={`font-black text-[11px] sm:text-base mb-2 sm:mb-4 text-white`}>Get Started</h4>
+            <p className={`text-[9px] sm:text-sm font-semibold mb-2 sm:mb-4 text-white/85`}>
               Are you an applicant or employer looking to join our network?
             </p>
             <Link
               to="/register-select"
-              className={`inline-block bg-[#2C7FFF] px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider shadow-md transition-all border-2 border-[#2C7FFF] ${
+              className={`inline-block bg-[#2C7FFF] px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-xl font-bold text-[8px] sm:text-xs uppercase tracking-wider shadow-md transition-all border-2 border-[#2C7FFF] ${
                 isAccessibilityMode && isDarkMode
                   ? 'fp-accessibility-dark-register-text'
                   : isDefaultPalette && isDarkMode
@@ -703,7 +703,7 @@ export default function ForgotPassword({ onClose }) {
 
         </div>
 
-        <div className={`max-w-[1700px] mx-auto pt-4 sm:pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-[10px] sm:text-xs font-bold ${isContrast ? 'text-white/70' : 'text-[#03045E]'}`}>
+        <div className={`max-w-[1700px] mx-auto pt-4 sm:pt-6 flex flex-col items-center justify-center gap-2 sm:gap-4 text-[8px] sm:text-xs font-bold text-center text-white/75`}>
           <p>© {new Date().getFullYear()} AgileWork Inc. All rights reserved.</p>
           <p className="font-bold">Empowering Abilities, Connecting Opportunities.</p>
         </div>

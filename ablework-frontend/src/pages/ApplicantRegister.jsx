@@ -750,7 +750,7 @@ export default function ApplicantRegister() {
                       onClick={() => toggleSelection(disability, selectedDisabilities, setSelectedDisabilities)}
                       className={`px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold border transition ${
                         selectedDisabilities.includes(disability)
-                          ? 'bg-[#03045E]/15 text-[#03045E] border-[#03045E]/30'
+                          ? 'bg-[#03045E] text-white border-[#03045E]'
                           : 'bg-white text-[#03045E] border-[#03045E]/30 hover:border-[#2C7FFF]'
                       }`}
                       title={`Click to select or deselect ${disability}`}
@@ -765,7 +765,7 @@ export default function ApplicantRegister() {
                     onClick={() => setShowOtherDisability(!showOtherDisability)}
                     className={`px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold border transition ${
                       showOtherDisability
-                        ? 'bg-[#03045E]/15 text-[#03045E] border-[#03045E]/30'
+                        ? 'bg-[#03045E] text-white border-[#03045E]'
                         : 'bg-white text-[#03045E] border-[#03045E]/30 hover:border-[#2C7FFF]'
                     }`}
                     title="Click to type an unlisted physical or sensory condition"
@@ -824,7 +824,7 @@ export default function ApplicantRegister() {
                       onClick={() => setIndependence(option)}
                       className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-[10px] sm:text-xs font-semibold border transition ${
                         independence === option
-                          ? 'bg-[#03045E]/15 text-[#03045E] border-[#03045E]/30'
+                          ? 'bg-[#03045E] text-white border-[#03045E]'
                           : 'bg-white text-[#03045E] border-[#03045E]/30 hover:border-[#2C7FFF]'
                       }`}
                       title={`Select if your workplace independence level is ${option}`}
@@ -847,7 +847,7 @@ export default function ApplicantRegister() {
                       onClick={() => toggleSelection(acc, selectedAccommodations, setSelectedAccommodations)}
                       className={`px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold border transition ${
                         selectedAccommodations.includes(acc)
-                          ? 'bg-[#03045E]/15 text-[#03045E] border-[#03045E]/30'
+                          ? 'bg-[#03045E] text-white border-[#03045E]'
                           : 'bg-white text-[#03045E] border-[#03045E]/30 hover:border-[#2C7FFF]'
                       }`}
                       title={`Click to select or deselect ${acc}`}
@@ -862,7 +862,7 @@ export default function ApplicantRegister() {
                     onClick={() => setShowOtherAccommodation(!showOtherAccommodation)}
                     className={`px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold border transition ${
                       showOtherAccommodation
-                        ? 'bg-[#03045E]/15 text-[#03045E] border-[#03045E]/30'
+                        ? 'bg-[#03045E] text-white border-[#03045E]'
                         : 'bg-white text-[#03045E] border-[#03045E]/30 hover:border-[#2C7FFF]'
                     }`}
                     title="Click to type an unlisted workplace accommodation"
@@ -941,7 +941,7 @@ export default function ApplicantRegister() {
                       onClick={() => toggleSelection(skill, selectedSkills, setSelectedSkills)}
                       className={`px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold border transition ${
                         selectedSkills.includes(skill)
-                          ? 'bg-[#03045E]/15 text-[#03045E] border-[#03045E]/30'
+                          ? 'bg-[#03045E] text-white border-[#03045E]'
                           : 'bg-white text-[#03045E] border-[#03045E]/30 hover:border-[#2C7FFF]'
                       }`}
                       title={`Click to select or deselect ${skill}`}
@@ -956,7 +956,7 @@ export default function ApplicantRegister() {
                     onClick={() => setShowOtherSkill(!showOtherSkill)}
                     className={`px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold border transition ${
                       showOtherSkill
-                        ? 'bg-[#03045E]/15 text-[#03045E] border-[#03045E]/30'
+                        ? 'bg-[#03045E] text-white border-[#03045E]'
                         : 'bg-white text-[#03045E] border-[#03045E]/30 hover:border-[#2C7FFF]'
                     }`}
                     title="Click to type an unlisted professional skill"

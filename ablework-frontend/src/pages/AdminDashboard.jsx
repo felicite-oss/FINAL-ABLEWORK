@@ -959,73 +959,75 @@ const handleToggleDark = () => {
                     />
                   </div>
 
-                  <div className={`w-full lg:w-2/3 ${cardBg} p-3 sm:p-8 rounded-2xl sm:rounded-[2rem] shadow-sm border-2 ${bdrMain} flex flex-col ${isAnalyticsExpanded ? 'fixed inset-4 z-[9999] h-auto' : ''}`}>
-                    <div className="mb-4 sm:mb-6 flex items-start justify-between gap-4">
-                      <div>
-                        <h2 className={`text-base sm:text-xl font-black tracking-tight ${txtMain}`}>Annual Platform Growth</h2>
-                        <p className={`text-[10px] sm:text-xs font-bold mt-0.5 ${txtMuted}`}>Monthly registration volume for new users.</p>
+                  <div className={`w-full lg:w-2/3 ${isAnalyticsExpanded ? 'fixed inset-0 z-[9999] flex flex-col p-4 sm:p-8 md:p-12 bg-black/80 backdrop-blur-sm' : `${cardBg} p-3 sm:p-8 rounded-2xl sm:rounded-[2rem] shadow-sm border-2 ${bdrMain}`}`}>
+                    <div className={`${isAnalyticsExpanded ? `${cardBg} w-full h-full max-w-[1400px] mx-auto rounded-2xl sm:rounded-[2rem] shadow-2xl border-2 ${bdrMain} p-4 sm:p-8 flex flex-col overflow-hidden` : 'flex flex-col h-full'}`}>
+                      <div className="mb-4 sm:mb-6 flex items-start justify-between gap-4 shrink-0">
+                        <div>
+                          <h2 className={`${isAnalyticsExpanded ? 'text-xl sm:text-2xl md:text-3xl' : 'text-base sm:text-xl'} font-black tracking-tight transition-all duration-300 ${txtMain}`}>Annual Platform Growth</h2>
+                          <p className={`${isAnalyticsExpanded ? 'text-sm sm:text-base' : 'text-[10px] sm:text-xs'} font-bold mt-0.5 transition-all duration-300 ${txtMuted}`}>Monthly registration volume for new users.</p>
+                        </div>
+                        <button
+                          onClick={() => setIsAnalyticsExpanded(!isAnalyticsExpanded)}
+                          className={`p-2 rounded-xl border-2 ${bdrMain} ${txtMain} hover:bg-white/10 transition-all cursor-pointer shrink-0`}
+                          title={isAnalyticsExpanded ? 'Minimize' : 'Maximize'}
+                        >
+                          {isAnalyticsExpanded ? (
+                            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" />
+                            </svg>
+                          ) : (
+                            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 4.5l5.25 5.25M4.5 4.5H9M4.5 4.5V9m14.25-4.5l-5.25 5.25M19.5 4.5H15m4.5 0V9m-14.25 10.5l5.25-5.25M4.5 19.5H9m-4.5 0V15m14.25 4.5l-5.25-5.25M19.5 19.5H15m4.5 0V15" />
+                            </svg>
+                          )}
+                        </button>
                       </div>
-                      <button
-                        onClick={() => setIsAnalyticsExpanded(!isAnalyticsExpanded)}
-                        className={`p-2 rounded-xl border-2 ${bdrMain} ${txtMain} hover:bg-white/10 transition-all cursor-pointer shrink-0`}
-                        title={isAnalyticsExpanded ? 'Minimize' : 'Maximize'}
-                      >
-                        {isAnalyticsExpanded ? (
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" />
-                          </svg>
-                        ) : (
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 4.5l5.25 5.25M4.5 4.5H9M4.5 4.5V9m14.25-4.5l-5.25 5.25M19.5 4.5H15m4.5 0V9m-14.25 10.5l5.25-5.25M4.5 19.5H9m-4.5 0V15m14.25 4.5l-5.25-5.25M19.5 19.5H15m4.5 0V15" />
-                          </svg>
-                        )}
-                      </button>
-                    </div>
-                    <div className={`${isAnalyticsExpanded ? 'flex-1' : 'h-[260px] sm:h-[400px]'} w-full -ml-2 sm:ml-0 transition-all duration-300`}>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={chartData} margin={{ top: 10, right: 8, left: -20, bottom: 0 }}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(3,4,94,0.1)'} />
-                          <XAxis
-                            dataKey="name"
-                            axisLine={false}
-                            tickLine={false}
-                            tick={{ fill: isDark ? '#ffffff' : '#03045E', fontSize: 10, fontWeight: 700 }}
-                            dy={8}
-                            interval="preserveStartEnd"
-                          />
-                          <YAxis
-                            axisLine={false}
-                            tickLine={false}
-                            tick={{ fill: isDark ? '#ffffff' : '#03045E', fontSize: 10, fontWeight: 700 }}
-                            width={28}
-                            allowDecimals={false}
-                          />
-                          <Tooltip
-                           cursor={{ fill: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(3,4,94,0.08)' }}
-                            contentStyle={{
-                              borderRadius: '12px',
-                              border: isDark ? '2px solid rgba(255,255,255,0.2)' : '2px solid rgba(3,4,94,0.15)',
-                              boxShadow: '0 10px 25px rgba(3,4,94,0.1)',
-                              fontWeight: 'bold',
-                              color: isDark ? '#ffffff' : '#03045E',
-                              backgroundColor: isDark ? '#000000' : '#ffffff',
-                              fontSize: '11px',
-                              padding: '6px 10px'
-                            }}
-                          />
-                          <Legend
-                            iconType="circle"
-                            wrapperStyle={{ paddingTop: '12px', fontWeight: 'bold', fontSize: '11px', color: isDark ? '#ffffff' : '#03045E' }}
-                          />
-                          <Bar
-                            dataKey="users"
-                            name="New Users"
-                           fill={isDark ? '#ffffff' : 'currentColor'}
-                            radius={[4, 4, 0, 0]}
-                            maxBarSize={28}
-                          />
-                        </BarChart>
-                      </ResponsiveContainer>
+                      <div className={`${isAnalyticsExpanded ? 'flex-1 w-full h-full min-h-[50vh]' : 'h-[260px] sm:h-[400px]'} w-full -ml-2 sm:ml-0 transition-all duration-300`}>
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={chartData} margin={{ top: 10, right: 8, left: isAnalyticsExpanded ? 0 : -20, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(3,4,94,0.1)'} />
+                            <XAxis
+                              dataKey="name"
+                              axisLine={false}
+                              tickLine={false}
+                              tick={{ fill: isDark ? '#ffffff' : '#03045E', fontSize: isAnalyticsExpanded ? 12 : 10, fontWeight: 700 }}
+                              dy={8}
+                              interval="preserveStartEnd"
+                            />
+                            <YAxis
+                              axisLine={false}
+                              tickLine={false}
+                              tick={{ fill: isDark ? '#ffffff' : '#03045E', fontSize: isAnalyticsExpanded ? 12 : 10, fontWeight: 700 }}
+                              width={isAnalyticsExpanded ? 40 : 28}
+                              allowDecimals={false}
+                            />
+                            <Tooltip
+                             cursor={{ fill: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(3,4,94,0.08)' }}
+                              contentStyle={{
+                                borderRadius: '12px',
+                                border: isDark ? '2px solid rgba(255,255,255,0.2)' : '2px solid rgba(3,4,94,0.15)',
+                                boxShadow: '0 10px 25px rgba(3,4,94,0.1)',
+                                fontWeight: 'bold',
+                                color: isDark ? '#ffffff' : '#03045E',
+                                backgroundColor: isDark ? '#000000' : '#ffffff',
+                                fontSize: isAnalyticsExpanded ? '14px' : '11px',
+                                padding: isAnalyticsExpanded ? '10px 14px' : '6px 10px'
+                              }}
+                            />
+                            <Legend
+                              iconType="circle"
+                              wrapperStyle={{ paddingTop: '12px', fontWeight: 'bold', fontSize: isAnalyticsExpanded ? '14px' : '11px', color: isDark ? '#ffffff' : '#03045E' }}
+                            />
+                            <Bar
+                              dataKey="users"
+                              name="New Users"
+                             fill={isDark ? '#ffffff' : '#03045E'}
+                              radius={[4, 4, 0, 0]}
+                              maxBarSize={isAnalyticsExpanded ? 64 : 28}
+                            />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
                     </div>
                   </div>
                 </div>

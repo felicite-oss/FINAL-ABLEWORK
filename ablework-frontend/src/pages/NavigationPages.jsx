@@ -1341,7 +1341,7 @@ function SimpleFooter() {
 
       </div>
 
-      <div className={`max-w-[1700px] mx-auto pt-3 sm:pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 text-[9px] sm:text-xs font-bold text-white`}>
+      <div className={`max-w-[1700px] mx-auto pt-3 sm:pt-6 flex flex-col items-center justify-center gap-2 sm:gap-4 text-[9px] sm:text-xs font-bold text-white text-center`}>
         <p>© {new Date().getFullYear()} AgileWork Inc. All rights reserved.</p>
         <p className="font-bold">Empowering Abilities, Connecting Opportunities.</p>
       </div>
