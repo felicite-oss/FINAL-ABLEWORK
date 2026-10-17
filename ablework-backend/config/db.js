@@ -1,7 +1,12 @@
 const mysql = require('mysql2/promise');
 require('dotenv').config();
 
-// Base configuration that works everywhere
+console.log("=== RENDER DATABASE DEBUG ===");
+console.log("Host:", process.env.DB_HOST);
+console.log("Port:", process.env.DB_PORT);
+console.log("SSL Required:", process.env.DB_REQUIRES_SSL);
+console.log("=============================");
+
 const dbConfig = {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -13,7 +18,6 @@ const dbConfig = {
     queueLimit: 0
 };
 
-// Only add the Aiven SSL requirement if the environment asks for it
 if (process.env.DB_REQUIRES_SSL === 'true') {
     dbConfig.ssl = { rejectUnauthorized: false };
 }
