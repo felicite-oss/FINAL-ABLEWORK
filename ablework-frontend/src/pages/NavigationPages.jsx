@@ -3,6 +3,7 @@ import React from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { AccessibilityContext } from '../context/AccessibilityContext';
 import { useColorPalette } from '../context/ColorPaletteContext';
+import { AccessibilityWelcome } from '../components/AccessibilityWelcome';
 import lightLogo from '../assets/LIGHT MODE.png';
 import darkLogo from '../assets/DARK MODE.png';
 import backgroundImg from '../assets/BG.png';
@@ -16,7 +17,8 @@ let DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow,
   iconSize: [25, 41],
-  iconAnchor: [12, 41]
+  iconAnchor: [12, 41],
+  alt: ''
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
@@ -45,14 +47,18 @@ function SiteHeader() {
         <div className="flex items-center gap-8">
           <div className="flex items-center flex-shrink-0 py-1">
             <img
-              src={isAccessibilityMode ? darkLogo : lightLogo}
-              alt="AbleWork Logo"
+              src={(isAccessibilityMode || (mode && typeof mode === 'string' && mode.toLowerCase().includes('dark'))) ? darkLogo : lightLogo}
+              alt="AbleWork logo"
+              role="img"
+              aria-label="AbleWork logo"
+              tabIndex="0"
               className="h-9 sm:h-12 md:h-14 w-auto object-contain max-h-full"
             />
           </div>
           <nav className={`hidden md:flex items-center gap-6 text-[15px] font-semibold ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`} aria-label="Main navigation">
             <NavLink 
               to="/" 
+              aria-label="Home"
               className={({ isActive }) => 
                 `transition-colors duration-200 hover:text-[var(--color-accent)] hover:scale-105 transform ${isActive ? `font-bold border-b-2 ${isContrast ? 'border-[var(--color-text)] text-[var(--color-text)]' : 'border-[#03045E] text-[#03045E]'} pb-0.5` : (isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]')}`
               }
@@ -61,6 +67,7 @@ function SiteHeader() {
             </NavLink>
             <NavLink 
               to="/about" 
+              aria-label="About Us"
               className={({ isActive }) => 
                 `transition-colors duration-200 hover:text-[var(--color-accent)] hover:scale-105 transform ${isActive ? `font-bold border-b-2 ${isContrast ? 'border-[var(--color-text)] text-[var(--color-text)]' : 'border-[#03045E] text-[#03045E]'} pb-0.5` : (isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]')}`
               }
@@ -69,6 +76,7 @@ function SiteHeader() {
             </NavLink>
             <NavLink 
               to="/policy" 
+              aria-label="Policy"
               className={({ isActive }) => 
                 `transition-colors duration-200 hover:text-[var(--color-accent)] hover:scale-105 transform ${isActive ? `font-bold border-b-2 ${isContrast ? 'border-[var(--color-text)] text-[var(--color-text)]' : 'border-[#03045E] text-[#03045E]'} pb-0.5` : (isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]')}`
               }
@@ -81,6 +89,7 @@ function SiteHeader() {
         <div className="hidden md:flex items-center">
           <Link
             to="/login"
+            aria-label="Log In"
             className={`login-btn px-5 py-2 rounded-full bg-transparent text-sm font-bold border-2 transition transform duration-200 ${
               isContrast 
                 ? 'text-[var(--color-text)] border-[var(--color-text)] hover:bg-[var(--color-accent)] hover:text-[var(--color-background)] hover:border-[var(--color-accent)] hover:brightness-125' 
@@ -94,8 +103,9 @@ function SiteHeader() {
         <button
           className={`md:hidden flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl border-2 shadow-sm cursor-pointer transition-all duration-200 shrink-0 ${isContrast ? 'bg-zinc-900 text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/20'}`}
           onClick={() => setIsOpen(!isOpen)}
-          aria-label={isOpen ? "Close menu" : "Open menu"}
+          aria-label="Menu"
           aria-expanded={isOpen}
+          aria-controls="site-mobile-menu"
         >
           {isOpen ? (
             <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -110,6 +120,7 @@ function SiteHeader() {
       </div>
 
       <div
+        id="site-mobile-menu"
         className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out border-b-2 ${
           isContrast ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/20'
         } ${
@@ -120,21 +131,22 @@ function SiteHeader() {
           <nav className={`flex flex-col px-2.5 pt-2.5 pb-2.5 gap-2 sm:px-3 sm:pt-3 sm:pb-3 sm:gap-2.5 ${isContrast ? 'text-white' : 'text-[#03045E]'}`} aria-label="Mobile navigation">
             <NavLink
               to="/"
+              aria-label="Home"
               onClick={() => setIsOpen(false)}
               className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}
             >
               {({ isActive }) => (
                 <>
-                  {isActive && <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
-                  <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                  {isActive && <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
+                  <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div aria-hidden="true" className="flex-1 min-w-0">
                     <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Home</span>
                   </div>
-                  <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
                 </>
@@ -143,21 +155,22 @@ function SiteHeader() {
 
             <NavLink
               to="/about"
+              aria-label="About Us"
               onClick={() => setIsOpen(false)}
               className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}
             >
               {({ isActive }) => (
                 <>
-                  {isActive && <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
-                  <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                  {isActive && <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
+                  <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div aria-hidden="true" className="flex-1 min-w-0">
                     <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">About Us</span>
                   </div>
-                  <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
                 </>
@@ -166,46 +179,48 @@ function SiteHeader() {
 
             <NavLink
               to="/policy"
+              aria-label="Policy"
               onClick={() => setIsOpen(false)}
               className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}
             >
               {({ isActive }) => (
                 <>
-                  {isActive && <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
-                  <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                  {isActive && <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
+                  <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div aria-hidden="true" className="flex-1 min-w-0">
                     <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Policy</span>
                   </div>
-                  <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
                 </>
               )}
             </NavLink>
 
-            <div className={`h-px my-0.5 ${isContrast ? 'bg-[#2C7FFF]/30' : 'bg-[#03045E]/15'}`}></div>
+            <div aria-hidden="true" className={`h-px my-0.5 ${isContrast ? 'bg-[#2C7FFF]/30' : 'bg-[#03045E]/15'}`}></div>
 
             <NavLink
               to="/login"
+              aria-label="Log In"
               onClick={() => setIsOpen(false)}
               className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}
             >
               {({ isActive }) => (
                 <>
-                  {isActive && <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
-                  <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                  {isActive && <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
+                  <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                     </svg>
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div aria-hidden="true" className="flex-1 min-w-0">
                     <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Log In</span>
                   </div>
-                  <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
                 </>
@@ -287,7 +302,7 @@ export function Home() {
   const mappedJobs = jobs.filter(j => j.latitude && j.longitude);
 
   return (
-    <div className={`min-h-screen flex flex-col ${isContrast ? 'dark-mode-fix bg-[var(--color-background)] text-[var(--color-text)]' : 'bg-white text-[#03045E]'}`}>
+    <div role="main" aria-label="Home Screen" className={`min-h-screen flex flex-col ${isContrast ? 'dark-mode-fix bg-[var(--color-background)] text-[var(--color-text)]' : 'bg-white text-[#03045E]'}`}>
 
       {usePlainWhiteText && (
         <style>{`
@@ -353,28 +368,30 @@ export function Home() {
 
         <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 lg:py-16 w-full relative">
           <div
-            className={`hero-bg-img absolute inset-0 rounded-2xl sm:rounded-[3rem] bg-no-repeat bg-cover bg-center md:bg-[size:1100px_auto] md:bg-left ${isContrast ? 'bg-[var(--color-background)]/60' : 'bg-white/10'}`}
+            className={`hero-bg-img absolute inset-0 rounded-2xl sm:rounded-[3rem] bg-no-repeat bg-center bg-[size:600px_auto] md:bg-[size:1100px_auto] md:bg-left ${isContrast ? 'bg-[var(--color-background)]/60' : 'bg-white/10'}`}
             style={{ backgroundImage: `url(${backgroundImg})` }}
+            aria-hidden="true"
           ></div>
 
           <div className={`relative z-10 p-4 sm:p-12 rounded-2xl sm:rounded-[3rem] shadow-2xl border backdrop-blur-[1px] ${isContrast ? 'bg-[var(--color-surface)]/80 border-[var(--color-border)] text-[var(--color-text)]' : 'bg-[var(--color-surface)]/50 border-white/40 text-[#03045E]'}`}>
             <div className="grid md:grid-cols-2 gap-6 sm:gap-12 items-start">
               <div>
-                <span className={`inline-block px-3 py-1 sm:px-4 sm:py-1.5 rounded-full ${isContrast ? 'bg-[var(--color-accentSoft)] text-[var(--color-text)] border border-[var(--color-accent)]' : 'bg-[#2C7FFF]/15 text-[#2C7FFF] bg-white/10'} font-black text-[10px] sm:text-xs uppercase tracking-widest mb-3 sm:mb-4 backdrop-blur-sm shadow-sm`}>
-                  WELCOME TO ABLEWORK
+                <span tabIndex="0" className={`inline-block px-3 py-1 sm:px-4 sm:py-1.5 rounded-full ${isContrast ? 'bg-[var(--color-accentSoft)] text-[var(--color-text)] border border-[var(--color-accent)]' : 'bg-[#2C7FFF]/15 text-[#2C7FFF] bg-white/10'} font-black text-[10px] sm:text-xs uppercase tracking-widest mb-3 sm:mb-4 backdrop-blur-sm shadow-sm`}>
+                  Welcome to AbleWork
                 </span>
 
-                <h1 data-hc-plain className={`text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight mb-4 sm:mb-6 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`} style={(isContrast || isDarkMode) ? { textShadow: 'none' } : undefined}>
-                  Building an <span className={isContrast ? 'text-[var(--color-accent)]' : 'text-[#03045E]'}>Inclusive Workforce</span> for Everyone
+                <h1 className={`text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight mb-4 sm:mb-6 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'} [text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`} style={(isContrast || isDarkMode) ? { textShadow: 'none' } : undefined}>
+                  Building an Inclusive Workforce for Everyone
                 </h1>
 
-                <p data-hc-plain className={`text-sm sm:text-lg font-semibold leading-relaxed mb-5 sm:mb-8 p-2.5 sm:p-3 rounded-xl ${isContrast ? 'text-[var(--color-text)] bg-[var(--color-surface)]/80 border border-[var(--color-border)]' : 'text-[#03045E] bg-[var(--color-surface)]/50'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_14px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`} style={(isContrast || isDarkMode) ? { textShadow: 'none' } : undefined}>
+                <p className={`text-sm sm:text-lg font-semibold leading-relaxed mb-5 sm:mb-8 p-2.5 sm:p-3 rounded-xl ${isContrast ? 'text-[var(--color-text)] bg-[var(--color-surface)]/80 border border-[var(--color-border)]' : 'text-[#03045E] bg-[var(--color-surface)]/50'} [text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_14px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`} style={(isContrast || isDarkMode) ? { textShadow: 'none' } : undefined}>
                   AbleWork helps persons with disabilities find suitable employment opportunities based on their unique skills, qualifications, and preferred locations.
                 </p>
 
                 <div className="flex flex-wrap gap-3 sm:gap-4">
                   <Link
                     to="/register-select"
+                    aria-label="Get Started Today"
                     className={`get-started-btn px-5 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-2 group text-sm sm:text-base ${
                       isContrast 
                         ? 'bg-[#1a1a1a] text-white border-2 border-white hover:bg-[#2C7FFF] hover:border-[#2C7FFF]' 
@@ -382,11 +399,12 @@ export function Home() {
                     }`}
                   >
                     Get Started Today
-                    <svg className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                    <svg aria-hidden="true" className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
                   </Link>
 
                   <Link
                     to="/about"
+                    aria-label="Learn More"
                     className={`learn-more-btn px-5 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl font-bold transition-all shadow-sm text-sm sm:text-base ${
                       isContrast
                         ? 'bg-[#1a1a1a] text-white border-2 border-white hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'
@@ -398,24 +416,24 @@ export function Home() {
                 </div>
 
                 <div className={`grid grid-cols-3 gap-4 sm:gap-6 mt-8 sm:mt-12 pt-6 sm:pt-10 border-t ${isContrast ? 'border-[var(--color-border)]' : 'border-[#03045E]/20'}`}>
-                  <div>
-                    <h4 className={`text-xl sm:text-3xl font-black ${isContrast ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`}>100%</h4>
-                    <p className={`text-[10px] sm:text-xs font-black uppercase tracking-wider mt-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`}>Accessible</p>
+                  <div tabIndex="0">
+                    <h4 className={`text-xl sm:text-3xl font-black ${isContrast || isDarkMode ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'} ${!isDarkMode ? 'max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]' : ''}`}>100%</h4>
+                    <p className={`text-[10px] sm:text-xs font-black uppercase tracking-wider mt-1 ${isContrast || isDarkMode ? 'text-[var(--color-text)]' : 'text-[#03045E]'} ${!isDarkMode ? 'max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]' : ''}`}>Accessible</p>
                   </div>
-                  <div>
-                    <h4 className={`text-xl sm:text-3xl font-black ${isContrast ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`}>24/7</h4>
-                    <p className={`text-[10px] sm:text-xs font-black uppercase tracking-wider mt-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`}>Support</p>
+                  <div tabIndex="0">
+                    <h4 className={`text-xl sm:text-3xl font-black ${isContrast || isDarkMode ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'} ${!isDarkMode ? 'max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]' : ''}`}>24/7</h4>
+                    <p className={`text-[10px] sm:text-xs font-black uppercase tracking-wider mt-1 ${isContrast || isDarkMode ? 'text-[var(--color-text)]' : 'text-[#03045E]'} ${!isDarkMode ? 'max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]' : ''}`}>Support</p>
                   </div>
-                  <div>
-                    <h4 className={`text-xl sm:text-3xl font-black ${isContrast ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`}>Secure</h4>
-                    <p className={`text-[10px] sm:text-xs font-black uppercase tracking-wider mt-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`}>Platform</p>
+                  <div tabIndex="0">
+                    <h4 className={`text-xl sm:text-3xl font-black ${isContrast || isDarkMode ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'} ${!isDarkMode ? 'max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]' : ''}`}>Secure</h4>
+                    <p className={`text-[10px] sm:text-xs font-black uppercase tracking-wider mt-1 ${isContrast || isDarkMode ? 'text-[var(--color-text)]' : 'text-[#03045E]'} ${!isDarkMode ? 'max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]' : ''}`}>Platform</p>
                   </div>
                 </div>
               </div>
 
               <div className={`h-full flex flex-col justify-center rounded-xl sm:rounded-[2rem] p-4 sm:p-8 shadow-xl border ${isContrast ? 'bg-[var(--color-surface)]/70 border-[var(--color-border)] text-[var(--color-text)]' : 'bg-[var(--color-surface)]/70 border-[#03045E]/20 text-[#03045E]'}`}>
-                <h2 className={`text-lg sm:text-2xl font-black mb-4 sm:mb-6 tracking-tight flex items-center gap-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`}>
-                  <span className="w-3 h-3 rounded-full bg-[var(--color-accent)]"></span>
+                <h2 className={`text-lg sm:text-2xl font-black mb-4 sm:mb-6 tracking-tight flex items-center gap-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
+                  <span aria-hidden="true" className="w-3 h-3 rounded-full bg-[var(--color-accent)]"></span>
                   Why Choose AbleWork?
                 </h2>
 
@@ -447,7 +465,7 @@ export function Home() {
             
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-6 sm:mb-8">
               <div>
-                <span className="inline-block px-3 py-1 rounded-full bg-[var(--color-accentSoft)] text-[var(--color-accent)] font-black text-[10px] sm:text-xs uppercase tracking-widest mb-2 sm:mb-3 border border-[var(--color-accent)]">
+                <span tabIndex="0" className="inline-block px-3 py-1 rounded-full bg-[var(--color-accentSoft)] text-[var(--color-accent)] font-black text-[10px] sm:text-xs uppercase tracking-widest mb-2 sm:mb-3 border border-[var(--color-accent)]">
                   Live Opportunities Map
                 </span>
                 <h2 className="text-xl sm:text-4xl font-black tracking-tight">
@@ -463,9 +481,10 @@ export function Home() {
                   type="button"
                   onClick={() => handleDetectUserLocation(true)}
                   disabled={isDetecting}
+                  aria-label={isDetecting ? 'Locating' : 'Find Jobs Near Me'}
                   className="find-jobs-btn px-4 py-2.5 sm:px-6 sm:py-3.5 bg-[var(--color-accent)] text-[var(--color-background)] font-black text-[10px] sm:text-xs uppercase tracking-wider rounded-xl sm:rounded-2xl shadow-md hover:brightness-125 transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
-                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <svg aria-hidden="true" className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                   </svg>
@@ -475,7 +494,7 @@ export function Home() {
             </div>
 
             {locationError && (
-              <div className="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-800 text-[10px] sm:text-xs font-bold rounded-xl">
+              <div role="alert" aria-live="assertive" className="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-800 text-[10px] sm:text-xs font-bold rounded-xl">
                 {locationError}
               </div>
             )}
@@ -489,7 +508,7 @@ export function Home() {
                   title={satelliteView ? 'Street view' : 'Satellite view'}
                   className="relative flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-full bg-white/95 backdrop-blur-md shadow-[0_4px_20px_rgba(3,4,94,0.15)] border border-[#03045E]/15 cursor-pointer"
                 >
-                  <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#2C7FFF]/10 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shrink-0">
+                  <span aria-hidden="true" className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#2C7FFF]/10 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shrink-0">
                     {satelliteView ? (
                       <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
@@ -500,7 +519,7 @@ export function Home() {
                       </svg>
                     )}
                   </span>
-                  <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E] whitespace-nowrap">
+                  <span aria-hidden="true" className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E] whitespace-nowrap">
                     {satelliteView ? 'Street' : 'Satellite'}
                   </span>
                 </button>
@@ -511,19 +530,21 @@ export function Home() {
                   <button
                     type="button"
                     onClick={() => setLegendOpen(open => !open)}
+                    aria-label="Map Legend"
                     aria-expanded={legendOpen}
                     aria-controls="home-map-legend-panel"
                     className="w-full flex items-center gap-2 px-3 py-2.5 cursor-pointer"
                   >
-                    <span className="w-6 h-6 rounded-lg bg-[#f4f4f4] border border-[#03045E]/20 flex items-center justify-center text-[#2C7FFF] shrink-0">
+                    <span aria-hidden="true" className="w-6 h-6 rounded-lg bg-[#f4f4f4] border border-[#03045E]/20 flex items-center justify-center text-[#2C7FFF] shrink-0">
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                       </svg>
                     </span>
-                    <span className="flex-1 text-left text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E]">
+                    <span aria-hidden="true" className="flex-1 text-left text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E]">
                       Map Legend
                     </span>
                     <svg
+                      aria-hidden="true"
                       className={`w-3.5 h-3.5 text-[#03045E] transition-transform duration-300 ${legendOpen ? 'rotate-180' : ''}`}
                       fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"
                     >
@@ -534,25 +555,25 @@ export function Home() {
                   <div className={`grid transition-all duration-300 ease-out ${legendOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
                     <div className="overflow-hidden">
                       <div id="home-map-legend-panel" className="px-3 pb-3 flex flex-col gap-2">
-                        <div className="h-px w-full bg-[#03045E]/10 mb-0.5"></div>
+                        <div aria-hidden="true" className="h-px w-full bg-[#03045E]/10 mb-0.5"></div>
 
                         <div className="flex items-center gap-2.5">
-                          <span className="w-3 h-3 rounded-full bg-[#2C7FFF] border-2 border-white shadow-sm shrink-0"></span>
+                          <span aria-hidden="true" className="w-3 h-3 rounded-full bg-[#2C7FFF] border-2 border-white shadow-sm shrink-0"></span>
                           <span className="flex-1 text-[11px] font-bold text-[#03045E] leading-tight">Active Job Pin</span>
-                          <span className="text-[10px] font-black text-[#2C7FFF] bg-[#2C7FFF]/10 px-1.5 py-0.5 rounded-full min-w-[22px] text-center">
+                          <span aria-hidden="true" className="text-[10px] font-black text-[#2C7FFF] bg-[#2C7FFF]/10 px-1.5 py-0.5 rounded-full min-w-[22px] text-center">
                             {mappedJobs.length}
                           </span>
                         </div>
 
                         {userLocation && (
                           <div className="flex items-center gap-2.5">
-                            <span className="w-3 h-3 rounded-full bg-[#10B981] border-2 border-white shadow-sm shrink-0"></span>
+                            <span aria-hidden="true" className="w-3 h-3 rounded-full bg-[#10B981] border-2 border-white shadow-sm shrink-0"></span>
                             <span className="flex-1 text-[11px] font-bold text-[#03045E] leading-tight">Your Location</span>
                           </div>
                         )}
 
                         <div className="flex items-center gap-2.5">
-                          <span className="w-3 h-3 rounded-full border-2 border-dashed border-[#2C7FFF]/70 shrink-0"></span>
+                          <span aria-hidden="true" className="w-3 h-3 rounded-full border-2 border-dashed border-[#2C7FFF]/70 shrink-0"></span>
                           <span className="flex-1 text-[11px] font-bold text-[#03045E] leading-tight">10 km Radius</span>
                         </div>
 
@@ -567,12 +588,14 @@ export function Home() {
                 </div>
               </div>
 
-              <MapContainer 
-                center={userLocation ? [userLocation.lat, userLocation.lng] : defaultCenter} 
-                zoom={userLocation ? 12 : 10} 
-                scrollWheelZoom={false} 
-                style={{ height: '100%', width: '100%' }}
-              >
+             <MapContainer 
+  aria-hidden="true"
+  tabIndex="-1"
+  center={userLocation ? [userLocation.lat, userLocation.lng] : defaultCenter} 
+  zoom={userLocation ? 12 : 10} 
+  scrollWheelZoom={false} 
+  style={{ height: '100%', width: '100%' }}
+>
                 {satelliteView ? (
                   <TileLayer
                     attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
@@ -590,22 +613,20 @@ export function Home() {
                     <MapRecenter lat={userLocation.lat} lng={userLocation.lng} />
                     <Marker position={[userLocation.lat, userLocation.lng]}>
                       <Popup>
-                        <div className="p-0 min-w-[240px] bg-black text-white rounded-2xl overflow-hidden shadow-2xl border-2 border-white">
-                          <div className="bg-white text-black px-3 py-1.5 flex items-center justify-between">
-                            <span className="text-[10px] font-black uppercase tracking-widest">Your Location</span>
-                            <span className="w-2 h-2 rounded-full bg-black animate-pulse"></span>
-                          </div>
-                          <div className="px-3 py-3 flex items-start gap-2">
-                            <div className="w-7 h-7 rounded-full bg-white text-black flex items-center justify-center shrink-0">
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                              </svg>
+                        <div className="p-0 min-w-[220px] rounded-2xl overflow-hidden bg-white shadow-xl" tabIndex="-1">
+                          <div aria-hidden="true" className="h-1.5 w-full bg-[#03045E]"></div>
+                          <div className="px-4 pt-3.5 pb-3">
+                            <div className="flex items-center justify-between gap-2 mb-2">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-sm bg-[#03045E]">
+                                <svg aria-hidden="true" className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" /></svg>
+                                Home Base
+                              </span>
+                              <span aria-hidden="true" className="w-2 h-2 rounded-full bg-[#03045E] animate-pulse"></span>
                             </div>
-                            <div>
-                              <p className="font-black text-sm text-white leading-tight">You are here</p>
-                              <p className="text-[11px] font-semibold text-white/80 mt-0.5">Browsing nearby verified jobs</p>
-                            </div>
+                            <h4 className="font-black text-[15px] text-[#03045E] leading-tight m-0 mb-1">Your Home Location</h4>
+                            <p className="text-xs font-bold text-[#03045E]/70 m-0 leading-relaxed">
+                              Jobs within 10 km of this address are shown on the map.
+                            </p>
                           </div>
                         </div>
                       </Popup>
@@ -624,50 +645,54 @@ export function Home() {
                     position={[Number(job.latitude), Number(job.longitude)]}
                   >
                     <Popup>
-                      <div className="p-0 min-w-[260px] bg-black text-white rounded-2xl overflow-hidden shadow-2xl border-2 border-white">
-                        <div className="bg-white text-black px-3 py-1.5 flex items-center justify-between">
-                          <span className="text-[10px] font-black uppercase tracking-widest">Active Opening</span>
-                          <span className="w-2 h-2 rounded-full bg-black animate-pulse"></span>
-                        </div>
+                      <div className="p-0 min-w-[240px] rounded-2xl overflow-hidden bg-white shadow-xl" tabIndex="-1">
+                        <div aria-hidden="true" className="h-1.5 w-full bg-[#2C7FFF]"></div>
 
-                        <div className="px-3 pt-3 pb-2">
-                          <h4 className="font-black text-base text-white leading-tight mb-1">{job.job_title}</h4>
-                          <p className="text-xs font-bold text-white/80 mb-3">{job.company_name}</p>
-
-                          <div className="space-y-2 mb-3">
-                            <div className="flex items-start gap-2">
-                              <div className="w-6 h-6 rounded-full bg-white text-black flex items-center justify-center shrink-0">
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                              </div>
-                              <p className="text-xs font-semibold text-white leading-snug">
-                                {job.workplace_address || job.company_address || job.address || 'Address provided upon application'}
-                              </p>
-                            </div>
-
-                            {job.salary_range && (
-                              <div className="flex items-start gap-2">
-                                <div className="w-6 h-6 rounded-full bg-white text-black flex items-center justify-center shrink-0">
-                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                  </svg>
-                                </div>
-                                <p className="text-xs font-black text-white leading-snug">{job.salary_range}</p>
-                              </div>
-                            )}
+                        <div className="px-4 pt-3.5 pb-3">
+                          <div className="flex items-center justify-between gap-2 mb-3">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-sm bg-[#2C7FFF]">
+                              <svg aria-hidden="true" className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" /></svg>
+                              Opportunity
+                            </span>
+                            <span aria-hidden="true" className="w-2 h-2 rounded-full animate-pulse bg-[#2C7FFF]"></span>
                           </div>
-                        </div>
 
-                        <div className="px-3 pb-3">
-                          <Link 
+                          <h4 className="font-black text-[15px] text-[#03045E] leading-tight m-0 mb-1">{job.job_title}</h4>
+
+                          <div className="flex items-center gap-1.5 mb-2">
+                            <svg aria-hidden="true" className="w-3.5 h-3.5 text-[#2C7FFF] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 12h.01M9 15h.01M9 18h.01M15 9h.01M15 12h.01M15 15h.01M15 18h.01" />
+                            </svg>
+                            <p className="text-xs font-bold text-[#03045E]/70 m-0 truncate">{job.company_name}</p>
+                          </div>
+
+                          <div className="flex items-start gap-1.5 mb-2">
+                            <svg aria-hidden="true" className="w-3.5 h-3.5 text-[#2C7FFF] shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <p className="text-xs font-semibold text-[#03045E]/70 m-0 leading-snug">
+                              {job.workplace_address || job.company_address || job.address || 'Address provided upon application'}
+                            </p>
+                          </div>
+
+                          {job.salary_range && (
+                            <div className="flex items-center gap-1.5 mb-3">
+                              <svg aria-hidden="true" className="w-3.5 h-3.5 text-[#2C7FFF] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              <p className="text-xs font-black text-[#03045E] m-0">{job.salary_range}</p>
+                            </div>
+                          )}
+
+                          <Link
                             to="/register-select"
-                            className="block text-center py-2.5 px-3 bg-white text-black text-xs font-black rounded-xl hover:bg-neutral-200 transition flex items-center justify-center gap-2"
+                            aria-label={`View job details for ${job.job_title} at ${job.company_name}`}
+                            className="w-full py-2.5 text-white text-xs font-black rounded-xl cursor-pointer flex items-center justify-center gap-2 shadow-md bg-[#2C7FFF]"
                           >
-                            Apply / Register Now
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            View Job Details
+                            <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                             </svg>
                           </Link>
                         </div>
@@ -681,15 +706,16 @@ export function Home() {
           </div>
         </section>
 
-        <section className={`py-10 sm:py-16 px-4 sm:px-6 my-6 sm:my-8 ${isContrast ? 'bg-[var(--color-background)] border-y border-[var(--color-border)]' : 'bg-[#03045E]'}`}>
+        <section className={`py-10 sm:py-16 px-4 sm:px-6 my-6 sm:my-8 ${isContrast ? 'bg-[var(--color-background)] border-y border-[var(--color-border)]' : 'bg-[#f4f4f4] border-y border-[#d1d5db]'}`}>
           <div className="max-w-5xl mx-auto text-center space-y-4 sm:space-y-6">
-            <h2 className={`text-xl sm:text-4xl font-black tracking-tight !text-white`}>Ready to Take the Next Step in Your Career?</h2>
-            <p className={`text-xs sm:text-lg font-semibold max-w-2xl mx-auto !text-white`}>
+            <h2 className={`text-xl sm:text-4xl font-black tracking-tight ${isContrast ? '!text-white' : 'text-[#03045E]'}`}>Ready to Take the Next Step in Your Career?</h2>
+            <p className={`text-xs sm:text-lg font-semibold max-w-2xl mx-auto ${isContrast ? '!text-white' : 'text-[#03045E]'}`}>
               Join our growing community of empowered candidates and inclusive companies building a barrier-free workplace.
             </p>
             <div className="pt-2">
               <Link
                 to="/register-select"
+                aria-label="Create Your Free Account"
                 className={`inline-block px-6 py-3 sm:px-9 sm:py-4 rounded-xl sm:rounded-2xl font-black shadow-xl hover:bg-[var(--color-accent)] hover:text-[var(--color-background)] hover:scale-105 hover:brightness-125 transition-all border-2 text-sm sm:text-base ${
                   isContrast 
                     ? 'bg-[var(--color-surface)]/50 !text-black border-[var(--color-accent)]' 
@@ -776,7 +802,7 @@ export function Policy() {
         <div className={`p-4 sm:p-8 md:p-12 rounded-2xl sm:rounded-3xl border-2 backdrop-blur-sm ${isContrast ? 'bg-[var(--color-surface)]/50 text-[var(--color-text)] border-[var(--color-border)]' : 'bg-[var(--color-surface)]/50 text-[#03045E] border-white/40'}`}>
 
           <div className={`pb-6 sm:pb-8 mb-6 sm:mb-8 border-b ${isContrast ? 'border-[var(--color-border)]' : 'border-[#03045E]/10'}`}>
-            <span className="text-[var(--color-accent)] font-black text-[10px] sm:text-xs uppercase tracking-widest block mb-2">Transparency & Commitment</span>
+            <span className="text-[var(--color-accent)] font-black text-[10px] sm:text-xs uppercase tracking-widest block mb-2">Transparency and Commitment</span>
             <h2 className={`text-lg sm:text-2xl font-black mb-2 sm:mb-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Your Privacy Matters to Us</h2>
             <p className={`text-xs sm:text-base font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'}`}>
               ABLEWORK ("the Platform", "we", "us") is dedicated to safeguarding the privacy and data security of all users, specifically Persons with Disabilities (PWDs) and participating employers. This Privacy Policy outlines our practices regarding the collection, use, storage, and protection of personal data in compliance with the Republic Act No. 10173, otherwise known as the Data Privacy Act of 2012 (DPA) of the Philippines, and its Implementing Rules and Regulations (IRR).
@@ -805,13 +831,13 @@ export function Policy() {
                 <div>
                   <p className="font-bold mb-1">For Employers:</p>
                   <ul className="list-disc pl-6 space-y-1 font-medium">
-                    <li><strong>Company & Representative Details:</strong> Company name, company description, industry classification, representative full name, business email, and contact number.</li>
-                    <li><strong>Verification Records:</strong> Uploaded business registration documents (e.g., DTI, SEC registration, or Mayor's/Business Permit).</li>
+                    <li><strong>Company and Representative Details:</strong> Company name, company description, industry classification, representative full name, business email, and contact number.</li>
+                    <li><strong>Verification Records:</strong> Uploaded business registration documents (e.g., DTI, SEC registration, or Mayor's or Business Permit).</li>
                     <li><strong>Job Listing Data:</strong> Job vacancies, job descriptions, required skills, guaranteed workplace accommodations, and accepted disability types.</li>
                   </ul>
                 </div>
                 <div>
-                  <p className="font-bold mb-1">System & Technical Metadata (All Users):</p>
+                  <p className="font-bold mb-1">System and Technical Metadata (All Users):</p>
                   <p className="font-medium">Network Internet Protocol (IP) addresses, verification attempt logs, system security timestamps, accessibility settings (e.g., high-contrast theme, font scale), and in-app notification logs.</p>
                 </div>
               </div>
@@ -833,21 +859,21 @@ export function Policy() {
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">3. Processing of Sensitive Personal Information (Disability & PWD Records)</h3>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">3. Processing of Sensitive Personal Information (Disability and PWD Records)</h3>
               <p className="font-medium">
                 Disability classifications and PWD ID documents are processed strictly to verify eligibility and ensure that matched workplaces meet necessary physical and sensory accommodations. PWD IDs and business verification files are stored in restricted server storage directories and are accessible exclusively to authorized system administrators for audit and approval purposes. Disability-related details are never sold, rented, or made visible to third-party advertising networks.
               </p>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">4. Artificial Intelligence & Third-Party Service Providers</h3>
+              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">4. Artificial Intelligence and Third-Party Service Providers</h3>
               <p className="font-medium mb-2">
                 To deliver modern web capabilities, ABLEWORK interfaces with selected third-party service providers under data protection principles:
               </p>
               <ul className="list-disc pl-6 space-y-1 font-medium">
                 <li><strong>Google Gemini API:</strong> Powers the ABBY conversational assistant. Real-time account metadata (e.g., application count, current verification standing) is supplied contextually during active chat queries to provide dynamic help. No passwords, credentials, or official government documents are transmitted to the AI engine.</li>
-                <li><strong>Email Dispatch (Nodemailer / Google SMTP):</strong> Delivers automated system alerts, application updates, and security OTPs to user-registered email addresses.</li>
-                <li><strong>Mapping & Geolocation Services:</strong> Processes device-derived or user-selected coordinates to calculate distance scores relative to employer workplaces.</li>
+                <li><strong>Email Dispatch (Nodemailer and Google SMTP):</strong> Delivers automated system alerts, application updates, and security OTPs to user-registered email addresses.</li>
+                <li><strong>Mapping and Geolocation Services:</strong> Processes device-derived or user-selected coordinates to calculate distance scores relative to employer workplaces.</li>
               </ul>
             </section>
 
@@ -867,7 +893,7 @@ export function Policy() {
               </p>
               <ul className="list-disc pl-6 space-y-1 font-medium">
                 <li><strong>Cryptographic Protection:</strong> Passwords are mathematically hashed with unique cryptographic salts using bcrypt before database storage.</li>
-                <li><strong>Header & Transport Security:</strong> HTTP security headers (Helmet) and Cross-Origin Resource Sharing (CORS) rules protect API communication channels.</li>
+                <li><strong>Header and Transport Security:</strong> HTTP security headers (Helmet) and Cross-Origin Resource Sharing (CORS) rules protect API communication channels.</li>
                 <li><strong>Access Segregation:</strong> Verification documents and candidate resumes are isolated within designated upload directories linked only to validated database records.</li>
               </ul>
             </section>
@@ -909,7 +935,7 @@ export function Policy() {
               </p>
               <ul className="list-disc pl-6 space-y-1 font-medium">
                 <li><strong>Platform:</strong> ABLEWORK Capstone Project</li>
-                <li><strong>Data Custody Team / Proponents:</strong> Paquio, Loueala Jean H., Pagado, Jesie Marie D., Astodillo, Felicite S., Gonzales, John Greg A., Gamboa, John Bryan T.</li>
+                <li><strong>Data Custody Team and Proponents:</strong> Paquio, Loueala Jean H., Pagado, Jesie Marie D., Astodillo, Felicite S., Gonzales, John Greg A., Gamboa, John Bryan T.</li>
                 <li><strong>Institution:</strong> STIWNU</li>
                 <li><strong>Official Support Email:</strong> ableworksys5i@gmail.com</li>
               </ul>
@@ -933,7 +959,7 @@ export function Terms() {
 
           <div className={`pb-6 sm:pb-8 mb-6 sm:mb-8 border-b ${isContrast ? 'border-[var(--color-border)]' : 'border-[#03045E]/10'}`}>
             <span className="text-[var(--color-accent)] font-black text-[10px] sm:text-xs uppercase tracking-widest block mb-2">User Guidelines</span>
-            <h2 className={`text-lg sm:text-2xl font-black mb-2 sm:mb-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Platform Rules & Conditions</h2>
+            <h2 className={`text-lg sm:text-2xl font-black mb-2 sm:mb-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Platform Rules and Conditions</h2>
             <p className={`text-xs sm:text-base font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'}`}>
               Welcome to ABLEWORK, a web-based employment assistance system designed to connect persons with disabilities (PWDs) with suitable employment opportunities and help employers manage job vacancies and applications. By accessing or using ABLEWORK, you agree to comply with these Terms and Conditions. If you do not agree with any part of these terms, please do not use the system.
             </p>
@@ -1148,6 +1174,7 @@ export function Contact() {
             </div>
             <button
               type="button"
+              aria-label="Send Message"
               className={`w-full py-2.5 sm:py-3 rounded-full font-bold transition border-2 hover:brightness-125 text-xs sm:text-sm ${
                 isContrast 
                   ? 'bg-[var(--color-surface)]/50 text-[var(--color-text)] border-[var(--color-surface)] hover:text-[var(--color-background)] hover:border-[var(--color-accent)]' 
@@ -1213,7 +1240,7 @@ function PageLayout({ title, children }) {
 
       <div className="flex-1 overflow-y-auto flex flex-col pt-16">
 
-        <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16 w-full">
+        <main role="main" aria-label={`${title} Screen`} className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16 w-full">
 
           <h1 className={`text-2xl sm:text-4xl md:text-5xl font-black text-center mb-8 sm:mb-12 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
             {title}
@@ -1238,20 +1265,23 @@ function SimpleFooter() {
   const isAccessibilityMode = paletteKey === 'highContrast' || paletteKey === 'darkComfort';
 
   return (
-    <footer className={`py-6 sm:py-12 px-4 sm:px-6 mt-auto border-t-2 shadow-inner ${isContrast ? 'bg-[var(--color-background)] text-[var(--color-text)] border-[var(--color-border)]' : 'bg-[#f4f4f4] text-[#03045E] border-[#03045E]/20'}`}>
+    <footer role="contentinfo" className={`py-6 sm:py-12 px-4 sm:px-6 mt-auto border-t-2 shadow-inner ${isContrast ? 'bg-[var(--color-background)] border-[var(--color-border)]' : 'bg-[#03045E] border-[#03045E]/20'}`}>
 
-      <div className={`max-w-[1700px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 pb-6 sm:pb-10 border-b ${isContrast ? 'border-[var(--color-border)]' : 'border-[#03045E]/10'}`}>
+      <div className={`max-w-[1700px] mx-auto grid grid-cols-3 md:grid-cols-4 gap-4 sm:gap-8 pb-6 sm:pb-10 border-b ${isContrast ? 'border-[var(--color-border)]' : 'border-[#03045E]/10'}`}>
         
-        <div className="col-span-2 md:col-span-1 space-y-2 sm:space-y-3">
+        <div className="col-span-3 md:col-span-1 space-y-2 sm:space-y-3">
           <img
-            src={isAccessibilityMode ? darkLogo : lightLogo}
-            alt="AbleWork Logo"
+            src={darkLogo}
+            alt="AbleWork logo"
+            role="img"
+            aria-label="AbleWork logo"
+            tabIndex="0"
             className="h-8 sm:h-10 w-auto object-contain"
           />
-          <p className={`text-[10px] sm:text-sm font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]'}`}>
+          <p className={`text-[10px] sm:text-sm font-semibold leading-relaxed text-white`}>
             Building an inclusive workforce and equal employment opportunities for everyone.
           </p>
-          <div className={`pt-1 flex items-center space-x-3 text-[9px] sm:text-xs font-bold uppercase tracking-wider ${isContrast ? 'text-[var(--color-textSubtle)]' : 'text-[#03045E]'}`}>
+          <div className={`pt-1 flex items-center space-x-3 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-white`}>
             <span> Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</span>
             <span></span>
             <span></span>
@@ -1259,20 +1289,20 @@ function SimpleFooter() {
         </div>
 
         <div>
-          <h4 className={`text-xs sm:text-base font-black mb-2 sm:mb-4 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Quick Links</h4>
+          <h4 className={`text-xs sm:text-base font-black mb-2 sm:mb-4 text-white`}>Quick Links</h4>
           <ul className="space-y-1 sm:space-y-2 text-[10px] sm:text-sm font-semibold">
             <li>
-              <Link to="/" className={`transition-colors ${isContrast ? 'text-[var(--color-textMuted)] hover:text-[var(--color-accent)]' : 'text-[#03045E] hover:text-[#2C7FFF]'}`}>
+              <Link to="/" aria-label="Home Dashboard" className={`transition-colors text-white hover:text-white`}>
                 Home Dashboard
               </Link>
             </li>
             <li>
-              <Link to="/about" className={`transition-colors ${isContrast ? 'text-[var(--color-textMuted)] hover:text-[var(--color-accent)]' : 'text-[#03045E] hover:text-[#2C7FFF]'}`}>
+              <Link to="/about" aria-label="About Our Mission" className={`transition-colors text-white hover:text-white`}>
                 About Our Mission
               </Link>
             </li>
             <li>
-              <Link to="/contact" className={`transition-colors ${isContrast ? 'text-[var(--color-textMuted)] hover:text-[var(--color-accent)]' : 'text-[#03045E] hover:text-[#2C7FFF]'}`}>
+              <Link to="/contact" aria-label="Contact Support" className={`transition-colors text-white hover:text-white`}>
                 Contact Support
               </Link>
             </li>
@@ -1280,28 +1310,29 @@ function SimpleFooter() {
         </div>
 
         <div>
-          <h4 className={`text-xs sm:text-base font-black mb-2 sm:mb-4 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Legal & Support</h4>
+          <h4 className={`text-xs sm:text-base font-black mb-2 sm:mb-4 text-white`}>Legal and Support</h4>
           <ul className="space-y-1 sm:space-y-2 text-[10px] sm:text-sm font-semibold">
             <li>
-              <Link to="/policy" className={`transition-colors ${isContrast ? 'text-[var(--color-textMuted)] hover:text-[var(--color-accent)]' : 'text-[#03045E] hover:text-[#2C7FFF]'}`}>
+              <Link to="/policy" aria-label="Privacy Policy" className={`transition-colors text-white hover:text-white`}>
                 Privacy Policy
               </Link>
             </li>
             <li>
-              <Link to="/terms" className={`transition-colors ${isContrast ? 'text-[var(--color-textMuted)] hover:text-[var(--color-accent)]' : 'text-[#03045E] hover:text-[#2C7FFF]'}`}>
-                Terms & Conditions
+              <Link to="/terms" aria-label="Terms and Conditions" className={`transition-colors text-white hover:text-white`}>
+                Terms and Conditions
               </Link>
             </li>
           </ul>
         </div>
 
         <div>
-          <h4 className={`text-xs sm:text-base font-black mb-2 sm:mb-4 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Get Started</h4>
-          <p className={`text-[10px] sm:text-sm font-semibold mb-2 sm:mb-4 ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]'}`}>
+          <h4 className={`text-xs sm:text-base font-black mb-2 sm:mb-4 text-white`}>Get Started</h4>
+          <p className={`text-[10px] sm:text-sm font-semibold mb-2 sm:mb-4 text-white`}>
             Are you an applicant or employer looking to join our network?
           </p>
           <Link
             to="/register-select"
+            aria-label="Register Now"
             className="register-btn inline-block bg-[var(--color-accent)] text-white px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-xl font-bold text-[9px] sm:text-xs uppercase tracking-wider shadow-md hover:brightness-125 hover:text-white transition-all border-2 border-[var(--color-accent)] hover:border-[var(--color-background)]"
           >
             Register Now
@@ -1310,7 +1341,7 @@ function SimpleFooter() {
 
       </div>
 
-      <div className={`max-w-[1700px] mx-auto pt-3 sm:pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 text-[9px] sm:text-xs font-bold ${isContrast ? 'text-[var(--color-textSubtle)]' : 'text-[#03045E]'}`}>
+      <div className={`max-w-[1700px] mx-auto pt-3 sm:pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 text-[9px] sm:text-xs font-bold text-white`}>
         <p>© {new Date().getFullYear()} AgileWork Inc. All rights reserved.</p>
         <p className="font-bold">Empowering Abilities, Connecting Opportunities.</p>
       </div>
@@ -1326,14 +1357,14 @@ function Feature({ title, text }) {
 
   return (
     <div role="group" aria-labelledby={id} className="flex gap-3 sm:gap-4 items-start p-2 sm:p-3 rounded-xl sm:rounded-2xl">
-      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-[var(--color-accentSoft)] text-[var(--color-accent)] flex items-center justify-center font-bold text-xs sm:text-sm shrink-0 mt-0.5">
+      <div aria-hidden="true" className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-[var(--color-accentSoft)] text-[var(--color-accent)] flex items-center justify-center font-bold text-xs sm:text-sm shrink-0 mt-0.5">
         ✓
       </div>
       <div>
-        <h3 id={id} className={`text-sm sm:text-base font-black mb-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`}>
+        <h3 id={id} className={`text-sm sm:text-base font-black mb-1 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
           {title}
         </h3>
-        <p className={`text-xs sm:text-sm font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]'} max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`}>
+        <p className={`text-xs sm:text-sm font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]'}`}>
           {text}
         </p>
       </div>
@@ -1597,18 +1628,19 @@ export default function ApplicantRegister() {
     <main
       className="min-h-screen flex flex-col bg-[var(--color-surface)] text-[#03045E] overflow-x-hidden relative font-sans antialiased"
       role="main"
-      aria-label="Applicant registration page"
+      aria-label="Applicant Registration Screen"
     >
       <header className="w-full bg-[var(--color-surface)]/90 backdrop-blur-md border-b border-[#03045E]/10 sticky top-0 left-0 z-50">
         <div className="w-full h-14 px-4 flex items-center justify-between max-w-md mx-auto box-border">
           <div className="flex items-center gap-3">
             <div className="flex items-center flex-shrink-0 py-1">
-              <img src={isAccessibilityMode ? darkLogo : lightLogo} alt="AbleWork Logo" className="h-9 w-auto object-contain max-h-full" />
+              <img src={(isAccessibilityMode || (mode && typeof mode === 'string' && mode.toLowerCase().includes('dark'))) ? darkLogo : lightLogo} alt="AbleWork logo" role="img" aria-label="AbleWork logo" tabIndex="0" className="h-9 w-auto object-contain max-h-full" />
             </div>
           </div>
           <div className="flex items-center">
             <NavLink
               to="/login"
+              aria-label="Log In"
               className={({ isActive }) => 
                 `px-3 py-1.5 rounded-full bg-transparent text-[#03045E] text-xs font-bold border border-[#03045E]/30 hover:bg-[#2C7FFF] hover:text-white hover:border-[#2C7FFF] transition whitespace-nowrap ${
                   isActive 
@@ -1629,7 +1661,7 @@ export default function ApplicantRegister() {
         aria-label="Applicant registration area"
       >
         <div
-          className="absolute inset-0 w-full h-full bg-no-repeat bg-cover bg-center pointer-events-none opacity-40 fixed"
+          className="absolute inset-0 w-full h-full bg-no-repeat bg-center bg-[size:auto] pointer-events-none opacity-40 fixed"
           style={{
             backgroundImage: `url(${backgroundImg})`,
           }}
@@ -1650,6 +1682,7 @@ export default function ApplicantRegister() {
           </div>
           <Link
             to="/register-select"
+            aria-label="Back to Role Selection"
             className="w-8 h-8 flex items-center justify-center rounded-full bg-[#03045E]/5 text-[#03045E] hover:bg-[#03045E] hover:text-white transition text-sm font-bold"
           >
             ✕
@@ -1675,65 +1708,69 @@ export default function ApplicantRegister() {
             
             <div className="flex flex-col gap-3.5">
               <div className="flex flex-col gap-1">
-                <label htmlFor="firstName" className="text-xs font-bold text-[#03045E]">First Name <span className="text-[#2C7FFF]">*</span></label>
-                <input id="firstName" type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Enter your First Name" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
+                <label htmlFor="firstName" className="text-xs font-bold text-[#03045E]">First Name <span aria-hidden="true" className="text-[#2C7FFF]">*</span></label>
+                <input id="firstName" type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Enter your First Name" aria-label="Enter your First Name" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
               </div>
               <div className="flex flex-col gap-1">
                 <label htmlFor="middleName" className="text-xs font-bold text-[#03045E]">Middle Name (Optional)</label>
-                <input id="middleName" type="text" value={middleName} onChange={(e) => setMiddleName(e.target.value)} placeholder="Enter your Middle Name" className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
+                <input id="middleName" type="text" value={middleName} onChange={(e) => setMiddleName(e.target.value)} placeholder="Enter your Middle Name" aria-label="Enter your Middle Name" className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
               </div>
               <div className="flex flex-col gap-1">
-                <label htmlFor="lastName" className="text-xs font-bold text-[#03045E]">Last Name <span className="text-[#2C7FFF]">*</span></label>
-                <input id="lastName" type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Enter your Last Name" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
+                <label htmlFor="lastName" className="text-xs font-bold text-[#03045E]">Last Name <span aria-hidden="true" className="text-[#2C7FFF]">*</span></label>
+                <input id="lastName" type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Enter your Last Name" aria-label="Enter your Last Name" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
               </div>
               <div className="flex flex-col gap-1">
-                <label htmlFor="phone" className="text-xs font-bold text-[#03045E]">Phone Number <span className="text-[#2C7FFF]">*</span></label>
-                <input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Enter your Phone Number" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
+                <label htmlFor="phone" className="text-xs font-bold text-[#03045E]">Phone Number <span aria-hidden="true" className="text-[#2C7FFF]">*</span></label>
+                <input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Enter your Phone Number" aria-label="Enter your Phone Number" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
               </div>
               <div className="flex flex-col gap-1">
-                <label htmlFor="email" className="text-xs font-bold text-[#03045E]">Email Address <span className="text-[#2C7FFF]">*</span></label>
-                <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your Email Address" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
+                <label htmlFor="email" className="text-xs font-bold text-[#03045E]">Email Address <span aria-hidden="true" className="text-[#2C7FFF]">*</span></label>
+                <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your Email Address" aria-label="Enter your Email Address" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
               </div>
               <div className="flex flex-col gap-1">
-                <label htmlFor="password" className="text-xs font-bold text-[#03045E]">Password <span className="text-[#2C7FFF]">*</span></label>
-                <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your Password" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
+                <label htmlFor="password" className="text-xs font-bold text-[#03045E]">Password <span aria-hidden="true" className="text-[#2C7FFF]">*</span></label>
+                <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your Password" aria-label="Enter your Password" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
               </div>
               <div className="flex flex-col gap-1">
-                <label htmlFor="confirmPassword" className="text-xs font-bold text-[#03045E]">Confirm Password <span className="text-[#2C7FFF]">*</span></label>
-                <input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm your Password" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
+                <label htmlFor="confirmPassword" className="text-xs font-bold text-[#03045E]">Confirm Password <span aria-hidden="true" className="text-[#2C7FFF]">*</span></label>
+                <input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm your Password" aria-label="Confirm your Password" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
               </div>
               <div className="flex flex-col gap-1">
-                <label htmlFor="birthdate" className="text-xs font-bold text-[#03045E]">Birthdate (Must be 18+) <span className="text-[#2C7FFF]">*</span></label>
-                <input id="birthdate" type="date" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} placeholder="Enter your Birthdate" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
+                <label htmlFor="birthdate" className="text-xs font-bold text-[#03045E]">Birthdate (Must be 18+) <span aria-hidden="true" className="text-[#2C7FFF]">*</span></label>
+                <input id="birthdate" type="date" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} placeholder="Enter your Birthdate" aria-label="Enter your Birthdate" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
               </div>
             </div>
 
-            <hr className="border-[#03045E]/10 my-1" />
+            <hr aria-hidden="true" className="border-[#03045E]/10 my-1" />
 
             <div className="flex flex-col gap-3.5 p-3.5 border border-[#2C7FFF]/20 rounded-2xl bg-[#2C7FFF]/5 shadow-sm">
-              <label htmlFor="address" className="text-xs font-bold text-[#03045E]">Residential Address <span className="text-[#2C7FFF]">*</span></label>
-              <button type="button" onClick={handleDetectLocation} disabled={isDetecting} className="bg-[#2C7FFF] text-white px-4 py-2 rounded-xl text-xs font-bold shadow hover:brightness-125 transition w-full flex items-center justify-center gap-1.5">
+              <label htmlFor="address" className="text-xs font-bold text-[#03045E]">Residential Address <span aria-hidden="true" className="text-[#2C7FFF]">*</span></label>
+              <button type="button" onClick={handleDetectLocation} disabled={isDetecting} aria-label={isDetecting ? 'Detecting Location' : 'Detect My Location'} className="bg-[#2C7FFF] text-white px-4 py-2 rounded-xl text-xs font-bold shadow hover:brightness-125 transition w-full flex items-center justify-center gap-1.5">
                 {isDetecting ? 'Detecting Location...' : '📍 Detect My Location'}
               </button>
-              <input id="address" type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Enter your Residential Address (e.g. Block 4, Main Street, Manila)" required className="w-full p-2.5 text-xs font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 shadow-sm" />
+              <input id="address" type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Enter your Residential Address (e.g. Block 4, Main Street, Manila)" aria-label="Enter your Residential Address" required className="w-full p-2.5 text-xs font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 shadow-sm" />
                
               <div className="mt-2 flex flex-col gap-2">
                 <div className="flex justify-between items-center">
                   <label htmlFor="radius" className="text-xs font-bold text-[#03045E]">
                     Max Travel Radius:
                   </label>
-                  <span className="text-[#2C7FFF] font-black text-sm bg-[var(--color-surface)] px-2.5 py-0.5 rounded-lg border border-[#2C7FFF]/20 shadow-sm">{radius} km</span>
+                  <span aria-hidden="true" className="text-[#2C7FFF] font-black text-sm bg-[var(--color-surface)] px-2.5 py-0.5 rounded-lg border border-[#2C7FFF]/20 shadow-sm">{radius} km</span>
                 </div>
                 <input 
                   id="radius" type="range" min="1" max="50" 
                   value={radius} onChange={(e) => setRadius(Number(e.target.value))} 
+                  aria-label="Max Travel Radius"
                   className="w-full h-2 accent-[#2C7FFF] cursor-pointer" 
                 />
                 <p className="text-[11px] font-semibold text-[#03045E]">Jobs beyond this distance will be filtered out automatically.</p>
               </div>
 
               {lat && lng ? (
-                <div className="h-48 w-full mt-2 rounded-xl overflow-hidden border border-[#03045E]/25 z-0 relative shadow-inner">
+                <div 
+                  role="region"
+                  aria-label={`Interactive map showing your home location and a ${radius} kilometer travel radius.`}
+                  className="h-48 w-full mt-2 rounded-xl overflow-hidden border border-[#03045E]/25 z-0 relative shadow-inner">
                   <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-[1000] flex flex-col gap-2">
                     <button
                       type="button"
@@ -1742,7 +1779,7 @@ export default function ApplicantRegister() {
                       title={satelliteView ? 'Street view' : 'Satellite view'}
                       className="relative flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-full bg-white/95 backdrop-blur-md shadow-[0_4px_20px_rgba(3,4,94,0.15)] border border-[#03045E]/15 cursor-pointer"
                     >
-                      <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#2C7FFF]/10 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shrink-0">
+                      <span aria-hidden="true" className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#2C7FFF]/10 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shrink-0">
                         {satelliteView ? (
                           <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
@@ -1753,7 +1790,7 @@ export default function ApplicantRegister() {
                           </svg>
                         )}
                       </span>
-                      <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E] whitespace-nowrap">
+                      <span aria-hidden="true" className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E] whitespace-nowrap">
                         {satelliteView ? 'Street' : 'Satellite'}
                       </span>
                     </button>
@@ -1764,19 +1801,21 @@ export default function ApplicantRegister() {
                       <button
                         type="button"
                         onClick={() => setLegendOpen(open => !open)}
+                        aria-label="Map Legend"
                         aria-expanded={legendOpen}
                         aria-controls="applicant-reg-map-legend-panel"
                         className="w-full flex items-center gap-2 px-3 py-2.5 cursor-pointer"
                       >
-                        <span className="w-6 h-6 rounded-lg bg-[#f4f4f4] border border-[#03045E]/20 flex items-center justify-center text-[#2C7FFF] shrink-0">
+                        <span aria-hidden="true" className="w-6 h-6 rounded-lg bg-[#f4f4f4] border border-[#03045E]/20 flex items-center justify-center text-[#2C7FFF] shrink-0">
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                           </svg>
                         </span>
-                        <span className="flex-1 text-left text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E]">
+                        <span aria-hidden="true" className="flex-1 text-left text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E]">
                           Map Legend
                         </span>
                         <svg
+                          aria-hidden="true"
                           className={`w-3.5 h-3.5 text-[#03045E] transition-transform duration-300 ${legendOpen ? 'rotate-180' : ''}`}
                           fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"
                         >
@@ -1787,17 +1826,17 @@ export default function ApplicantRegister() {
                       <div className={`grid transition-all duration-300 ease-out ${legendOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
                         <div className="overflow-hidden">
                           <div id="applicant-reg-map-legend-panel" className="px-3 pb-3 flex flex-col gap-2">
-                            <div className="h-px w-full bg-[#03045E]/10 mb-0.5"></div>
+                            <div aria-hidden="true" className="h-px w-full bg-[#03045E]/10 mb-0.5"></div>
 
                             <div className="flex items-center gap-2.5">
-                              <span className="w-3 h-3 rounded-full bg-[#03045E] border-2 border-white shadow-sm shrink-0"></span>
+                              <span aria-hidden="true" className="w-3 h-3 rounded-full bg-[#03045E] border-2 border-white shadow-sm shrink-0"></span>
                               <span className="flex-1 text-[11px] font-bold text-[#03045E] leading-tight">Your Home Base</span>
                             </div>
 
                             <div className="flex items-center gap-2.5">
-                              <span className="w-3 h-3 rounded-full bg-[#2C7FFF] border-2 border-white shadow-sm shrink-0"></span>
+                              <span aria-hidden="true" className="w-3 h-3 rounded-full bg-[#2C7FFF] border-2 border-white shadow-sm shrink-0"></span>
                               <span className="flex-1 text-[11px] font-bold text-[#03045E] leading-tight">Search Radius</span>
-                              <span className="text-[10px] font-black text-[#2C7FFF] bg-[#2C7FFF]/10 border border-[#2C7FFF]/20 px-1.5 py-0.5 rounded-full">
+                              <span aria-hidden="true" className="text-[10px] font-black text-[#2C7FFF] bg-[#2C7FFF]/10 border border-[#2C7FFF]/20 px-1.5 py-0.5 rounded-full">
                                 {radius} km
                               </span>
                             </div>
@@ -1807,7 +1846,7 @@ export default function ApplicantRegister() {
                     </div>
                   </div>
 
-                  <MapContainer center={[lat, lng]} zoom={11} scrollWheelZoom={false} style={{ height: '100%', width: '100%', zIndex: 0 }}>
+                <MapContainer center={[lat, lng]} zoom={11} scrollWheelZoom={false} style={{ height: '100%', width: '100%', zIndex: 0 }}>
                     {satelliteView ? (
                       <TileLayer
                         attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
@@ -1826,26 +1865,27 @@ export default function ApplicantRegister() {
                 </div>
               ) : (
                 <div className="h-32 w-full mt-2 rounded-xl border border-dashed border-[#03045E]/20 bg-gray-50 flex flex-col items-center justify-center text-[#03045E] p-3 text-center">
-                  <svg className="w-6 h-6 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                  <svg aria-hidden="true" className="w-6 h-6 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                   <span className="text-xs font-semibold">Click 'Detect My Location' to view your travel zone.</span>
                 </div>
               )}
             </div>
 
-            <hr className="border-[#03045E]/10 my-1" />
+            <hr aria-hidden="true" className="border-[#03045E]/10 my-1" />
 
             <fieldset className="flex flex-col gap-2.5">
-              <legend className="text-xs font-bold text-[#03045E]">Physical & Sensory Profile (Work-Enabled) <span className="text-[#2C7FFF]">*</span></legend>
+              <legend className="text-xs font-bold text-[#03045E]">Physical and Sensory Profile (Work-Enabled) <span aria-hidden="true" className="text-[#2C7FFF]">*</span></legend>
               <p className="text-[11px] font-semibold text-[#03045E]">Select applicable physical or sensory categories for tailored job accommodation matching.</p>
                
               {selectedDisabilities.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 p-2.5 bg-[#03045E]/5 rounded-xl border border-[#03045E]/15 shadow-sm">
-                  <span className="w-full text-[10px] font-bold text-[#03045E] uppercase tracking-wider mb-0.5">Selected Profile:</span>
+                  <span aria-hidden="true" className="w-full text-[10px] font-bold text-[#03045E] uppercase tracking-wider mb-0.5">Selected Profile:</span>
                   {selectedDisabilities.map(disability => (
                     <span key={disability} className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-[#2C7FFF] text-white text-[11px] font-bold rounded-full shadow-sm">
                       {disability}
                       <button 
                         type="button" 
+                        aria-label={`Remove ${disability}`}
                         onClick={() => setSelectedDisabilities(selectedDisabilities.filter(d => d !== disability))}
                         className="hover:text-red-200 font-bold ml-0.5 text-xs"
                       >
@@ -1862,25 +1902,27 @@ export default function ApplicantRegister() {
                     type="button"
                     key={disability}
                     onClick={() => toggleSelection(disability, selectedDisabilities, setSelectedDisabilities)}
+                    aria-label={disability}
                     className={`px-3 py-1 rounded-full text-[11px] font-bold border transition shadow-xs ${
                       selectedDisabilities.includes(disability)
                         ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:brightness-125'
                         : 'bg-[var(--color-surface)] text-[#03045E] border-[#03045E]/20 hover:bg-[#2C7FFF] hover:text-white hover:border-[#2C7FFF]'
                     }`}
                   >
-                    {disability} {selectedDisabilities.includes(disability) ? '✓' : '+'}
+                    {disability} <span aria-hidden="true">{selectedDisabilities.includes(disability) ? '✓' : '+'}</span>
                   </button>
                 ))}
                 <button
                   type="button"
                   onClick={() => setShowOtherDisability(!showOtherDisability)}
+                  aria-label="Other"
                   className={`px-3 py-1 rounded-full text-[11px] font-bold border transition shadow-xs ${
                   showOtherDisability
                     ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:brightness-125'
                     : 'bg-[var(--color-surface)] text-[#03045E] border-[#03045E]/20 hover:bg-[#2C7FFF] hover:text-white hover:border-[#2C7FFF]'
                 }`}
               >
-                Other {showOtherDisability ? '✓' : '+'}
+                Other <span aria-hidden="true">{showOtherDisability ? '✓' : '+'}</span>
               </button>
             </div>
 
@@ -1892,6 +1934,7 @@ export default function ApplicantRegister() {
                   onChange={(e) => setOtherDisability(e.target.value)}
                   onKeyDown={handleCustomDisabilityKeyDown}
                   placeholder="Type custom condition and press Enter..."
+                  aria-label="Type custom condition and press Enter"
                   className="w-full p-2.5 text-xs font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 shadow-sm"
                 />
                 {otherDisability.length > 0 && (
@@ -1903,6 +1946,7 @@ export default function ApplicantRegister() {
                         <button
                           key={suggestion}
                           type="button"
+                          aria-label={suggestion}
                           onClick={() => {
                             toggleSelection(suggestion, selectedDisabilities, setSelectedDisabilities);
                             setOtherDisability(''); 
@@ -1919,20 +1963,21 @@ export default function ApplicantRegister() {
           </fieldset>
 
           <fieldset className="flex flex-col gap-2.5">
-            <legend className="text-xs font-bold text-[#03045E]">Workplace Independence <span className="text-[#2C7FFF]">*</span></legend>
+            <legend className="text-xs font-bold text-[#03045E]">Workplace Independence <span aria-hidden="true" className="text-[#2C7FFF]">*</span></legend>
             <div className="flex flex-wrap gap-1.5">
               {['Independent', 'Requires Assistance'].map((option) => (
                 <button
                   type="button"
                   key={option}
                   onClick={() => setIndependence(option)}
+                  aria-label={option}
                   className={`px-3.5 py-1.5 rounded-full text-[11px] font-bold border transition shadow-xs ${
                     independence === option
                       ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:brightness-125'
                       : 'bg-[var(--color-surface)] text-[#03045E] border-[#03045E]/20 hover:bg-[#2C7FFF] hover:text-white hover:border-[#2C7FFF]'
                   }`}
                 >
-                  {option} {independence === option ? '✓' : ''}
+                  {option} <span aria-hidden="true">{independence === option ? '✓' : ''}</span>
                 </button>
               ))}
             </div>
@@ -1946,25 +1991,27 @@ export default function ApplicantRegister() {
                   type="button"
                   key={acc}
                   onClick={() => toggleSelection(acc, selectedAccommodations, setSelectedAccommodations)}
+                  aria-label={acc}
                   className={`px-3 py-1 rounded-full text-[11px] font-bold border transition shadow-xs ${
                     selectedAccommodations.includes(acc)
                       ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:brightness-125'
                       : 'bg-[var(--color-surface)] text-[#03045E] border-[#03045E]/20 hover:bg-[#2C7FFF] hover:text-white hover:border-[#2C7FFF]'
                   }`}
                 >
-                  {acc} {selectedAccommodations.includes(acc) ? '✓' : '+'}
+                  {acc} <span aria-hidden="true">{selectedAccommodations.includes(acc) ? '✓' : '+'}</span>
                 </button>
               ))}
               <button
                 type="button"
                 onClick={() => setShowOtherAccommodation(!showOtherAccommodation)}
+                aria-label="Other"
                 className={`px-3 py-1 rounded-full text-[11px] font-bold border transition shadow-xs ${
                   showOtherAccommodation
                     ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:brightness-125'
                     : 'bg-[var(--color-surface)] text-[#03045E] border-[#03045E]/20 hover:bg-[#2C7FFF] hover:text-white hover:border-[#2C7FFF]'
                 }`}
               >
-                Other {showOtherAccommodation ? '✓' : '+'}
+                Other <span aria-hidden="true">{showOtherAccommodation ? '✓' : '+'}</span>
               </button>
             </div>
 
@@ -1975,6 +2022,7 @@ export default function ApplicantRegister() {
                   value={otherAccommodation}
                   onChange={(e) => setOtherAccommodation(e.target.value)}
                   placeholder="Type custom accommodation and press Enter..."
+                  aria-label="Type custom accommodation and press Enter"
                   className="w-full p-2.5 text-xs font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 shadow-sm"
                 />
                 {otherAccommodation.length > 0 && (
@@ -1986,6 +2034,7 @@ export default function ApplicantRegister() {
                         <button
                           key={suggestion}
                           type="button"
+                          aria-label={suggestion}
                           onClick={() => {
                             toggleSelection(suggestion, selectedAccommodations, setSelectedAccommodations);
                             setOtherAccommodation(''); 
@@ -2002,16 +2051,17 @@ export default function ApplicantRegister() {
           </fieldset>
 
           <fieldset className="flex flex-col gap-2.5">
-            <legend className="text-xs font-bold text-[#03045E]">Your Skills <span className="text-[#2C7FFF]">*</span></legend>
+            <legend className="text-xs font-bold text-[#03045E]">Your Skills <span aria-hidden="true" className="text-[#2C7FFF]">*</span></legend>
               
             {selectedSkills.length > 0 && (
               <div className="flex flex-wrap gap-1.5 p-2.5 bg-[#03045E]/5 rounded-xl border border-[#03045E]/15 shadow-sm">
-                <span className="w-full text-[10px] font-bold text-[#03045E] uppercase tracking-wider mb-0.5">Selected Skills:</span>
+                <span aria-hidden="true" className="w-full text-[10px] font-bold text-[#03045E] uppercase tracking-wider mb-0.5">Selected Skills:</span>
                 {selectedSkills.map(skill => (
                   <span key={skill} className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-[#2C7FFF] text-white text-[11px] font-bold rounded-full shadow-sm">
                     {skill}
                     <button 
                       type="button" 
+                      aria-label={`Remove ${skill}`}
                       onClick={() => setSelectedSkills(selectedSkills.filter(s => s !== skill))}
                       className="hover:text-red-200 font-bold ml-0.5 text-xs"
                     >
@@ -2028,25 +2078,27 @@ export default function ApplicantRegister() {
                   type="button"
                   key={skill}
                   onClick={() => toggleSelection(skill, selectedSkills, setSelectedSkills)}
+                  aria-label={skill}
                   className={`px-3 py-1 rounded-full text-[11px] font-bold border transition shadow-xs ${
                     selectedSkills.includes(skill)
                       ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:brightness-125'
                       : 'bg-[var(--color-surface)] text-[#03045E] border-[#03045E]/20 hover:bg-[#2C7FFF] hover:text-white hover:border-[#2C7FFF]'
                   }`}
                 >
-                  {skill} {selectedSkills.includes(skill) ? '✓' : '+'}
+                  {skill} <span aria-hidden="true">{selectedSkills.includes(skill) ? '✓' : '+'}</span>
                 </button>
               ))}
               <button
                 type="button"
                 onClick={() => setShowOtherSkill(!showOtherSkill)}
+                aria-label="Other"
                 className={`px-3 py-1 rounded-full text-[11px] font-bold border transition shadow-xs ${
                   showOtherSkill
                     ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:brightness-125'
                     : 'bg-[var(--color-surface)] text-[#03045E] border-[#03045E]/20 hover:bg-[#2C7FFF] hover:text-white hover:border-[#2C7FFF]'
                 }`}
               >
-                Other {showOtherSkill ? '✓' : '+'}
+                Other <span aria-hidden="true">{showOtherSkill ? '✓' : '+'}</span>
               </button>
             </div>
 
@@ -2058,6 +2110,7 @@ export default function ApplicantRegister() {
                   onChange={(e) => setOtherSkill(e.target.value)}
                   onKeyDown={handleCustomSkillKeyDown}
                   placeholder="Type custom skill and press Enter..."
+                  aria-label="Type custom skill and press Enter"
                   className="w-full p-2.5 text-xs font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 shadow-sm"
                 />
                 {otherSkill.length > 0 && (
@@ -2069,6 +2122,7 @@ export default function ApplicantRegister() {
                         <button
                           key={suggestion}
                           type="button"
+                          aria-label={suggestion}
                           onClick={() => {
                             toggleSelection(suggestion, selectedSkills, setSelectedSkills);
                             setOtherSkill(''); 
@@ -2084,15 +2138,16 @@ export default function ApplicantRegister() {
             )}
           </fieldset>
 
-          <hr className="border-[#03045E]/10 my-1" />
+          <hr aria-hidden="true" className="border-[#03045E]/10 my-1" />
 
           <div className="p-3.5 rounded-2xl border border-dashed border-[#03045E]/20 bg-gray-50 shadow-xs">
-            <label htmlFor="pwdId" className="block text-xs font-bold text-[#03045E] mb-1.5">Upload PWD ID / Certificates <span className="text-[#2C7FFF]">*</span></label>
+            <label htmlFor="pwdId" className="block text-xs font-bold text-[#03045E] mb-1.5">Upload PWD ID or Certificates <span aria-hidden="true" className="text-[#2C7FFF]">*</span></label>
             <input
               id="pwdId"
               type="file"
               accept=".jpg,.jpeg"
               onChange={(e) => setPwdFile(e.target.files[0])}
+              aria-label="Upload PWD ID or Certificates"
               className="w-full text-xs font-semibold text-[#03045E] file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-[#2C7FFF] file:text-white file:font-bold cursor-pointer"
               required
             />
@@ -2104,6 +2159,7 @@ export default function ApplicantRegister() {
           <button
             type="submit"
             disabled={isLoading}
+            aria-label={isLoading ? 'Submitting' : 'Complete Registration'}
             className="mt-2 py-3 bg-[#03045E] text-white hover:bg-[#2C7FFF] hover:text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition disabled:opacity-50"
           >
             {isLoading ? 'Submitting...' : 'Complete Registration'}
@@ -2111,7 +2167,7 @@ export default function ApplicantRegister() {
         </form>
 
         <p className="mt-5 text-center text-xs font-semibold text-[#03045E]">
-          <Link to="/register-select" className="font-bold text-[#2C7FFF] hover:underline">
+          <Link to="/register-select" aria-label="Back to Role Selection" className="font-bold text-[#2C7FFF] hover:underline">
             ← Back to Role Selection
           </Link>
         </p>
@@ -2127,13 +2183,13 @@ export default function ApplicantRegister() {
       aria-labelledby="success-title"
     >
       <div className="relative w-full max-w-xs bg-[var(--color-surface)] text-[#03045E] rounded-3xl shadow-2xl border border-[#03045E]/20 overflow-hidden animate-fadeIn p-6 text-center">
-        <div className="h-1.5 w-full bg-gradient-to-r from-white via-[#2C7FFF] to-white -mx-6 -mt-6 mb-6" />
+        <div aria-hidden="true" className="h-1.5 w-full bg-gradient-to-r from-white via-[#2C7FFF] to-white -mx-6 -mt-6 mb-6" />
 
         <div className="flex flex-col items-center">
-          <div className="relative mb-4">
+          <div aria-hidden="true" className="relative mb-4">
             <div className="w-16 h-16 rounded-full bg-[#2C7FFF]/15 flex items-center justify-center">
               <div className="w-12 h-12 rounded-full bg-[#2C7FFF] flex items-center justify-center shadow-lg shadow-[#2C7FFF]/40">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
@@ -2147,7 +2203,7 @@ export default function ApplicantRegister() {
             Registration completed successfully.
           </p>
 
-          <div className="flex items-center gap-1.5 mb-2" aria-label="Redirecting to login">
+          <div aria-hidden="true" className="flex items-center gap-1.5 mb-2">
             <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-pulse" />
             <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-pulse [animation-delay:150ms]" />
             <span className="w-2 h-2 rounded-full bg-[#2C7FFF] animate-pulse [animation-delay:300ms]" />

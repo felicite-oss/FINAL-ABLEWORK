@@ -250,26 +250,26 @@ export default function EmployerSettings({ profile, refreshData }) {
 
   const renderMapInner = () => (
     <>
-      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-[1000] flex flex-col gap-2">
+      <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-[1000] flex flex-col gap-1.5">
         <button
           type="button"
           onClick={() => setMapExpanded(prev => !prev)}
           aria-label={mapExpanded ? 'Exit fullscreen map' : 'Expand map to fullscreen'}
           title={mapExpanded ? 'Exit fullscreen' : 'Expand map'}
-          className="relative flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-full bg-white/95 backdrop-blur-md shadow-[0_4px_20px_rgba(3,4,94,0.15)] border border-[#03045E]/15 cursor-pointer"
+          className="relative flex items-center gap-1 pl-1.5 pr-2 py-1 rounded-full bg-white/95 backdrop-blur-md shadow-[0_2px_10px_rgba(3,4,94,0.12)] border border-[#03045E]/15 cursor-pointer"
         >
-          <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#2C7FFF]/10 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shrink-0">
+          <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-[#2C7FFF]/10 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shrink-0">
             {mapExpanded ? (
-              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             ) : (
-              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
               </svg>
             )}
           </span>
-          <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E] whitespace-nowrap">
+          <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-[#03045E] whitespace-nowrap">
             {mapExpanded ? 'Exit' : 'Expand'}
           </span>
         </button>
@@ -279,20 +279,20 @@ export default function EmployerSettings({ profile, refreshData }) {
           onClick={() => setSatelliteView(prev => !prev)}
           aria-label={satelliteView ? 'Switch to street view' : 'Switch to satellite view'}
           title={satelliteView ? 'Street view' : 'Satellite view'}
-          className="relative flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-full bg-white/95 backdrop-blur-md shadow-[0_4px_20px_rgba(3,4,94,0.15)] border border-[#03045E]/15 cursor-pointer"
+          className="relative flex items-center gap-1 pl-1.5 pr-2 py-1 rounded-full bg-white/95 backdrop-blur-md shadow-[0_2px_10px_rgba(3,4,94,0.12)] border border-[#03045E]/15 cursor-pointer"
         >
-          <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#2C7FFF]/10 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shrink-0">
+          <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-[#2C7FFF]/10 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shrink-0">
             {satelliteView ? (
-              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
               </svg>
             ) : (
-              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             )}
           </span>
-          <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E] whitespace-nowrap">
+          <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-[#03045E] whitespace-nowrap">
             {satelliteView ? 'Street' : 'Satellite'}
           </span>
         </button>
@@ -304,25 +304,25 @@ export default function EmployerSettings({ profile, refreshData }) {
         </div>
       )}
 
-      <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-[1000]">
-        <div className="w-[200px] sm:w-[228px] bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-[#03045E]/20 overflow-hidden">
+      <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 z-[1000]">
+        <div className="w-[145px] sm:w-[160px] bg-white/95 backdrop-blur-sm rounded-xl shadow-md border border-[#03045E]/20 overflow-hidden">
           <button
             type="button"
             onClick={() => setLegendOpen(open => !open)}
             aria-expanded={legendOpen}
             aria-controls="employer-map-legend-panel"
-            className="w-full flex items-center gap-2 px-3 py-2.5 cursor-pointer"
+            className="w-full flex items-center gap-1.5 px-2 py-1.5 cursor-pointer"
           >
-            <span className="w-6 h-6 rounded-lg bg-[#f4f4f4] border border-[#03045E]/20 flex items-center justify-center text-[#2C7FFF] shrink-0">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-md bg-[#f4f4f4] border border-[#03045E]/20 flex items-center justify-center text-[#2C7FFF] shrink-0">
+              <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
               </svg>
             </span>
-            <span className="flex-1 text-left text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#03045E]">
+            <span className="flex-1 text-left text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-[#03045E]">
               Map Legend
             </span>
             <svg
-              className={`w-3.5 h-3.5 text-[#03045E] transition-transform duration-300 ${legendOpen ? 'rotate-180' : ''}`}
+              className={`w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#03045E] transition-transform duration-300 ${legendOpen ? 'rotate-180' : ''}`}
               fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -331,17 +331,17 @@ export default function EmployerSettings({ profile, refreshData }) {
 
           <div className={`grid transition-all duration-300 ease-out ${legendOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
             <div className="overflow-hidden">
-              <div id="employer-map-legend-panel" className="px-3 pb-3 flex flex-col gap-2">
+              <div id="employer-map-legend-panel" className="px-2 pb-2 flex flex-col gap-1.5">
                 <div className="h-px w-full bg-[#03045E]/10 mb-0.5"></div>
 
-                <div className="flex items-center gap-2.5">
-                  <span className="w-3 h-3 rounded-full bg-[#03045E] border-2 border-white shadow-sm shrink-0"></span>
-                  <span className="flex-1 text-[11px] font-bold text-[#03045E] leading-tight">Office Location</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#03045E] border-2 border-white shadow-sm shrink-0"></span>
+                  <span className="flex-1 text-[9px] font-bold text-[#03045E] leading-tight">Office Location</span>
                 </div>
 
-                <div className="flex items-center gap-2.5">
-                  <span className="w-3 h-3 rounded-full bg-[#2C7FFF] border-2 border-white shadow-sm shrink-0"></span>
-                  <span className="flex-1 text-[11px] font-bold text-[#03045E] leading-tight">Company Base</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#2C7FFF] border-2 border-white shadow-sm shrink-0"></span>
+                  <span className="flex-1 text-[9px] font-bold text-[#03045E] leading-tight">Company Base</span>
                 </div>
               </div>
             </div>

@@ -103,18 +103,18 @@ export default function AbbyChatbot() {
   };
 
   return (
-    <div className="fixed bottom-6 right-4 sm:right-6 z-50 flex flex-col items-end">
+    <div className="fixed bottom-6 right-4 sm:right-6 z-50 flex flex-col items-end" style={{ bottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}>
       
       {isOpen && (
         <div 
           className="bg-[#f4f4f4] w-[calc(100vw-2rem)] max-w-sm sm:w-96 rounded-2xl sm:rounded-3xl shadow-2xl border-2 border-[#03045E]/20 flex flex-col overflow-hidden mb-3 animate-in fade-in slide-in-from-bottom-3 duration-200"
-          style={{ height: 'min(500px, 70vh)' }}
+          style={{ height: 'min(500px, 70dvh)', maxHeight: 'calc(100dvh - 6rem)' }}
           role="dialog"
           aria-label="Chat with Abby AI Assistant"
         >
         
           <div className="bg-[#03045E] text-[#f4f4f4] px-3 py-3 sm:px-5 sm:py-4 flex justify-between items-center shrink-0 shadow-md z-10">
-            <h2 tabIndex="0" className="font-black text-sm sm:text-[16px] tracking-tight flex items-center gap-2 sm:gap-3">
+            <h2 tabIndex="0" className="font-black text-sm sm:text-base tracking-tight flex items-center gap-2 sm:gap-3">
               <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full overflow-hidden border-2 border-[#2C7FFF] flex items-center justify-center bg-[#f4f4f4] shrink-0 pointer-events-none shadow-sm" aria-hidden="true">
                 <video 
                   src={abbyVideo} 
@@ -147,7 +147,7 @@ export default function AbbyChatbot() {
               <div 
                 key={index}
                 tabIndex="0" 
-                className={`max-w-[88%] px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-[14px] font-semibold leading-relaxed shadow-sm ${
+                className={`max-w-[88%] px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm font-semibold leading-relaxed shadow-sm ${
                   msg.sender === 'user' 
                     ? 'bg-[#2C7FFF] text-[#f4f4f4] self-end rounded-2xl rounded-br-sm' 
                     : 'bg-white border-2 border-[#03045E]/10 text-[#03045E] self-start rounded-2xl rounded-bl-sm'
@@ -160,7 +160,7 @@ export default function AbbyChatbot() {
           
             {isTyping && (
               <div tabIndex="0" className="bg-white border-2 border-[#03045E]/10 text-[#03045E] self-start px-3 py-2 sm:px-4 sm:py-3 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-1.5 animate-pulse">
-                <span className="text-[10px] sm:text-xs font-bold text-[#03045E]/70 mr-1">Abby is thinking</span>
+                <span className="text-[0.625rem] sm:text-xs font-bold text-[#03045E]/70 mr-1">Abby is thinking</span>
                 <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-[#2C7FFF] rounded-full animate-bounce [animation-delay:-0.3s]"></div>
                 <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-[#2C7FFF] rounded-full animate-bounce [animation-delay:-0.15s]"></div>
                 <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-[#2C7FFF] rounded-full animate-bounce"></div>
@@ -180,6 +180,13 @@ export default function AbbyChatbot() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
+              onFocus={() => {
+                setTimeout(() => {
+                  if (textareaRef.current) {
+                    textareaRef.current.scrollIntoView({ block: 'end', behavior: 'smooth' });
+                  }
+                }, 300);
+              }}
               disabled={isTyping}
               rows={1}
               placeholder={isTyping ? "Abby is generating response..." : "Ask Abby something..."}

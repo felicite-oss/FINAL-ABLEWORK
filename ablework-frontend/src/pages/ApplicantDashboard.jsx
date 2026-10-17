@@ -39,6 +39,8 @@ export default function ApplicantDashboard() {
   const [showDesktopSidebar, setShowDesktopSidebar] = useState(true);
   const dropdownRef = useRef(null);
   const notifRef = useRef(null); 
+  const notifPanelRef = useRef(null);
+  const profilePanelRef = useRef(null);
 
   const [profile, setProfile] = useState(() => {
     const savedUser = JSON.parse(localStorage.getItem('user'));
@@ -66,6 +68,24 @@ export default function ApplicantDashboard() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (notificationDropdownOpen && notifPanelRef.current) {
+      const timer = setTimeout(() => {
+        notifPanelRef.current.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [notificationDropdownOpen]);
+
+  useEffect(() => {
+    if (profileDropdownOpen && profilePanelRef.current) {
+      const timer = setTimeout(() => {
+        profilePanelRef.current.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [profileDropdownOpen]);
 
   useEffect(() => {
     const handleStorageSync = () => {
@@ -161,23 +181,7 @@ export default function ApplicantDashboard() {
     }, 3000);
   };
 
-  if (isLoading) return (
-    <div className={`min-h-screen flex flex-col items-center justify-center relative overflow-x-hidden ${isContrast ? 'bg-black' : 'bg-[#f4f4f4]'}`}>
-      <div className={`absolute inset-0 backdrop-blur-xs z-50 flex flex-col items-center justify-center p-4 transition-all duration-300 ${isContrast ? 'bg-black/90' : 'bg-[#f4f4f4]/90'}`}>
-        <div className={`border-2 px-6 py-8 sm:px-8 sm:py-10 rounded-3xl shadow-[0_20px_50px_rgba(3,4,94,0.15)] flex flex-col items-center max-w-sm w-full mx-auto transform animate-in fade-in zoom-in-95 duration-300 ${isContrast ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/20'}`}>
-          <div className="relative w-16 h-16 flex items-center justify-center mb-5">
-            <div className="absolute inset-0 rounded-full border-4 border-[#2C7FFF]/30 animate-pulse"></div>
-            <div className="absolute inset-0 rounded-full border-4 border-t-[#2C7FFF] border-r-transparent border-b-[#03045E] border-l-transparent animate-spin"></div>
-            <div className={`w-6 h-6 rounded-full shadow-md animate-ping opacity-75 absolute ${isContrast ? 'bg-white' : 'bg-[#03045E]'}`}></div>
-          </div>
-          <h3 className={`text-lg font-black tracking-tight text-center mb-1 ${isContrast ? 'text-white' : 'text-[#03045E]'}`}>Loading Workspace</h3>
-          <p className={`text-xs text-center font-bold ${isContrast ? 'text-white/80' : 'text-[#03045E]/80'}`}>Preparing your dashboard and real-time updates...</p>
-        </div>
-      </div>
-    </div>
-  );
-
-  if (error) return <div className={`min-h-screen flex items-center justify-center font-black p-4 text-center ${isContrast ? 'bg-black text-red-400' : 'text-red-600'}`}>{error}</div>;
+  if (error) return <div role="alert" aria-live="assertive" className={`min-h-screen flex items-center justify-center font-black p-4 text-center ${isContrast ? 'bg-black text-red-400' : 'text-red-600'}`}>{error}</div>;
 
   const isRejected = profile?.verification_status === 'Rejected';
   const unreadCount = notifications.filter(n => !n.is_read).length;
@@ -209,10 +213,37 @@ export default function ApplicantDashboard() {
   return (
     <div className={`min-h-screen flex flex-col selection:bg-[#2C7FFF] selection:text-white relative overflow-x-hidden w-full max-w-[100vw] ${(isContrast || isDarkMode) ? 'bg-black text-white' : 'bg-[#f4f4f4] text-[#03045E]'}`}>
       
+      {isLoading && (
+        <div
+          className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
+          style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="loading-title"
+          aria-describedby="loading-desc"
+          tabIndex="-1"
+        >
+          <div className={`border-2 px-6 py-8 sm:px-8 sm:py-10 rounded-3xl shadow-[0_20px_50px_rgba(3,4,94,0.15)] flex flex-col items-center max-w-sm w-full mx-auto transform animate-in fade-in zoom-in-95 duration-300 ${isContrast ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/20'}`}>
+            <div className="relative w-16 h-16 flex items-center justify-center mb-5">
+              <div className="absolute inset-0 rounded-full border-4 border-[#2C7FFF]/30 animate-pulse"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-t-[#2C7FFF] border-r-transparent border-b-[#03045E] border-l-transparent animate-spin"></div>
+              <div className={`w-6 h-6 rounded-full shadow-md animate-ping opacity-75 absolute ${isContrast ? 'bg-white' : 'bg-[#03045E]'}`}></div>
+            </div>
+            <h3 id="loading-title" className={`text-lg font-black tracking-tight text-center mb-1 ${isContrast ? 'text-white' : 'text-[#03045E]'}`}>Loading Workspace</h3>
+            <p id="loading-desc" className={`text-xs text-center font-bold ${isContrast ? 'text-white/80' : 'text-[#03045E]/80'}`}>Preparing your dashboard and real-time updates...</p>
+          </div>
+        </div>
+      )}
+
       {isLoggingOut && (
         <div
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="logging-title"
+          aria-describedby="logging-desc"
+          tabIndex="-1"
         >
           <div className={`relative w-full max-w-md rounded-2xl sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${(isContrast || isDarkMode) ? 'bg-black border-2 border-white' : 'bg-white border-2 border-[#2C7FFF]'}`}>
             <div className="h-1.5 sm:h-2 w-full bg-[#2C7FFF]" />
@@ -232,10 +263,10 @@ export default function ApplicantDashboard() {
                 Notice
               </span>
 
-              <h2 className={`text-lg sm:text-3xl font-black tracking-tight mb-1 sm:mb-2 ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#03045E]'}`}>
+              <h2 id="logging-title" className={`text-lg sm:text-3xl font-black tracking-tight mb-1 sm:mb-2 ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#03045E]'}`}>
                 Logging Out...
               </h2>
-              <p className={`text-[11px] sm:text-sm font-bold leading-relaxed mb-5 sm:mb-8 max-w-xs ${(isContrast || isDarkMode) ? 'text-white/80' : 'text-[#03045E]/80'}`}>
+              <p id="logging-desc" className={`text-[11px] sm:text-sm font-bold leading-relaxed mb-5 sm:mb-8 max-w-xs ${(isContrast || isDarkMode) ? 'text-white/80' : 'text-[#03045E]/80'}`}>
                 Please wait while we secure your account and end the session.
               </p>
 
@@ -253,6 +284,11 @@ export default function ApplicantDashboard() {
         <div
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="logout-title"
+          aria-describedby="logout-desc"
+          tabIndex="-1"
         >
           <div className={`relative w-full max-w-md rounded-2xl sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${(isContrast || isDarkMode) ? 'bg-black border-2 border-white' : 'bg-white border-2 border-[#2C7FFF]'}`}>
             <div className="h-1.5 sm:h-2 w-full bg-[#2C7FFF]" />
@@ -272,16 +308,17 @@ export default function ApplicantDashboard() {
                 Notice
               </span>
 
-              <h2 className={`text-lg sm:text-3xl font-black tracking-tight mb-1 sm:mb-2 ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#03045E]'}`}>
+              <h2 id="logout-title" className={`text-lg sm:text-3xl font-black tracking-tight mb-1 sm:mb-2 ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#03045E]'}`}>
                 Are you sure to logout?
               </h2>
-              <p className={`text-[11px] sm:text-sm font-bold leading-relaxed mb-5 sm:mb-8 max-w-xs ${(isContrast || isDarkMode) ? 'text-white/80' : 'text-[#03045E]/80'}`}>
+              <p id="logout-desc" className={`text-[11px] sm:text-sm font-bold leading-relaxed mb-5 sm:mb-8 max-w-xs ${(isContrast || isDarkMode) ? 'text-white/80' : 'text-[#03045E]/80'}`}>
                 You will be signed out of your account and returned to the login page.
               </p>
 
               <div className="flex flex-row gap-2 sm:gap-3 w-full">
                 <button
                   onClick={() => setShowLogoutConfirm(false)}
+                  aria-label="Cancel logout and stay on page"
                   className="flex-1 py-2.5 sm:py-4 rounded-xl sm:rounded-2xl font-black text-[11px] sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2"
                   style={{ color: '#16a34a', borderColor: '#16a34a' }}
                 >
@@ -289,6 +326,7 @@ export default function ApplicantDashboard() {
                 </button>
                 <button
                   onClick={handleLogout}
+                  aria-label="Confirm logout and end session"
                   className="flex-1 py-2.5 sm:py-4 rounded-xl sm:rounded-2xl font-black text-[11px] sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2"
                   style={{ color: '#DC2626', borderColor: '#DC2626' }}
                 >
@@ -301,14 +339,17 @@ export default function ApplicantDashboard() {
       )}
 
       {/* HEADER */}
-      <header className={`w-full border-b-2 fixed top-0 left-0 z-50 transition-all duration-300 shadow-sm ${isContrast ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/15'}`}>
+      <header role="banner" className={`w-full border-b-2 fixed top-0 left-0 z-50 transition-all duration-300 shadow-sm ${isContrast ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/15'}`}>
         <div className="w-full h-14 sm:h-16 pl-3 pr-3 sm:pl-4 sm:pr-4 md:pr-8 flex items-center justify-between max-w-[1700px] mx-auto box-border">
           <div className="flex items-center gap-2 sm:gap-3 md:gap-6 min-w-0">
-            <div className="flex items-center flex-shrink-0 cursor-pointer overflow-hidden py-1" onClick={() => setActiveTab('overview')}>
+            <div className="flex items-center flex-shrink-0 py-1">
               <img
                 src={isAccessibilityMode ? darkHeaderLogo : headerLogo}
-                alt="AbleWork Logo"
-                className="h-9 sm:h-12 md:h-14 w-auto object-contain max-h-full hover:opacity-95 transition-opacity"
+                alt="AbleWork logo"
+                role="img"
+                aria-label="AbleWork logo"
+                tabIndex="0"
+                className="h-9 sm:h-12 md:h-14 w-auto object-contain max-h-full"
               />
             </div>
           </div>
@@ -317,6 +358,9 @@ export default function ApplicantDashboard() {
             <div className="relative" ref={notifRef}>
               <button
                 onClick={() => setNotificationDropdownOpen(!notificationDropdownOpen)}
+                aria-expanded={notificationDropdownOpen}
+                aria-haspopup="true"
+                aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications, no unread'}
                 className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 transition-all duration-200 cursor-pointer flex items-center justify-center shrink-0 p-0 shadow-sm ${
                   (isContrast || isDarkMode)
                     ? notificationDropdownOpen
@@ -328,19 +372,24 @@ export default function ApplicantDashboard() {
                 }`}
                 title="Notifications"
               >
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <svg aria-hidden="true" className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
                 {unreadCount > 0 && (
-                  <span className={`absolute top-0 right-0 w-3 h-3 sm:w-3.5 sm:h-3.5 border-2 rounded-full ${isContrast ? 'bg-[#2C7FFF] border-black' : 'bg-[#2C7FFF] border-white'}`}></span>
+                  <span aria-hidden="true" className={`absolute top-0 right-0 w-3 h-3 sm:w-3.5 sm:h-3.5 border-2 rounded-full ${isContrast ? 'bg-[#2C7FFF] border-black' : 'bg-[#2C7FFF] border-white'}`}></span>
                 )}
               </button>
 
               {notificationDropdownOpen && (
-                <div className={`fixed left-1/2 -translate-x-1/2 top-16 sm:top-20 w-[calc(100vw-2rem)] max-w-sm sm:absolute sm:left-auto sm:translate-x-0 sm:top-auto sm:right-0 sm:mt-3 sm:w-96 sm:max-w-none rounded-xl sm:rounded-2xl shadow-[0_15px_40px_rgba(3,4,94,0.2)] border-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden ${isContrast ? 'bg-black border-[#2C7FFF]/50' : 'bg-white border-[#03045E]/20'}`}>
+                <div 
+                  ref={notifPanelRef}
+                  tabIndex={-1}
+                  role="region" 
+                  aria-label={`Notifications panel. ${unreadCount} unread notifications.`} 
+                  className={`fixed left-1/2 -translate-x-1/2 top-16 sm:top-20 w-[calc(100vw-2rem)] max-w-sm sm:absolute sm:left-auto sm:translate-x-0 sm:top-auto sm:right-0 sm:mt-3 sm:w-96 sm:max-w-none rounded-xl sm:rounded-2xl shadow-[0_15px_40px_rgba(3,4,94,0.2)] border-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden focus:outline-none ${isContrast ? 'bg-black border-[#2C7FFF]/50' : 'bg-white border-[#03045E]/20'}`}>
                   <div className={`px-3 py-2.5 sm:px-5 sm:py-3.5 border-b-2 flex justify-between items-center rounded-t-xl sm:rounded-t-2xl relative z-20 ${isContrast ? 'bg-black border-[#2C7FFF]/40' : 'bg-[#f4f4f4] border-[#03045E]/15'}`}>
                     <div className="flex items-center gap-1.5 sm:gap-2">
-                      <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#2C7FFF]"></div>
+                      <div aria-hidden="true" className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#2C7FFF]"></div>
                       <h3 className={`font-black text-xs sm:text-base tracking-tight ${isContrast ? 'text-white' : 'text-[#03045E]'}`}>Notifications</h3>
                     </div>
                     {unreadCount > 0 ? (
@@ -356,6 +405,9 @@ export default function ApplicantDashboard() {
                     {notifications.length > 0 ? notifications.map(notif => (
                       <div 
                         key={notif.id} 
+                        role="menuitem"
+                        tabIndex={0}
+                        aria-label={`Notification: ${notif.title}. Message: ${notif.message}. Status: ${!notif.is_read ? 'Unread' : 'Read'}. Received: ${new Date(notif.created_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`}
                         onClick={() => {
                           if (!notif.is_read) handleMarkAsRead(notif.id);
                           if (notif.type === 'update' || notif.type === 'application') {
@@ -367,21 +419,35 @@ export default function ApplicantDashboard() {
                           }
                           setNotificationDropdownOpen(false);
                         }} 
-                        className={`p-2.5 sm:p-5 cursor-pointer relative ${
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            if (!notif.is_read) handleMarkAsRead(notif.id);
+                            if (notif.type === 'update' || notif.type === 'application') {
+                              setActiveTab('tracker');
+                            } else if (notif.type === 'match') {
+                              setActiveTab('explore-jobs');
+                            } else {
+                              setActiveTab('overview');
+                            }
+                            setNotificationDropdownOpen(false);
+                          }
+                        }}
+                        className={`p-2.5 sm:p-5 cursor-pointer relative focus:outline-none focus:ring-2 focus:ring-[#2C7FFF] focus:ring-inset ${
                           !notif.is_read 
                             ? (isContrast ? 'bg-[#2C7FFF]/15' : 'bg-[#2C7FFF]/10') 
                             : (isContrast ? 'bg-black' : 'bg-white')
                         }`}
                       >
                         {!notif.is_read && (
-                          <div className="absolute left-0 top-0 bottom-0 w-1 sm:w-1.5 bg-[#2C7FFF]"></div>
+                          <div aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1 sm:w-1.5 bg-[#2C7FFF]"></div>
                         )}
                         <div className="flex items-start justify-between gap-1.5 sm:gap-2">
                           <h4 className={`text-[11px] sm:text-sm tracking-tight ${!notif.is_read ? (isContrast ? 'font-black text-white' : 'font-black text-[#03045E]') : (isContrast ? 'font-bold text-white/80' : 'font-bold text-[#03045E]/80')}`}>
                             {notif.title}
                           </h4>
                           {!notif.is_read && (
-                            <span className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full bg-[#2C7FFF] shrink-0 mt-1"></span>
+                            <span aria-hidden="true" className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full bg-[#2C7FFF] shrink-0 mt-1"></span>
                           )}
                         </div>
                         <p className={`text-[10px] sm:text-xs mt-0.5 sm:mt-1.5 leading-relaxed ${!notif.is_read ? (isContrast ? 'text-white font-bold' : 'text-[#03045E] font-bold') : (isContrast ? 'text-white/70 font-semibold' : 'text-[#03045E]/70 font-semibold')}`}>
@@ -393,8 +459,8 @@ export default function ApplicantDashboard() {
                       </div>
                     )) : (
                       <div className={`p-6 sm:p-10 text-center flex flex-col items-center justify-center ${isContrast ? 'bg-black' : 'bg-white'}`}>
-                        <div className="w-8 h-8 sm:w-12 sm:h-12 bg-[#2C7FFF]/15 text-[#2C7FFF] rounded-xl sm:rounded-2xl flex items-center justify-center mb-2 sm:mb-3">
-                          <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                        <div aria-hidden="true" className="w-8 h-8 sm:w-12 sm:h-12 bg-[#2C7FFF]/15 text-[#2C7FFF] rounded-xl sm:rounded-2xl flex items-center justify-center mb-2 sm:mb-3">
+                          <svg aria-hidden="true" className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                         </div>
                         <span className={`text-[11px] sm:text-sm font-black ${isContrast ? 'text-white' : 'text-[#03045E]'}`}>You're all caught up!</span>
                         <span className={`text-[9px] sm:text-xs font-bold mt-1 ${isContrast ? 'text-white/70' : 'text-[#03045E]/70'}`}>No new notifications at the moment.</span>
@@ -408,6 +474,9 @@ export default function ApplicantDashboard() {
             <div className="hidden md:block relative" ref={dropdownRef}>
               <button
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                aria-expanded={profileDropdownOpen}
+                aria-haspopup="true"
+                aria-label={`Profile Menu for ${profile?.firstname || profile?.full_name || 'User'}`}
                 className={`w-10 h-10 rounded-full overflow-hidden border-2 transition-all duration-200 cursor-pointer shadow-sm hover:border-[#2C7FFF] flex items-center justify-center shrink-0 p-0 ${
                   profileDropdownOpen || activeTab === 'profile' || activeTab === 'settings' ? 'border-[#2C7FFF] ring-2 ring-[#2C7FFF]/30' : (isContrast ? 'bg-zinc-900 border-white/30' : 'bg-white border-[#03045E]/20')
                 }`}
@@ -416,31 +485,36 @@ export default function ApplicantDashboard() {
                 {getHeaderImageSrc() ? (
                   <img 
                     src={getHeaderImageSrc()} 
-                    alt="Profile" 
+                    alt={`Profile picture of ${profile?.firstname || profile?.full_name || 'User'}`} 
                     className="w-full h-full object-cover" 
                   />
                 ) : (
-                  <div className={`w-full h-full flex items-center justify-center font-black text-sm ${isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white'}`}>
+                  <div aria-hidden="true" className={`w-full h-full flex items-center justify-center font-black text-sm ${isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white'}`}>
                     {profile?.firstname?.[0] || profile?.full_name?.[0] || 'U'}
                   </div>
                 )}
               </button>
 
               {profileDropdownOpen && (
-                <div className={`absolute right-0 mt-3 w-72 rounded-3xl shadow-[0_20px_50px_rgba(3,4,94,0.25)] border-2 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 ${isContrast ? 'bg-black border-[#2C7FFF]/60' : 'bg-white border-[#03045E]/20'}`}>
+                <div 
+                  ref={profilePanelRef}
+                  tabIndex={-1}
+                  role="region" 
+                  aria-label={`Profile menu panel. Logged in as ${profile?.firstname || profile?.full_name || 'Applicant'}.`} 
+                  className={`absolute right-0 mt-3 w-72 rounded-3xl shadow-[0_20px_50px_rgba(3,4,94,0.25)] border-2 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 focus:outline-none ${isContrast ? 'bg-black border-[#2C7FFF]/60' : 'bg-white border-[#03045E]/20'}`}>
                   <div className={`relative p-4 pb-5 ${isContrast ? 'bg-black border-b border-[#2C7FFF]/30' : 'bg-[#f4f4f4] border-b border-[#03045E]/10'}`}>
                     <div className="flex items-center gap-3.5">
                       <div className="relative shrink-0">
                         <div className={`w-14 h-14 rounded-2xl overflow-hidden border-2 border-[#2C7FFF] shadow-md`}>
                           {getHeaderImageSrc() ? (
-                            <img src={getHeaderImageSrc()} alt="Profile" className="w-full h-full object-cover" />
+                            <img src={getHeaderImageSrc()} alt={`Profile picture of ${profile?.firstname || profile?.full_name || 'User'}`} className="w-full h-full object-cover" />
                           ) : (
-                            <div className={`w-full h-full flex items-center justify-center font-black text-lg ${isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white'}`}>
+                            <div aria-hidden="true" className={`w-full h-full flex items-center justify-center font-black text-lg ${isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white'}`}>
                               {profile?.firstname?.[0] || profile?.full_name?.[0] || 'U'}
                             </div>
                           )}
                         </div>
-                        <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white shadow-md"></span>
+                        <span aria-hidden="true" className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white shadow-md"></span>
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className={`text-[10px] font-black uppercase tracking-[0.15em] ${isContrast ? 'text-[#2C7FFF]' : 'text-[#2C7FFF]'}`}>Welcome back</p>
@@ -455,66 +529,74 @@ export default function ApplicantDashboard() {
                   </div>
 
                   <div className="p-2">
-                    <p className={`px-3 pt-1.5 pb-2 text-[10px] font-black uppercase tracking-[0.15em] ${isContrast ? 'text-white/50' : 'text-[#03045E]/50'}`}>Account</p>
+                    <p aria-hidden="true" className={`px-3 pt-1.5 pb-2 text-[10px] font-black uppercase tracking-[0.15em] ${isContrast ? 'text-white/50' : 'text-[#03045E]/50'}`}>Account</p>
                     <button
+                      role="menuitem"
                       onClick={() => { setActiveTab('profile'); setProfileDropdownOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-black transition-colors text-left cursor-pointer ${
+                      aria-label="Edit Profile"
+                      aria-current={activeTab === 'profile' ? 'page' : undefined}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-black transition-colors text-left cursor-pointer focus:outline-none ${
                         activeTab === 'profile'
                           ? (isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white')
                           : (isContrast ? 'text-white' : 'text-[#03045E]')
                       }`}
                     >
-                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                      <div aria-hidden="true" className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
                         activeTab === 'profile'
                           ? (isContrast ? 'bg-white text-[#2C7FFF]' : 'bg-white text-[#03045E]')
                           : (isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white')
                       }`}>
-                        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <svg aria-hidden="true" className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                       </div>
                       <div className="flex-1 min-w-0"><span className="truncate block">Edit Profile</span></div>
-                      {activeTab === 'profile' && <span className={`w-2 h-2 rounded-full shrink-0 ${isContrast ? 'bg-[#2C7FFF]' : 'bg-white'}`}></span>}
+                      {activeTab === 'profile' && <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${isContrast ? 'bg-[#2C7FFF]' : 'bg-white'}`}></span>}
                     </button>
 
                     <button
+                      role="menuitem"
                       onClick={() => { setActiveTab('settings'); setProfileDropdownOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-black transition-colors text-left cursor-pointer ${
+                      aria-label="Settings"
+                      aria-current={activeTab === 'settings' ? 'page' : undefined}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-black transition-colors text-left cursor-pointer focus:outline-none ${
                         activeTab === 'settings'
                           ? (isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white')
                           : (isContrast ? 'text-white' : 'text-[#03045E]')
                       }`}
                     >
-                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                      <div aria-hidden="true" className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
                         activeTab === 'settings'
                           ? (isContrast ? 'bg-white text-[#2C7FFF]' : 'bg-white text-[#03045E]')
                           : (isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white')
                       }`}>
-                        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <svg aria-hidden="true" className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                       </div>
                       <div className="flex-1 min-w-0"><span className="truncate block">Settings</span></div>
-                      {activeTab === 'settings' && <span className={`w-2 h-2 rounded-full shrink-0 ${isContrast ? 'bg-[#2C7FFF]' : 'bg-white'}`}></span>}
+                      {activeTab === 'settings' && <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${isContrast ? 'bg-[#2C7FFF]' : 'bg-white'}`}></span>}
                     </button>
 
-                    <div className={`h-px my-2 mx-2 ${isContrast ? 'bg-[#2C7FFF]/30' : 'bg-[#03045E]/10'}`}></div>
+                    <div aria-hidden="true" className={`h-px my-2 mx-2 ${isContrast ? 'bg-[#2C7FFF]/30' : 'bg-[#03045E]/10'}`}></div>
 
                     <button
+                      role="menuitem"
                       disabled={isLoggingOut}
                       onClick={() => { setProfileDropdownOpen(false); setShowLogoutConfirm(true); }}
                       style={{ color: '#DC2626' }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-black transition-colors text-left cursor-pointer disabled:opacity-50`}
+                      aria-label={isLoggingOut ? 'Logging out' : 'Log Out'}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-black transition-colors text-left cursor-pointer disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#DC2626] focus:ring-inset`}
                     >
-                      <div style={{ backgroundColor: '#FEE2E2', color: '#DC2626' }} className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0`}>
+                      <div aria-hidden="true" style={{ backgroundColor: '#FEE2E2', color: '#DC2626' }} className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0`}>
                         {isLoggingOut ? (
-                          <svg className="w-4 h-4 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+                          <svg aria-hidden="true" className="w-4 h-4 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                           </svg>
                         ) : (
-                          <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                          <svg aria-hidden="true" className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
                           </svg>
                         )}
@@ -528,17 +610,20 @@ export default function ApplicantDashboard() {
 
             {/* Hamburger Button */}
             <button
+              aria-label={isOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isOpen}
+              aria-controls="mobile-menu"
               className={`md:hidden flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl border-2 shadow-sm cursor-pointer transition-all duration-200 shrink-0 ${
                 isContrast ? 'bg-zinc-900 text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/20'
               }`}
               onClick={() => setIsOpen(!isOpen)}
             >
               {isOpen ? (
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               ) : (
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               )}
@@ -548,6 +633,8 @@ export default function ApplicantDashboard() {
 
         {/* MOBILE HAMBURGER MENU */}
         <div
+          id="mobile-menu"
+          aria-hidden={!isOpen}
           className={`md:hidden absolute top-full left-0 w-full overflow-hidden transition-all duration-300 ease-in-out border-b-2 z-40 ${
             isContrast ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/20'
           } ${
@@ -555,10 +642,12 @@ export default function ApplicantDashboard() {
           }`}
         >
           <div className={`w-full ${isContrast ? 'bg-black' : 'bg-white'}`}>
-            <nav className={`flex flex-col px-2.5 pt-2.5 pb-2.5 gap-2 sm:px-3 sm:pt-3 sm:pb-3 sm:gap-2.5 ${isContrast ? 'text-white' : 'text-[#03045E]'}`} aria-label="Mobile navigation">
+            <nav aria-label="Mobile navigation" className={`flex flex-col px-2.5 pt-2.5 pb-2.5 gap-2 sm:px-3 sm:pt-3 sm:pb-3 sm:gap-2.5 ${isContrast ? 'text-white' : 'text-[#03045E]'}`}>
               
               <button
                 onClick={() => { setActiveTab('profile'); setIsOpen(false); }}
+                aria-label="Profile"
+                aria-current={activeTab === 'profile' ? 'page' : undefined}
                 className={`relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${
                   activeTab === 'profile'
                     ? 'bg-white text-[#03045E] border-[#03045E] shadow-md'
@@ -566,13 +655,13 @@ export default function ApplicantDashboard() {
                 }`}
               >
                 {activeTab === 'profile' && (
-                  <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>
+                  <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>
                 )}
-                <div className={`p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 overflow-hidden ${
+                <div aria-hidden="true" className={`p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 overflow-hidden ${
                   activeTab === 'profile' ? 'bg-[#03045E] text-white border-[#03045E]' : 'bg-[#03045E] text-white border-[#03045E]'
                 }`}>
                   {getHeaderImageSrc() ? (
-                    <img src={getHeaderImageSrc()} alt="Profile" className="w-3.5 h-3.5 object-cover rounded-md" />
+                    <img src={getHeaderImageSrc()} alt="" className="w-3.5 h-3.5 object-cover rounded-md" />
                   ) : (
                     <span className="text-[9px] font-black leading-none">
                       {profile?.firstname?.[0] || profile?.full_name?.[0] || 'U'}
@@ -582,13 +671,15 @@ export default function ApplicantDashboard() {
                 <div className="flex-1 min-w-0">
                   <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Profile</span>
                 </div>
-                <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
 
               <button
                 onClick={() => { setActiveTab('settings'); setIsOpen(false); }}
+                aria-label="Settings"
+                aria-current={activeTab === 'settings' ? 'page' : undefined}
                 className={`relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${
                   activeTab === 'settings'
                     ? 'bg-white text-[#03045E] border-[#03045E] shadow-md'
@@ -596,10 +687,10 @@ export default function ApplicantDashboard() {
                 }`}
               >
                 {activeTab === 'settings' && (
-                  <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>
+                  <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>
                 )}
-                <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                  <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                   </svg>
@@ -607,27 +698,29 @@ export default function ApplicantDashboard() {
                 <div className="flex-1 min-w-0">
                   <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Settings</span>
                 </div>
-                <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
 
-              <div className={`h-px my-0.5 ${isContrast ? 'bg-[#2C7FFF]/30' : 'bg-[#03045E]/15'}`}></div>
+              <div aria-hidden="true" className={`h-px my-0.5 ${isContrast ? 'bg-[#2C7FFF]/30' : 'bg-[#03045E]/15'}`}></div>
 
               {[
                 { id: 'overview', label: 'Overview', icon: (
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                  <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                 )},
                 { id: 'explore-jobs', label: 'Explore Jobs', icon: (
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 )},
                 { id: 'tracker', label: 'Job Tracker', icon: (
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                  <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                 )}
               ].map((item) => (
                 <button 
                   key={item.id} 
                   onClick={() => { setActiveTab(item.id); setIsOpen(false); }} 
+                  aria-label={item.label}
+                  aria-current={activeTab === item.id ? 'page' : undefined}
                   className={`relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${
                     activeTab === item.id
                       ? 'bg-white text-[#03045E] border-[#03045E] shadow-md'
@@ -635,35 +728,36 @@ export default function ApplicantDashboard() {
                   }`}
                 >
                   {activeTab === item.id && (
-                    <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>
+                    <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>
                   )}
-                  <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                  <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                     {item.icon}
                   </div>
                   <div className="flex-1 min-w-0">
                     <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">{item.label}</span>
                   </div>
-                  <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
               ))}
 
-              <div className={`h-px my-0.5 ${isContrast ? 'bg-[#2C7FFF]/30' : 'bg-[#03045E]/15'}`}></div>
+              <div aria-hidden="true" className={`h-px my-0.5 ${isContrast ? 'bg-[#2C7FFF]/30' : 'bg-[#03045E]/15'}`}></div>
 
               <button
                 disabled={isLoggingOut}
                 onClick={() => { setIsOpen(false); setShowLogoutConfirm(true); }}
+                aria-label={isLoggingOut ? 'Logging out' : 'Logout'}
                 className={`relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#DC2626]/40 disabled:opacity-50`}
               >
-                <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#DC2626] text-white border-[#DC2626]">
+                <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#DC2626] text-white border-[#DC2626]">
                   {isLoggingOut ? (
-                    <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                     </svg>
                   ) : (
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
                     </svg>
                   )}
@@ -671,7 +765,7 @@ export default function ApplicantDashboard() {
                 <div className="flex-1 min-w-0">
                   <span className="text-[13px] tracking-wide font-black block leading-tight text-[#DC2626] break-words">{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
                 </div>
-                <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#DC2626]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#DC2626]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -684,6 +778,7 @@ export default function ApplicantDashboard() {
         onClick={() => setShowDesktopSidebar((prev) => !prev)}
         aria-label="Toggle sidebar"
         aria-expanded={showDesktopSidebar}
+        aria-controls="sidebar-navigation"
         title={showDesktopSidebar ? 'Hide navigation' : 'Show navigation'}
         className={`hidden md:flex fixed top-[4.5rem] left-4 z-40 w-11 h-11 items-center justify-center rounded-2xl border-2 shadow-md transition-all duration-200 cursor-pointer ${
           isContrast || isDarkMode
@@ -691,7 +786,7 @@ export default function ApplicantDashboard() {
             : 'bg-white text-[#03045E] border-[#03045E]/15'
         }`}
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+        <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
           {showDesktopSidebar ? (
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           ) : (
@@ -704,18 +799,18 @@ export default function ApplicantDashboard() {
       <div className={`flex flex-col md:flex-row flex-1 min-h-screen pt-16 sm:pt-20 transition-all duration-300 ${(isContrast || isDarkMode) ? 'bg-black' : ''}`}>
 
         {showDesktopSidebar && (
-        <aside className={`hidden md:flex w-72 flex-col z-10 border-r px-4 pt-16 pb-4 justify-between shadow-sm flex-shrink-0 fixed top-16 left-0 h-[calc(100vh-4rem)] overflow-y-auto ${(isContrast || isDarkMode) ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/15'}`}>
-          <nav className="flex flex-col space-y-3 w-full">
+        <aside id="sidebar-navigation" role="complementary" aria-label="Sidebar navigation" className={`hidden md:flex w-72 flex-col z-10 border-r px-4 pt-16 pb-4 justify-between shadow-sm flex-shrink-0 fixed top-16 left-0 h-[calc(100vh-4rem)] overflow-y-auto ${(isContrast || isDarkMode) ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/15'}`}>
+          <nav className="flex flex-col space-y-3 w-full" aria-label="Sidebar navigation links">
 
             {[
               { id: 'overview', label: 'Overview', desc: 'Your snapshot', icon: (
-                <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <svg aria-hidden="true" className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
               )},
               { id: 'explore-jobs', label: 'Explore Jobs', desc: 'Browse openings', icon: (
-                <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <svg aria-hidden="true" className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
               )},
               { id: 'tracker', label: 'Job Tracker', desc: 'Your progress', icon: (
-                <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                <svg aria-hidden="true" className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
               )}
             ].map((item) => {
               const isActive = activeTab === item.id;
@@ -723,6 +818,8 @@ export default function ApplicantDashboard() {
                 <button 
                   key={item.id} 
                   onClick={() => setActiveTab(item.id)} 
+                  aria-label={`${item.label}. ${item.desc}`}
+                  aria-current={isActive ? 'page' : undefined}
                   className={`relative flex items-center gap-3.5 text-left pl-4 pr-3.5 py-3.5 rounded-2xl font-extrabold transition-all duration-300 capitalize cursor-pointer border-2 group overflow-hidden ${
                     isActive
                       ? 'bg-white text-[#03045E] border-[#03045E] shadow-md'
@@ -730,9 +827,10 @@ export default function ApplicantDashboard() {
                   }`}
                 >
                   {isActive && (
-                    <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>
+                    <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>
                   )}
                   <div 
+                    aria-hidden="true"
                     className={`p-2.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 ${
                       isActive
                         ? 'bg-[#03045E] text-white border-[#03045E]'
@@ -756,6 +854,7 @@ export default function ApplicantDashboard() {
                     </span>
                   </div>
                   <svg 
+                    aria-hidden="true"
                     className={`w-4 h-4 shrink-0 transition-transform duration-300 ${
                       isActive
                         ? 'text-[#03045E]'
@@ -775,12 +874,15 @@ export default function ApplicantDashboard() {
         </aside>
         )}
 
-        <main className={`flex-1 p-3 pt-6 sm:p-6 sm:pt-10 md:p-10 md:pt-14 relative min-w-0 transition-all duration-300 flex flex-col box-border ${showDesktopSidebar ? 'md:ml-72' : ''} ${(isContrast || isDarkMode) ? 'bg-black' : ''}`}>
+        <div role="region" aria-label="Dashboard content area" className={`flex-1 p-3 pt-6 sm:p-6 sm:pt-10 md:p-10 md:pt-14 relative min-w-0 transition-all duration-300 flex flex-col box-border ${showDesktopSidebar ? 'md:ml-72' : ''} ${(isContrast || isDarkMode) ? 'bg-black' : ''}`}>
           <div className="flex items-start gap-4 w-full min-w-0">
             <div className="w-full flex-1 min-w-0 overflow-x-hidden">
 
               {isRejected && (
                 <div 
+                  role="alert"
+                  aria-live="assertive"
+                  aria-label={`Account Verification Failed. ${profile.rejection_reason || "Your verification document did not meet platform standards."}`}
                   className={`mb-8 p-6 sm:p-8 border-2 rounded-[2rem] shadow-sm flex flex-col gap-5 animate-fadeIn transition-all`}
                   style={{
                     backgroundColor: (isContrast || isDarkMode) ? '#1a0505' : 'rgba(239, 68, 68, 0.08)',
@@ -789,13 +891,14 @@ export default function ApplicantDashboard() {
                 >
                   <div className="flex items-start gap-4">
                     <div 
+                      aria-hidden="true"
                       className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
                       style={{
                         backgroundColor: (isContrast || isDarkMode) ? '#ef4444' : '#fee2e2',
                         color: (isContrast || isDarkMode) ? '#000000' : '#b91c1c'
                       }}
                     >
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                      <svg aria-hidden="true" className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                     </div>
                     <div>
                       <h2 className="text-xl font-black tracking-tight" style={{ color: (isContrast || isDarkMode) ? '#ffffff' : '#991b1b' }}>Account Verification Failed</h2>
@@ -816,7 +919,7 @@ export default function ApplicantDashboard() {
                   </p>
                 </div>
                   
-                  <hr style={{ borderColor: (isContrast || isDarkMode) ? 'rgba(239, 68, 68, 0.4)' : '#fca5a5' }} />
+                  <hr aria-hidden="true" style={{ borderColor: (isContrast || isDarkMode) ? 'rgba(239, 68, 68, 0.4)' : '#fca5a5' }} />
                   
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
@@ -832,6 +935,7 @@ export default function ApplicantDashboard() {
                     <button 
                       disabled={!canResubmit}
                       onClick={() => setActiveTab('settings')}
+                      aria-label={canResubmit ? 'Go to Profile to Resubmit' : `Locked for ${daysLeft} Days`}
                       className="px-6 py-3 rounded-xl font-black text-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer"
                       style={{
                         backgroundColor: canResubmit ? '#ef4444' : ((isContrast || isDarkMode) ? '#18181b' : '#fecaca'),
@@ -840,7 +944,7 @@ export default function ApplicantDashboard() {
                         borderColor: canResubmit ? '#ef4444' : 'transparent'
                       }}
                     >
-                      {!canResubmit && <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>}
+                      {!canResubmit && <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>}
                       {canResubmit ? 'Go to Profile to Resubmit' : `Locked for ${daysLeft} Days`}
                     </button>
                   </div>
@@ -880,7 +984,7 @@ export default function ApplicantDashboard() {
               )}
             </div>
           </div>
-        </main>
+        </div>
       </div>
 
       <div className={`transition-all duration-300 ${showDesktopSidebar ? 'md:ml-72' : ''}`}>

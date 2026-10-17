@@ -7,6 +7,7 @@ import RegisterSelect from './pages/RegisterSelect';
 import ApplicantRegister from './pages/ApplicantRegister';
 import EmployerRegister from './pages/EmployerRegister';
 import AccessibilityToolbar from './components/AccessibilityToolbar';
+import { AccessibilityWelcome } from './components/AccessibilityWelcome';
 import ApplicantDashboard from './pages/ApplicantDashboard';
 import EmployerDashboard from './pages/EmployerDashboard';
 import AbbyChatbot from './components/AbbyChatbot';
@@ -165,6 +166,8 @@ function AppRoutes() {
           <RouteFocusManager />
 
           <GlobalOverlays />
+
+          <AccessibilityWelcome />
 
           <main 
             id="main-content" 
