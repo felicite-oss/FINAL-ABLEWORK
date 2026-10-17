@@ -229,6 +229,12 @@ export default function ApplicantRegister() {
       setStatusMessage({ type: 'error', text: "Please upload your PWD ID or Certification." });
       return;
     }
+
+    if (pwdFile.size > 5 * 1024 * 1024) {
+      setStatusMessage({ type: 'error', text: "File size exceeds the 5MB limit. Please upload a smaller file." });
+      return;
+    }
+
     setIsLoading(true);
 
     const formData = new FormData();
@@ -249,11 +255,18 @@ export default function ApplicantRegister() {
     formData.append('skills', JSON.stringify(selectedSkills));
     formData.append('pwdDocument', pwdFile);
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/register/applicant`, {
         method: 'POST',
         body: formData,
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
+      
       const data = await response.json();
       if (response.ok) {
         setShowSuccessModal(true);
@@ -265,8 +278,13 @@ export default function ApplicantRegister() {
         setStatusMessage({ type: 'error', text: data.message || "Registration failed. Please try again." });
       }
     } catch (error) {
+      clearTimeout(timeoutId);
       console.error("Server Error:", error);
-      setStatusMessage({ type: 'error', text: "Cannot connect to the server. Is your Express backend running?" });
+      if (error.name === 'AbortError') {
+        setStatusMessage({ type: 'error', text: "Request timed out. The server is taking too long to respond." });
+      } else {
+        setStatusMessage({ type: 'error', text: "Cannot connect to the server. Is your Express backend running?" });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -276,11 +294,11 @@ export default function ApplicantRegister() {
     <main
       className={`h-[100dvh] flex flex-col ${isContrast ? 'bg-black text-white' : 'bg-[#f4f4f4] text-[#03045E]'} ${isAccessibilityMode ? '[&_svg]:!text-white [&_svg]:!stroke-white' : ''} overflow-hidden relative`}
       role="main"
-      aria-label="Applicant registration page"
+      aria-label="Applicant Registration Screen"
     >
 
       <div
-        className="fixed inset-0 bg-no-repeat bg-cover bg-center md:bg-[size:1100px_auto] md:bg-left pointer-events-none z-0"
+        className="fixed top-0 left-0 w-full h-[110vh] md:h-[105vh] bg-no-repeat bg-center bg-[size:600px_auto] md:bg-[size:1100px_auto] md:bg-left pointer-events-none z-0"
         style={{
           backgroundImage: `url(${backgroundImg})`,
         }}
@@ -289,21 +307,29 @@ export default function ApplicantRegister() {
 
       <div className="fixed inset-0 backdrop-blur-[2px] pointer-events-none z-0" aria-hidden="true" />
 
-      <header className={`w-full ${isContrast ? 'bg-black border-b-2 border-[#2C7FFF]' : 'bg-white border-b-2 border-[#03045E]/15'} fixed top-0 left-0 z-50 transition-all duration-300 shadow-sm`}>
+      <header role="banner" className={`w-full ${isContrast ? 'bg-black border-b-2 border-[#2C7FFF]' : 'bg-white border-b-2 border-[#03045E]/15'} fixed top-0 left-0 z-50 transition-all duration-300 shadow-sm`}>
         <div className="w-full h-14 sm:h-16 pl-3 pr-3 sm:pl-4 sm:pr-4 md:pr-8 flex items-center justify-between max-w-[1700px] mx-auto box-border">
           <div className="flex items-center gap-8">
             <div className="flex items-center flex-shrink-0 py-1">
-              <img src={isAccessibilityMode ? darkLogo : lightLogo} alt="AbleWork Logo" className="h-9 sm:h-12 md:h-14 w-auto object-contain max-h-full" />
+              <img
+               src={(isAccessibilityMode || isDarkMode) ? darkLogo : lightLogo}
+                alt="AbleWork logo"
+                role="img"
+                aria-label="AbleWork logo"
+                tabIndex="0"
+                className="h-9 sm:h-12 md:h-14 w-auto object-contain max-h-full"
+              />
             </div>
-            <nav className={`hidden md:flex items-center gap-6 text-[15px] font-medium ${isAccessibilityMode ? '!text-white' : (isContrast ? 'text-white' : 'text-[#03045E]')}`}>
-              <Link to="/" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#2C7FFF]')} transition`}>Home</Link>
-              <Link to="/about" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#2C7FFF]')} transition`}>About Us</Link>
-              <Link to="/policy" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#2C7FFF]')} transition`}>Policy</Link>
+            <nav aria-label="Main navigation" className={`hidden md:flex items-center gap-6 text-[15px] font-medium ${isAccessibilityMode ? '!text-white' : (isContrast ? 'text-white' : 'text-[#03045E]')}`}>
+              <Link to="/" aria-label="Home" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#2C7FFF]')} transition`}>Home</Link>
+              <Link to="/about" aria-label="About Us" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#2C7FFF]')} transition`}>About Us</Link>
+              <Link to="/policy" aria-label="Policy" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#2C7FFF]')} transition`}>Policy</Link>
             </nav>
           </div>
           <div className="hidden md:flex items-center">
             <NavLink
               to="/login"
+              aria-label="Log In"
               className={({ isActive }) => 
                 `login-btn px-5 py-2 rounded-full bg-transparent ${isAccessibilityDarkMode || isDefaultDarkMode ? '!text-black' : isAccessibilityMode ? '!text-white' : 'text-[#03045E]'} text-sm font-bold border-2 transform duration-200 transition whitespace-nowrap ${
                   isAccessibilityDarkMode || isDefaultDarkMode
@@ -323,8 +349,9 @@ export default function ApplicantRegister() {
           </div>
           <button
             type="button"
-            aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-label="Menu"
             aria-expanded={isOpen}
+            aria-controls="mobile-menu"
             className={`md:hidden flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl border-2 shadow-sm cursor-pointer transition-all duration-200 shrink-0 ${isContrast ? 'bg-zinc-900 text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/20'}`}
             onClick={() => setIsOpen(!isOpen)}
           >
@@ -341,6 +368,7 @@ export default function ApplicantRegister() {
         </div>
 
         <div
+          id="mobile-menu"
           className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out border-b-2 ${
             isContrast ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/20'
           } ${
@@ -349,64 +377,64 @@ export default function ApplicantRegister() {
           aria-hidden={!isOpen}
         >
           <div className={`w-full ${isContrast ? 'bg-black' : 'bg-white'}`}>
-            <nav className={`flex flex-col px-2.5 pt-2.5 pb-2.5 gap-2 sm:px-3 sm:pt-3 sm:pb-3 sm:gap-2.5 ${isContrast ? 'text-white' : 'text-[#03045E]'}`} aria-label="Mobile navigation">
-              <Link to="/" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
-                <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+            <nav aria-label="Mobile navigation" className={`flex flex-col px-2.5 pt-2.5 pb-2.5 gap-2 sm:px-3 sm:pt-3 sm:pb-3 sm:gap-2.5 ${isContrast ? 'text-white' : 'text-[#03045E]'}`}>
+              <Link to="/" aria-label="Home" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
+                <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                   </svg>
                 </div>
-                <div className="flex-1 min-w-0">
+                <div aria-hidden="true" className="flex-1 min-w-0">
                   <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Home</span>
                 </div>
-                <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
 
-              <Link to="/about" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
-                <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+              <Link to="/about" aria-label="About Us" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
+                <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <div className="flex-1 min-w-0">
+                <div aria-hidden="true" className="flex-1 min-w-0">
                   <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">About Us</span>
                 </div>
-                <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
 
-              <Link to="/policy" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
-                <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+              <Link to="/policy" aria-label="Policy" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
+                <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <div className="flex-1 min-w-0">
+                <div aria-hidden="true" className="flex-1 min-w-0">
                   <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Policy</span>
                 </div>
-                <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
 
-              <div className={`h-px my-0.5 ${isContrast ? 'bg-[#2C7FFF]/30' : 'bg-[#03045E]/15'}`}></div>
+              <div aria-hidden="true" className={`h-px my-0.5 ${isContrast ? 'bg-[#2C7FFF]/30' : 'bg-[#03045E]/15'}`}></div>
 
-              <NavLink to="/login" onClick={() => setIsOpen(false)} className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}>
+              <NavLink to="/login" aria-label="Log In" onClick={() => setIsOpen(false)} className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}>
                 {({ isActive }) => (
                   <>
-                    {isActive && <span className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
-                    <div className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                    {isActive && <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
+                    <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                       </svg>
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div aria-hidden="true" className="flex-1 min-w-0">
                       <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Log In</span>
                     </div>
-                    <svg className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
                   </>
@@ -448,21 +476,6 @@ export default function ApplicantRegister() {
           </div>
 
           <div className="flex-1 min-h-0 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6 overscroll-contain [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                       {statusMessage.text && (
-              <div
-                role="alert"
-                aria-live="assertive"
-                className={`p-4 mb-6 rounded-xl font-bold text-center border-2 ${
-                  statusMessage.type === 'success'
-                    ? 'bg-green-100 text-green-800 border-green-400'
-                    : isDarkMode
-                      ? 'bg-black text-red-500 border-red-500'
-                      : 'bg-white text-red-600 border-red-600'
-                }`}
-              >
-                {statusMessage.text}
-              </div>
-            )}
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-7" autoComplete="off">
 
@@ -557,12 +570,12 @@ export default function ApplicantRegister() {
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? (
-                        <svg className={`w-5 h-5 ${isAccessibilityMode ? '!text-white !stroke-white' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <svg className={`w-5 h-5 ${isAccessibilityMode ? '!text-white !stroke-white' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                         </svg>
                       ) : (
-                        <svg className={`w-5 h-5 ${isAccessibilityMode ? '!text-white !stroke-white' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <svg className={`w-5 h-5 ${isAccessibilityMode ? '!text-white !stroke-white' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
                         </svg>
                       )}
@@ -590,12 +603,12 @@ export default function ApplicantRegister() {
                       aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                     >
                       {showConfirmPassword ? (
-                        <svg className={`w-5 h-5 ${isAccessibilityMode ? '!text-white !stroke-white' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <svg className={`w-5 h-5 ${isAccessibilityMode ? '!text-white !stroke-white' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                         </svg>
                       ) : (
-                        <svg className={`w-5 h-5 ${isAccessibilityMode ? '!text-white !stroke-white' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <svg className={`w-5 h-5 ${isAccessibilityMode ? '!text-white !stroke-white' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
                         </svg>
                       )}
@@ -616,8 +629,8 @@ export default function ApplicantRegister() {
                       title="Please select your date of birth. You must be at least 18 years old to register."
                       aria-label="Birthdate. Please select your date of birth. You must be at least 18 years old to register."
                     />
-                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#03045E]">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+                    <span aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#03045E]">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                         <line x1="16" y1="2" x2="16" y2="6" />
                         <line x1="8" y1="2" x2="8" y2="6" />
@@ -634,7 +647,7 @@ export default function ApplicantRegister() {
                 </div>
               </div>
 
-              <hr className="border-[#03045E]/10" />
+              <hr aria-hidden="true" className="border-[#03045E]/10" />
 
               <div className="flex flex-col gap-3 p-5 border border-[#2C7FFF]/30 rounded-2xl bg-[var(--color-accentSoft)]">
                 <label htmlFor="address" className="text-lg sm:text-xl font-bold text-[#03045E]">Residential Address <span className="text-[#03045E]">*</span></label>
@@ -646,7 +659,7 @@ export default function ApplicantRegister() {
                   title="Click to automatically detect and fill your current location."
                   aria-label="Detect My Location. Click to automatically detect and fill your current location."
                 >
-                  <svg className={`detect-pin-icon w-5 h-5 shrink-0 ${isAccessibilityDarkMode ? '!text-black' : isAccessibilityMode ? '!text-white' : isDarkMode ? '!text-black' : 'text-white'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg aria-hidden="true" className={`detect-pin-icon w-5 h-5 shrink-0 ${isAccessibilityDarkMode ? '!text-black' : isAccessibilityMode ? '!text-white' : isDarkMode ? '!text-black' : 'text-white'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
@@ -699,16 +712,16 @@ export default function ApplicantRegister() {
                   </div>
                 ) : (
                   <div className={`h-36 sm:h-40 w-full mt-4 rounded-xl border-2 border-dashed ${isAccessibilityDarkMode ? 'border-[#03045E]/20 bg-white/50 text-black' : 'border-[#03045E]/20 bg-white/50 text-[#03045E]/50'} flex flex-col items-center justify-center`}>
-                    <svg className={`w-8 h-8 mb-2 ${isAccessibilityDarkMode ? 'text-black' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <svg aria-hidden="true" className={`w-8 h-8 mb-2 ${isAccessibilityDarkMode ? 'text-black' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     <span className={`text-xs sm:text-sm font-semibold ${isAccessibilityDarkMode ? 'text-black' : ''}`}>Click 'Detect My Location' to view your travel zone.</span>
                   </div>
                 )}
               </div>
 
-              <hr className="border-[#03045E]/10" />
+              <hr aria-hidden="true" className="border-[#03045E]/10" />
 
               <fieldset className="flex flex-col gap-3">
-                <legend className="text-xs sm:text-sm font-bold text-[#03045E]">Physical & Sensory Profile (Work-Enabled) <span className="text-[#03045E]">*</span></legend>
+                <legend className="text-xs sm:text-sm font-bold text-[#03045E]">Physical &amp; Sensory Profile (Work-Enabled) <span className="text-[#03045E]">*</span></legend>
                 <p className="text-[11px] sm:text-xs text-gray-500">Select applicable physical or sensory categories for tailored job accommodation matching.</p>
 
                 {selectedDisabilities.length > 0 && (
@@ -994,7 +1007,7 @@ export default function ApplicantRegister() {
                 )}
               </fieldset>
 
-              <hr className="border-[#03045E]/10" />
+              <hr aria-hidden="true" className="border-[#03045E]/10" />
 
               <div className="p-4 rounded-2xl border-2 border-dashed border-[#03045E]/20 bg-[#f4f4f4]/50">
                 <label htmlFor="pwdId" className="block text-xs sm:text-sm font-bold text-[#03045E] mb-1">Upload PWD ID / Certificates <span className="text-[#03045E]">*</span></label>
@@ -1045,6 +1058,22 @@ export default function ApplicantRegister() {
                 </label>
               </div>
 
+              {statusMessage.text && (
+                <div
+                  role="alert"
+                  aria-live="assertive"
+                  className={`p-4 rounded-xl font-bold text-center border-2 ${
+                    statusMessage.type === 'success'
+                      ? 'bg-green-100 text-green-800 border-green-400'
+                      : isDarkMode
+                        ? 'bg-black text-red-500 border-red-500'
+                        : 'bg-white text-red-600 border-red-600'
+                  }`}
+                >
+                  {statusMessage.text}
+                </div>
+              )}
+
               <button
                 type="submit"
                 disabled={isLoading}
@@ -1072,12 +1101,15 @@ export default function ApplicantRegister() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="success-title"
+          aria-describedby="success-desc"
+          aria-live="assertive"
+          tabIndex="-1"
         >
           <div className={`relative w-full max-w-md rounded-2xl sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${(isContrast || isDarkMode) ? 'bg-black border-2 border-white' : 'bg-white border-2 border-[#2C7FFF]'}`}>
-            <div className="h-2 w-full bg-[#2C7FFF]" />
+            <div aria-hidden="true" className="h-2 w-full bg-[#2C7FFF]" />
 
             <div className="relative px-5 pt-8 pb-6 sm:px-8 sm:pt-10 sm:pb-8 flex flex-col items-center text-center">
-              <div className="relative mb-4 sm:mb-5">
+              <div aria-hidden="true" className="relative mb-4 sm:mb-5">
                 <div className={`w-16 h-16 sm:w-24 sm:h-24 rounded-full flex items-center justify-center ${(isContrast || isDarkMode) ? 'bg-transparent border-4 border-white' : 'bg-transparent border-4 border-[#2C7FFF]'}`}>
                   <svg className={`w-8 h-8 sm:w-12 sm:h-12 ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -1086,7 +1118,7 @@ export default function ApplicantRegister() {
                 <div className={`absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold ${(isContrast || isDarkMode) ? 'bg-white text-black' : 'bg-[#03045E] text-white'}`}>✓</div>
               </div>
 
-              <span className={`inline-flex items-center gap-1 sm:gap-1.5 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-3 sm:mb-4 border-2 ${(isContrast || isDarkMode) ? 'text-white bg-transparent border-white' : 'text-[#2C7FFF] bg-transparent border-[#2C7FFF]'}`}>
+              <span aria-hidden="true" className={`inline-flex items-center gap-1 sm:gap-1.5 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-3 sm:mb-4 border-2 ${(isContrast || isDarkMode) ? 'text-white bg-transparent border-white' : 'text-[#2C7FFF] bg-transparent border-[#2C7FFF]'}`}>
                 <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-[#10B981]"></span>
                 Success
               </span>
@@ -1094,11 +1126,11 @@ export default function ApplicantRegister() {
               <h2 id="success-title" className={`text-xl sm:text-3xl font-black tracking-tight mb-1.5 sm:mb-2 ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#03045E]'}`}>
                 You're all set!
               </h2>
-              <p className={`text-xs sm:text-sm font-bold leading-relaxed mb-6 sm:mb-8 max-w-xs ${(isContrast || isDarkMode) ? 'text-white/80' : 'text-[#03045E]/80'}`}>
+              <p id="success-desc" className={`text-xs sm:text-sm font-bold leading-relaxed mb-6 sm:mb-8 max-w-xs ${(isContrast || isDarkMode) ? 'text-white/80' : 'text-[#03045E]/80'}`}>
                 Registration completed successfully. Taking you to Log In…
               </p>
 
-              <div className="flex items-center gap-1 sm:gap-1.5" aria-label="Redirecting to login">
+              <div aria-hidden="true" className="flex items-center gap-1 sm:gap-1.5">
                 <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#2C7FFF] animate-pulse" />
                 <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#2C7FFF] animate-pulse [animation-delay:150ms]" />
                 <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#2C7FFF] animate-pulse [animation-delay:300ms]" />

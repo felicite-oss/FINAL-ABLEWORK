@@ -80,7 +80,7 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
       </div>
       <p className={`text-[10px] sm:text-sm font-semibold ${isDark ? 'text-gray-300' : 'text-[#03045E]/80'} mb-4 sm:mb-6`}>Volume of candidate applications received over the last 7 days.</p>
       
-      <div className={`flex-1 w-full ${expanded ? 'h-[calc(100vh-200px)]' : 'h-full'} min-h-[180px] sm:min-h-[200px]`}>
+      <div className={`flex-1 w-full ${expanded ? 'h-[calc(100vh-200px)]' : 'h-full'} min-h-[180px] sm:min-h-[200px]`} role="img" aria-label="Bar chart showing application trends for the last 7 days. The chart displays the volume of candidate applications received over the last week.">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={stats.chartData || mockChartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? '#ffffff' : '#03045E'} strokeOpacity={0.15} />
@@ -136,6 +136,7 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
           <button
             type="button"
             onClick={() => setActiveTab && setActiveTab('jobs')}
+            aria-label={`Active Postings, ${stats.activeJobs}. Click to view your job listings.`}
             className={`text-left relative overflow-hidden p-2 sm:p-6 rounded-xl sm:rounded-3xl ${isDark ? 'bg-black border-white' : 'bg-[#f4f4f4] border-[#03045E]/20'} shadow-[0_10px_30px_rgba(3,4,94,0.06)] border flex flex-col lg:flex-row items-center justify-between group transition-all duration-300 cursor-pointer`}
           >
             <div className="absolute top-0 right-0 w-16 sm:w-32 h-16 sm:h-32 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 10%, transparent), transparent)' }}></div>
@@ -158,6 +159,7 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
           <button
             type="button"
             onClick={() => setActiveTab && setActiveTab('applications')}
+            aria-label={`Pending Review, ${stats.pendingApps}. Click to view applications.`}
             className={`text-left relative overflow-hidden p-2 sm:p-6 rounded-xl sm:rounded-3xl ${isDark ? 'bg-black border-white' : 'bg-[#f4f4f4] border-[#03045E]/20'} shadow-[0_10px_30px_rgba(3,4,94,0.06)] border flex flex-col lg:flex-row items-center justify-between group transition-all duration-300 cursor-pointer`}
           >
             <div className="absolute top-0 right-0 w-16 sm:w-32 h-16 sm:h-32 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 10%, transparent), transparent)' }}></div>
@@ -180,6 +182,7 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
           <button
             type="button"
             onClick={() => setActiveTab && setActiveTab('applications')}
+            aria-label={`Shortlisted, ${stats.shortlistedApps}. Click to view applications.`}
             className={`text-left relative overflow-hidden p-2 sm:p-6 rounded-xl sm:rounded-3xl ${isDark ? 'bg-black border-white' : 'bg-[#f4f4f4] border-[#03045E]/20'} shadow-[0_10px_30px_rgba(3,4,94,0.06)] border flex flex-col lg:flex-row items-center justify-between group transition-all duration-300 cursor-pointer`}
           >
             <div className="absolute top-0 right-0 w-16 sm:w-32 h-16 sm:h-32 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 10%, transparent), transparent)' }}></div>

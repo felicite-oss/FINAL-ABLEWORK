@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import headerLogo from '../assets/LIGHT MODE.png';
+import headerLogoDark from '../assets/DARK MODE.png';
 import ProfileMenu from '../components/Admin/ProfileMenu';
 import SettingsModal from '../components/Admin/SettingsModal';
 import DarkModeToggle from '../components/Admin/DarkModeToggle';
@@ -393,13 +394,13 @@ const handleToggleDark = () => {
               <div className="flex flex-row gap-3 w-full">
                 <button
                   onClick={() => setShowLogoutConfirm(false)}
-                  className={`flex-1 py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 ${isDark ? 'text-white border-white hover:bg-white hover:text-black' : 'text-[#16a34a] border-[#16a34a]'}`}
+                  className={`flex-1 py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 ${isDark ? 'text-[#16a34a] border-[#16a34a]' : 'text-[#16a34a] border-[#16a34a]'}`}
                 >
                   No, Stay
                 </button>
                 <button
                   onClick={handleLogout}
-                  className={`flex-1 py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 ${isDark ? 'text-white border-white hover:bg-white hover:text-black' : 'text-[#DC2626] border-[#DC2626]'}`}
+                  className={`flex-1 py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 ${isDark ? 'text-[#DC2626] border-[#DC2626]' : 'text-[#DC2626] border-[#DC2626]'}`}
                 >
                   Yes, Logout
                 </button>
@@ -509,7 +510,7 @@ const handleToggleDark = () => {
           <div className="flex items-center gap-2 sm:gap-3 md:gap-6 min-w-0 flex-shrink overflow-hidden">
             <div className="flex items-center flex-shrink min-w-0 cursor-pointer overflow-hidden py-1" onClick={() => setActiveTab('Overview')}>
               <img
-                src={headerLogo}
+                src={isDark ? headerLogoDark : headerLogo}
                 alt="AbleWork Logo"
                 className="h-10 sm:h-12 md:h-14 w-auto object-contain max-h-full hover:opacity-95 transition-opacity"
               />
@@ -660,9 +661,6 @@ const handleToggleDark = () => {
                 )},
                 { id: 'Applicants', label: 'Applicants', desc: 'Manage job seekers', icon: (
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                )},
-                { id: 'Profile', label: 'Profile', desc: 'Account settings', icon: (
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                 )}
               ].map((tab) => {
                 const isActive = activeTab === tab.id;
@@ -670,14 +668,9 @@ const handleToggleDark = () => {
                   <button
                     key={tab.id}
                     onClick={() => { 
-                      if (tab.id === 'Profile') {
-                        setShowSettings(true);
-                        setIsOpen(false);
-                      } else {
-                        setActiveTab(tab.id); 
-                        setListFilter('Pending'); 
-                        setIsOpen(false); 
-                      }
+                      setActiveTab(tab.id); 
+                      setListFilter('Pending'); 
+                      setIsOpen(false); 
                     }}
                     className={`relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${
                       isActive

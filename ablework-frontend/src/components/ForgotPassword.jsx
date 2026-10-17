@@ -152,8 +152,6 @@ export default function ForgotPassword({ onClose }) {
   return (
     <main
       className={`min-h-screen flex flex-col ${isContrast ? 'bg-black text-white' : 'bg-[#f4f4f4] text-[#03045E]'} overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]`}
-      role="main"
-      aria-label="Forgot password page"
     >
       {isDarkMode && (
         <style>{`
@@ -222,7 +220,6 @@ export default function ForgotPassword({ onClose }) {
 
       <header
         className={`w-full ${isContrast ? 'bg-black border-b-2 border-[#2C7FFF]' : 'bg-white border-b-2 border-[#03045E]/15'} fixed top-0 left-0 z-50 transition-all duration-300 shadow-sm`}
-        role="banner"
       >
         <div className="w-full h-14 sm:h-16 pl-3 pr-3 sm:pl-4 sm:pr-4 md:pr-8 flex items-center justify-between max-w-[1700px] mx-auto box-border">
           <div className="flex items-center gap-3 sm:gap-8">
@@ -261,15 +258,13 @@ export default function ForgotPassword({ onClose }) {
               isContrast ? 'bg-zinc-900 text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/20'
             }`}
             onClick={() => setIsOpen(!isOpen)}
-            aria-label={isOpen ? "Close menu" : "Open menu"}
-            aria-expanded={isOpen}
           >
             {isOpen ? (
-              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
               </svg>
             ) : (
-              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             )}
@@ -282,12 +277,10 @@ export default function ForgotPassword({ onClose }) {
           } ${
             isOpen ? 'max-h-96 opacity-100 shadow-xl' : 'max-h-0 opacity-0'
           }`}
-          aria-hidden={!isOpen}
         >
           <div className={`w-full ${isContrast ? 'bg-black' : 'bg-white'}`}>
             <nav
               className={`flex flex-col px-2.5 pt-2.5 pb-2.5 gap-2 sm:px-3 sm:pt-3 sm:pb-3 sm:gap-2.5 ${isContrast ? 'text-white' : 'text-[#03045E]'} max-w-[1700px] mx-auto`}
-              aria-label="Mobile navigation"
             >
               <Link
                 to="/"
@@ -350,14 +343,11 @@ export default function ForgotPassword({ onClose }) {
       <div
         className={`flex-grow pt-16 pb-12 flex flex-col items-center md:items-end justify-center px-3 sm:pl-4 sm:pr-4 md:pr-12 lg:pr-16 md:pl-8 max-w-[1700px] mx-auto w-full box-border relative bg-no-repeat bg-cover bg-center md:bg-[size:1100px_auto] md:bg-left min-h-[110vh] md:min-h-[105vh] transition-all duration-300 ${isOpen ? 'mt-48 sm:mt-56' : 'mt-0'}`}
         style={{ backgroundImage: `url(${backgroundImg})` }}
-        role="region"
-        aria-label="Forgot password form area"
       >
         <div
           className={`w-full ${isAssist ? 'max-w-[480px] sm:max-w-xl' : 'max-w-[400px] sm:max-w-lg'} flex flex-col items-center justify-start gap-4 sm:gap-6 relative z-10
             ${isContrast ? 'bg-black text-white border-2 border-blue-400 shadow-[0_0_25px_rgba(0,204,21,0.4)]' : isDarkMode ? 'bg-zinc-900 text-white border-2 border-blue-500/50 shadow-2xl' : 'bg-white/90 text-[#03045E] border border-[#03045E]/15'} backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-2xl
             pt-8 px-5 pb-8 sm:pt-12 sm:px-10 sm:pb-14 md:mt-4 mr-0 md:mr-2 lg:mr-6`}
-          role="region"
         >
           <div className="w-full flex items-center justify-start">
             <div className="flex items-center gap-2">
@@ -390,8 +380,6 @@ export default function ForgotPassword({ onClose }) {
 
           {message.text && (
             <div
-              role="alert"
-              aria-live="assertive"
               className={`w-full p-3 sm:p-3.5 rounded-xl font-bold text-xs sm:text-sm text-center border-2 shadow-sm bg-white ${
                 message.type === 'success'
                   ? 'text-green-600 border-green-500'
@@ -501,7 +489,6 @@ export default function ForgotPassword({ onClose }) {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className={`absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 transition cursor-pointer ${isAccessibilityMode ? 'text-white hover:text-white' : (isContrast || isDarkMode) ? 'text-white/60 hover:text-white' : 'text-[#03045E]/50 hover:text-[#2C7FFF]'}`}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? (
                       <svg className={`w-4 h-4 sm:w-5 sm:h-5 ${isAccessibilityMode ? '!text-white !stroke-white' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -542,7 +529,6 @@ export default function ForgotPassword({ onClose }) {
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className={`absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 transition cursor-pointer ${isAccessibilityMode ? 'text-white hover:text-white' : (isContrast || isDarkMode) ? 'text-white/60 hover:text-white' : 'text-[#03045E]/50 hover:text-[#2C7FFF]'}`}
-                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                   >
                     {showConfirmPassword ? (
                       <svg className={`w-4 h-4 sm:w-5 sm:h-5 ${isAccessibilityMode ? '!text-white !stroke-white' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -629,7 +615,7 @@ export default function ForgotPassword({ onClose }) {
                 Your password has been successfully reset. Taking you to Log In…
               </p>
 
-              <div className="flex items-center gap-1 sm:gap-1.5" aria-label="Redirecting to login">
+              <div className="flex items-center gap-1 sm:gap-1.5">
                 <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#2C7FFF] animate-pulse" />
                 <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#2C7FFF] animate-pulse [animation-delay:150ms]" />
                 <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#2C7FFF] animate-pulse [animation-delay:300ms]" />
@@ -641,8 +627,6 @@ export default function ForgotPassword({ onClose }) {
 
       <footer
         className={`py-8 sm:py-12 px-4 sm:px-6 mt-auto border-t-2 shadow-inner ${isContrast ? 'bg-black text-white border-white/20' : 'bg-[#f4f4f4] text-[#03045E] border-[#03045E]/20'}`}
-        role="contentinfo"
-        aria-label="Site footer"
       >
         <div className={`max-w-[1700px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 pb-6 sm:pb-10 border-b ${isContrast ? 'border-white/10' : 'border-[#03045E]/10'}`}>
           

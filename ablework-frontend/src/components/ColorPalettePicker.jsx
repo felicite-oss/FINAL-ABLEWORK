@@ -12,7 +12,7 @@ export default function ColorPalettePicker() {
       <p className="text-[8px] sm:text-[10px] font-bold text-[var(--color-textMuted)] -mt-1 mb-1 leading-snug">
         Choose colors that work best for your eyes
       </p>
-      <div className="grid grid-cols-2 gap-1.5 sm:gap-2 max-h-72 overflow-y-auto pr-1 bg-[var(--color-surface)] border-2 border-[var(--color-border)] p-1.5 sm:p-2 rounded-2xl">
+      <div className="grid grid-cols-2 gap-1.5 sm:gap-2 bg-[var(--color-surface)] border-2 border-[var(--color-border)] p-1.5 sm:p-2 rounded-2xl">
         {Object.entries(palettes).map(([key, p]) => {
           const selected = key === paletteKey;
           return (
@@ -21,12 +21,19 @@ export default function ColorPalettePicker() {
               onClick={() => setPaletteKey(key)}
               aria-pressed={selected}
               aria-label={`Select ${p.name} color palette`}
-              className={`w-full flex flex-col items-center justify-center gap-1 sm:gap-1.5 px-1.5 py-2 sm:px-3 sm:py-3 rounded-xl text-center transition-all cursor-pointer border-2 ${
+              className={`relative w-full flex flex-col items-center justify-center gap-1 sm:gap-1.5 px-1.5 py-2 sm:px-3 sm:py-3 rounded-xl text-center transition-all cursor-pointer border-2 ${
                 selected
                   ? 'bg-[var(--color-accentSoft)] border-[var(--color-accent)] shadow-sm'
                   : 'bg-[var(--color-surface)] border-[var(--color-border)] hover:border-[var(--color-accent)]'
               }`}
             >
+              {selected && (
+                <span className="absolute top-1 right-1 sm:top-1.5 sm:right-1.5 w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-[var(--color-accent)] text-[var(--color-background)] flex items-center justify-center shadow-sm pointer-events-none" aria-hidden="true">
+                  <svg className="w-2 h-2 sm:w-2.5 sm:h-2.5" fill="none" stroke="currentColor" strokeWidth="3.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+              )}
               <div className="flex items-center gap-0.5 shrink-0">
                 {p.swatch.map((color, i) => (
                   <span
@@ -40,11 +47,6 @@ export default function ColorPalettePicker() {
                 <p className="text-[9px] sm:text-[11px] font-black text-[var(--color-text)] truncate leading-tight">{p.name}</p>
                 <p className="text-[7px] sm:text-[9px] font-bold truncate leading-tight mt-0.5 text-[var(--color-textMuted)]">{p.description}</p>
               </div>
-              {selected && (
-                <svg className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 shrink-0 text-[var(--color-accent)]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              )}
             </button>
           );
         })}
