@@ -88,8 +88,38 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
   const [satelliteView, setSatelliteView] = useState(false);
   const [legendOpen, setLegendOpen] = useState(true);
 
-  const modalRef = useRef(null);
+  // 1. Create a state to hold the combined skills
+  const [recommendedSkills, setRecommendedSkills] = useState(SKILL_RECOMMENDATIONS);
 
+  useEffect(() => {
+    const fetchPopularSkills = async () => {
+      try {
+        const res = await fetch(`http://localhost:5001/api/skills/popular`);
+        if (res.ok) {
+          const dynamicSkills = await res.json();
+          
+          // Normalize the data: extract the string if the backend returns objects
+          const normalizedSkills = dynamicSkills.map(skill => {
+            if (typeof skill === 'object' && skill !== null) {
+              // Adjust 'skill_name' to whatever column name your database uses
+              return skill.skill_name || skill.name || skill.skill || Object.values(skill)[0];
+            }
+            return skill;
+          });
+
+          // Combine the database skills with the default hardcoded ones and remove duplicates
+          const combined = Array.from(new Set([...normalizedSkills, ...SKILL_RECOMMENDATIONS]));
+          setRecommendedSkills(combined);
+        }
+      } catch (error) {
+        console.error("Failed to fetch popular skills:", error);
+      }
+    };
+    
+    fetchPopularSkills();
+  }, []);
+
+  const modalRef = useRef(null);
   useEffect(() => {
     if (isModalOpen && modalRef.current) {
       modalRef.current.focus();
@@ -796,7 +826,7 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
             
             {skillInput.trim().length > 0 && (
               <div role="list" aria-label="Skill suggestions" className="flex flex-wrap gap-1.5 mt-1.5 sm:mt-2 animate-fadeIn">
-                {SKILL_RECOMMENDATIONS
+                {recommendedSkills
                   .filter(s => s.toLowerCase().includes(skillInput.toLowerCase()) && !skills.includes(s))
                   .map((rec, i) => (
                     <button

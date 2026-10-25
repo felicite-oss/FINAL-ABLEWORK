@@ -1,11 +1,12 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import AbbyChatbot from '../AbbyChatbot';
 import useApplicantTheme from '../../hooks/useApplicantTheme';
-import { MapContainer, TileLayer, Marker, Circle, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Circle, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
 
 let DefaultIcon = L.icon({
     iconUrl: icon,
@@ -52,34 +53,40 @@ const getMatchColor = (percentage) => {
   return 'bg-[#f4f4f4] text-[#03045E] border-[#03045E]/20';
 };
 
-export default function ApplicantExploreJobs({ profile, jobs, applications = [], refreshData }) {
+export default function ApplicantExploreJobs({ profile, jobs, applications = [], refreshData, initialSelectedJob, clearJobFromMap }) {
   const {
     isContrast,
     isDarkMode,
     isDarkScreen,
     isColorVisionPalette,
   } = useApplicantTheme();
-
   const colorUI = isColorVisionPalette && !isDarkScreen;
-
   const [applyingTo, setApplyingTo] = useState(null);
   const [selectedJob, setSelectedJob] = useState(null);
-
   const [modalView, setModalView] = useState('details'); 
   const [resumeFile, setResumeFile] = useState(null);
   const [coverLetter, setCoverLetter] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [sweetAlert, setSweetAlert] = useState({ isOpen: false, title: '', text: '', type: 'notice' });
-  
   const [searchQuery, setSearchQuery] = useState('');
   const [maxDistance, setMaxDistance] = useState('Any');
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [selectedAccs, setSelectedAccs] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
   const [distanceOpen, setDistanceOpen] = useState(false);
-
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
+
+  useEffect(() => {
+    if (initialSelectedJob) {
+      setSelectedJob(initialSelectedJob);
+      setModalView('details');
+      
+      if (clearJobFromMap) {
+        clearJobFromMap(); 
+      }
+    }
+  }, [initialSelectedJob, clearJobFromMap]);
 
   useEffect(() => {
     if (selectedJob && closeButtonRef.current) {
@@ -680,7 +687,27 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                               attribution='&copy; OpenStreetMap contributors'
                             />
-                            <Marker position={[Number(selectedJob.latitude), Number(selectedJob.longitude)]} />
+                            <Marker position={[Number(selectedJob.latitude), Number(selectedJob.longitude)]}>
+                              <Popup>
+                                <div className="flex flex-col items-center justify-center gap-2 p-1 min-w-[140px]">
+                                  <span className="font-extrabold text-[#03045E] text-xs text-center leading-tight">
+                                    {selectedJob.company_name}
+                                  </span>
+                                  <a
+                                    href={`https://www.google.com/maps?q=${selectedJob.latitude},${selectedJob.longitude}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="bg-[#2C7FFF] text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-[#03045E] transition-colors flex items-center justify-center gap-1.5 no-underline shadow-sm w-full"
+                                  >
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    Open in Maps
+                                  </a>
+                                </div>
+                              </Popup>
+                            </Marker>
                           </MapContainer>
                         </div>
 

@@ -415,7 +415,9 @@ export default function EmployerApplications({ profile, refreshStats }) {
               {nextSteps.isOpen ? (
                 <div className="flex flex-col gap-3">
                   <label className={`text-xs sm:text-sm font-bold ${pageText}`}>
-                    Provide Next Steps for the Applicant (for {nextSteps.status} status)
+                    {nextSteps.status === 'Rejected' 
+                        ? 'Provide a Reason for Rejection (Optional but recommended)' 
+                        : `Provide Next Steps for the Applicant (for ${nextSteps.status} status)`}
                   </label>
                   <textarea
                     value={messageText}
@@ -466,9 +468,9 @@ export default function EmployerApplications({ profile, refreshStats }) {
                   {selectedApp.application_status !== 'Hired' && selectedApp.application_status !== 'Rejected' ? (
                     <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
                       <button 
-                        onClick={() => updateStatus(selectedApp.application_id, 'Rejected', null, true, true)} 
+                        onClick={() => setNextSteps({ isOpen: true, status: 'Rejected' })} 
                         className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold rounded-md sm:rounded-lg cursor-pointer border-2 bg-white text-red-600 border-red-500"
-                      >
+                        >
                         Reject
                       </button>
                       

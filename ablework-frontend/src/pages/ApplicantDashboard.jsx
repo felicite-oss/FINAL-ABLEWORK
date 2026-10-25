@@ -29,8 +29,8 @@ export default function ApplicantDashboard() {
   const { isContrast, isDarkMode } = useApplicantTheme();
   const { paletteKey } = useColorPalette();
   const isAccessibilityMode = paletteKey === 'highContrast' || paletteKey === 'darkComfort' || isContrast || isDarkMode;
-
   const [activeTab, setActiveTab] = useState('overview');
+  const [selectedJobFromMap, setSelectedJobFromMap] = useState(null);
   const [isOpen, setIsOpen] = useState(false); 
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false); 
   const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
@@ -969,11 +969,22 @@ export default function ApplicantDashboard() {
               )}
 
               {activeTab === 'overview' && profile && (
-                <ApplicantOverview profile={profile} matches={matches} jobs={matches} matchesCount={matches.length} applications={applications} setActiveTab={handleTabChange} />
+                <ApplicantOverview profile={profile} 
+                matches={matches} 
+                jobs={matches} 
+                matchesCount={matches.length} 
+                applications={applications} 
+                setActiveTab={handleTabChange} 
+                setJobFromMap={setSelectedJobFromMap} />
               )}
 
               {activeTab === 'explore-jobs' && profile && (
-                <ApplicantExploreJobs profile={profile} jobs={matches} refreshData={refreshData} />
+                <ApplicantExploreJobs 
+                profile={profile} 
+                jobs={matches} 
+                refreshData={refreshData} 
+                initialSelectedJob={selectedJobFromMap}
+                clearJobFromMap={() => setSelectedJobFromMap(null)}/>
               )}
               
               {activeTab === 'tracker' && (
