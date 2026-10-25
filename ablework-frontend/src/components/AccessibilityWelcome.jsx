@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import { AccessibilityContext } from '../context/AccessibilityContext';
 import ColorPalettePicker from './ColorPalettePicker';
 
@@ -53,6 +53,7 @@ function MoonIcon({ className = 'h-4 w-4 sm:h-5 sm:w-5', forceColor }) {
 
 export function AccessibilityWelcome() {
   const { mode, setMode } = useContext(AccessibilityContext);
+  const panelRef = useRef(null);
 
   const [visible, setVisible] = useState(() => {
     try {
@@ -74,6 +75,15 @@ export function AccessibilityWelcome() {
     }
   });
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (visible && panelRef.current && !isLoading) {
+      const timer = setTimeout(() => {
+        panelRef.current.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [visible, isLoading]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -191,7 +201,11 @@ export function AccessibilityWelcome() {
       )}
 
       <div className={`w-full max-w-lg my-auto ${leaving ? 'aw-leaving' : 'aw-pop'} ${isLoading ? 'opacity-0 pointer-events-none' : ''}`}>
-        <div className="relative flex flex-col max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-2.5rem)] md:max-h-[calc(100dvh-3rem)] overflow-hidden rounded-2xl sm:rounded-3xl border-2 border-[#03045E]/20 bg-white shadow-[0_30px_80px_rgba(3,4,94,0.4)]">
+        <div
+          ref={panelRef}
+          tabIndex={-1}
+          className="relative flex flex-col max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-2.5rem)] md:max-h-[calc(100dvh-3rem)] overflow-hidden rounded-xl sm:rounded-2xl border-2 border-[#03045E]/20 bg-white shadow-[0_30px_80px_rgba(3,4,94,0.4)] focus:outline-none"
+        >
           <div className="h-1 sm:h-1.5 w-full shrink-0 bg-[#2C7FFF]" />
 
           <div className="px-3.5 sm:px-6 md:px-8 pt-3.5 sm:pt-5 md:pt-6 pb-2.5 sm:pb-3 md:pb-4 flex items-center justify-between gap-2 shrink-0">
@@ -209,14 +223,14 @@ export function AccessibilityWelcome() {
                 </svg>
               </span>
               <div className="min-w-0">
-                <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.18em] sm:tracking-[0.2em] text-[#2C7FFF]">AbleWork</p>
-                <h2 className="text-xs sm:text-sm md:text-base font-black text-[#03045E] leading-tight truncate">Accessibility Setup</h2>
+                <p tabIndex="0" className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.18em] sm:tracking-[0.2em] text-[#2C7FFF] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit">AbleWork</p>
+                <h2 tabIndex="0" className="text-xs sm:text-sm md:text-base font-black text-[#03045E] leading-tight truncate transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit">Accessibility Setup</h2>
               </div>
             </div>
             <button
               type="button"
               onClick={finish}
-              className="shrink-0 cursor-pointer text-[9px] sm:text-[10px] md:text-[11px] font-black uppercase tracking-[0.1em] sm:tracking-[0.15em] text-[#03045E]/45 hover:text-[#2C7FFF] transition"
+              className="shrink-0 cursor-pointer text-[9px] sm:text-[10px] md:text-[11px] font-black uppercase tracking-[0.1em] sm:tracking-[0.15em] text-[#03045E]/45 hover:text-[#2C7FFF] transition focus:outline-none"
             >
               Skip
             </button>
@@ -237,8 +251,8 @@ export function AccessibilityWelcome() {
             {step === 0 && (
               <div className="flex flex-col gap-3 sm:gap-4">
                 <div>
-                  <h3 className="text-base sm:text-lg md:text-xl font-black text-[#03045E]">Choose a theme</h3>
-                  <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs font-semibold text-[#03045E]/60">Pick the look that's easiest on your eyes.</p>
+                  <h3 tabIndex="0" className="text-base sm:text-lg md:text-xl font-black text-[#03045E] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit">Choose a theme</h3>
+                  <p tabIndex="0" className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs font-semibold text-[#03045E]/60 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit">Pick the look that's easiest on your eyes.</p>
                 </div>
                 <div className="grid grid-cols-2 gap-2 sm:gap-2.5 md:gap-3">
                   {THEMES.map((theme) => {
@@ -252,7 +266,7 @@ export function AccessibilityWelcome() {
                         type="button"
                         onClick={() => chooseTheme(theme.key)}
                         aria-pressed={isSelected}
-                        className={`flex flex-col gap-1.5 sm:gap-2 rounded-xl sm:rounded-2xl border-2 p-2 sm:p-2.5 md:p-3 transition-all ${
+                        className={`flex flex-col gap-1.5 sm:gap-2 rounded-xl sm:rounded-2xl border-2 p-2 sm:p-2.5 md:p-3 transition-all focus:outline-none ${
                           isSelected
                             ? 'border-[#2C7FFF] bg-[#2C7FFF]/5 shadow-md'
                             : 'border-[#03045E]/15 bg-white hover:border-[#2C7FFF]/50'
@@ -289,7 +303,7 @@ export function AccessibilityWelcome() {
 
                 {selectedTheme !== 'Dark' && (
                   <div className="rounded-xl sm:rounded-2xl border border-[#03045E]/10 bg-[#F6F8FF] p-2.5 sm:p-3">
-                    <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.18em] text-[#03045E]/45 mb-1.5 sm:mb-2">Color Palette</p>
+                    <p tabIndex="0" className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.18em] text-[#03045E]/45 mb-1.5 sm:mb-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit">Color Palette</p>
                     <ColorPalettePicker />
                   </div>
                 )}
@@ -299,8 +313,8 @@ export function AccessibilityWelcome() {
             {step === 1 && (
               <div className="flex flex-col gap-3 sm:gap-4">
                 <div>
-                  <h3 className="text-base sm:text-lg md:text-xl font-black text-[#03045E]">Text size</h3>
-                  <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs font-semibold text-[#03045E]/60">Pick the size that's most comfortable to read.</p>
+                  <h3 tabIndex="0" className="text-base sm:text-lg md:text-xl font-black text-[#03045E] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit">Text size</h3>
+                  <p tabIndex="0" className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs font-semibold text-[#03045E]/60 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit">Pick the size that's most comfortable to read.</p>
                 </div>
                 <div className="grid grid-cols-3 gap-1.5 sm:gap-2 md:gap-2.5">
                   {SIZES.map((size) => {
@@ -315,7 +329,7 @@ export function AccessibilityWelcome() {
                         type="button"
                         onClick={() => setFontSize(size.key)}
                         aria-pressed={isSelected}
-                        className={`flex flex-col items-center justify-center gap-0.5 sm:gap-1 rounded-lg sm:rounded-xl md:rounded-2xl border-2 px-1 sm:px-2 py-2 sm:py-3 md:py-4 transition-all ${
+                        className={`flex flex-col items-center justify-center gap-0.5 sm:gap-1 rounded-lg sm:rounded-xl md:rounded-2xl border-2 px-1 sm:px-2 py-2 sm:py-3 md:py-4 transition-all focus:outline-none ${
                           isSelected
                             ? 'border-[#2C7FFF] shadow-md'
                             : 'border-[#03045E]/15 bg-white text-[#03045E] hover:border-[#2C7FFF]/50'
@@ -363,13 +377,15 @@ export function AccessibilityWelcome() {
                 </div>
                 <div className="rounded-xl sm:rounded-2xl border border-[#03045E]/10 bg-[#F6F8FF] p-2.5 sm:p-3 md:p-4">
                   <p
-                    className={`text-[8px] sm:text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.18em] mb-1.5 sm:mb-2 ${isDarkScreen ? 'text-black' : 'text-[#03045E]/45'}`}
+                    tabIndex="0"
+                    className={`text-[8px] sm:text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.18em] mb-1.5 sm:mb-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit ${isDarkScreen ? 'text-black' : 'text-[#03045E]/45'}`}
                     style={isDarkScreen ? { color: '#000000', WebkitTextFillColor: '#000000' } : undefined}
                   >
                     Preview
                   </p>
                   <p
-                    className={`font-semibold leading-relaxed ${isDarkScreen ? 'text-black' : 'text-[#03045E]'}`}
+                    tabIndex="0"
+                    className={`font-semibold leading-relaxed transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded p-1 -m-1 w-fit ${isDarkScreen ? 'text-black' : 'text-[#03045E]'}`}
                     style={{ fontSize: `${PREVIEW_PX[fontSize]}px`, ...(isDarkScreen ? { color: '#000000', WebkitTextFillColor: '#000000' } : {}) }}
                   >
                     AbleWork connects persons with disabilities to inclusive employers who value every ability.
@@ -381,8 +397,8 @@ export function AccessibilityWelcome() {
             {step === 2 && (
               <div className="flex flex-col gap-3 sm:gap-4">
                 <div>
-                  <h3 className="text-base sm:text-lg md:text-xl font-black text-[#03045E]">All set!</h3>
-                  <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs font-semibold text-[#03045E]/60">Here's what we'll remember for you.</p>
+                  <h3 tabIndex="0" className="text-base sm:text-lg md:text-xl font-black text-[#03045E] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit">All set!</h3>
+                  <p tabIndex="0" className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs font-semibold text-[#03045E]/60 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit">Here's what we'll remember for you.</p>
                 </div>
                 <div className="space-y-2 sm:space-y-2.5">
                   <div className="flex items-center gap-2 sm:gap-3 rounded-xl sm:rounded-2xl border border-[#03045E]/10 bg-[#F6F8FF] px-2.5 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3">
@@ -396,13 +412,15 @@ export function AccessibilityWelcome() {
                     </span>
                     <div className="flex-1 min-w-0">
                       <p 
-                        className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.18em] text-[#03045E]/45"
+                        tabIndex="0"
+                        className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.18em] text-[#03045E]/45 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit"
                         style={isDarkScreen ? { color: '#000000', WebkitTextFillColor: '#000000', opacity: 1 } : undefined}
                       >
                         Display theme
                       </p>
                       <p 
-                        className="text-xs sm:text-sm font-black text-[#03045E] truncate"
+                        tabIndex="0"
+                        className="text-xs sm:text-sm font-black text-[#03045E] truncate transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit"
                         style={isDarkScreen ? { color: '#000000', WebkitTextFillColor: '#000000' } : undefined}
                       >
                         {themeLabel}
@@ -420,13 +438,15 @@ export function AccessibilityWelcome() {
                     </span>
                     <div className="flex-1 min-w-0">
                       <p 
-                        className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.18em] text-[#03045E]/45"
+                        tabIndex="0"
+                        className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.18em] text-[#03045E]/45 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit"
                         style={isDarkScreen ? { color: '#000000', WebkitTextFillColor: '#000000', opacity: 1 } : undefined}
                       >
                         Text size
                       </p>
                       <p 
-                        className="text-xs sm:text-sm font-black text-[#03045E] truncate"
+                        tabIndex="0"
+                        className="text-xs sm:text-sm font-black text-[#03045E] truncate transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit"
                         style={isDarkScreen ? { color: '#000000', WebkitTextFillColor: '#000000' } : undefined}
                       >
                         {sizeLabel}
@@ -443,7 +463,8 @@ export function AccessibilityWelcome() {
                     i
                   </span>
                   <p 
-                    className="text-[10px] sm:text-[11px] font-semibold text-[#03045E]/75 leading-relaxed"
+                    tabIndex="0"
+                    className="text-[10px] sm:text-[11px] font-semibold text-[#03045E]/75 leading-relaxed transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit"
                     style={!isDarkScreen ? { color: '#ffffff', WebkitTextFillColor: '#ffffff' } : undefined}
                   >
                     You can change these anytime using the accessibility button at the bottom-left of the screen.
@@ -458,7 +479,7 @@ export function AccessibilityWelcome() {
               type="button"
               onClick={() => setStep((s) => Math.max(0, s - 1))}
               disabled={step === 0}
-              className="cursor-pointer rounded-lg sm:rounded-xl px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#03045E]/50 transition hover:text-[#03045E] disabled:opacity-0 disabled:cursor-not-allowed"
+              className="cursor-pointer rounded-lg sm:rounded-xl px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#03045E]/50 transition hover:text-[#03045E] disabled:opacity-0 disabled:cursor-not-allowed focus:outline-none"
             >
               Back
             </button>
@@ -466,7 +487,7 @@ export function AccessibilityWelcome() {
               <button
                 type="button"
                 onClick={() => setStep((s) => Math.min(2, s + 1))}
-                className="group flex items-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl bg-[#2C7FFF] px-4 sm:px-5 md:px-6 py-2.5 sm:py-2.5 md:py-3 text-xs sm:text-sm font-black text-white shadow-md hover:bg-[#03045E] transition"
+                className="group flex items-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl bg-[#2C7FFF] px-4 sm:px-5 md:px-6 py-2.5 sm:py-2.5 md:py-3 text-xs sm:text-sm font-black text-white shadow-md hover:bg-[#03045E] transition focus:outline-none"
                 style={isDarkScreen ? { color: '#000000', WebkitTextFillColor: '#000000' } : undefined}
               >
                 Continue
@@ -486,7 +507,7 @@ export function AccessibilityWelcome() {
               <button
                 type="button"
                 onClick={finish}
-                className="group flex items-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl bg-[#2C7FFF] px-4 sm:px-5 md:px-6 py-2.5 sm:py-2.5 md:py-3 text-xs sm:text-sm font-black text-white shadow-md hover:bg-[#03045E] transition"
+                className="group flex items-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl bg-[#2C7FFF] px-4 sm:px-5 md:px-6 py-2.5 sm:py-2.5 md:py-3 text-xs sm:text-sm font-black text-white shadow-md hover:bg-[#03045E] transition focus:outline-none"
                 style={isDarkScreen ? { color: '#000000', WebkitTextFillColor: '#000000' } : undefined}
               >
                 Enter AbleWork

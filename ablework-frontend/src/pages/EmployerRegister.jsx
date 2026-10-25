@@ -170,9 +170,9 @@ export default function EmployerRegister() {
               />
             </div>
             <nav aria-label="Main navigation" className={`hidden md:flex items-center gap-6 text-[15px] font-medium ${isAccessibilityMode ? '!text-white' : (isContrast ? 'text-white' : 'text-[#03045E]')}`}>
-              <Link to="/" aria-label="Home" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#2C7FFF]')} transition`}>Home</Link>
-              <Link to="/about" aria-label="About Us" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#2C7FFF]')} transition`}>About Us</Link>
-              <Link to="/policy" aria-label="Policy" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#2C7FFF]')} transition`}>Policy</Link>
+              <Link to="/" aria-label="Home" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#03045e]')} transition`}>Home</Link>
+              <Link to="/about" aria-label="About Us" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#03045e]')} transition`}>About Us</Link>
+              <Link to="/policy" aria-label="Policy" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#03045e]')} transition`}>Policy</Link>
             </nav>
           </div>
           <div className="hidden md:flex items-center">
@@ -201,7 +201,7 @@ export default function EmployerRegister() {
             aria-label="Menu"
             aria-expanded={isOpen}
             aria-controls="mobile-menu"
-            className={`md:hidden flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl border-2 shadow-sm cursor-pointer transition-all duration-200 shrink-0 ${isContrast ? 'bg-zinc-900 text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/20'}`}
+            className={`md:hidden flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg border-2 shadow-sm cursor-pointer transition-all duration-200 shrink-0 ${isContrast ? 'bg-zinc-900 text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/20'}`}
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? (
@@ -227,8 +227,8 @@ export default function EmployerRegister() {
         >
           <div className={`w-full ${isContrast ? 'bg-black' : 'bg-white'}`}>
             <nav aria-label="Mobile navigation" className={`flex flex-col px-2.5 pt-2.5 pb-2.5 gap-2 sm:px-3 sm:pt-3 sm:pb-3 sm:gap-2.5 ${isContrast ? 'text-white' : 'text-[#03045E]'}`}>
-              <Link to="/" aria-label="Home" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
-                <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+              <Link to="/" aria-label="Home" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-lg font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
+                <div aria-hidden="true" className="p-1.5 rounded-md transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                   </svg>
@@ -241,8 +241,8 @@ export default function EmployerRegister() {
                 </svg>
               </Link>
 
-              <Link to="/about" aria-label="About Us" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
-                <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+              <Link to="/about" aria-label="About Us" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-lg font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
+                <div aria-hidden="true" className="p-1.5 rounded-md transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -255,8 +255,8 @@ export default function EmployerRegister() {
                 </svg>
               </Link>
 
-              <Link to="/policy" aria-label="Policy" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
-                <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+              <Link to="/policy" aria-label="Policy" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-lg font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
+                <div aria-hidden="true" className="p-1.5 rounded-md transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
@@ -275,12 +275,12 @@ export default function EmployerRegister() {
                 to="/login"
                 aria-label="Log In"
                 onClick={() => setIsOpen(false)}
-                className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}
+                className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-lg font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}
               >
                 {({ isActive }) => (
                   <>
                     {isActive && <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
-                    <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                    <div aria-hidden="true" className="p-1.5 rounded-md transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                       </svg>
@@ -305,7 +305,7 @@ export default function EmployerRegister() {
         aria-label="Employer registration area"
       >
 
-        <div className="w-full max-w-2xl min-w-0 h-[80vh] sm:h-[85vh] max-h-full flex flex-col bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-2xl border border-[#03045E]/10 overflow-hidden relative z-50 animate-fadeIn">
+        <div className="w-full max-w-2xl min-w-0 h-[80vh] sm:h-[85vh] max-h-full flex flex-col bg-white/95 backdrop-blur-md rounded-lg sm:rounded-xl shadow-2xl border border-[#03045E]/10 overflow-hidden relative z-50 animate-fadeIn">
 
           <div className="flex-shrink-0 px-4 pt-5 pb-3 sm:px-6 sm:pt-6 sm:pb-4 border-b border-[#03045E]/10 bg-white/90">
             <div className="flex items-center gap-3">
@@ -319,10 +319,10 @@ export default function EmployerRegister() {
                 </svg>
               </Link>
               <div className="min-w-0">
-                <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-[#03045E] break-words">
+                <h1 tabIndex="0" title="Employer Registration" aria-label="Employer Registration" className="text-xl sm:text-3xl md:text-4xl font-bold text-[#03045E] break-words focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded">
                   Employer Registration
                 </h1>
-                <p className="text-xs sm:text-sm text-[#03045E]/70 mt-0.5">
+                <p tabIndex="0" title="Create your company profile to start posting inclusive jobs" aria-label="Create your company profile to start posting inclusive jobs" className="text-xs sm:text-sm text-[#03045E]/70 mt-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded">
                   Create your company profile to start posting inclusive jobs
                 </p>
               </div>
@@ -335,7 +335,7 @@ export default function EmployerRegister() {
 
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="companyName" className="text-xs sm:text-sm font-semibold text-[#03045E]">Company Name <span className="text-[#03045E]">*</span></label>
+                  <label htmlFor="companyName" tabIndex="0" title="Company Name" aria-label="Company Name" className="text-xs sm:text-sm font-semibold text-[#03045E] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded">Company Name <span className="text-[#03045E]">*</span></label>
                   <input
                     id="companyName"
                     type="text"
@@ -343,14 +343,14 @@ export default function EmployerRegister() {
                     onChange={(e) => setCompanyName(e.target.value)}
                     placeholder="Enter your Company Name"
                     required
-                    className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
+                    className="w-full p-3 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
                     title="Please enter your registered company name."
                     aria-label="Company Name. Please enter your registered company name."
                   />
                 </div>
 
                                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="companyDescription" className="text-xs sm:text-sm font-semibold text-[var(--color-text)]">Company Description <span className="text-[var(--color-text)]">*</span></label>
+                  <label htmlFor="companyDescription" tabIndex="0" title="Company Description" aria-label="Company Description" className="text-xs sm:text-sm font-semibold text-[var(--color-text)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded">Company Description <span className="text-[var(--color-text)]">*</span></label>
                   <textarea
                     id="companyDescription"
                     value={companyDescription}
@@ -358,14 +358,14 @@ export default function EmployerRegister() {
                     placeholder="Briefly describe what your company does..."
                     required
                     rows="3"
-                    className="w-full p-3 border border-[var(--color-border)] rounded-xl bg-[var(--color-surface)] text-[var(--color-text)] placeholder:text-[var(--color-textSubtle)] focus:outline-none focus:border-[var(--color-accent)] transition resize-none"
+                    className="w-full p-3 border border-[var(--color-border)] rounded-lg bg-[var(--color-surface)] text-[var(--color-text)] placeholder:text-[var(--color-textSubtle)] focus:outline-none focus:border-[var(--color-accent)] transition resize-none"
                     title="Please briefly describe what your company does."
                     aria-label="Company Description. Please briefly describe what your company does."
                   ></textarea>
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="industry" className=  "text-xs sm:text-sm font-semibold text-[#03045E]">Industry Type <span className="text-[#03045E]">*</span></label>
+                  <label htmlFor="industry" tabIndex="0" title="Industry Type" aria-label="Industry Type" className=  "text-xs sm:text-sm font-semibold text-[#03045E] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded">Industry Type <span className="text-[#03045E]">*</span></label>
                   <input
                     id="industry"
                     type="text"
@@ -373,14 +373,14 @@ export default function EmployerRegister() {
                     onChange={(e) => setIndustry(e.target.value)}
                     placeholder="e.g. Technology"
                     required
-                    className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
+                    className="w-full p-3 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
                     title="Please enter the industry your company belongs to."
                     aria-label="Industry Type. Please enter the industry your company belongs to."
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="email" className="text-xs sm:text-sm font-semibold text-[#03045E]">Work Email <span className="text-[#03045E]">*</span></label>
+                  <label htmlFor="email" tabIndex="0" title="Work Email" aria-label="Work Email" className="text-xs sm:text-sm font-semibold text-[#03045E] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded">Work Email <span className="text-[#03045E]">*</span></label>
                   <input
                     id="email"
                     type="email"
@@ -388,14 +388,14 @@ export default function EmployerRegister() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your Work Email"
                     required
-                    className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
+                    className="w-full p-3 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
                     title="Please enter a valid work email address for your account."
                     aria-label="Work Email. Please enter a valid work email address for your account."
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="phone" className="text-xs sm:text-sm font-semibold text-[#03045E]">Telephone Number <span className="text-[#03045E]">*</span></label>
+                  <label htmlFor="phone" tabIndex="0" title="Telephone Number" aria-label="Telephone Number" className="text-xs sm:text-sm font-semibold text-[#03045E] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded">Telephone Number <span className="text-[#03045E]">*</span></label>
                   <input
                     id="phone"
                     type="tel"
@@ -403,14 +403,14 @@ export default function EmployerRegister() {
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="Enter your Telephone Number"
                     required
-                    className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
+                    className="w-full p-3 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
                     title="Please enter your active company contact number."
                     aria-label="Telephone Number. Please enter your active company contact number."
                   />
                 </div>
                 
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="password" className="text-xs sm:text-sm font-semibold text-[#03045E]">Password <span className="text-[#03045E]">*</span></label>
+                  <label htmlFor="password" tabIndex="0" title="Password" aria-label="Password" className="text-xs sm:text-sm font-semibold text-[#03045E] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded">Password <span className="text-[#03045E]">*</span></label>
                   <div className="relative">
                     <input
                       id="password"
@@ -419,7 +419,7 @@ export default function EmployerRegister() {
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your Password"
                       required
-                      className="w-full p-3 pr-12 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
+                      className="w-full p-3 pr-12 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
                       title="Please create a secure password with at least 6 characters."
                       aria-label="Password. Please create a secure password with at least 6 characters."
                     />
@@ -444,7 +444,7 @@ export default function EmployerRegister() {
                 </div>
                 
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="confirmPassword" className="text-xs sm:text-sm font-semibold text-[#03045E]">Confirm Password <span className="text-[#03045E]">*</span></label>
+                  <label htmlFor="confirmPassword" tabIndex="0" title="Confirm Password" aria-label="Confirm Password" className="text-xs sm:text-sm font-semibold text-[#03045E] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded">Confirm Password <span className="text-[#03045E]">*</span></label>
                   <div className="relative">
                     <input
                       id="confirmPassword"
@@ -453,7 +453,7 @@ export default function EmployerRegister() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Confirm your Password"
                       required
-                      className="w-full p-3 pr-12 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
+                      className="w-full p-3 pr-12 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
                       title="Please re-enter your password to confirm it matches."
                       aria-label="Confirm Password. Please re-enter your password to confirm it matches."
                     />
@@ -482,7 +482,7 @@ export default function EmployerRegister() {
               <hr className="border-[#03045E]/10" />
 
               <fieldset className="flex flex-col gap-3">
-                <legend className="text-xs sm:text-sm font-bold text-[#03045E]">Primary Job Role / Title <span className="text-[#03045E]">*</span></legend>
+                <legend tabIndex="0" title="Primary Job Role / Title" aria-label="Primary Job Role / Title" className="text-xs sm:text-sm font-bold text-[#03045E] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded">Primary Job Role / Title <span className="text-[#03045E]">*</span></legend>
                 <input
                   id="jobRole"
                   type="text"
@@ -490,19 +490,19 @@ export default function EmployerRegister() {
                   onChange={(e) => setJobRole(e.target.value)}
                   placeholder="e.g. Hiring Manager"
                   required
-                  className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
+                  className="w-full p-3 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
                   title="Please enter your primary job role or title within the company."
                   aria-label="Primary Job Role or Title. Please enter your primary job role or title within the company."
                 />
               </fieldset>
 
-              <div className="flex flex-col gap-3 p-5 border border-[#2C7FFF]/30 rounded-2xl bg-[var(--color-accentSoft)]">
-                <label htmlFor="address" className="text-lg sm:text-xl font-bold text-[#03045E]">Workplace Location <span className="text-[#03045E]">*</span></label>
-                <p className="text-[10px] sm:text-xs text-gray-500">Pinpoint your office location to match with nearby applicants.</p>
+              <div className="flex flex-col gap-3 p-5 border border-[#2C7FFF]/30 rounded-lg bg-[var(--color-accentSoft)]">
+                <label htmlFor="address" tabIndex="0" title="Workplace Location" aria-label="Workplace Location" className="text-lg sm:text-xl font-bold text-[#03045E] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded">Workplace Location <span className="text-[#03045E]">*</span></label>
+                <p tabIndex="0" title="Pinpoint your office location to match with nearby applicants." aria-label="Pinpoint your office location to match with nearby applicants." className="text-[10px] sm:text-xs text-gray-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded">Pinpoint your office location to match with nearby applicants.</p>
                 <button
                   type="button"
                   onClick={handleDetectLocation}
-                  className={`inline-flex items-center justify-center gap-2 ${isAccessibilityDarkMode ? '!bg-white !text-black' : 'bg-[#2C7FFF]'} ${isAccessibilityMode ? '!text-white !bg-blue-600' : useBlackText ? '!text-black' : 'text-white'} px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold shadow-md transition`}
+                  className={`inline-flex items-center justify-center gap-2 ${isAccessibilityDarkMode ? '!bg-white !text-black' : 'bg-[#2C7FFF]'} ${isAccessibilityMode ? '!text-white !bg-blue-600' : useBlackText ? '!text-black' : 'text-white'} px-4 py-2 sm:px-5 sm:py-2.5 rounded-md text-xs sm:text-sm font-semibold shadow-md transition`}
                   title="Click to automatically detect and fill your workplace location."
                   aria-label="Open Map and Detect Location. Click to automatically detect and fill your workplace location."
                 >
@@ -519,24 +519,24 @@ export default function EmployerRegister() {
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder="Enter your Workplace Address (e.g. 123 Main Street, Makati)"
                   required
-                  className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E]"
+                  className="w-full p-3 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E]"
                   title="Please enter your full workplace address or use the detect location button."
                   aria-label="Workplace Location. Please enter your full workplace address or use the detect location button."
                 />
                 {isDetecting ? (
-                  <div className="h-48 sm:h-60 flex items-center justify-center bg-gray-50 rounded-xl border border-gray-200 mt-2" aria-live="polite">
+                  <div className="h-48 sm:h-60 flex items-center justify-center bg-gray-50 rounded-md border border-gray-200 mt-2" aria-live="polite">
                     <p className="text-xs sm:text-sm font-medium text-gray-500 animate-pulse">Detecting your location...</p>
                   </div>
                 ) : lat && lng ? (
                   <>
-                    <div className="h-48 sm:h-60 rounded-xl overflow-hidden border border-gray-300 shadow-inner mt-2">
+                    <div className="h-48 sm:h-60 rounded-md overflow-hidden border border-gray-300 shadow-inner mt-2">
                       <iframe
                         width="100%" height="100%" frameBorder="0" scrolling="no" marginHeight="0" marginWidth="0"
                         src={`https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.005},${lat - 0.005},${lng + 0.005},${lat + 0.005}&layer=mapnik&marker=${lat},${lng}`}
                         title="Workplace location map"
                       ></iframe>
                     </div>
-                    <div className="text-xs sm:text-sm font-medium text-[#03045E] bg-[#f4f4f4] p-4 rounded-xl border border-[#03045E]/10 shadow-sm mt-2">
+                    <div className="text-xs sm:text-sm font-medium text-[#03045E] bg-[#f4f4f4] p-4 rounded-md border border-[#03045E]/10 shadow-sm mt-2">
                       <span className="text-[10px] sm:text-xs font-bold text-[#03045E]/60 uppercase tracking-wider block mb-1">Detected Address:</span>
                       <span className={`font-normal leading-relaxed block ${isAccessibilityMode ? '!text-white' : 'text-[#2C7FFF]'}`}>{address}</span>
                     </div>
@@ -546,19 +546,19 @@ export default function EmployerRegister() {
 
               <hr className="border-[#03045E]/10" />
 
-              <div className="p-4 rounded-2xl border-2 border-dashed border-[#03045E]/20 bg-[#f4f4f4]/50">
-                <label htmlFor="verificationDoc" className="block text-xs sm:text-sm font-bold text-[#03045E] mb-1">Company Registration (DTI / SEC / Mayor's Permit) <span className="text-[#03045E]">*</span></label>
+              <div className="p-4 rounded-md border-2 border-dashed border-[#03045E]/20 bg-[#f4f4f4]/50">
+                <label htmlFor="verificationDoc" tabIndex="0" title="Company Registration (DTI / SEC / Mayor's Permit)" aria-label="Company Registration (DTI / SEC / Mayor's Permit)" className="block text-xs sm:text-sm font-bold text-[#03045E] mb-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded">Company Registration (DTI / SEC / Mayor's Permit) <span className="text-[#03045E]">*</span></label>
                 <input
                   id="verificationDoc"
                   type="file"
                   accept=".pdf,.jpg,.jpeg,.png"
                   onChange={(e) => setVerificationDoc(e.target.files[0])}
-                  className={`w-full text-[10px] sm:text-sm text-[#03045E] file:mr-4 file:py-2 file:px-4 file:rounded-[10px] file:border-2 file:border-[#03045E]/30 file:bg-white file:text-[#03045E] file:font-semibold cursor-pointer ${isAccessibilityDarkMode ? '[&::file-selector-button]:!text-black' : isDefaultDarkMode ? '[&::file-selector-button]:!text-black' : ''}`}
+                  className={`w-full text-[10px] sm:text-sm text-[#03045E] file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-2 file:border-[#03045E]/30 file:bg-white file:text-[#03045E] file:font-semibold cursor-pointer ${isAccessibilityDarkMode ? '[&::file-selector-button]:!text-black' : isDefaultDarkMode ? '[&::file-selector-button]:!text-black' : ''}`}
                   required
                   title="Please upload your company registration document. Max size 5MB."
                   aria-label="Company registration document upload. Please upload a clear copy of your DTI, SEC, Business Permit, or Mayor's Permit. Max size 5 Megabytes."
                 />
-                <p className="text-[10px] sm:text-xs text-[#03045E]/70 mt-2 font-semibold">
+                <p tabIndex="0" title="Supported formats: .pdf, .jpg, .jpeg, .png (Max size: 5MB)" aria-label="Supported formats: .pdf, .jpg, .jpeg, .png (Max size: 5MB)" className="text-[10px] sm:text-xs text-[#03045E]/70 mt-2 font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded">
                   Supported formats: .pdf, .jpg, .jpeg, .png (Max size: 5MB)
                 </p>
               </div>
@@ -574,7 +574,7 @@ export default function EmployerRegister() {
                     title="Check this box to agree to the Terms and Conditions."
                     aria-label="Terms and Conditions agreement checkbox. Check to agree."
                   />
-                  <span className="text-[10px] sm:text-xs font-bold text-[#03045E] leading-tight">
+                  <span tabIndex="0" title="I have read and agree to the ABLEWORK Terms and Conditions." aria-label="I have read and agree to the ABLEWORK Terms and Conditions." className="text-[10px] sm:text-xs font-bold text-[#03045E] leading-tight focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded">
                     I have read and agree to the <Link to="/terms" target="_blank" className="text-[#2C7FFF] underline hover:text-[#03045E]" aria-label="Open ABLEWORK Terms and Conditions in a new tab">ABLEWORK Terms and Conditions</Link>.
                   </span>
                 </label>
@@ -589,7 +589,7 @@ export default function EmployerRegister() {
                     title="Check this box to agree to the Privacy Policy."
                     aria-label="Privacy Policy agreement checkbox. Check to agree."
                   />
-                  <span className="text-[10px] sm:text-xs font-bold text-[#03045E] leading-tight">
+                  <span tabIndex="0" title="I have read and understood the ABLEWORK Privacy Policy and consent to the collection and processing of my corporate information for employment assistance purposes." aria-label="I have read and understood the ABLEWORK Privacy Policy and consent to the collection and processing of my corporate information for employment assistance purposes." className="text-[10px] sm:text-xs font-bold text-[#03045E] leading-tight focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded">
                     I have read and understood the <Link to="/policy" target="_blank" className="text-[#2C7FFF] underline hover:text-[#03045E]" aria-label="Open ABLEWORK Privacy Policy in a new tab">ABLEWORK Privacy Policy</Link> and consent to the collection and processing of my corporate information for employment assistance purposes.
                   </span>
                 </label>
@@ -599,7 +599,7 @@ export default function EmployerRegister() {
                 <div
                   role="alert"
                   aria-live="assertive"
-                  className={`p-4 rounded-xl font-bold text-center border-2 ${
+                  className={`p-4 rounded-md font-bold text-center border-2 ${
                     statusMessage.type === 'success'
                       ? 'bg-green-100 text-green-800 border-green-400'
                       : 'bg-white text-red-600 border-red-600'
@@ -612,7 +612,7 @@ export default function EmployerRegister() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`submit-register-btn mt-1 py-3 sm:py-3.5 bg-[#03045E] hover:bg-[#2C7FFF] ${isAccessibilityDarkMode ? '!text-black' : isAccessibilityMode ? '!text-white' : useBlackText ? '!text-black' : 'text-white'} text-sm sm:text-base font-semibold rounded-full shadow-md transition disabled:opacity-50`}
+                className={`submit-register-btn mt-1 py-3 sm:py-3.5 bg-[#03045E] hover:bg-[#2C7FFF] ${isAccessibilityDarkMode ? '!text-black' : isAccessibilityMode ? '!text-white' : useBlackText ? '!text-black' : 'text-white'} text-sm sm:text-base font-semibold rounded-lg shadow-md transition disabled:opacity-50`}
                 title="Submit your registration"
                 aria-label="Complete Employer Registration button. Click to submit your company profile."
               >
@@ -641,7 +641,7 @@ export default function EmployerRegister() {
           aria-live="assertive"
           tabIndex="-1"
         >
-          <div className={`relative w-full max-w-md rounded-2xl sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${(isContrast || isDarkMode) ? 'bg-black border-2 border-white' : 'bg-white border-2 border-[#2C7FFF]'}`}>
+          <div className={`relative w-full max-w-md rounded-lg sm:rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${(isContrast || isDarkMode) ? 'bg-black border-2 border-white' : 'bg-white border-2 border-[#2C7FFF]'}`}>
             <div aria-hidden="true" className="h-2 w-full bg-[#2C7FFF]" />
 
             <div className="relative px-5 pt-8 pb-6 sm:px-8 sm:pt-10 sm:pb-8 flex flex-col items-center text-center">

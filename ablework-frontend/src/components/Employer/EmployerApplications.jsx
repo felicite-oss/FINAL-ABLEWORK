@@ -187,11 +187,11 @@ export default function EmployerApplications({ profile, refreshStats }) {
 
   return (
     <div className={`animate-fadeIn max-w-9xl mx-auto pb-6 sm:pb-10 relative px-1 sm:px-0 ${pageText}`}>
-      <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 backdrop-blur-md p-4 sm:p-6 rounded-[15px] border-2 ${panelBg}`}>
+      <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 backdrop-blur-md p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 ${panelBg}`}>
         <div>
           <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-1.5 flex-wrap">
-            <span className={`text-[10px] sm:text-xs font-extrabold px-2 sm:px-3 py-0.5 sm:py-1 rounded-[15px] uppercase tracking-wider border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#2C7FFF] border-gray-200'}`}>Candidate Hub</span>
-            <span className={`text-[10px] sm:text-xs font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-[15px] flex items-center gap-1 sm:gap-1.5 border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-gray-200'}`}>
+            <span className={`text-[10px] sm:text-xs font-extrabold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full uppercase tracking-wider border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#2C7FFF] border-gray-200'}`}>Candidate Hub</span>
+            <span className={`text-[10px] sm:text-xs font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full flex items-center gap-1 sm:gap-1.5 border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-gray-200'}`}>
               <span className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'} animate-pulse`}></span> Active Pipeline
             </span>
           </div>
@@ -200,7 +200,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
         </div>
       </div>
       
-                     <div className={`flex gap-1 p-1 sm:gap-2 sm:p-2 rounded-xl sm:rounded-[15px] border-2 w-full overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] ${panelBg}`}>
+                     <div className={`flex gap-1 p-1 sm:gap-2 sm:p-2 rounded-lg sm:rounded-xl border-2 w-full overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] ${panelBg}`}>
         {tabs.map(tab => {
           const count = tab === 'All' 
             ? applications.length 
@@ -209,7 +209,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex-1 min-w-0 px-1.5 py-1 sm:px-4 sm:py-2.5 rounded-lg sm:rounded-xl font-extrabold text-[8px] sm:text-sm whitespace-nowrap transition-all flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 cursor-pointer ${
+              className={`flex-1 min-w-0 px-1.5 py-1 sm:px-4 sm:py-2.5 rounded-md sm:rounded-lg font-extrabold text-[8px] sm:text-sm whitespace-nowrap transition-all flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 cursor-pointer ${
                 activeTab === tab
                   ? (isHighContrastOrDarkComfort
                       ? (isDark ? 'bg-white text-black shadow-md' : 'bg-[#2C7FFF] !text-white shadow-md')
@@ -241,12 +241,12 @@ export default function EmployerApplications({ profile, refreshStats }) {
       <div className="flex flex-col gap-3 sm:gap-4">
         {filteredApplications.length > 0 ? (
           filteredApplications.map(app => (
-            <div key={app.application_id} className={`p-4 sm:p-6 rounded-[15px] border-2 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 ${cardBg}`}>
+            <div key={app.application_id} className={`p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 ${cardBg}`}>
               
               <div className="flex-1">
                 <div className="flex items-center gap-2 sm:gap-3 mb-1 flex-wrap">
                   <h3 className={`text-base sm:text-xl font-bold ${pageText}`}>{app.firstname} {app.lastname}</h3>
-                  <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-[15px] text-[9px] sm:text-[11px] font-bold uppercase tracking-wider border-2 ${getStatusColor(app.application_status)}`}>
+                  <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[9px] sm:text-[11px] font-bold uppercase tracking-wider border-2 ${getStatusColor(app.application_status)}`}>
                     {app.application_status}
                   </span>
                 </div>
@@ -265,7 +265,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
                         updateStatus(app.application_id, 'Under Review', null, false);
                     }
                   }} 
-                  className={`w-full md:w-auto px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-[15px] cursor-pointer border-2 ${
+                  className={`w-full md:w-auto px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-md sm:rounded-lg cursor-pointer border-2 ${
                     isDark
                       ? 'bg-black text-white border-white'
                       : 'bg-white text-[#03045E] border-gray-200'
@@ -278,7 +278,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
             </div>
           ))
         ) : (
-          <div className={`p-6 sm:p-10 text-center font-bold border-2 border-dashed rounded-[15px] text-sm sm:text-base ${
+          <div className={`p-6 sm:p-10 text-center font-bold border-2 border-dashed rounded-xl sm:rounded-2xl text-sm sm:text-base ${
             isDark 
               ? 'text-white/70 border-white bg-black' 
               : 'text-[#03045E]/70 border-gray-200 bg-white'
@@ -293,7 +293,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`p-4 sm:p-8 rounded-[15px] max-w-5xl w-full max-h-[90vh] overflow-y-auto flex flex-col border-2 ${
+          <div className={`p-4 sm:p-8 rounded-xl sm:rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto flex flex-col border-2 ${
             isDark ? 'bg-black border-white text-white' : 'bg-white border-gray-200 text-[#03045E]'
           }`}>
             
@@ -302,7 +302,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
                 <h2 className={`text-xl sm:text-3xl font-extrabold ${pageText}`}>{selectedApp.firstname} {selectedApp.lastname}</h2>
                 <p className={`text-xs sm:text-base font-semibold mt-1 ${muted}`}>Applying for: <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>{selectedApp.job_title}</span></p>
               </div>
-              <span className={`px-3 sm:px-4 py-1 sm:py-2 rounded-[15px] text-[10px] sm:text-sm font-bold border-2 ${getStatusColor(selectedApp.application_status)}`}>
+              <span className={`px-3 sm:px-4 py-1 sm:py-2 rounded-full text-[10px] sm:text-sm font-bold border-2 ${getStatusColor(selectedApp.application_status)}`}>
                 {selectedApp.application_status}
               </span>
             </div>
@@ -328,7 +328,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
 
                 <div>
                   <h4 className={`text-[10px] sm:text-xs font-extrabold uppercase tracking-wider mb-2 ${subtle}`}>Disability Profile</h4>
-                  <p className={`text-xs sm:text-base font-semibold p-2.5 sm:p-3.5 rounded-[15px] border-2 ${softPanel} ${pageText}`}>
+                  <p className={`text-xs sm:text-base font-semibold p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl border-2 ${softPanel} ${pageText}`}>
                     {selectedApp.disability_type || 'Not specified'}
                   </p>
                 </div>
@@ -341,7 +341,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
                         href={`http://localhost:5001${selectedApp.resume_path}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-base font-bold rounded-[15px] border-2 ${
+                        className={`inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-base font-bold rounded-lg sm:rounded-xl border-2 ${
                           isDark 
                             ? 'bg-white text-black border-white' 
                             : 'bg-[#03045E] text-white border-[#03045E]'
@@ -353,7 +353,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
                         <span>View Attached Resume</span>
                       </a>
                     ) : (
-                      <p className={`text-xs sm:text-sm font-semibold p-2.5 sm:p-3 rounded-[15px] border-2 text-center ${
+                      <p className={`text-xs sm:text-sm font-semibold p-2.5 sm:p-3 rounded-lg sm:rounded-xl border-2 text-center ${
                         isDark 
                           ? 'text-white bg-black border-white' 
                           : 'text-[#03045E] bg-white border-gray-200'
@@ -371,7 +371,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
                   <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {selectedApp.skills ? 
                       (typeof selectedApp.skills === 'string' ? JSON.parse(selectedApp.skills) : selectedApp.skills).map((skill, i) => (
-                        <span key={i} className={`px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-[15px] border-2 ${
+                        <span key={i} className={`px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-full border-2 ${
                           isDark 
                             ? 'bg-black text-white border-white' 
                             : 'bg-white text-[#03045E] border-gray-200'
@@ -388,7 +388,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
                   <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {selectedApp.accommodations_needed ? 
                       (typeof selectedApp.accommodations_needed === 'string' ? JSON.parse(selectedApp.accommodations_needed) : selectedApp.accommodations_needed).map((acc, i) => (
-                        <span key={i} className={`px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-[15px] border-2 ${
+                        <span key={i} className={`px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-full border-2 ${
                           isDark 
                             ? 'bg-black text-white border-white' 
                             : 'bg-white text-[#03045E] border-gray-200'
@@ -401,7 +401,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
                 </div>
 
                 {selectedApp.cover_letter && selectedApp.cover_letter.trim() !== '' && (
-                  <div className={`p-3 sm:p-5 rounded-[15px] border-2 ${softPanel}`}>
+                  <div className={`p-3 sm:p-5 rounded-lg sm:rounded-xl border-2 ${softPanel}`}>
                     <h5 className={`text-[10px] sm:text-xs font-extrabold uppercase tracking-wider mb-2 ${subtle}`}>Cover Letter / Message</h5>
                     <p className={`text-xs sm:text-sm font-medium whitespace-pre-wrap leading-relaxed ${pageText}`}>
                       {selectedApp.cover_letter}
@@ -421,7 +421,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
                     placeholder="e.g., We would love to invite you for an interview on Monday at 10 AM. Here is the Google Meet link..."
-                    className={`w-full p-3 sm:p-4 border-2 rounded-[15px] outline-none min-h-[80px] sm:min-h-[100px] text-xs sm:text-sm resize-none font-semibold ${
+                    className={`w-full p-3 sm:p-4 border-2 rounded-lg sm:rounded-xl outline-none min-h-[80px] sm:min-h-[100px] text-xs sm:text-sm resize-none font-semibold ${
                       isDark 
                         ? 'border-white bg-black text-white placeholder-white/40' 
                         : 'border-gray-200 bg-white text-[#03045E] placeholder-[#03045E]/40'
@@ -430,7 +430,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
                   <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 mt-2">
                     <button
                       onClick={() => { setNextSteps({ isOpen: false, status: '' }); setMessageText(''); }}
-                      className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 text-xs sm:text-sm font-bold rounded-[15px] cursor-pointer border-2 ${
+                      className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 text-xs sm:text-sm font-bold rounded-md sm:rounded-lg cursor-pointer border-2 ${
                         isDark 
                           ? 'bg-black text-white border-white' 
                           : 'bg-white text-[#03045E] border-gray-200'
@@ -440,7 +440,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
                     </button>
                     <button
                       onClick={() => updateStatus(selectedApp.application_id, nextSteps.status, messageText, true, true)}
-                      className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 text-xs sm:text-sm font-bold rounded-[15px] cursor-pointer border-2 ${
+                      className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 text-xs sm:text-sm font-bold rounded-md sm:rounded-lg cursor-pointer border-2 ${
                         isDark 
                           ? 'bg-white text-black border-white' 
                           : 'bg-[#03045E] text-white border-[#03045E]'
@@ -454,7 +454,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
                 <div className="flex flex-col sm:flex-row justify-between items-center w-full gap-3 sm:gap-0">
                   <button 
                     onClick={() => setSelectedApp(null)} 
-                    className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold rounded-[15px] cursor-pointer border-2 ${
+                    className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold rounded-md sm:rounded-lg cursor-pointer border-2 ${
                       isDark 
                         ? 'bg-black text-white border-white' 
                         : 'bg-white text-[#03045E] border-gray-200'
@@ -467,14 +467,14 @@ export default function EmployerApplications({ profile, refreshStats }) {
                     <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
                       <button 
                         onClick={() => updateStatus(selectedApp.application_id, 'Rejected', null, true, true)} 
-                        className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold rounded-[15px] cursor-pointer border-2 bg-white text-red-600 border-red-500"
+                        className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold rounded-md sm:rounded-lg cursor-pointer border-2 bg-white text-red-600 border-red-500"
                       >
                         Reject
                       </button>
                       
                       <button 
                         onClick={() => setNextSteps({ isOpen: true, status: 'Shortlisted' })} 
-                        className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold rounded-[15px] cursor-pointer border-2 ${
+                        className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold rounded-md sm:rounded-lg cursor-pointer border-2 ${
                           isDark 
                             ? 'bg-black text-white border-white' 
                             : 'bg-white text-[#03045E] border-gray-200'
@@ -485,7 +485,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
                       
                       <button 
                         onClick={() => setNextSteps({ isOpen: true, status: 'Hired' })} 
-                        className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold rounded-[15px] cursor-pointer border-2 ${
+                        className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold rounded-md sm:rounded-lg cursor-pointer border-2 ${
                           isDark 
                             ? 'bg-black text-emerald-400 border-emerald-500' 
                             : 'bg-white text-emerald-700 border-emerald-500'
@@ -495,7 +495,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
                       </button>
                     </div>
                   ) : (
-                    <div className={`w-full sm:w-auto px-3 sm:px-4 py-2 rounded-[15px] border-2 text-center ${isDark ? 'bg-black border-white' : 'bg-white border-gray-200'}`}>
+                    <div className={`w-full sm:w-auto px-3 sm:px-4 py-2 rounded-md sm:rounded-lg border-2 text-center ${isDark ? 'bg-black border-white' : 'bg-white border-gray-200'}`}>
                       <p className={`text-xs sm:text-sm font-bold italic ${pageText}`}>
                         Application finalized as <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>{selectedApp.application_status}</span>.
                       </p>
@@ -514,7 +514,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative w-full max-w-md rounded-[15px] shadow-2xl border-2 overflow-hidden animate-in zoom-in-95 duration-300 bg-white ${statusAlert.tone === 'rejected' ? 'border-red-500/30' : 'border-[#2C7FFF]/30'}`}>
+          <div className={`relative w-full max-w-md rounded-lg sm:rounded-xl shadow-2xl border-2 overflow-hidden animate-in zoom-in-95 duration-300 bg-white ${statusAlert.tone === 'rejected' ? 'border-red-500/30' : 'border-[#2C7FFF]/30'}`}>
             <div className="px-6 sm:px-8 pt-6 sm:pt-8 pb-5 sm:pb-7 flex flex-col items-center text-center">
               <div className="relative mb-4 sm:mb-5">
                 <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-full flex items-center justify-center ${statusAlert.tone === 'rejected' ? 'bg-red-100' : 'bg-[#2C7FFF]/10'}`}>
@@ -538,7 +538,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
 
               <button
                 onClick={() => setShowStatusAlert(false)}
-                className={`w-full py-3 sm:py-3.5 rounded-[15px] font-black text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all cursor-pointer ${getAlertBadgeStyle(statusAlert.tone)} text-white hover:opacity-90`}
+                className={`w-full py-3 sm:py-3.5 rounded-md sm:rounded-lg font-black text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all cursor-pointer ${getAlertBadgeStyle(statusAlert.tone)} text-white hover:opacity-90`}
               >
                 Got it!
               </button>

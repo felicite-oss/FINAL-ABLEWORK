@@ -77,24 +77,24 @@ export default function EmployerAccountSettings({ profile }) {
   const subtle = isDark ? 'text-white/60' : 'text-[#03045E]/60';
   const divider = isDark ? 'border-gray-200' : 'border-gray-200';
   const inputCls = isDark
-    ? 'w-full p-2.5 sm:p-3.5 border-2 border-white bg-black rounded-xl text-white placeholder:text-gray-400 focus:border-white outline-none transition font-medium text-sm sm:text-base'
-    : 'w-full p-2.5 sm:p-3.5 border-2 border-gray-200 bg-white rounded-xl text-[#03045E] placeholder:text-gray-400 focus:border-gray-200 outline-none transition font-medium text-sm sm:text-base';
+    ? 'w-full p-2.5 sm:p-3.5 border-2 border-white bg-black rounded-lg text-white placeholder:text-gray-400 focus:border-white outline-none transition font-medium text-sm sm:text-base'
+    : 'w-full p-2.5 sm:p-3.5 border-2 border-gray-200 bg-white rounded-lg text-[#03045E] placeholder:text-gray-400 focus:border-gray-200 outline-none transition font-medium text-sm sm:text-base';
   const disabledInputCls = isDark
-    ? 'w-full p-2.5 sm:p-3.5 bg-black border-2 border-white/40 rounded-xl text-white/50 outline-none cursor-not-allowed font-medium text-sm sm:text-base'
-    : 'w-full p-2.5 sm:p-3.5 bg-[#F4F4F4] border-2 border-gray-200 rounded-xl text-[#03045E]/50 outline-none cursor-not-allowed font-medium text-sm sm:text-base';
+    ? 'w-full p-2.5 sm:p-3.5 bg-black border-2 border-white/40 rounded-lg text-white/50 outline-none cursor-not-allowed font-medium text-sm sm:text-base'
+    : 'w-full p-2.5 sm:p-3.5 bg-[#F4F4F4] border-2 border-gray-200 rounded-lg text-[#03045E]/50 outline-none cursor-not-allowed font-medium text-sm sm:text-base';
         const cancelBtn = isDark
-    ? 'px-4 sm:px-6 py-2.5 sm:py-3.5 bg-white border-2 border-white text-black font-bold rounded-xl cursor-pointer text-xs sm:text-sm'
-    : 'px-4 sm:px-6 py-2.5 sm:py-3.5 bg-[#F4F4F4] border-2 border-[#03045E] text-[#03045E] font-bold rounded-xl cursor-pointer text-xs sm:text-sm';
+    ? 'px-4 sm:px-6 py-2.5 sm:py-3.5 bg-white border-2 border-white text-black font-bold rounded-lg cursor-pointer text-xs sm:text-sm'
+    : 'px-4 sm:px-6 py-2.5 sm:py-3.5 bg-[#F4F4F4] border-2 border-[#03045E] text-[#03045E] font-bold rounded-lg cursor-pointer text-xs sm:text-sm';
     const primaryBtn = isHighContrastOrDarkComfort
-    ? 'px-4 sm:px-6 py-2.5 sm:py-3.5 bg-[#2C7FFF] !text-white font-black rounded-xl transition disabled:opacity-50 cursor-pointer border-2 border-[#2C7FFF] hover:bg-white hover:text-[#2C7FFF] text-xs sm:text-sm'
+    ? 'px-4 sm:px-6 py-2.5 sm:py-3.5 bg-[#2C7FFF] !text-white font-black rounded-lg transition disabled:opacity-50 cursor-pointer border-2 border-[#2C7FFF] hover:bg-white hover:text-[#2C7FFF] text-xs sm:text-sm'
     : isDark
-      ? 'px-4 sm:px-6 py-2.5 sm:py-3.5 bg-white !text-black font-black rounded-xl hover:bg-black hover:!text-white transition disabled:opacity-50 cursor-pointer border-2 border-white text-xs sm:text-sm'
-      : 'px-4 sm:px-6 py-2.5 sm:py-3.5 bg-[#03045E] text-white font-black rounded-xl hover:bg-[#2C7FFF] transition disabled:opacity-50 cursor-pointer border-2 border-[#03045E] hover:border-[#2C7FFF] text-xs sm:text-sm';
+      ? 'px-4 sm:px-6 py-2.5 sm:py-3.5 bg-white !text-black font-black rounded-lg hover:bg-black hover:!text-white transition disabled:opacity-50 cursor-pointer border-2 border-white text-xs sm:text-sm'
+      : 'px-4 sm:px-6 py-2.5 sm:py-3.5 bg-[#03045E] text-white font-black rounded-lg hover:bg-[#2C7FFF] transition disabled:opacity-50 cursor-pointer border-2 border-[#03045E] hover:border-[#2C7FFF] text-xs sm:text-sm';
   const secondaryBtn = isHighContrastOrDarkComfort
-    ? 'w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3.5 bg-[#2C7FFF] !text-white font-black rounded-xl transition disabled:opacity-50 cursor-pointer border-2 border-[#2C7FFF] hover:bg-white hover:text-[#2C7FFF] text-xs sm:text-sm'
+    ? 'w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3.5 bg-[#2C7FFF] !text-white font-black rounded-lg transition disabled:opacity-50 cursor-pointer border-2 border-[#2C7FFF] hover:bg-white hover:text-[#2C7FFF] text-xs sm:text-sm'
     : isDark
-      ? 'w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3.5 bg-white text-black font-black rounded-xl transition disabled:opacity-50 cursor-pointer border-2 border-white hover:bg-black hover:text-white text-xs sm:text-sm'
-      : 'w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3.5 bg-[#03045E] text-white font-black rounded-xl transition disabled:opacity-50 cursor-pointer border-2 border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF] text-xs sm:text-sm';
+      ? 'w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3.5 bg-white text-black font-black rounded-lg transition disabled:opacity-50 cursor-pointer border-2 border-white hover:bg-black hover:text-white text-xs sm:text-sm'
+      : 'w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3.5 bg-[#03045E] text-white font-black rounded-lg transition disabled:opacity-50 cursor-pointer border-2 border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF] text-xs sm:text-sm';
     const successMsg = isHighContrastOrDarkComfort
     ? 'bg-transparent !text-white border-[#2C7FFF]'
     : isDark
@@ -413,7 +413,7 @@ export default function EmployerAccountSettings({ profile }) {
   return (
     <div className={`animate-fadeIn max-w-9xl mx-auto pb-6 sm:pb-10 px-1 sm:px-0 ${pageText}`}>
       
-      <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 backdrop-blur-md p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border-2 ${panelBg}`}>
+      <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 backdrop-blur-md p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border-2 ${panelBg}`}>
         <div>
           <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-1.5 flex-wrap">
             <span className={`text-[10px] sm:text-xs font-extrabold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full uppercase tracking-wider border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-[#2C7FFF]/15 text-[#2C7FFF] border-[#2C7FFF]/30'}`}>Settings Hub</span>
@@ -428,7 +428,7 @@ export default function EmployerAccountSettings({ profile }) {
 
       <div className="flex flex-col gap-3 sm:gap-4">
         
-        <div className={`rounded-2xl sm:rounded-3xl border-2 shadow-[0_10px_30px_rgba(3,4,94,0.06)] overflow-hidden transition-all duration-300 ${openSection === 'verification' ? cardActive : cardHover} ${cardBg}`}>
+        <div className={`rounded-xl sm:rounded-2xl border-2 shadow-[0_10px_30px_rgba(3,4,94,0.06)] overflow-hidden transition-all duration-300 ${openSection === 'verification' ? cardActive : cardHover} ${cardBg}`}>
           <button onClick={() => toggleSection('verification')} className="w-full p-4 sm:p-8 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer">
             <div className="text-left">
               <h2 className={`text-sm sm:text-lg font-bold ${pageText}`}>Verification Status</h2>
@@ -443,17 +443,17 @@ export default function EmployerAccountSettings({ profile }) {
                 <div className="flex-1">
                   <p className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 ${subtle}`}>Current Standing</p>
                                     {profile?.verification_status === 'Approved' && (
-                    <span className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 font-bold text-xs sm:text-sm rounded-xl border-2" style={{ backgroundColor: isDark ? '#000000' : '#2C7FFF', color: '#ffffff', borderColor: isDark ? '#ffffff' : '#2C7FFF' }}>
+                    <span className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 font-bold text-xs sm:text-sm rounded-lg border-2" style={{ backgroundColor: isDark ? '#000000' : '#2C7FFF', color: '#ffffff', borderColor: isDark ? '#ffffff' : '#2C7FFF' }}>
                       Approved
                     </span>
                   )}
                   {profile?.verification_status === 'Pending' && (
-                    <span className={`inline-block px-3 sm:px-4 py-1 sm:py-1.5 font-bold text-xs sm:text-sm rounded-xl border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-[#F4F4F4] text-[#03045E] border-[#03045E]'}`}>
+                    <span className={`inline-block px-3 sm:px-4 py-1 sm:py-1.5 font-bold text-xs sm:text-sm rounded-lg border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-[#F4F4F4] text-[#03045E] border-[#03045E]'}`}>
                       Pending Review
                     </span>
                   )}
                   {isRejected && (
-                    <span className={`inline-block px-3 sm:px-4 py-1 sm:py-1.5 font-bold text-xs sm:text-sm rounded-xl border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-[#F4F4F4] text-[#03045E] border-[#03045E]'}`}>
+                    <span className={`inline-block px-3 sm:px-4 py-1 sm:py-1.5 font-bold text-xs sm:text-sm rounded-lg border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-[#F4F4F4] text-[#03045E] border-[#03045E]'}`}>
                       Action Required
                     </span>
                   )}
@@ -464,20 +464,20 @@ export default function EmployerAccountSettings({ profile }) {
                 </div>
 
                 {isRejected && (
-                  <div className={`flex-1 p-3 sm:p-5 rounded-xl sm:rounded-2xl border-2 w-full ${softBg}`}>
+                  <div className={`flex-1 p-3 sm:p-5 rounded-lg sm:rounded-xl border-2 w-full ${softBg}`}>
                     <h3 className={`text-xs sm:text-sm font-bold mb-2 ${pageText}`}>Re-verify Company</h3>
                     <p className={`text-[10px] sm:text-xs mb-3 sm:mb-4 font-medium ${muted}`}>
                       {canResubmit ? "Your cooldown has expired. Please upload a clear, valid Business Registration (DTI/SEC)." : `Security lock active. You can upload a new document in ${daysLeft} days.`}
                     </p>
                     
                     {verStatus.msg && (
-                      <div className={`p-2.5 sm:p-3 text-[10px] sm:text-xs font-bold rounded-xl mb-3 sm:mb-4 border-2 ${verStatus.type === 'error' ? errorMsg : successMsg}`}>{verStatus.msg}</div>
+                      <div className={`p-2.5 sm:p-3 text-[10px] sm:text-xs font-bold rounded-lg mb-3 sm:mb-4 border-2 ${verStatus.type === 'error' ? errorMsg : successMsg}`}>{verStatus.msg}</div>
                     )}
 
                     <form onSubmit={handleResubmitVerification} className="flex flex-col gap-2 sm:gap-3">
-                      <input type="file" accept=".jpg,.jpeg,.png,.pdf" disabled={!canResubmit || isResubmitting} onChange={(e) => setVerificationDoc(e.target.files[0])} className={`text-[10px] sm:text-xs file:mr-2 sm:file:mr-4 file:py-1.5 sm:file:py-2 file:px-3 sm:file:px-4 file:rounded-xl file:border-0 file:text-[10px] sm:file:text-xs file:font-bold disabled:opacity-50 cursor-pointer ${isDark ? 'file:bg-white file:text-black hover:file:bg-black hover:file:text-white' : 'file:bg-[#2C7FFF] file:text-white hover:file:bg-[#03045E]'} ${pageText}`} />
+                      <input type="file" accept=".jpg,.jpeg,.png,.pdf" disabled={!canResubmit || isResubmitting} onChange={(e) => setVerificationDoc(e.target.files[0])} className={`text-[10px] sm:text-xs file:mr-2 sm:file:mr-4 file:py-1.5 sm:file:py-2 file:px-3 sm:file:px-4 file:rounded-lg file:border-0 file:text-[10px] sm:file:text-xs file:font-bold disabled:opacity-50 cursor-pointer ${isDark ? 'file:bg-white file:text-black hover:file:bg-black hover:file:text-white' : 'file:bg-[#2C7FFF] file:text-white hover:file:bg-[#03045E]'} ${pageText}`} />
                       {canResubmit && (
-                        <button type="submit" disabled={isResubmitting || !verificationDoc} className={`mt-2 py-2 sm:py-2.5 font-bold text-xs sm:text-sm rounded-xl transition disabled:opacity-50 cursor-pointer border-2 ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:bg-[#03045E] hover:border-[#03045E]'}`}>
+                        <button type="submit" disabled={isResubmitting || !verificationDoc} className={`mt-2 py-2 sm:py-2.5 font-bold text-xs sm:text-sm rounded-lg transition disabled:opacity-50 cursor-pointer border-2 ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:bg-[#03045E] hover:border-[#03045E]'}`}>
                           {isResubmitting ? 'Uploading...' : 'Submit New Document'}
                         </button>
                       )}
@@ -489,7 +489,7 @@ export default function EmployerAccountSettings({ profile }) {
           )}
         </div>
 
-        <div className={`rounded-2xl sm:rounded-3xl border-2 shadow-[0_10px_30px_rgba(3,4,94,0.06)] overflow-hidden transition-all duration-300 ${openSection === 'email' ? cardActive : cardHover} ${cardBg}`}>
+        <div className={`rounded-xl sm:rounded-2xl border-2 shadow-[0_10px_30px_rgba(3,4,94,0.06)] overflow-hidden transition-all duration-300 ${openSection === 'email' ? cardActive : cardHover} ${cardBg}`}>
           <button onClick={() => toggleSection('email')} className="w-full p-4 sm:p-8 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer">
             <div className="text-left">
               <h2 className={`text-sm sm:text-lg font-bold ${pageText}`}>Work Email Address</h2>
@@ -502,7 +502,7 @@ export default function EmployerAccountSettings({ profile }) {
             <div className={`px-4 pb-4 sm:px-8 sm:pb-8 border-t-2 pt-4 sm:pt-6 animate-fadeIn ${divider}`}>
               
               {emailStatus.msg && (
-                <div className={`p-3 sm:p-4 mb-4 sm:mb-6 rounded-xl text-xs sm:text-sm font-bold border-2 ${emailStatus.type === 'error' ? errorMsg : successMsg}`}>
+                <div className={`p-3 sm:p-4 mb-4 sm:mb-6 rounded-lg text-xs sm:text-sm font-bold border-2 ${emailStatus.type === 'error' ? errorMsg : successMsg}`}>
                   {emailStatus.msg}
                 </div>
               )}
@@ -529,7 +529,7 @@ export default function EmployerAccountSettings({ profile }) {
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-2 sm:mt-4">
-                    <button type="button" onClick={() => { setEmailStep(1); setEmailStatus({type:'', msg:''}); }} className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3.5 font-black rounded-xl transition disabled:opacity-50 cursor-pointer border-2 text-xs sm:text-sm ${isHighContrastOrDarkComfort ? 'bg-[#2C7FFF] !text-white border-[#2C7FFF]' : isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}><span style={{ color: isDark ? '#000000' : undefined }}>Cancel</span></button>
+                    <button type="button" onClick={() => { setEmailStep(1); setEmailStatus({type:'', msg:''}); }} className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3.5 font-black rounded-lg transition disabled:opacity-50 cursor-pointer border-2 text-xs sm:text-sm ${isHighContrastOrDarkComfort ? 'bg-[#2C7FFF] !text-white border-[#2C7FFF]' : isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}><span style={{ color: isDark ? '#000000' : undefined }}>Cancel</span></button>
                     <button type="submit" disabled={isUpdatingEmail || emailOtp.length < 6} className={`${secondaryBtn} w-full sm:w-auto`}>
                       {isUpdatingEmail ? 'Verifying...' : 'Verify & Update Email'}
                     </button>
@@ -540,7 +540,7 @@ export default function EmployerAccountSettings({ profile }) {
           )}
         </div>
 
-        <div className={`rounded-2xl sm:rounded-3xl border-2 shadow-[0_10px_30px_rgba(3,4,94,0.06)] overflow-hidden transition-all duration-300 ${openSection === 'password' ? cardActive : cardHover} ${cardBg}`}>
+        <div className={`rounded-xl sm:rounded-2xl border-2 shadow-[0_10px_30px_rgba(3,4,94,0.06)] overflow-hidden transition-all duration-300 ${openSection === 'password' ? cardActive : cardHover} ${cardBg}`}>
           <button onClick={() => toggleSection('password')} className="w-full p-4 sm:p-8 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer">
             <div className="text-left">
               <h2 className={`text-sm sm:text-lg font-bold ${pageText}`}>Change Password</h2>
@@ -553,7 +553,7 @@ export default function EmployerAccountSettings({ profile }) {
             <div className={`px-4 pb-4 sm:px-8 sm:pb-8 border-t-2 pt-4 sm:pt-6 animate-fadeIn ${divider}`}>
               
               {passwordStatus.msg && (
-                <div className={`p-3 sm:p-4 mb-4 sm:mb-6 rounded-xl text-xs sm:text-sm font-bold border-2 ${passwordStatus.type === 'error' ? errorMsg : successMsg}`}>
+                <div className={`p-3 sm:p-4 mb-4 sm:mb-6 rounded-lg text-xs sm:text-sm font-bold border-2 ${passwordStatus.type === 'error' ? errorMsg : successMsg}`}>
                   {passwordStatus.msg}
                 </div>
               )}
@@ -626,7 +626,7 @@ export default function EmployerAccountSettings({ profile }) {
           )}
         </div>
 
-        <div className={`rounded-2xl sm:rounded-3xl border-2 shadow-[0_10px_30px_rgba(3,4,94,0.06)] transition-all duration-300 ${openSection === 'danger' ? dangerActive : dangerCardHover} ${dangerCardBg}`}>
+        <div className={`rounded-xl sm:rounded-2xl border-2 shadow-[0_10px_30px_rgba(3,4,94,0.06)] transition-all duration-300 ${openSection === 'danger' ? dangerActive : dangerCardHover} ${dangerCardBg}`}>
           <button onClick={() => toggleSection('danger')} className="w-full p-4 sm:p-8 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer">
             <div className="text-left">
               <h2 className={`text-sm sm:text-lg font-bold ${dangerText}`} style={isDark ? {} : { color: '#FF0000' }}>Danger Zone</h2>
@@ -651,7 +651,7 @@ export default function EmployerAccountSettings({ profile }) {
                 </div>
                                                                 <button 
                   onClick={handleToggleDeactivation} 
-                  className="w-full md:w-auto px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl whitespace-nowrap cursor-pointer border-2"
+                  className="w-full md:w-auto px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-lg whitespace-nowrap cursor-pointer border-2"
                   style={isDark ? { backgroundColor: '#000000', color: '#ffffff', borderColor: '#ffffff' } : (isDeactivated ? { backgroundColor: '#ffffff', color: '#FF0000', borderColor: '#2C7FFF' } : { backgroundColor: '#ffffff', color: '#FF0000', borderColor: '#FF0000' })}
                 >
                   {isDeactivated ? 'Reactivate Account' : 'Deactivate Account'}
@@ -667,7 +667,7 @@ export default function EmployerAccountSettings({ profile }) {
                 </div>
                                    <button 
                   onClick={() => setShowDeleteModal(true)} 
-                  className="w-full md:w-auto px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl shadow-sm transition whitespace-nowrap cursor-pointer border-2"
+                  className="w-full md:w-auto px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-lg shadow-sm transition whitespace-nowrap cursor-pointer border-2"
                   style={isDark ? { backgroundColor: '#000000', color: '#ffffff', borderColor: '#ffffff' } : { backgroundColor: '#ffffff', color: '#FF0000', borderColor: '#FF0000' }}
                 >
                   Delete Account
@@ -684,12 +684,12 @@ export default function EmployerAccountSettings({ profile }) {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`rounded-[2rem] w-full max-w-md p-5 sm:p-8 shadow-2xl flex flex-col gap-3 sm:gap-4 animate-fadeIn border-2 ${isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#2C7FFF]'}`}>
+          <div className={`rounded-xl sm:rounded-2xl w-full max-w-md p-5 sm:p-8 shadow-2xl flex flex-col gap-3 sm:gap-4 animate-fadeIn border-2 ${isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#2C7FFF]'}`}>
             <h3 className={`text-lg sm:text-xl font-extrabold ${isDark ? 'text-white' : 'text-[#03045E]'}`}>Confirm Deletion</h3>
             <p className={`text-xs sm:text-sm font-medium ${isDark ? 'text-white/70' : 'text-[#03045E]/70'}`}>This will permanently delete your account, documents, and application history. Please enter your password to confirm.</p>
             
             {dangerStatus.msg && (
-              <div className={`p-2.5 sm:p-3 text-xs sm:text-sm font-bold rounded-xl border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-[#03045E]/20'}`}>{dangerStatus.msg}</div>
+              <div className={`p-2.5 sm:p-3 text-xs sm:text-sm font-bold rounded-lg border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-[#03045E]/20'}`}>{dangerStatus.msg}</div>
             )}
 
             <form onSubmit={handleDelete} className="flex flex-col gap-3 sm:gap-4 mt-2">
@@ -700,7 +700,7 @@ export default function EmployerAccountSettings({ profile }) {
                   onChange={(e) => setDeletePassword(e.target.value)} 
                   required 
                   placeholder="Enter password" 
-                  className={`w-full p-2.5 sm:p-3.5 pr-10 sm:pr-12 rounded-xl outline-none transition font-medium border-2 text-sm sm:text-base ${isDark ? 'bg-black border-white text-white placeholder:text-gray-400 focus:border-white' : 'bg-white border-[#03045E]/20 text-[#03045E] focus:border-[#2C7FFF]'}`} 
+                  className={`w-full p-2.5 sm:p-3.5 pr-10 sm:pr-12 rounded-lg outline-none transition font-medium border-2 text-sm sm:text-base ${isDark ? 'bg-black border-white text-white placeholder:text-gray-400 focus:border-white' : 'bg-white border-[#03045E]/20 text-[#03045E] focus:border-[#2C7FFF]'}`} 
                 />
                 <button type="button" onClick={() => setShowDeletePassword(!showDeletePassword)} className={`absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 transition cursor-pointer ${isDark ? 'text-white/60 hover:text-white' : 'text-[#03045E]/50 hover:text-[#2C7FFF]'}`}>
                   {showDeletePassword ? (
@@ -712,8 +712,8 @@ export default function EmployerAccountSettings({ profile }) {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-2">
-                <button type="button" onClick={() => setShowDeleteModal(false)} className={`flex-1 py-2.5 sm:py-3.5 text-xs sm:text-sm font-extrabold rounded-xl transition cursor-pointer border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-[#F4F4F4] border-[#03045E]/15 text-[#03045E] hover:bg-white'}`}>Cancel</button>
-                <button type="submit" style={{ color: '#ffffff' }} className={`flex-1 py-2.5 sm:py-3.5 text-xs sm:text-sm font-extrabold rounded-xl shadow-md transition cursor-pointer border-2 ${isDark ? 'bg-[#2C7FFF] border-[#2C7FFF] hover:bg-white hover:!text-[#2C7FFF]' : 'bg-[#03045E] border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}>Confirm Delete</button>
+                <button type="button" onClick={() => setShowDeleteModal(false)} className={`flex-1 py-2.5 sm:py-3.5 text-xs sm:text-sm font-extrabold rounded-lg transition cursor-pointer border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-[#F4F4F4] border-[#03045E]/15 text-[#03045E] hover:bg-white'}`}>Cancel</button>
+                <button type="submit" style={{ color: '#ffffff' }} className={`flex-1 py-2.5 sm:py-3.5 text-xs sm:text-sm font-extrabold rounded-lg shadow-md transition cursor-pointer border-2 ${isDark ? 'bg-[#2C7FFF] border-[#2C7FFF] hover:bg-white hover:!text-[#2C7FFF]' : 'bg-[#03045E] border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}>Confirm Delete</button>
               </div>
             </form>
           </div>
@@ -725,7 +725,7 @@ export default function EmployerAccountSettings({ profile }) {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative w-full max-w-sm rounded-[2rem] shadow-[0_25px_60px_rgba(3,4,94,0.4)] border-2 overflow-hidden animate-in zoom-in-95 duration-300 ${isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#2C7FFF]'}`}>
+          <div className={`relative w-full max-w-sm rounded-xl sm:rounded-2xl shadow-[0_25px_60px_rgba(3,4,94,0.4)] border-2 overflow-hidden animate-in zoom-in-95 duration-300 ${isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#2C7FFF]'}`}>
             <div className={`h-1.5 sm:h-2 w-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
 
             <div className="px-5 sm:px-8 pt-6 sm:pt-10 pb-5 sm:pb-8 flex flex-col items-center text-center">
@@ -756,7 +756,7 @@ export default function EmployerAccountSettings({ profile }) {
 
               <button
                 onClick={() => setShowAlert(false)}
-                className={`w-full py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer border-2 ${isHighContrastOrDarkComfort ? 'bg-[#2C7FFF] !text-white border-[#2C7FFF] hover:bg-white hover:text-[#2C7FFF]' : isDark ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:bg-white hover:text-[#2C7FFF]' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+                className={`w-full py-3 sm:py-3.5 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer border-2 ${isHighContrastOrDarkComfort ? 'bg-[#2C7FFF] !text-white border-[#2C7FFF] hover:bg-white hover:text-[#2C7FFF]' : isDark ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:bg-white hover:text-[#2C7FFF]' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
               >
                 Got it
               </button>
@@ -770,7 +770,7 @@ export default function EmployerAccountSettings({ profile }) {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative w-full max-w-sm rounded-[2rem] shadow-[0_25px_60px_rgba(3,4,94,0.4)] border-2 overflow-hidden animate-in zoom-in-95 duration-300 ${isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#2C7FFF]'}`}>
+          <div className={`relative w-full max-w-sm rounded-xl sm:rounded-2xl shadow-[0_25px_60px_rgba(3,4,94,0.4)] border-2 overflow-hidden animate-in zoom-in-95 duration-300 ${isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#2C7FFF]'}`}>
             <div className={`h-1.5 sm:h-2 w-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
 
             {deactivateStage === 'confirm' && (
@@ -813,7 +813,7 @@ export default function EmployerAccountSettings({ profile }) {
                   </button>
                   <button
                     onClick={confirmToggleDeactivation}
-                    className={`flex-1 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer border-2 ${isHighContrastOrDarkComfort ? 'bg-[#2C7FFF] !text-white border-[#2C7FFF] hover:bg-white hover:text-[#2C7FFF]' : isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+                    className={`flex-1 py-3 sm:py-3.5 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer border-2 ${isHighContrastOrDarkComfort ? 'bg-[#2C7FFF] !text-white border-[#2C7FFF] hover:bg-white hover:text-[#2C7FFF]' : isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
                   >
                     {deactivateTargetState ? 'Reactivate' : 'Deactivate'}
                   </button>
@@ -875,7 +875,7 @@ export default function EmployerAccountSettings({ profile }) {
 
                 <button
                   onClick={() => setShowDeactivateModal(false)}
-                  className={`w-full py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer border-2 ${isHighContrastOrDarkComfort ? 'bg-[#2C7FFF] !text-white border-[#2C7FFF] hover:bg-white hover:text-[#2C7FFF]' : isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+                  className={`w-full py-3 sm:py-3.5 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer border-2 ${isHighContrastOrDarkComfort ? 'bg-[#2C7FFF] !text-white border-[#2C7FFF] hover:bg-white hover:text-[#2C7FFF]' : isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
                 >
                   Got it
                 </button>
@@ -907,7 +907,7 @@ export default function EmployerAccountSettings({ profile }) {
 
                 <button
                   onClick={() => setShowDeactivateModal(false)}
-                  className={`w-full py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer border-2 ${isHighContrastOrDarkComfort ? 'bg-[#2C7FFF] !text-white border-[#2C7FFF] hover:bg-white hover:text-[#2C7FFF]' : isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+                  className={`w-full py-3 sm:py-3.5 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer border-2 ${isHighContrastOrDarkComfort ? 'bg-[#2C7FFF] !text-white border-[#2C7FFF] hover:bg-white hover:text-[#2C7FFF]' : isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
                 >
                   Close
                 </button>

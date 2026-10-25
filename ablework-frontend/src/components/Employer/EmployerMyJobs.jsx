@@ -69,8 +69,8 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
     ? 'px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-bold rounded-lg border-2 bg-black text-white border-white'
     : 'px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-bold rounded-lg border-2 bg-white text-[#03045E] border-gray-200';
   const chipBoxContainer = isDark
-    ? 'flex flex-wrap gap-1.5 sm:gap-2 mt-2 p-2 sm:p-3 rounded-xl border-2 bg-black border-white'
-    : 'flex flex-wrap gap-1.5 sm:gap-2 mt-2 p-2 sm:p-3 rounded-xl border-2 bg-white border-gray-200';
+    ? 'flex flex-wrap gap-1.5 sm:gap-2 mt-2 p-2 sm:p-3 rounded-lg border-2 bg-black border-white'
+    : 'flex flex-wrap gap-1.5 sm:gap-2 mt-2 p-2 sm:p-3 rounded-lg border-2 bg-white border-gray-200';
   const chipPill = isDark
     ? 'inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-full shadow-sm bg-white text-black border-2 border-white'
     : 'inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-full shadow-sm bg-white text-[#03045E] border-2 border-gray-200';
@@ -254,7 +254,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
   return (
     <div className={`animate-fadeIn max-w-9xl mx-auto pb-6 sm:pb-10 relative px-1 sm:px-0 ${pageText}`}>
       
-      <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 backdrop-blur-md p-4 sm:p-6 rounded-2xl sm:rounded-3xl border-2 ${panelBg}`}>
+      <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 backdrop-blur-md p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 ${panelBg}`}>
         <div>
           <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-1.5 flex-wrap">
             <span className={`text-[10px] sm:text-xs font-extrabold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full uppercase tracking-wider border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#2C7FFF] border-gray-200'}`}>Job Management</span>
@@ -265,16 +265,16 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
           <h1 className={`text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight ${pageText}`}>My Job Listings</h1>
           <p className={`text-xs sm:text-sm font-semibold mt-0.5 ${muted}`}>Manage active opportunities and review your archived posting history.</p>
         </div>
-        <div className={`flex gap-1 sm:gap-2 p-1 rounded-xl border-2 w-full md:w-auto ${tabContainerBg}`}>
+        <div className={`flex gap-1 sm:gap-2 p-1 rounded-lg sm:rounded-xl border-2 w-full md:w-auto ${tabContainerBg}`}>
           <button 
             onClick={() => setListTab('active')}
-            className={`flex-1 md:flex-none px-3 sm:px-6 py-1.5 sm:py-2 rounded-lg font-bold text-[10px] sm:text-sm transition cursor-pointer ${listTab === 'active' ? `${tabActive} shadow` : tabInactive}`}
+            className={`flex-1 md:flex-none px-3 sm:px-6 py-1.5 sm:py-2 rounded-md sm:rounded-lg font-bold text-[10px] sm:text-sm transition cursor-pointer ${listTab === 'active' ? `${tabActive} shadow` : tabInactive}`}
           >
             Active Jobs
           </button>
           <button 
             onClick={() => setListTab('archived')}
-            className={`flex-1 md:flex-none px-3 sm:px-6 py-1.5 sm:py-2 rounded-lg font-bold text-[10px] sm:text-sm transition cursor-pointer ${listTab === 'archived' ? `${tabActive} shadow` : tabInactive}`}
+            className={`flex-1 md:flex-none px-3 sm:px-6 py-1.5 sm:py-2 rounded-md sm:rounded-lg font-bold text-[10px] sm:text-sm transition cursor-pointer ${listTab === 'archived' ? `${tabActive} shadow` : tabInactive}`}
           >
             Archived / History
           </button>
@@ -284,7 +284,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
       <div className="flex flex-col gap-3 sm:gap-4">
         {displayedJobs.length > 0 ? (
           displayedJobs.map(job => (
-            <div key={job.id} className={`p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 transition-all ${cardBg}`}>
+            <div key={job.id} className={`p-4 sm:p-6 rounded-lg sm:rounded-xl border-2 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 transition-all ${cardBg}`}>
               <div>
                 <h3 className={`text-base sm:text-xl font-bold ${pageText}`}>{job.job_title}</h3>
                 <p className={`text-[10px] sm:text-sm mt-1 ${subtle}`}>Posted on {new Date(job.created_at).toLocaleDateString()}</p>
@@ -307,26 +307,26 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                         setCurrentAccommodation('');
                         setCurrentBenefit('');
                       }} 
-                      className={`w-full sm:w-auto px-4 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-full border-2 transition cursor-pointer ${isDark ? 'text-white bg-black border-white hover:bg-white hover:text-black' : 'text-[#03045E] bg-white border-gray-200 hover:bg-gray-100'}`}
+                      className={`w-full sm:w-auto px-4 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-md sm:rounded-lg border-2 transition cursor-pointer ${isDark ? 'text-white bg-black border-white hover:bg-white hover:text-black' : 'text-[#03045E] bg-white border-gray-200 hover:bg-gray-100'}`}
                     >
                       Edit
                     </button>
                     
                     <button 
                       onClick={() => handleArchiveJob(job.id)} 
-                      className="w-full sm:w-auto px-4 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-full border-2 cursor-pointer bg-white text-[#ff0000] border-[#ff0000]"
+                      className="w-full sm:w-auto px-4 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-md sm:rounded-lg border-2 cursor-pointer bg-white text-[#ff0000] border-[#ff0000]"
                     >
                       Close & Archive
                     </button>
                   </>
                 ) : (
-                  <span className={`px-4 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-full border-2 text-center ${closedBadge}`}>Closed</span>
+                  <span className={`px-4 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-md sm:rounded-lg border-2 text-center ${closedBadge}`}>Closed</span>
                 )}
               </div>
             </div>
           ))
         ) : (
-          <div className={`p-8 sm:p-10 text-center font-bold border-2 border-dashed rounded-xl sm:rounded-2xl text-sm sm:text-base ${emptyState}`}>
+          <div className={`p-8 sm:p-10 text-center font-bold border-2 border-dashed rounded-lg sm:rounded-xl text-sm sm:text-base ${emptyState}`}>
             No {listTab} job postings found.
           </div>
         )}
@@ -337,19 +337,19 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`p-5 sm:p-8 rounded-2xl sm:rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] border-2 ${modalBg}`}>
+          <div className={`p-5 sm:p-8 rounded-xl sm:rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] border-2 ${modalBg}`}>
             <h2 className={`text-xl sm:text-2xl font-extrabold mb-4 sm:mb-6 ${pageText}`}>Edit Job Posting</h2>
             
             <form onSubmit={handleEditJob} className="flex flex-col gap-4 sm:gap-5">
               
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs sm:text-sm font-bold text-[#03045E]">Job Title</label>
-                <input type="text" value={editingJob.job_title} onChange={e => setEditingJob({...editingJob, job_title: e.target.value})} required className={`p-2.5 sm:p-3 border-2 rounded-xl outline-none font-semibold transition-all text-sm sm:text-base ${inputBg}`} />
+                <input type="text" value={editingJob.job_title} onChange={e => setEditingJob({...editingJob, job_title: e.target.value})} required className={`p-2.5 sm:p-3 border-2 rounded-lg sm:rounded-xl outline-none font-semibold transition-all text-sm sm:text-base ${inputBg}`} />
               </div>
               
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs sm:text-sm font-bold text-[#03045E]">Description</label>
-                <textarea rows="4" value={editingJob.job_description} onChange={e => setEditingJob({...editingJob, job_description: e.target.value})} required className={`p-2.5 sm:p-3 border-2 rounded-xl resize-none outline-none font-semibold transition-all text-sm sm:text-base ${inputBg}`}></textarea>
+                <textarea rows="4" value={editingJob.job_description} onChange={e => setEditingJob({...editingJob, job_description: e.target.value})} required className={`p-2.5 sm:p-3 border-2 rounded-lg sm:rounded-xl resize-none outline-none font-semibold transition-all text-sm sm:text-base ${inputBg}`}></textarea>
               </div>
               
               <hr className={`my-1 border-t-2 ${divider}`} />
@@ -362,7 +362,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                   onChange={e => setCurrentSkill(e.target.value)} 
                   onKeyDown={e => handleAddChip(e, 'parsedSkills', currentSkill, setCurrentSkill)} 
                   placeholder="e.g. Python, Communication..."
-                  className={`p-2.5 sm:p-3 border-2 rounded-xl outline-none font-semibold transition-all text-sm sm:text-base ${inputBg}`} 
+                  className={`p-2.5 sm:p-3 border-2 rounded-lg sm:rounded-xl outline-none font-semibold transition-all text-sm sm:text-base ${inputBg}`} 
                 />
                 
                 {filteredSkills.length > 0 && (
@@ -394,7 +394,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                   onChange={e => setCurrentAccommodation(e.target.value)} 
                   onKeyDown={e => handleAddChip(e, 'parsedAccoms', currentAccommodation, setCurrentAccommodation)} 
                   placeholder="e.g. Wheelchair Access..."
-                  className={`p-2.5 sm:p-3 border-2 rounded-xl outline-none font-semibold transition-all text-sm sm:text-base ${inputBg}`} 
+                  className={`p-2.5 sm:p-3 border-2 rounded-lg sm:rounded-xl outline-none font-semibold transition-all text-sm sm:text-base ${inputBg}`} 
                 />
                 
                 {filteredAccommodations.length > 0 && (
@@ -418,7 +418,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                 )}
               </div>
 
-              <div className={`flex flex-col gap-2 p-3 sm:p-5 rounded-xl sm:rounded-2xl border-2 ${disabBoxBg}`}>
+              <div className={`flex flex-col gap-2 p-3 sm:p-5 rounded-lg sm:rounded-xl border-2 ${disabBoxBg}`}>
                 <div>
                   <label className="text-xs sm:text-sm font-extrabold flex items-center gap-1.5 sm:gap-2 uppercase tracking-wider text-[#03045E]">
                     Accepted Disabilities <span style={{ color: 'var(--color-primary, #2C7FFF)' }}>*</span>
@@ -432,7 +432,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                         type="button"
                         key={disability}
                         onClick={() => toggleDisability(disability)}
-                        className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold border-2 transition-colors cursor-pointer shadow-sm`}
+                        className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold border-2 transition-colors cursor-pointer shadow-sm`}
                         style={isDark ? {
                           color: isSelected ? '#000000' : '#ffffff',
                           backgroundColor: isSelected ? '#ffffff' : '#000000',
@@ -458,7 +458,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs sm:text-sm font-bold text-[#03045E]">Salary Range</label>
-                <input type="text" value={editingJob.salary_range} onChange={e => setEditingJob({...editingJob, salary_range: e.target.value})} className={`p-2.5 sm:p-3 border-2 rounded-xl outline-none font-semibold transition-all text-sm sm:text-base ${inputBg}`} placeholder="e.g. ₱20,000 - ₱30,000 / month" />
+                <input type="text" value={editingJob.salary_range} onChange={e => setEditingJob({...editingJob, salary_range: e.target.value})} className={`p-2.5 sm:p-3 border-2 rounded-lg sm:rounded-xl outline-none font-semibold transition-all text-sm sm:text-base ${inputBg}`} placeholder="e.g. ₱20,000 - ₱30,000 / month" />
               </div>
               
               <div className="flex flex-col gap-1.5">
@@ -468,7 +468,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                   type="text" value={currentBenefit} 
                   onChange={e => setCurrentBenefit(e.target.value)} 
                   onKeyDown={e => handleAddChip(e, 'parsedBenefits', currentBenefit, setCurrentBenefit)} 
-                  className={`p-2.5 sm:p-3 border-2 rounded-xl outline-none font-semibold transition-all text-sm sm:text-base ${inputBg}`} 
+                  className={`p-2.5 sm:p-3 border-2 rounded-lg sm:rounded-xl outline-none font-semibold transition-all text-sm sm:text-base ${inputBg}`} 
                   placeholder="e.g. HMO, 13th Month Pay..." 
                 />
 
@@ -497,7 +497,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`flex-1 py-3 sm:py-3.5 text-sm sm:text-base font-extrabold rounded-xl transition cursor-pointer border-2 ${
+                  className={`flex-1 py-3 sm:py-3.5 text-sm sm:text-base font-extrabold rounded-lg sm:rounded-xl transition cursor-pointer border-2 ${
                     isHighContrastOrDarkComfort
                       ? 'bg-[#2C7FFF] !text-white border-[#2C7FFF] hover:bg-white hover:text-[#2C7FFF]'
                       : (isDark
@@ -507,7 +507,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                 >
                   Save Changes
                 </button>
-                <button type="button" onClick={() => setEditingJob(null)} className={`flex-1 py-3 sm:py-3.5 text-sm sm:text-base font-extrabold rounded-xl border-2 transition cursor-pointer ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-white text-[#03045E] border-gray-200 hover:bg-gray-100'}`}>Cancel</button>
+                <button type="button" onClick={() => setEditingJob(null)} className={`flex-1 py-3 sm:py-3.5 text-sm sm:text-base font-extrabold rounded-lg sm:rounded-xl border-2 transition cursor-pointer ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-white text-[#03045E] border-gray-200 hover:bg-gray-100'}`}>Cancel</button>
               </div>
             </form>
           </div>
@@ -519,7 +519,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative w-full max-w-sm rounded-[2rem] border-2 overflow-hidden ${modalBg}`}>
+          <div className={`relative w-full max-w-sm rounded-xl sm:rounded-2xl border-2 overflow-hidden ${modalBg}`}>
             <div className={`h-2 w-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
 
             {archiveStage === 'confirm' && (
@@ -548,13 +548,13 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
                   <button
                     onClick={closeArchiveModal}
-                    className={`flex-1 py-3 sm:py-3.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider border-2 transition cursor-pointer ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-white text-[#03045E] border-gray-200 hover:bg-gray-100'}`}
+                    className={`flex-1 py-3 sm:py-3.5 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider border-2 transition cursor-pointer ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-white text-[#03045E] border-gray-200 hover:bg-gray-100'}`}
                   >
                     Cancel
                   </button>
                   <button
                     onClick={confirmArchiveJob}
-                    className={`flex-1 py-3 sm:py-3.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer border-2 ${
+                    className={`flex-1 py-3 sm:py-3.5 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer border-2 ${
                       isHighContrastOrDarkComfort
                         ? 'bg-[#2C7FFF] !text-white border-[#2C7FFF] hover:bg-white hover:text-[#2C7FFF]'
                         : (isDark
@@ -620,7 +620,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
 
                 <button
                   onClick={closeArchiveModal}
-                  className={`w-full py-3 sm:py-3.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+                  className={`w-full py-3 sm:py-3.5 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
                 >
                   Got it
                 </button>
@@ -652,7 +652,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
 
                 <button
                   onClick={closeArchiveModal}
-                  className={`w-full py-3 sm:py-3.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+                  className={`w-full py-3 sm:py-3.5 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDark ? 'bg-white text-black border-white hover:bg-black hover:text-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
                 >
                   Close
                 </button>
@@ -667,7 +667,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative w-full max-w-sm rounded-[2rem] border-2 overflow-hidden ${modalBg}`}>
+          <div className={`relative w-full max-w-sm rounded-xl sm:rounded-2xl border-2 overflow-hidden ${modalBg}`}>
             <div className={`h-2 w-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
 
             <div className="px-6 sm:px-8 pt-8 sm:pt-10 pb-6 sm:pb-8 flex flex-col items-center text-center">
@@ -698,7 +698,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
 
               <button
                 onClick={() => setShowAlert(false)}
-                className={`w-full py-3 sm:py-3.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDark ? 'bg-white border-white hover:bg-black' : 'bg-[#03045E] border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+                className={`w-full py-3 sm:py-3.5 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDark ? 'bg-white border-white hover:bg-black' : 'bg-[#03045E] border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
               >
                 <span style={{ color: '#ffffff' }}>Got it</span>
               </button>

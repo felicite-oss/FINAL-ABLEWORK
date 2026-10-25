@@ -38,7 +38,11 @@ export default function EmployerDashboard() {
   const notifPanelRef = useRef(null);
   const profilePanelRef = useRef(null);
 
- 
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -178,7 +182,7 @@ export default function EmployerDashboard() {
           aria-describedby="logging-desc"
           tabIndex="-1"
         >
-          <div className={`relative w-full max-w-md rounded-2xl sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${(isContrast || isDarkMode) ? 'bg-black border-2 border-white' : 'bg-white border-2 border-[#2C7FFF]'}`}>
+          <div className={`relative w-full max-w-md rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${(isContrast || isDarkMode) ? 'bg-black border-2 border-white' : 'bg-white border-2 border-[#2C7FFF]'}`}>
             <div className="h-1.5 sm:h-2 w-full bg-[#2C7FFF]" />
 
             <div className="relative px-4 pt-6 pb-5 sm:px-8 sm:pt-10 sm:pb-8 flex flex-col items-center text-center">
@@ -223,7 +227,7 @@ export default function EmployerDashboard() {
           aria-describedby="logout-desc"
           tabIndex="-1"
         >
-          <div className={`relative w-full max-w-md rounded-2xl sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${(isContrast || isDarkMode) ? 'bg-black border-2 border-white' : 'bg-white border-2 border-[#2C7FFF]'}`}>
+          <div className={`relative w-full max-w-md rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${(isContrast || isDarkMode) ? 'bg-black border-2 border-white' : 'bg-white border-2 border-[#2C7FFF]'}`}>
             <div className="h-1.5 sm:h-2 w-full bg-[#2C7FFF]" />
 
             <div className="relative px-4 pt-6 pb-5 sm:px-8 sm:pt-10 sm:pb-8 flex flex-col items-center text-center">
@@ -323,8 +327,8 @@ export default function EmployerDashboard() {
                 tabIndex={-1}
                 role="region" 
                 aria-label={`Notifications panel. ${unreadCount} unread notifications.`} 
-                className={`fixed left-1/2 -translate-x-1/2 top-16 sm:top-20 w-[calc(100vw-2rem)] max-w-sm sm:absolute sm:left-auto sm:translate-x-0 sm:top-auto sm:right-0 sm:mt-3 sm:w-96 sm:max-w-none rounded-2xl shadow-[0_15px_40px_rgba(3,4,94,0.2)] border-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden focus:outline-none ${dark ? 'bg-black border-[#2C7FFF]/50' : 'bg-white border-[#03045E]/20'}`}>
-                <div className={`px-5 py-3.5 border-b-2 flex justify-between items-center rounded-t-2xl relative z-20 ${dark ? 'bg-black border-[#2C7FFF]/40' : 'bg-[#f4f4f4] border-[#03045E]/15'}`}>
+                className={`fixed left-1/2 -translate-x-1/2 top-16 sm:top-20 w-[calc(100vw-2rem)] max-w-sm sm:absolute sm:left-auto sm:translate-x-0 sm:top-auto sm:right-0 sm:mt-3 sm:w-96 sm:max-w-none rounded-lg sm:rounded-xl shadow-[0_15px_40px_rgba(3,4,94,0.2)] border-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden focus:outline-none ${dark ? 'bg-black border-[#2C7FFF]/50' : 'bg-white border-[#03045E]/20'}`}>
+                <div className={`px-5 py-3.5 border-b-2 flex justify-between items-center rounded-t-lg sm:rounded-t-xl relative z-20 ${dark ? 'bg-black border-[#2C7FFF]/40' : 'bg-[#f4f4f4] border-[#03045E]/15'}`}>
                   <div className="flex items-center gap-2">
                     <div aria-hidden="true" className="w-2.5 h-2.5 rounded-full bg-[#2C7FFF]"></div>
                     <h3 className={`font-black text-base tracking-tight ${dark ? 'text-white' : 'text-[#03045E]'}`}>Notifications</h3>
@@ -348,9 +352,9 @@ export default function EmployerDashboard() {
                       onClick={() => {
                         if (!notif.is_read) handleMarkAsRead(notif.id);
                         if (notif.type === 'application') {
-                          setActiveTab('applications');
+                          handleTabChange('applications');
                         } else {
-                          setActiveTab('overview');
+                          handleTabChange('overview');
                         }
                         setNotificationDropdownOpen(false);
                       }} 
@@ -359,9 +363,9 @@ export default function EmployerDashboard() {
                           e.preventDefault();
                           if (!notif.is_read) handleMarkAsRead(notif.id);
                           if (notif.type === 'application') {
-                            setActiveTab('applications');
+                            handleTabChange('applications');
                           } else {
-                            setActiveTab('overview');
+                            handleTabChange('overview');
                           }
                           setNotificationDropdownOpen(false);
                         }
@@ -392,7 +396,7 @@ export default function EmployerDashboard() {
                     </div>
                   )) : (
                     <div className={`p-10 text-center flex flex-col items-center justify-center ${dark ? 'bg-black' : 'bg-white'}`}>
-                      <div aria-hidden="true" className="w-12 h-12 bg-[#2C7FFF]/15 text-[#2C7FFF] rounded-2xl flex items-center justify-center mb-3">
+                      <div aria-hidden="true" className="w-12 h-12 bg-[#2C7FFF]/15 text-[#2C7FFF] rounded-lg sm:rounded-xl flex items-center justify-center mb-3">
                         <svg aria-hidden="true" className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                       </div>
                       <span className={`text-sm font-black ${dark ? 'text-white' : 'text-[#03045E]'}`}>You're all caught up!</span>
@@ -430,11 +434,11 @@ export default function EmployerDashboard() {
                 tabIndex={-1}
                 role="region" 
                 aria-label={`Profile menu panel. Logged in as ${profile?.company_name || 'Employer'}.`} 
-                className={`absolute right-0 mt-3 w-72 rounded-3xl shadow-[0_20px_50px_rgba(3,4,94,0.25)] border-2 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 focus:outline-none ${isContrast ? 'bg-black border-[#2C7FFF]/60' : 'bg-white border-[#03045E]/20'}`}>
+                className={`absolute right-0 mt-3 w-72 rounded-lg sm:rounded-xl shadow-[0_20px_50px_rgba(3,4,94,0.25)] border-2 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 focus:outline-none ${isContrast ? 'bg-black border-[#2C7FFF]/60' : 'bg-white border-[#03045E]/20'}`}>
                 <div className={`relative p-4 pb-5 ${isContrast ? 'bg-black border-b border-[#2C7FFF]/30' : 'bg-[#f4f4f4] border-b border-[#03045E]/10'}`}>
                   <div className="flex items-center gap-3.5">
                     <div className="relative shrink-0">
-                      <div className={`w-14 h-14 rounded-2xl overflow-hidden border-2 border-[#2C7FFF] shadow-md`}>
+                      <div className={`w-14 h-14 rounded-lg sm:rounded-xl overflow-hidden border-2 border-[#2C7FFF] shadow-md`}>
                         {profile?.company_logo ? (
                           <img src={`http://localhost:5001${profile.company_logo}`} alt={`Company Logo of ${profile?.company_name || 'Employer'}`} className="w-full h-full object-cover" />
                         ) : (
@@ -461,16 +465,16 @@ export default function EmployerDashboard() {
                   <p aria-hidden="true" className={`px-3 pt-1.5 pb-2 text-[10px] font-black uppercase tracking-[0.15em] ${isContrast ? 'text-white/50' : 'text-[#03045E]/50'}`}>Account</p>
                   <button
                     role="menuitem"
-                    onClick={() => { setActiveTab('profile'); setShowProfileDropdown(false); }}
+                    onClick={() => { handleTabChange('profile'); setShowProfileDropdown(false); }}
                     aria-label="Edit Profile"
                     aria-current={activeTab === 'profile' ? 'page' : undefined}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-black transition-colors text-left cursor-pointer focus:outline-none ${
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg sm:rounded-xl text-sm font-black transition-colors text-left cursor-pointer focus:outline-none ${
                       activeTab === 'profile'
                         ? (isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white')
                         : (isContrast ? 'text-white' : 'text-[#03045E]')
                     }`}
                   >
-                    <div aria-hidden="true" className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                    <div aria-hidden="true" className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                       activeTab === 'profile'
                         ? (isContrast ? 'bg-white text-[#2C7FFF]' : 'bg-white text-[#03045E]')
                         : (isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white')
@@ -485,16 +489,16 @@ export default function EmployerDashboard() {
 
                   <button
                     role="menuitem"
-                    onClick={() => { setActiveTab('settings'); setShowProfileDropdown(false); }}
+                    onClick={() => { handleTabChange('settings'); setShowProfileDropdown(false); }}
                     aria-label="Settings"
                     aria-current={activeTab === 'settings' ? 'page' : undefined}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-black transition-colors text-left cursor-pointer focus:outline-none ${
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg sm:rounded-xl text-sm font-black transition-colors text-left cursor-pointer focus:outline-none ${
                       activeTab === 'settings'
                         ? (isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white')
                         : (isContrast ? 'text-white' : 'text-[#03045E]')
                     }`}
                   >
-                    <div aria-hidden="true" className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                    <div aria-hidden="true" className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                       activeTab === 'settings'
                         ? (isContrast ? 'bg-white text-[#2C7FFF]' : 'bg-white text-[#03045E]')
                         : (isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white')
@@ -516,9 +520,9 @@ export default function EmployerDashboard() {
                     onClick={() => { setShowProfileDropdown(false); setShowLogoutConfirm(true); }}
                     style={{ color: '#DC2626' }}
                     aria-label={isLoggingOut ? 'Logging out' : 'Log Out'}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-black transition-colors text-left cursor-pointer disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#DC2626] focus:ring-inset`}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg sm:rounded-xl text-sm font-black transition-colors text-left cursor-pointer disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#DC2626] focus:ring-inset`}
                   >
-                    <div aria-hidden="true" style={{ backgroundColor: '#FEE2E2', color: '#DC2626' }} className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0`}>
+                    <div aria-hidden="true" style={{ backgroundColor: '#FEE2E2', color: '#DC2626' }} className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0`}>
                       {isLoggingOut ? (
                         <svg aria-hidden="true" className="w-4 h-4 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -543,7 +547,7 @@ export default function EmployerDashboard() {
               aria-label={showMobileMenu ? "Close menu" : "Open menu"}
               aria-expanded={showMobileMenu}
               aria-controls="mobile-menu"
-              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl border-2 shadow-sm transition-all flex items-center justify-center cursor-pointer shrink-0 ${dark ? 'bg-zinc-900 text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/20'}`}
+              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg border-2 shadow-sm transition-all flex items-center justify-center cursor-pointer shrink-0 ${dark ? 'bg-zinc-900 text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/20'}`}
             >
               <svg aria-hidden="true" className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 {showMobileMenu ? (
@@ -558,7 +562,7 @@ export default function EmployerDashboard() {
             <div
               id="mobile-menu"
               aria-hidden={!showMobileMenu}
-              className={`fixed left-2 right-2 top-16 sm:absolute sm:right-0 sm:left-auto sm:top-auto sm:mt-3 sm:w-[22rem] max-w-[calc(100vw-1rem)] rounded-2xl sm:rounded-3xl shadow-2xl border-2 p-3 sm:p-4 z-50 flex flex-col gap-2.5 sm:gap-3 overflow-hidden transition-all duration-300 ease-in-out ${dark ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/20'} ${showMobileMenu ? 'max-h-[calc(100vh-5rem)] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0 pointer-events-none'}`}
+              className={`fixed left-2 right-2 top-16 sm:absolute sm:right-0 sm:left-auto sm:top-auto sm:mt-3 sm:w-[22rem] max-w-[calc(100vw-1rem)] rounded-lg sm:rounded-xl shadow-2xl border-2 p-3 sm:p-4 z-50 flex flex-col gap-2.5 sm:gap-3 overflow-hidden transition-all duration-300 ease-in-out ${dark ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/20'} ${showMobileMenu ? 'max-h-[calc(100vh-5rem)] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0 pointer-events-none'}`}
             >
                 
   
@@ -566,14 +570,14 @@ export default function EmployerDashboard() {
                   role="button"
                   tabIndex={0}
                   onClick={() => {
-                    setActiveTab('profile');
+                    handleTabChange('profile');
                     setShowMobileMenu(false);
                   }}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveTab('profile'); setShowMobileMenu(false); } }}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleTabChange('profile'); setShowMobileMenu(false); } }}
                   aria-label="View and Edit Profile"
-                  className={`flex items-center gap-2 sm:gap-2.5 p-2 sm:p-2.5 rounded-xl sm:rounded-2xl cursor-pointer transition-all border-2 shrink-0 ${dark ? 'bg-zinc-900 border-white/30' : 'bg-[#f4f4f4] border-[#03045E]/10'}`}
+                  className={`flex items-center gap-2 sm:gap-2.5 p-2 sm:p-2.5 rounded-md sm:rounded-lg cursor-pointer transition-all border-2 shrink-0 ${dark ? 'bg-zinc-900 border-white/30' : 'bg-[#f4f4f4] border-[#03045E]/10'}`}
                 >
-                  <div aria-hidden="true" className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-bold overflow-hidden shadow-md flex-shrink-0 border-2 ${dark ? 'bg-[#2C7FFF] text-white border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}>
+                  <div aria-hidden="true" className={`w-9 h-9 sm:w-10 sm:h-10 rounded-md sm:rounded-lg flex items-center justify-center font-bold overflow-hidden shadow-md flex-shrink-0 border-2 ${dark ? 'bg-[#2C7FFF] text-white border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}>
                     {profile?.company_logo ? (
                       <img src={`http://localhost:5001${profile.company_logo}`} alt="" className="w-full h-full object-cover" />
                     ) : (
@@ -591,12 +595,12 @@ export default function EmployerDashboard() {
             
                 <button
                   onClick={() => {
-                    setActiveTab('settings');
+                    handleTabChange('settings');
                     setShowMobileMenu(false);
                   }}
                   aria-label="Account Settings"
                   aria-current={activeTab === 'settings' ? 'page' : undefined}
-                  className={`flex items-center gap-2 sm:gap-2.5 px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl font-bold transition-all text-[11px] sm:text-xs w-full border-2 shadow-sm cursor-pointer shrink-0 ${
+                  className={`flex items-center gap-2 sm:gap-2.5 px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-md sm:rounded-lg font-bold transition-all text-[11px] sm:text-xs w-full border-2 shadow-sm cursor-pointer shrink-0 ${
                     activeTab === 'settings' 
                       ? 'bg-[#2C7FFF] text-white border-[#2C7FFF]' 
                       : (dark ? 'bg-zinc-900 text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/20')
@@ -638,12 +642,12 @@ export default function EmployerDashboard() {
                       <button 
                         key={tabItem.id} 
                         onClick={() => {
-                            setActiveTab(tabItem.id);
+                            handleTabChange(tabItem.id);
                             setShowMobileMenu(false);
                         }} 
                         aria-label={tabItem.label}
                         aria-current={isActive ? 'page' : undefined}
-                        className={`flex items-center gap-2 sm:gap-2.5 px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-bold transition-all text-[11px] sm:text-xs w-full relative group border-2 cursor-pointer text-left shrink-0 ${
+                        className={`flex items-center gap-2 sm:gap-2.5 px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-md sm:rounded-lg font-bold transition-all text-[11px] sm:text-xs w-full relative group border-2 cursor-pointer text-left shrink-0 ${
                             isActive 
                               ? (isContrast ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] shadow-md' : isDarkMode ? 'bg-[#03045E] text-white border-[#03045E] shadow-md' : 'bg-[#03045E] text-white border-[#03045E] shadow-md') 
                               : (dark ? 'bg-zinc-900 text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/20')
@@ -671,7 +675,7 @@ export default function EmployerDashboard() {
                   }}
                   aria-label={isLoggingOut ? "Logging out" : "Logout Account"}
                   style={{ backgroundColor: '#FEE2E2', color: '#DC2626', borderColor: '#FCA5A5' }}
-                  className="w-full flex items-center justify-center gap-2 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl font-extrabold text-[11px] sm:text-xs transition-colors border-2 shadow-sm cursor-pointer disabled:opacity-50 shrink-0"
+                  className="w-full flex items-center justify-center gap-2 p-2.5 sm:p-3 rounded-md sm:rounded-lg font-extrabold text-[11px] sm:text-xs transition-colors border-2 shadow-sm cursor-pointer disabled:opacity-50 shrink-0"
                 >
                     {isLoggingOut ? (
                       <svg aria-hidden="true" className="w-4 h-4 flex-shrink-0 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -698,7 +702,7 @@ export default function EmployerDashboard() {
         aria-expanded={showDesktopSidebar}
         aria-controls="sidebar-navigation"
         title={showDesktopSidebar ? 'Hide navigation' : 'Show navigation'}
-        className={`hidden md:flex fixed top-[4.5rem] left-4 z-40 w-11 h-11 items-center justify-center rounded-2xl border-2 shadow-md transition-all duration-200 cursor-pointer ${
+        className={`hidden md:flex fixed top-[4.5rem] left-4 z-40 w-11 h-11 items-center justify-center rounded-lg border-2 shadow-md transition-all duration-200 cursor-pointer ${
           dark
             ? 'bg-black text-white border-white'
             : 'bg-white text-[#03045E] border-[#03045E]/15'
@@ -746,10 +750,10 @@ export default function EmployerDashboard() {
               return (
                 <button 
                   key={tabItem.id} 
-                  onClick={() => setActiveTab(tabItem.id)} 
+                  onClick={() => handleTabChange(tabItem.id)} 
                   aria-label={tabItem.label}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`relative flex items-center gap-3.5 text-left pl-4 pr-3.5 py-3.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${
+                  className={`relative flex items-center gap-3.5 text-left pl-4 pr-3.5 py-3.5 rounded-lg font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${
                     isActive
                       ? 'bg-white text-[#03045E] border-[#03045E] shadow-md'
                       : 'bg-white text-[#03045E] border-[#03045E]/25'
@@ -760,7 +764,7 @@ export default function EmployerDashboard() {
                   )}
                   <div 
                     aria-hidden="true"
-                    className={`p-2.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 ${
+                    className={`p-2.5 rounded-lg transition-all duration-300 shrink-0 flex items-center justify-center border-2 ${
                       isActive
                         ? 'bg-[#03045E] text-white border-[#03045E]'
                         : 'bg-[#03045E] text-white border-[#03045E]'
@@ -797,7 +801,7 @@ export default function EmployerDashboard() {
                   role="alert"
                   aria-live="assertive"
                   aria-label={`Account Verification Failed. ${profile.rejection_reason || "Your verification document did not meet platform standards."}`}
-                  className={`mb-8 p-6 sm:p-8 border-2 rounded-[2rem] shadow-sm flex flex-col gap-5 animate-fadeIn transition-all`}
+                  className={`mb-8 p-6 sm:p-8 border-2 rounded-lg sm:rounded-xl shadow-sm flex flex-col gap-5 animate-fadeIn transition-all`}
                   style={{
                     backgroundColor: dark ? '#1a0505' : 'rgba(239, 68, 68, 0.08)',
                     borderColor: dark ? '#ef4444' : '#fca5a5'
@@ -821,7 +825,7 @@ export default function EmployerDashboard() {
                   </div>
                   
                   <div 
-                    className="p-5 rounded-2xl border-2 shadow-inner backdrop-blur-md transition-all"
+                    className="p-5 rounded-md sm:rounded-lg border-2 shadow-inner backdrop-blur-md transition-all"
                     style={{
                       backgroundColor: (dark || isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.25)' : 'rgba(255, 255, 255, 0.26)',
                       borderColor: (dark || isContrast || isDarkMode) ? 'rgba(239, 68, 68, 0.4)' : 'rgba(254, 202, 202, 0.99)'
@@ -848,9 +852,9 @@ export default function EmployerDashboard() {
                     </div>
                     <button 
                       disabled={!canResubmit}
-                      onClick={() => setActiveTab('settings')}
+                      onClick={() => handleTabChange('settings')}
                       aria-label={canResubmit ? 'Go to Settings to Resubmit' : `Locked for ${daysLeft} Days`}
-                      className="px-6 py-3 rounded-xl font-black text-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+                      className="px-6 py-3 rounded-md sm:rounded-lg font-black text-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer"
                       style={{
                         backgroundColor: canResubmit ? '#ef4444' : (dark ? '#18181b' : '#f64c4c5c'),
                         color: canResubmit ? '#ffffff' : (dark ? 'rgba(255, 255, 255, 0.72)' : '#f30606ff'),
@@ -865,15 +869,15 @@ export default function EmployerDashboard() {
                 </div>
               )}
               
-              {activeTab === 'overview' && profile && <EmployerOverview profile={profile} stats={stats} setActiveTab={setActiveTab} />}
-              {activeTab === 'post-job' && <EmployerPostJob profile={profile} refreshData={refreshJobsAndStats} setActiveTab={setActiveTab} />}
+              {activeTab === 'overview' && profile && <EmployerOverview profile={profile} stats={stats} setActiveTab={handleTabChange} />}
+              {activeTab === 'post-job' && <EmployerPostJob profile={profile} refreshData={refreshJobsAndStats} setActiveTab={handleTabChange} />}
               {activeTab === 'jobs' && <EmployerMyJobs jobs={jobs} refreshData={refreshJobsAndStats} />}
               {activeTab === 'applications' && profile && <EmployerApplications profile={profile} refreshStats={refreshJobsAndStats} />}
               {activeTab === 'profile' && profile && <EmployerProfile profile={profile} refreshData={refreshJobsAndStats} />}
               {activeTab === 'settings' && profile && <EmployerAccountSettings profile={profile} />}
-              {activeTab === 'employer-policy' && <EmployerPolicy onBack={() => setActiveTab('overview')} />}
-              {activeTab === 'employer-terms' && <EmployerTerms onBack={() => setActiveTab('overview')} />}
-              {activeTab === 'employer-contact' && <EmployerContact onBack={() => setActiveTab('overview')} />}
+              {activeTab === 'employer-policy' && <EmployerPolicy onBack={() => handleTabChange('overview')} />}
+              {activeTab === 'employer-terms' && <EmployerTerms onBack={() => handleTabChange('overview')} />}
+              {activeTab === 'employer-contact' && <EmployerContact onBack={() => handleTabChange('overview')} />}
             </div>
           </div>
         </main>
@@ -881,7 +885,7 @@ export default function EmployerDashboard() {
 
 
       <div className={`transition-all duration-300 ease-in-out ${showDesktopSidebar ? 'md:ml-72' : 'md:ml-0'}`}>
-        <EmployerFooter activeTab={activeTab} setActiveTab={setActiveTab} />
+        <EmployerFooter activeTab={activeTab} setActiveTab={handleTabChange} />
       </div>
       
     </div>

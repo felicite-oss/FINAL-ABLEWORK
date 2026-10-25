@@ -145,15 +145,15 @@ export default function Login() {
                 <div className={`absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold ${(isContrast || isDarkMode || isAccessibilityMode) ? 'bg-white text-black' : 'bg-[#03045E] text-white'}`}>✓</div>
               </div>
 
-              <span aria-hidden="true" className={`inline-flex items-center gap-1 sm:gap-1.5 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-3 sm:mb-4 border-2 ${(isContrast || isDarkMode || isAccessibilityMode) ? 'text-white bg-transparent border-white' : 'text-[#2C7FFF] bg-transparent border-[#2C7FFF]'}`}>
+              <span aria-hidden="true" title="Notice" className={`inline-flex items-center gap-1 sm:gap-1.5 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-3 sm:mb-4 border-2 ${(isContrast || isDarkMode || isAccessibilityMode) ? 'text-white bg-transparent border-white' : 'text-[#2C7FFF] bg-transparent border-[#2C7FFF]'}`}>
                 <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-[#10B981]"></span>
                 Notice
               </span>
 
-              <h2 id="logging-title" className={`text-xl sm:text-3xl font-black tracking-tight mb-1.5 sm:mb-2 ${(isContrast || isDarkMode || isAccessibilityMode) ? 'text-white' : 'text-[#03045E]'}`}>
+              <h2 id="logging-title" title="Logging In..." className={`text-xl sm:text-3xl font-black tracking-tight mb-1.5 sm:mb-2 ${(isContrast || isDarkMode || isAccessibilityMode) ? 'text-white' : 'text-[#03045E]'}`}>
                 Logging In...
               </h2>
-              <p id="logging-desc" className={`text-xs sm:text-sm font-bold leading-relaxed mb-6 sm:mb-8 max-w-xs ${(isContrast || isDarkMode || isAccessibilityMode) ? 'text-white/80' : 'text-[#03045E]/80'}`}>
+              <p id="logging-desc" title="Please wait while we set up your session and redirect you." className={`text-xs sm:text-sm font-bold leading-relaxed mb-6 sm:mb-8 max-w-xs ${(isContrast || isDarkMode || isAccessibilityMode) ? 'text-white/80' : 'text-[#03045E]/80'}`}>
                 Please wait while we set up your session and redirect you.
               </p>
 
@@ -179,20 +179,22 @@ export default function Login() {
                 role="img"
                 aria-label="AbleWork logo"
                 tabIndex="0"
+                title="AbleWork Logo"
                 className="h-9 sm:h-12 md:h-14 w-auto object-contain max-h-full"
               />
             </div>
             <nav className="hidden md:flex items-center gap-6 text-[15px] font-medium text-[#03045E]">
-              <Link to="/" aria-label="Home" className="text-[#03045E] hover:text-[#03045E] transition pb-0.5">Home</Link>
-              <Link to="/about" aria-label="About Us" className="text-[#03045E] hover:text-[#03045E] transition">About Us</Link>
-              <Link to="/policy" aria-label="Policy" className="text-[#03045E] hover:text-[#03045E] transition">Policy</Link>
+              <Link to="/" aria-label="Home" title="Home" className="text-[#03045E] hover:text-[#03045E] transition pb-0.5">Home</Link>
+              <Link to="/about" aria-label="About Us" title="About Us" className="text-[#03045E] hover:text-[#03045E] transition">About Us</Link>
+              <Link to="/policy" aria-label="Policy" title="Policy" className="text-[#03045E] hover:text-[#03045E] transition">Policy</Link>
             </nav>
           </div>
 
           <div className="hidden md:flex items-center">
             <span
               aria-label="Log In"
-              className={`px-5 py-2 rounded-full ${isAccessibilityMode ? 'bg-white text-black border border-white' : (isContrast || isDarkMode) ? 'bg-blue-400 text-black border border-blue-400' : 'bg-[#2C7FFF] text-white border border-[#2C7FFF]'} text-sm font-medium cursor-default`}
+              title="Log In"
+              className={`px-5 py-2 rounded-full ${isAccessibilityMode ? 'bg-white text-black border border-white' : (isContrast || isDarkMode) ? 'bg-blue-400 text-black border border-blue-400' : 'bg-transparent text-[#03045E] border border-[#03045E]'} text-sm font-medium cursor-default`}
             >
               Log In
             </span>
@@ -200,8 +202,9 @@ export default function Login() {
 
           <button
             aria-label="Menu"
+            title="Menu"
             aria-expanded={isOpen}
-            className={`md:hidden flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl border-2 shadow-sm cursor-pointer transition-all duration-200 shrink-0 ${isContrast ? 'bg-zinc-900 text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/20'}`}
+            className={`md:hidden flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg border-2 shadow-sm cursor-pointer transition-all duration-200 shrink-0 ${isContrast ? 'bg-zinc-900 text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/20'}`}
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? (
@@ -228,14 +231,15 @@ export default function Login() {
               <Link
                 to="/"
                 aria-label="Home"
+                title="Home"
                 onClick={() => setIsOpen(false)}
-                className={`relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${
+                className={`relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${
                   isContrast
                     ? 'bg-white text-[#03045E] border-[#03045E]/25'
                     : 'bg-white text-[#03045E] border-[#03045E]/25'
                 }`}
               >
-                <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                <div aria-hidden="true" className="p-1.5 rounded-lg transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                   </svg>
@@ -251,14 +255,15 @@ export default function Login() {
               <Link
                 to="/about"
                 aria-label="About Us"
+                title="About Us"
                 onClick={() => setIsOpen(false)}
-                className={`relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${
+                className={`relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${
                   isContrast
                     ? 'bg-white text-[#03045E] border-[#03045E]/25'
                     : 'bg-white text-[#03045E] border-[#03045E]/25'
                 }`}
               >
-                <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                <div aria-hidden="true" className="p-1.5 rounded-lg transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -274,14 +279,15 @@ export default function Login() {
               <Link
                 to="/policy"
                 aria-label="Policy"
+                title="Policy"
                 onClick={() => setIsOpen(false)}
-                className={`relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${
+                className={`relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${
                   isContrast
                     ? 'bg-white text-[#03045E] border-[#03045E]/25'
                     : 'bg-white text-[#03045E] border-[#03045E]/25'
                 }`}
               >
-                <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                <div aria-hidden="true" className="p-1.5 rounded-lg transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
@@ -298,10 +304,11 @@ export default function Login() {
 
               <span
                 aria-label="Log In"
-                className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E] shadow-md"
+                title="Log In"
+                className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E] shadow-md"
               >
                 <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>
-                <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                <div aria-hidden="true" className="p-1.5 rounded-lg transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                   </svg>
@@ -327,18 +334,26 @@ export default function Login() {
       
         <div
           className={`w-full ${isAssist ? 'max-w-[480px] sm:max-w-xl' : 'max-w-[400px] sm:max-w-md'} flex flex-col items-center justify-start ${containerGap} relative z-10
-            ${isContrast ? 'bg-black/90 text-white border-2 border-blue-400 shadow-[0_0_25px_rgba(,204,21,0.4)]' : 'bg-white/40 sm:bg-white/85 text-[#03045E] border border-[#03045E]/15'} backdrop-blur-[1px] sm:backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-xl
+            ${isContrast ? 'bg-black/90 text-white border-2 border-blue-400 shadow-[0_0_25px_rgba(,204,21,0.4)]' : 'bg-white/40 sm:bg-white/85 text-[#03045E] border border-[#03045E]/15'} backdrop-blur-[1px] sm:backdrop-blur-md rounded-xl sm:rounded-2xl shadow-xl
             ${containerPadding}
             ${isAssist ? 'min-h-[auto] sm:min-h-[660px]' : 'min-h-[auto] sm:min-h-[600px]'} md:mt-4 mr-0 md:mr-2 lg:mr-6`}
         >
           
           <div className="text-center w-full -mt-2 sm:-mt-3">
             <h1
+              tabIndex="0"
+              aria-label="Login to AbleWork"
+              title="Login to AbleWork"
               className={`${titleSize} ${isAccessibilityMode ? '!text-white' : (isContrast ? '!text-white' : '')} tracking-tight mb-1.5 sm:mb-2`}
             >
               Login to AbleWork
             </h1>
-            <p className={`${subtitleSize} ${isAccessibilityMode ? '!text-white/90' : (isContrast ? '!text-white/90' : '')}`}>
+            <p
+              tabIndex="0"
+              aria-label="Welcome back! Please enter your details"
+              title="Welcome back! Please enter your details"
+              className={`${subtitleSize} ${isAccessibilityMode ? '!text-white/90' : (isContrast ? '!text-white/90' : '')}`}
+            >
               Welcome back! Please enter your details
             </p>
           </div>
@@ -361,6 +376,9 @@ export default function Login() {
             <div className="flex flex-col gap-1.5 sm:gap-2">
               <label
                 id="email-label"
+                tabIndex="0"
+                aria-label="Email Address"
+                title="Email Address"
                 className={`${labelSize} ${isAccessibilityMode ? '!text-white' : (isContrast ? '!text-white' : '')}`}
                 htmlFor="email"
               >
@@ -376,7 +394,8 @@ export default function Login() {
                 readOnly
                 onFocus={(e) => e.target.removeAttribute('readOnly')}
                 aria-label="Enter your email"
-                className={`${inputSize} ${isContrast ? 'border-2 border-blue-400 bg-black text-white focus:border-blue-300' : 'border-2 border-[#03045E]/30 bg-white text-[#03045E] focus:border-[#2C7FFF]'} rounded-xl sm:rounded-2xl focus:outline-none shadow-sm transition`}
+                title="Enter your email"
+                className={`${inputSize} ${isContrast ? 'border-2 border-blue-400 bg-black text-white focus:border-blue-300' : 'border-2 border-[#03045E]/30 bg-white text-[#03045E] focus:border-[#2C7FFF]'} rounded-lg sm:rounded-xl focus:outline-none shadow-sm transition`}
                 placeholder="Enter your email"
                 required
               />
@@ -385,6 +404,9 @@ export default function Login() {
             <div className="flex flex-col gap-1.5 sm:gap-2">
               <label
                 id="password-label"
+                tabIndex="0"
+                aria-label="Password"
+                title="Password"
                 className={`${labelSize} ${isAccessibilityMode ? '!text-white' : (isContrast ? '!text-white' : '')}`}
                 htmlFor="password"
               >
@@ -401,13 +423,15 @@ export default function Login() {
                   readOnly
                   onFocus={(e) => e.target.removeAttribute('readOnly')}
                   aria-label="Enter your password"
-                  className={`${inputSize} w-full pr-10 sm:pr-12 ${isContrast ? 'border-2 border-blue-400 bg-black text-white focus:border-blue-300' : 'border-2 border-[#03045E]/30 bg-white text-[#03045E] focus:border-[#2C7FFF]'} rounded-xl sm:rounded-2xl focus:outline-none shadow-sm transition`}
+                  title="Enter your password"
+                  className={`${inputSize} w-full pr-10 sm:pr-12 ${isContrast ? 'border-2 border-blue-400 bg-black text-white focus:border-blue-300' : 'border-2 border-[#03045E]/30 bg-white text-[#03045E] focus:border-[#2C7FFF]'} rounded-lg sm:rounded-xl focus:outline-none shadow-sm transition`}
                   placeholder="Enter your password"
                   required
                 />
                 <button
                   type="button"
                   aria-label="Show password"
+                  title="Show password"
                   onClick={() => setShowPassword(!showPassword)}
                   className={`absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 transition cursor-pointer ${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'text-white/60 hover:text-white' : 'text-[#03045E]/50 hover:text-[#2C7FFF]')}`}
                 >
@@ -429,6 +453,7 @@ export default function Login() {
               <Link 
                 to="/forgot-password" 
                 aria-label="Forgot Password"
+                title="Forgot Password"
                 className={`text-xs sm:text-sm font-bold transition-all hover:underline ${
                   isAccessibilityMode 
                     ? '!text-white hover:!text-white' 
@@ -445,17 +470,24 @@ export default function Login() {
               type="submit"
               disabled={isLoading}
               aria-label={isLoading ? "Logging In" : "Log In"}
-              className={`mt-1.5 sm:mt-2 ${tapTargetSize} ${isDarkMode ? '!bg-black !text-white border border-white font-black' : isAccessibilityMode ? '!bg-blue-400 !text-white border border-blue-400 font-black' : isContrast ? 'bg-blue-400 text-black hover:bg-blue-300 border border-blue-400 font-black hover:brightness-125' : 'bg-[#03045E] hover:bg-[#2C7FFF] text-white hover:brightness-125'} disabled:opacity-50 disabled:cursor-not-allowed rounded-full shadow-md w-full transition-all duration-200 cursor-pointer`}
+              title={isLoading ? "Logging In" : "Log In"}
+              className={`mt-1.5 sm:mt-2 ${tapTargetSize} ${isDarkMode ? '!bg-black !text-white border border-white font-black' : isAccessibilityMode ? '!bg-blue-400 !text-white border border-blue-400 font-black' : isContrast ? 'bg-blue-400 text-black hover:bg-blue-300 border border-blue-400 font-black hover:brightness-125' : 'bg-[#03045E] hover:bg-[#2C7FFF] text-white hover:brightness-125'} disabled:opacity-50 disabled:cursor-not-allowed rounded-xl sm:rounded-2xl shadow-md w-full transition-all duration-200 cursor-pointer`}
             >
               {isLoading ? 'Logging In...' : 'Log In'}
             </button>
           </form>
 
-          <p className={`text-center ${isAccessibilityMode ? '!text-white/90' : (isContrast ? 'text-white/90' : 'text-[#03045E]/90')} ${footerLinkSize} pt-1`}>
+          <p 
+            tabIndex="0"
+            aria-label="Don't have an account? Create one"
+            title="Don't have an account? Create one"
+            className={`text-center ${isAccessibilityMode ? '!text-white/90' : (isContrast ? 'text-white/90' : 'text-[#03045E]/90')} ${footerLinkSize} pt-1`}
+          >
             Don't have an account?{' '}
             <Link
               to="/register-select"
               aria-label="Create one"
+              title="Create one"
               className={`font-bold ${isAccessibilityMode ? '!text-white hover:!text-white underline' : (isContrast ? 'text-blue-400 hover:text-blue-300 underline' : 'text-[#2C7FFF] hover:underline')}`}
             >
               Create one
@@ -476,12 +508,23 @@ export default function Login() {
               role="img"
               aria-label="AbleWork logo"
               tabIndex="0"
+              title="AbleWork Logo"
               className="h-7 sm:h-10 w-auto object-contain"
             />
-            <p className="text-[10px] sm:text-sm font-semibold leading-relaxed text-white/85">
+            <p 
+              tabIndex="0"
+              aria-label="Building an inclusive workforce and equal employment opportunities for everyone."
+              title="Building an inclusive workforce and equal employment opportunities for everyone."
+              className="text-[10px] sm:text-sm font-semibold leading-relaxed text-white/85"
+            >
               Building an inclusive workforce and equal employment opportunities for everyone.
             </p>
-            <div className="pt-1 flex items-center space-x-3 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-white/70">
+            <div 
+              tabIndex="0"
+              aria-label="Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines"
+              title="Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines"
+              className="pt-1 flex items-center space-x-3 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-white/70"
+            >
               <span> Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</span>
               <span></span>
               <span></span>
@@ -489,20 +532,27 @@ export default function Login() {
           </div>
 
           <div>
-            <h4 className="text-xs sm:text-base font-black mb-2 sm:mb-4 text-white">Quick Links</h4>
+            <h4 
+              tabIndex="0"
+              aria-label="Quick Links"
+              title="Quick Links"
+              className="text-xs sm:text-base font-black mb-2 sm:mb-4 text-white"
+            >
+              Quick Links
+            </h4>
             <ul className="space-y-1 sm:space-y-2 text-[10px] sm:text-sm font-semibold">
               <li>
-                <Link to="/" aria-label="Home Dashboard" className="text-white/85 hover:text-[#7FB0FF] transition-colors">
+                <Link to="/" aria-label="Home Dashboard" title="Home Dashboard" className="text-white/85 hover:text-[#7FB0FF] transition-colors">
                   Home Dashboard
                 </Link>
               </li>
               <li>
-                <Link to="/about" aria-label="About Our Mission" className="text-white/85 hover:text-[#7FB0FF] transition-colors">
+                <Link to="/about" aria-label="About Our Mission" title="About Our Mission" className="text-white/85 hover:text-[#7FB0FF] transition-colors">
                   About Our Mission
                 </Link>
               </li>
               <li>
-                <Link to="/contact" aria-label="Contact Support" className="text-white/85 hover:text-[#7FB0FF] transition-colors">
+                <Link to="/contact" aria-label="Contact Support" title="Contact Support" className="text-white/85 hover:text-[#7FB0FF] transition-colors">
                   Contact Support
                 </Link>
               </li>
@@ -510,15 +560,22 @@ export default function Login() {
           </div>
 
           <div>
-            <h4 className="text-xs sm:text-base font-black mb-2 sm:mb-4 text-white">Legal &amp; Support</h4>
+            <h4 
+              tabIndex="0"
+              aria-label="Legal & Support"
+              title="Legal & Support"
+              className="text-xs sm:text-base font-black mb-2 sm:mb-4 text-white"
+            >
+              Legal &amp; Support
+            </h4>
             <ul className="space-y-1 sm:space-y-2 text-[10px] sm:text-sm font-semibold">
               <li>
-                <Link to="/policy" aria-label="Privacy Policy" className="text-white/85 hover:text-[#7FB0FF] transition-colors">
+                <Link to="/policy" aria-label="Privacy Policy" title="Privacy Policy" className="text-white/85 hover:text-[#7FB0FF] transition-colors">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link to="/terms" aria-label="Terms of Service" className="text-white/85 hover:text-[#7FB0FF] transition-colors">
+                <Link to="/terms" aria-label="Terms of Service" title="Terms of Service" className="text-white/85 hover:text-[#7FB0FF] transition-colors">
                   Terms of Service
                 </Link>
               </li>
@@ -526,13 +583,26 @@ export default function Login() {
           </div>
 
           <div>
-            <h4 className="text-xs sm:text-base font-black mb-2 sm:mb-4 text-white">Get Started</h4>
-            <p className="text-[10px] sm:text-sm font-semibold mb-2 sm:mb-4 text-white/85">
+            <h4 
+              tabIndex="0"
+              aria-label="Get Started"
+              title="Get Started"
+              className="text-xs sm:text-base font-black mb-2 sm:mb-4 text-white"
+            >
+              Get Started
+            </h4>
+            <p 
+              tabIndex="0"
+              aria-label="Are you an applicant or employer looking to join our network?"
+              title="Are you an applicant or employer looking to join our network?"
+              className="text-[10px] sm:text-sm font-semibold mb-2 sm:mb-4 text-white/85"
+            >
               Are you an applicant or employer looking to join our network?
             </p>
             <Link
               to="/register-select"
               aria-label="Register Now"
+              title="Register Now"
               className="inline-block bg-[#2C7FFF] text-[#03045E] px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-xl font-bold text-[9px] sm:text-xs uppercase tracking-wider shadow-md hover:bg-white hover:text-[#03045E] transition-all border-2 border-[#2C7FFF] hover:border-white"
             >
               Register Now
@@ -541,7 +611,12 @@ export default function Login() {
 
         </div>
 
-        <div className="max-w-[1700px] mx-auto pt-3 sm:pt-6 flex flex-col items-center justify-center gap-2 sm:gap-4 text-[9px] sm:text-xs font-bold text-white/75 text-center">
+        <div 
+          tabIndex="0"
+          aria-label="Copyright information and slogan"
+          title="Copyright information and slogan"
+          className="max-w-[1700px] mx-auto pt-3 sm:pt-6 flex flex-col items-center justify-center gap-2 sm:gap-4 text-[9px] sm:text-xs font-bold text-white/75 text-center"
+        >
           <p>© {new Date().getFullYear()} AgileWork Inc. All rights reserved.</p>
           <p className="font-bold">Empowering Abilities, Connecting Opportunities.</p>
         </div>

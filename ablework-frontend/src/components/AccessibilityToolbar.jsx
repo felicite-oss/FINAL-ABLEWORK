@@ -1,10 +1,11 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import { AccessibilityContext } from '../context/AccessibilityContext';
 import ColorPalettePicker from './ColorPalettePicker';
 
 export function AccessibilityToolbar() {
   const { mode, setMode } = useContext(AccessibilityContext);
   const [isOpen, setIsOpen] = useState(false);
+  const panelRef = useRef(null);
   const [fontSize, setFontSize] = useState(() => {
     try {
       const stored = localStorage.getItem('ui_fontsize');
@@ -24,6 +25,15 @@ export function AccessibilityToolbar() {
       root.classList.add('standard');
     }
   }, [mode]);
+
+  useEffect(() => {
+    if (isOpen && panelRef.current) {
+      const timer = setTimeout(() => {
+        panelRef.current.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     try {
@@ -73,7 +83,9 @@ export function AccessibilityToolbar() {
       
       {isOpen && (
         <div 
-          className="mb-3 w-[calc(100vw-2rem)] max-w-80 sm:w-80 relative rounded-2xl sm:rounded-[2rem] border-2 border-[var(--color-border)] overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.35)] backdrop-blur-xl animate-in fade-in slide-in-from-bottom-3 duration-300 max-h-[62vh] flex flex-col bg-[var(--color-surface)]"
+          ref={panelRef}
+          tabIndex={-1}
+          className="mb-3 w-[calc(100vw-2rem)] max-w-80 sm:w-80 relative rounded-xl sm:rounded-2xl border-2 border-[var(--color-border)] overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.35)] backdrop-blur-xl animate-in fade-in slide-in-from-bottom-3 duration-300 max-h-[62vh] flex flex-col bg-[var(--color-surface)] focus:outline-none"
           role="region"
           aria-label="Accessibility Control Panel. Adjust display theme, color palette, and text size settings."
         >
@@ -83,20 +95,20 @@ export function AccessibilityToolbar() {
           <div className="relative px-3 pt-2 pb-2 sm:px-5 sm:pt-3 sm:pb-3 border-b-2 border-[var(--color-border)] shrink-0">
             <div className="flex items-center justify-between gap-2 sm:gap-3">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-[var(--color-accent)] text-[var(--color-background)] flex items-center justify-center border-2 border-[var(--color-border)] shadow-md" aria-hidden="true">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-[var(--color-accent)] text-[var(--color-background)] flex items-center justify-center border-2 border-[var(--color-border)] shadow-md" aria-hidden="true">
                   <svg className="w-3.5 h-3.5 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="currentColor">
                     <circle cx="12" cy="4" r="2" />
                     <path d="M19 13h-2v-3c0-1.1-.9-2-2-2h-3.5c-.3-.6-.9-1-1.5-1h-2c-1.1 0-2 .9-2 2v5c0 1.1.9 2 2 2h2v4h2v-4h1v4h2v-5.5c0-.8-.7-1.5-1.5-1.5z" />
                   </svg>
                 </div>
                 <div>
-                  <h3 tabIndex="0" className="font-black text-[11px] sm:text-sm tracking-tight uppercase text-[var(--color-text)] leading-none">Accessibility</h3>
-                  <p className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] text-[var(--color-accent)] mt-0.5 sm:mt-1">Control Center</p>
+                  <h3 tabIndex="0" className="font-black text-[11px] sm:text-sm tracking-tight uppercase text-[var(--color-text)] leading-none transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 rounded w-fit">Accessibility</h3>
+                  <p tabIndex="0" className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] text-[var(--color-accent)] mt-0.5 sm:mt-1 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 rounded w-fit">Control Center</p>
                 </div>
               </div>
               <button 
                 onClick={() => setIsOpen(false)}
-                className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl border-2 border-[var(--color-border)] text-[var(--color-textMuted)] hover:text-[var(--color-text)] hover:border-[var(--color-accent)] font-black text-sm sm:text-lg flex items-center justify-center cursor-pointer transition-all"
+                className="w-6 h-6 sm:w-8 sm:h-8 rounded-md sm:rounded-lg border-2 border-[var(--color-border)] text-[var(--color-textMuted)] hover:text-[var(--color-text)] hover:border-[var(--color-accent)] font-black text-sm sm:text-lg flex items-center justify-center cursor-pointer transition-all focus:outline-none"
                 aria-label="Close accessibility control center"
               >
                 <span aria-hidden="true">&times;</span>
@@ -108,20 +120,20 @@ export function AccessibilityToolbar() {
             <div className="flex flex-col gap-1.5 sm:gap-2.5" role="group" aria-label="Display Theme Settings">
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-[var(--color-accent)]" aria-hidden="true"></span>
-                <span tabIndex="0" className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] text-[var(--color-textMuted)]">Display Theme</span>
+                <span tabIndex="0" className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] text-[var(--color-textMuted)] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 rounded w-fit">Display Theme</span>
               </div>
               <div className="grid grid-cols-2 gap-1.5 sm:gap-2.5">
                 <button
                   onClick={() => handleThemeChange('Standard')}
                   aria-pressed={mode === 'Standard'}
-                  className={`group relative py-2 px-1.5 sm:py-3 sm:px-3 rounded-xl sm:rounded-2xl border-2 transition-all cursor-pointer shadow-sm flex flex-col items-center gap-1 sm:gap-1.5 ${
+                  className={`group relative py-2 px-1.5 sm:py-3 sm:px-3 rounded-lg sm:rounded-xl border-2 transition-all cursor-pointer shadow-sm flex flex-col items-center gap-1 sm:gap-1.5 focus:outline-none ${
                     mode === 'Standard' 
                       ? 'bg-[var(--color-primary)] text-[var(--color-background)] border-[var(--color-primary)] shadow-md scale-[1.02]' 
                       : 'bg-[var(--color-surface)] text-[var(--color-text)] border-[var(--color-border)] hover:border-[var(--color-accent)]'
                   }`}
                   aria-label="Standard Mode Theme"
                 >
-                  <div className={`w-5 h-5 sm:w-7 sm:h-7 rounded-lg sm:rounded-xl flex items-center justify-center border-2 ${
+                  <div className={`w-5 h-5 sm:w-7 sm:h-7 rounded-md sm:rounded-lg flex items-center justify-center border-2 ${
                     mode === 'Standard' ? 'bg-[var(--color-background)] text-[var(--color-primary)] border-[var(--color-background)]' : 'bg-[var(--color-surface)] text-[var(--color-text)] border-[var(--color-border)]'
                   }`} aria-hidden="true">
                     <svg className="w-3 h-3 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -134,14 +146,14 @@ export function AccessibilityToolbar() {
                 <button
                   onClick={() => handleThemeChange('Dark')}
                   aria-pressed={mode === 'Dark'}
-                  className={`group relative py-2 px-1.5 sm:py-3 sm:px-3 rounded-xl sm:rounded-2xl border-2 transition-all cursor-pointer shadow-sm flex flex-col items-center gap-1 sm:gap-1.5 ${
+                  className={`group relative py-2 px-1.5 sm:py-3 sm:px-3 rounded-lg sm:rounded-xl border-2 transition-all cursor-pointer shadow-sm flex flex-col items-center gap-1 sm:gap-1.5 focus:outline-none ${
                     mode === 'Dark' 
                       ? 'bg-[var(--color-primary)] text-[var(--color-background)] border-[var(--color-primary)] shadow-md scale-[1.02]' 
                       : 'bg-[var(--color-surface)] text-[var(--color-text)] border-[var(--color-border)] hover:border-[var(--color-accent)]'
                   }`}
                   aria-label="Toggle Dark Mode Theme"
                 >
-                  <div className={`w-5 h-5 sm:w-7 sm:h-7 rounded-lg sm:rounded-xl flex items-center justify-center border-2 ${
+                  <div className={`w-5 h-5 sm:w-7 sm:h-7 rounded-md sm:rounded-lg flex items-center justify-center border-2 ${
                     mode === 'Dark' ? 'bg-[var(--color-background)] text-[var(--color-primary)] border-[var(--color-background)]' : 'bg-[var(--color-surface)] text-[var(--color-text)] border-[var(--color-border)]'
                   }`} aria-hidden="true">
                     <svg className="w-3 h-3 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -157,7 +169,7 @@ export function AccessibilityToolbar() {
               <div className="flex flex-col gap-1.5 sm:gap-2.5 border-t-2 border-[var(--color-border)] pt-3 sm:pt-4" role="group" aria-label="Color Palette Settings">
                 <div className="flex items-center gap-1.5 sm:gap-2">
                   <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-[var(--color-accent)]" aria-hidden="true"></span>
-                  <span tabIndex="0" className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] text-[var(--color-textMuted)]">Color Palette</span>
+                  <span tabIndex="0" className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] text-[var(--color-textMuted)] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 rounded w-fit">Color Palette</span>
                 </div>
                 <ColorPalettePicker />
               </div>
@@ -166,13 +178,13 @@ export function AccessibilityToolbar() {
             <div className="flex flex-col gap-1.5 sm:gap-2.5 border-t-2 border-[var(--color-border)] pt-3 sm:pt-4" role="group" aria-label="Text Size Settings">
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-[var(--color-accent)]" aria-hidden="true"></span>
-                <span tabIndex="0" className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] text-[var(--color-textMuted)]">Text Size</span>
+                <span tabIndex="0" className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] text-[var(--color-textMuted)] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 rounded w-fit">Text Size</span>
               </div>
               <div className="grid grid-cols-3 gap-1.5 sm:gap-2.5">
                 <button
                   onClick={() => handleFontSizeChange('normal')}
                   aria-pressed={fontSize === 'normal'}
-                  className={`py-2 sm:py-3 rounded-xl sm:rounded-2xl border-2 transition-all cursor-pointer shadow-sm flex flex-col items-center justify-center gap-0.5 sm:gap-1 ${
+                  className={`py-2 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all cursor-pointer shadow-sm flex flex-col items-center justify-center gap-0.5 sm:gap-1 focus:outline-none ${
                     fontSize === 'normal' 
                       ? 'bg-[var(--color-accent)] text-[var(--color-background)] border-[var(--color-accent)] shadow-md scale-[1.02]' 
                       : 'bg-[var(--color-surface)] text-[var(--color-text)] border-[var(--color-border)] hover:border-[var(--color-accent)]'
@@ -185,7 +197,7 @@ export function AccessibilityToolbar() {
                 <button
                   onClick={() => handleFontSizeChange('large')}
                   aria-pressed={fontSize === 'large'}
-                  className={`py-2 sm:py-3 rounded-xl sm:rounded-2xl border-2 transition-all cursor-pointer shadow-sm flex flex-col items-center justify-center gap-0.5 sm:gap-1 ${
+                  className={`py-2 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all cursor-pointer shadow-sm flex flex-col items-center justify-center gap-0.5 sm:gap-1 focus:outline-none ${
                     fontSize === 'large' 
                       ? 'bg-[var(--color-accent)] text-[var(--color-background)] border-[var(--color-accent)] shadow-md scale-[1.02]' 
                       : 'bg-[var(--color-surface)] text-[var(--color-text)] border-[var(--color-border)] hover:border-[var(--color-accent)]'
@@ -198,7 +210,7 @@ export function AccessibilityToolbar() {
                 <button
                   onClick={() => handleFontSizeChange('xlarge')}
                   aria-pressed={fontSize === 'xlarge'}
-                  className={`py-2 sm:py-3 rounded-xl sm:rounded-2xl border-2 transition-all cursor-pointer shadow-sm flex flex-col items-center justify-center gap-0.5 sm:gap-1 whitespace-nowrap ${
+                  className={`py-2 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all cursor-pointer shadow-sm flex flex-col items-center justify-center gap-0.5 sm:gap-1 whitespace-nowrap focus:outline-none ${
                     fontSize === 'xlarge' 
                       ? 'bg-[var(--color-accent)] text-[var(--color-background)] border-[var(--color-accent)] shadow-md scale-[1.02]' 
                       : 'bg-[var(--color-surface)] text-[var(--color-text)] border-[var(--color-border)] hover:border-[var(--color-accent)]'
@@ -213,25 +225,30 @@ export function AccessibilityToolbar() {
           </div>
 
           <div className="relative px-3 py-2 sm:px-5 sm:py-3 border-t-2 border-[var(--color-border)] flex items-center justify-between shrink-0">
-            <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] text-[var(--color-textMuted)]">Settings Auto-Save</span>
+            <span tabIndex="0" className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] text-[var(--color-textMuted)] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 rounded w-fit">Settings Auto-Save</span>
             <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[var(--color-accent)] animate-pulse" aria-hidden="true"></span>
           </div>
         </div>
       )}
 
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="group relative bg-[var(--color-accent)] hover:bg-[var(--color-primary)] text-[var(--color-background)] p-3 sm:p-4 rounded-full shadow-[0_8px_16px_rgba(44,127,255,0.4)] flex items-center justify-center transition-all hover:scale-110 border-[3px] border-[var(--color-border)] cursor-pointer"
-        aria-label="Open Accessibility Menu and Control Center"
-        aria-haspopup="dialog"
-        aria-expanded={isOpen}
-      >
-        <span className="absolute inset-0 rounded-full bg-[var(--color-accent)] opacity-40 animate-ping" aria-hidden="true"></span>
-        <svg xmlns="http://www.w3.org/2000/svg" className="relative h-5 w-5 sm:h-7 sm:w-7" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <circle cx="12" cy="4" r="2" />
-          <path d="M19 13h-2v-3c0-1.1-.9-2-2-2h-3.5c-.3-.6-.9-1-1.5-1h-2c-1.1 0-2 .9-2 2v5c0 1.1.9 2 2 2h2v4h2v-4h1v4h2v-5.5c0-.8-.7-1.5-1.5-1.5z" />
-        </svg>
-      </button>
+      <div className="relative group flex flex-row items-center">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="group relative bg-[var(--color-accent)] hover:bg-[var(--color-primary)] text-[var(--color-background)] p-3 sm:p-4 rounded-2xl sm:rounded-3xl shadow-[0_8px_16px_rgba(44,127,255,0.4)] flex items-center justify-center transition-all hover:scale-110 border-[3px] border-[var(--color-border)] cursor-pointer focus:outline-none"
+          aria-label="Open Accessibility Menu and Control Center"
+          aria-haspopup="dialog"
+          aria-expanded={isOpen}
+        >
+          <span className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-[var(--color-accent)] opacity-40 animate-ping" aria-hidden="true"></span>
+          <svg xmlns="http://www.w3.org/2000/svg" className="relative h-5 w-5 sm:h-7 sm:w-7" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <circle cx="12" cy="4" r="2" />
+            <path d="M19 13h-2v-3c0-1.1-.9-2-2-2h-3.5c-.3-.6-.9-1-1.5-1h-2c-1.1 0-2 .9-2 2v5c0 1.1.9 2 2 2h2v4h2v-4h1v4h2v-5.5c0-.8-.7-1.5-1.5-1.5z" />
+          </svg>
+        </button>
+        <span className="absolute bottom-full left-0 mb-2 px-3 py-1.5 rounded-lg bg-[var(--color-text)] text-[var(--color-background)] text-[10px] sm:text-xs font-black uppercase tracking-wider whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 pointer-events-none shadow-lg z-50">
+          Accessibility
+        </span>
+      </div>
 
     </div>
   );

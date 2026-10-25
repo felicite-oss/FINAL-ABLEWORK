@@ -52,6 +52,7 @@ function SiteHeader() {
               role="img"
               aria-label="AbleWork logo"
               tabIndex="0"
+              title="AbleWork Logo"
               className="h-9 sm:h-12 md:h-14 w-auto object-contain max-h-full"
             />
           </div>
@@ -59,6 +60,7 @@ function SiteHeader() {
             <NavLink 
               to="/" 
               aria-label="Home"
+              title="Home"
               className={({ isActive }) => 
                 `transition-colors duration-200 hover:text-[var(--color-accent)] hover:scale-105 transform ${isActive ? `font-bold border-b-2 ${isContrast ? 'border-[var(--color-text)] text-[var(--color-text)]' : 'border-[#03045E] text-[#03045E]'} pb-0.5` : (isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]')}`
               }
@@ -68,6 +70,7 @@ function SiteHeader() {
             <NavLink 
               to="/about" 
               aria-label="About Us"
+              title="About Us"
               className={({ isActive }) => 
                 `transition-colors duration-200 hover:text-[var(--color-accent)] hover:scale-105 transform ${isActive ? `font-bold border-b-2 ${isContrast ? 'border-[var(--color-text)] text-[var(--color-text)]' : 'border-[#03045E] text-[#03045E]'} pb-0.5` : (isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]')}`
               }
@@ -77,6 +80,7 @@ function SiteHeader() {
             <NavLink 
               to="/policy" 
               aria-label="Policy"
+              title="Policy"
               className={({ isActive }) => 
                 `transition-colors duration-200 hover:text-[var(--color-accent)] hover:scale-105 transform ${isActive ? `font-bold border-b-2 ${isContrast ? 'border-[var(--color-text)] text-[var(--color-text)]' : 'border-[#03045E] text-[#03045E]'} pb-0.5` : (isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]')}`
               }
@@ -90,6 +94,7 @@ function SiteHeader() {
           <Link
             to="/login"
             aria-label="Log In"
+            title="Log In"
             className={`login-btn px-5 py-2 rounded-full bg-transparent text-sm font-bold border-2 transition transform duration-200 ${
               isContrast 
                 ? 'text-[var(--color-text)] border-[var(--color-text)] hover:bg-[var(--color-accent)] hover:text-[var(--color-background)] hover:border-[var(--color-accent)] hover:brightness-125' 
@@ -104,6 +109,7 @@ function SiteHeader() {
           className={`md:hidden flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl border-2 shadow-sm cursor-pointer transition-all duration-200 shrink-0 ${isContrast ? 'bg-zinc-900 text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/20'}`}
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Menu"
+          title="Menu"
           aria-expanded={isOpen}
           aria-controls="site-mobile-menu"
         >
@@ -132,6 +138,7 @@ function SiteHeader() {
             <NavLink
               to="/"
               aria-label="Home"
+              title="Home"
               onClick={() => setIsOpen(false)}
               className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}
             >
@@ -156,6 +163,7 @@ function SiteHeader() {
             <NavLink
               to="/about"
               aria-label="About Us"
+              title="About Us"
               onClick={() => setIsOpen(false)}
               className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}
             >
@@ -180,6 +188,7 @@ function SiteHeader() {
             <NavLink
               to="/policy"
               aria-label="Policy"
+              title="Policy"
               onClick={() => setIsOpen(false)}
               className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}
             >
@@ -206,6 +215,7 @@ function SiteHeader() {
             <NavLink
               to="/login"
               aria-label="Log In"
+              title="Log In"
               onClick={() => setIsOpen(false)}
               className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}
             >
@@ -376,15 +386,15 @@ export function Home() {
           <div className={`relative z-10 p-4 sm:p-12 rounded-2xl sm:rounded-[3rem] shadow-2xl border backdrop-blur-[1px] ${isContrast ? 'bg-[var(--color-surface)]/80 border-[var(--color-border)] text-[var(--color-text)]' : 'bg-[var(--color-surface)]/50 border-white/40 text-[#03045E]'}`}>
             <div className="grid md:grid-cols-2 gap-6 sm:gap-12 items-start">
               <div>
-                <span tabIndex="0" className={`inline-block px-3 py-1 sm:px-4 sm:py-1.5 rounded-full ${isContrast ? 'bg-[var(--color-accentSoft)] text-[var(--color-text)] border border-[var(--color-accent)]' : 'bg-[#2C7FFF]/15 text-[#2C7FFF] bg-white/10'} font-black text-[10px] sm:text-xs uppercase tracking-widest mb-3 sm:mb-4 backdrop-blur-sm shadow-sm`}>
+                <span tabIndex="0" role="text" aria-label="Welcome to AbleWork" title="Welcome to AbleWork" className={`inline-block px-3 py-1 sm:px-4 sm:py-1.5 rounded-full ${isContrast ? 'bg-[var(--color-accentSoft)] text-[var(--color-text)] border border-[var(--color-accent)]' : 'bg-[#2C7FFF]/15 text-[#2C7FFF] bg-white/10'} font-black text-[10px] sm:text-xs uppercase tracking-widest mb-3 sm:mb-4 backdrop-blur-sm shadow-sm`}>
                   Welcome to AbleWork
                 </span>
 
-                <h1 className={`text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight mb-4 sm:mb-6 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'} [text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`} style={(isContrast || isDarkMode) ? { textShadow: 'none' } : undefined}>
+                <h1 tabIndex="0" role="heading" aria-level="1" aria-label="Building an Inclusive Workforce for Everyone" title="Building an Inclusive Workforce for Everyone" className={`text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight mb-4 sm:mb-6 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'} [text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`} style={(isContrast || isDarkMode) ? { textShadow: 'none' } : undefined}>
                   Building an Inclusive Workforce for Everyone
                 </h1>
 
-                <p className={`text-sm sm:text-lg font-semibold leading-relaxed mb-5 sm:mb-8 p-2.5 sm:p-3 rounded-xl ${isContrast ? 'text-[var(--color-text)] bg-[var(--color-surface)]/80 border border-[var(--color-border)]' : 'text-[#03045E] bg-[var(--color-surface)]/50'} [text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_14px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`} style={(isContrast || isDarkMode) ? { textShadow: 'none' } : undefined}>
+                <p tabIndex="0" role="text" aria-label="AbleWork helps persons with disabilities find suitable employment opportunities based on their unique skills, qualifications, and preferred locations." title="AbleWork helps persons with disabilities find suitable employment opportunities based on their unique skills, qualifications, and preferred locations." className={`text-sm sm:text-lg font-semibold leading-relaxed mb-5 sm:mb-8 p-2.5 sm:p-3 rounded-xl ${isContrast ? 'text-[var(--color-text)] bg-[var(--color-surface)]/80 border border-[var(--color-border)]' : 'text-[#03045E] bg-[var(--color-surface)]/50'} [text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_14px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`} style={(isContrast || isDarkMode) ? { textShadow: 'none' } : undefined}>
                   AbleWork helps persons with disabilities find suitable employment opportunities based on their unique skills, qualifications, and preferred locations.
                 </p>
 
@@ -392,6 +402,7 @@ export function Home() {
                   <Link
                     to="/register-select"
                     aria-label="Get Started Today"
+                    title="Get Started Today"
                     className={`get-started-btn px-5 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-2 group text-sm sm:text-base ${
                       isContrast 
                         ? 'bg-[#1a1a1a] text-white border-2 border-white hover:bg-[#2C7FFF] hover:border-[#2C7FFF]' 
@@ -405,6 +416,7 @@ export function Home() {
                   <Link
                     to="/about"
                     aria-label="Learn More"
+                    title="Learn More"
                     className={`learn-more-btn px-5 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl font-bold transition-all shadow-sm text-sm sm:text-base ${
                       isContrast
                         ? 'bg-[#1a1a1a] text-white border-2 border-white hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'
@@ -416,15 +428,15 @@ export function Home() {
                 </div>
 
                 <div className={`grid grid-cols-3 gap-4 sm:gap-6 mt-8 sm:mt-12 pt-6 sm:pt-10 border-t ${isContrast ? 'border-[var(--color-border)]' : 'border-[#03045E]/20'}`}>
-                  <div tabIndex="0">
+                  <div tabIndex="0" role="text" aria-label="100% Accessible" title="100% Accessible">
                     <h4 className={`text-xl sm:text-3xl font-black ${isContrast || isDarkMode ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'} ${!isDarkMode ? 'max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]' : ''}`}>100%</h4>
                     <p className={`text-[10px] sm:text-xs font-black uppercase tracking-wider mt-1 ${isContrast || isDarkMode ? 'text-[var(--color-text)]' : 'text-[#03045E]'} ${!isDarkMode ? 'max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]' : ''}`}>Accessible</p>
                   </div>
-                  <div tabIndex="0">
+                  <div tabIndex="0" role="text" aria-label="24/7 Support" title="24/7 Support">
                     <h4 className={`text-xl sm:text-3xl font-black ${isContrast || isDarkMode ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'} ${!isDarkMode ? 'max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]' : ''}`}>24/7</h4>
                     <p className={`text-[10px] sm:text-xs font-black uppercase tracking-wider mt-1 ${isContrast || isDarkMode ? 'text-[var(--color-text)]' : 'text-[#03045E]'} ${!isDarkMode ? 'max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]' : ''}`}>Support</p>
                   </div>
-                  <div tabIndex="0">
+                  <div tabIndex="0" role="text" aria-label="Secure Platform" title="Secure Platform">
                     <h4 className={`text-xl sm:text-3xl font-black ${isContrast || isDarkMode ? 'text-[var(--color-text)]' : 'text-[var(--color-accent)]'} ${!isDarkMode ? 'max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]' : ''}`}>Secure</h4>
                     <p className={`text-[10px] sm:text-xs font-black uppercase tracking-wider mt-1 ${isContrast || isDarkMode ? 'text-[var(--color-text)]' : 'text-[#03045E]'} ${!isDarkMode ? 'max-md:[text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]' : ''}`}>Platform</p>
                   </div>
@@ -432,7 +444,7 @@ export function Home() {
               </div>
 
               <div className={`h-full flex flex-col justify-center rounded-xl sm:rounded-[2rem] p-4 sm:p-8 shadow-xl border ${isContrast ? 'bg-[var(--color-surface)]/70 border-[var(--color-border)] text-[var(--color-text)]' : 'bg-[var(--color-surface)]/70 border-[#03045E]/20 text-[#03045E]'}`}>
-                <h2 className={`text-lg sm:text-2xl font-black mb-4 sm:mb-6 tracking-tight flex items-center gap-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
+                <h2 tabIndex="0" role="heading" aria-level="2" aria-label="Why Choose AbleWork?" title="Why Choose AbleWork?" className={`text-lg sm:text-2xl font-black mb-4 sm:mb-6 tracking-tight flex items-center gap-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
                   <span aria-hidden="true" className="w-3 h-3 rounded-full bg-[var(--color-accent)]"></span>
                   Why Choose AbleWork?
                 </h2>
@@ -465,13 +477,13 @@ export function Home() {
             
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-6 sm:mb-8">
               <div>
-                <span tabIndex="0" className="inline-block px-3 py-1 rounded-full bg-[var(--color-accentSoft)] text-[var(--color-accent)] font-black text-[10px] sm:text-xs uppercase tracking-widest mb-2 sm:mb-3 border border-[var(--color-accent)]">
+                <span tabIndex="0" role="text" aria-label="Live Opportunities Map" title="Live Opportunities Map" className="inline-block px-3 py-1 rounded-full bg-[var(--color-accentSoft)] text-[var(--color-accent)] font-black text-[10px] sm:text-xs uppercase tracking-widest mb-2 sm:mb-3 border border-[var(--color-accent)]">
                   Live Opportunities Map
                 </span>
-                <h2 className="text-xl sm:text-4xl font-black tracking-tight">
+                <h2 tabIndex="0" role="heading" aria-level="2" aria-label="Explore Inclusive Jobs Around You" title="Explore Inclusive Jobs Around You" className="text-xl sm:text-4xl font-black tracking-tight">
                   Explore Inclusive Jobs Around You
                 </h2>
-                <p className={`text-xs sm:text-base font-bold mt-2 max-w-2xl ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/80'}`}>
+                <p tabIndex="0" role="text" aria-label="See verified hiring workplaces near your location before creating an account. Click any marker to view workplace details!" title="See verified hiring workplaces near your location before creating an account. Click any marker to view workplace details!" className={`text-xs sm:text-base font-bold mt-2 max-w-2xl ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/80'}`}>
                   See verified hiring workplaces near your location before creating an account. Click any marker to view workplace details!
                 </p>
               </div>
@@ -482,6 +494,7 @@ export function Home() {
                   onClick={() => handleDetectUserLocation(true)}
                   disabled={isDetecting}
                   aria-label={isDetecting ? 'Locating' : 'Find Jobs Near Me'}
+                  title={isDetecting ? 'Locating...' : 'Find Jobs Near Me'}
                   className="find-jobs-btn px-4 py-2.5 sm:px-6 sm:py-3.5 bg-[var(--color-accent)] text-[var(--color-background)] font-black text-[10px] sm:text-xs uppercase tracking-wider rounded-xl sm:rounded-2xl shadow-md hover:brightness-125 transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   <svg aria-hidden="true" className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -531,6 +544,7 @@ export function Home() {
                     type="button"
                     onClick={() => setLegendOpen(open => !open)}
                     aria-label="Map Legend"
+                    title="Map Legend"
                     aria-expanded={legendOpen}
                     aria-controls="home-map-legend-panel"
                     className="w-full flex items-center gap-2 px-3 py-2.5 cursor-pointer"
@@ -588,7 +602,7 @@ export function Home() {
                 </div>
               </div>
 
-             <MapContainer 
+                       <MapContainer 
   aria-hidden="true"
   tabIndex="-1"
   center={userLocation ? [userLocation.lat, userLocation.lng] : defaultCenter} 
@@ -688,6 +702,7 @@ export function Home() {
                           <Link
                             to="/register-select"
                             aria-label={`View job details for ${job.job_title} at ${job.company_name}`}
+                            title={`View job details for ${job.job_title} at ${job.company_name}`}
                             className="w-full py-2.5 text-white text-xs font-black rounded-xl cursor-pointer flex items-center justify-center gap-2 shadow-md bg-[#2C7FFF]"
                           >
                             View Job Details
@@ -708,14 +723,15 @@ export function Home() {
 
         <section className={`py-10 sm:py-16 px-4 sm:px-6 my-6 sm:my-8 ${isContrast ? 'bg-[var(--color-background)] border-y border-[var(--color-border)]' : 'bg-[#f4f4f4] border-y border-[#d1d5db]'}`}>
           <div className="max-w-5xl mx-auto text-center space-y-4 sm:space-y-6">
-            <h2 className={`text-xl sm:text-4xl font-black tracking-tight ${isContrast ? '!text-white' : 'text-[#03045E]'}`}>Ready to Take the Next Step in Your Career?</h2>
-            <p className={`text-xs sm:text-lg font-semibold max-w-2xl mx-auto ${isContrast ? '!text-white' : 'text-[#03045E]'}`}>
+            <h2 tabIndex="0" role="heading" aria-level="2" aria-label="Ready to Take the Next Step in Your Career?" title="Ready to Take the Next Step in Your Career?" className={`text-xl sm:text-4xl font-black tracking-tight ${isContrast ? '!text-white' : 'text-[#03045E]'}`}>Ready to Take the Next Step in Your Career?</h2>
+            <p tabIndex="0" role="text" aria-label="Join our growing community of empowered candidates and inclusive companies building a barrier-free workplace." title="Join our growing community of empowered candidates and inclusive companies building a barrier-free workplace." className={`text-xs sm:text-lg font-semibold max-w-2xl mx-auto ${isContrast ? '!text-white' : 'text-[#03045E]'}`}>
               Join our growing community of empowered candidates and inclusive companies building a barrier-free workplace.
             </p>
             <div className="pt-2">
               <Link
                 to="/register-select"
                 aria-label="Create Your Free Account"
+                title="Create Your Free Account"
                 className={`inline-block px-6 py-3 sm:px-9 sm:py-4 rounded-xl sm:rounded-2xl font-black shadow-xl hover:bg-[var(--color-accent)] hover:text-[var(--color-background)] hover:scale-105 hover:brightness-125 transition-all border-2 text-sm sm:text-base ${
                   isContrast 
                     ? 'bg-[var(--color-surface)]/50 !text-black border-[var(--color-accent)]' 
@@ -743,15 +759,15 @@ export function About() {
       <div className="grid md:grid-cols-2 gap-4 sm:gap-8">
 
         <InfoBox>
-          <h2 className="text-lg sm:text-2xl font-black mb-3 sm:mb-5">
+          <h2 tabIndex="0" aria-label="About AbleWork" title="About AbleWork" className="text-lg sm:text-2xl font-black mb-3 sm:mb-5">
             About AbleWork
           </h2>
-          <p className="text-xs sm:text-base font-semibold leading-6 sm:leading-7">
+          <p tabIndex="0" aria-label="AbleWork is a web-based employment assistance system designed to help persons with disabilities find appropriate employment opportunities." title="AbleWork is a web-based employment assistance system designed to help persons with disabilities find appropriate employment opportunities." className="text-xs sm:text-base font-semibold leading-6 sm:leading-7">
             AbleWork is a web-based employment assistance system
             designed to help persons with disabilities find
             appropriate employment opportunities.
           </p>
-          <p className="text-xs sm:text-base font-semibold leading-6 sm:leading-7 mt-3 sm:mt-5">
+          <p tabIndex="0" aria-label="The system connects applicants and employers while helping employers find qualified candidates based on skills, qualifications, and location." title="The system connects applicants and employers while helping employers find qualified candidates based on skills, qualifications, and location." className="text-xs sm:text-base font-semibold leading-6 sm:leading-7 mt-3 sm:mt-5">
             The system connects applicants and employers while
             helping employers find qualified candidates based on
             skills, qualifications, and location.
@@ -759,15 +775,15 @@ export function About() {
         </InfoBox>
 
         <InfoBox>
-          <h2 className="text-lg sm:text-2xl font-black mb-3 sm:mb-5">
+          <h2 tabIndex="0" aria-label="What We Do" title="What We Do" className="text-lg sm:text-2xl font-black mb-3 sm:mb-5">
             What We Do
           </h2>
           <ul className="space-y-3 sm:space-y-4 text-xs sm:text-base font-semibold">
-            <li>✓ Connect applicants with employers</li>
-            <li>✓ Provide suitable job recommendations</li>
-            <li>✓ Help applicants search and apply for jobs</li>
-            <li>✓ Help employers find qualified applicants</li>
-            <li>✓ Promote an inclusive workforce</li>
+            <li tabIndex="0" title="Connect applicants with employers">✓ Connect applicants with employers</li>
+            <li tabIndex="0" title="Provide suitable job recommendations">✓ Provide suitable job recommendations</li>
+            <li tabIndex="0" title="Help applicants search and apply for jobs">✓ Help applicants search and apply for jobs</li>
+            <li tabIndex="0" title="Help employers find qualified applicants">✓ Help employers find qualified applicants</li>
+            <li tabIndex="0" title="Promote an inclusive workforce">✓ Promote an inclusive workforce</li>
           </ul>
         </InfoBox>
 
@@ -802,142 +818,142 @@ export function Policy() {
         <div className={`p-4 sm:p-8 md:p-12 rounded-2xl sm:rounded-3xl border-2 backdrop-blur-sm ${isContrast ? 'bg-[var(--color-surface)]/50 text-[var(--color-text)] border-[var(--color-border)]' : 'bg-[var(--color-surface)]/50 text-[#03045E] border-white/40'}`}>
 
           <div className={`pb-6 sm:pb-8 mb-6 sm:mb-8 border-b ${isContrast ? 'border-[var(--color-border)]' : 'border-[#03045E]/10'}`}>
-            <span className="text-[var(--color-accent)] font-black text-[10px] sm:text-xs uppercase tracking-widest block mb-2">Transparency and Commitment</span>
-            <h2 className={`text-lg sm:text-2xl font-black mb-2 sm:mb-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Your Privacy Matters to Us</h2>
-            <p className={`text-xs sm:text-base font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'}`}>
+            <span tabIndex="0" title="Transparency and Commitment" className="text-[var(--color-accent)] font-black text-[10px] sm:text-xs uppercase tracking-widest block mb-2">Transparency and Commitment</span>
+            <h2 tabIndex="0" title="Your Privacy Matters to Us" className={`text-lg sm:text-2xl font-black mb-2 sm:mb-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Your Privacy Matters to Us</h2>
+            <p tabIndex="0" title="ABLEWORK (the Platform, we, us) is dedicated to safeguarding the privacy and data security of all users, specifically Persons with Disabilities (PWDs) and participating employers." className={`text-xs sm:text-base font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'}`}>
               ABLEWORK ("the Platform", "we", "us") is dedicated to safeguarding the privacy and data security of all users, specifically Persons with Disabilities (PWDs) and participating employers. This Privacy Policy outlines our practices regarding the collection, use, storage, and protection of personal data in compliance with the Republic Act No. 10173, otherwise known as the Data Privacy Act of 2012 (DPA) of the Philippines, and its Implementing Rules and Regulations (IRR).
             </p>
-            <p className={`text-xs sm:text-base font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'} mt-3`}>
+            <p tabIndex="0" title="By registering an account or accessing the platform, you acknowledge and consent to the data processing practices described herein." className={`text-xs sm:text-base font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'} mt-3`}>
               By registering an account or accessing the platform, you acknowledge and consent to the data processing practices described herein.
             </p>
           </div>
 
           <div className={`space-y-6 sm:space-y-8 text-sm sm:text-base leading-relaxed ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">1. Information We Collect</h3>
-              <p className="font-medium mb-3">
+              <h3 tabIndex="0" title="1. Information We Collect" className="text-base sm:text-xl font-black tracking-tight mb-2">1. Information We Collect</h3>
+              <p tabIndex="0" title="We collect only the personal information reasonably necessary to facilitate inclusive employment matching, account verification, and secure platform operations." className="font-medium mb-3">
                 We collect only the personal information reasonably necessary to facilitate inclusive employment matching, account verification, and secure platform operations:
               </p>
               <div className="space-y-3 pl-2">
                 <div>
-                  <p className="font-bold mb-1">For Applicants (Job Seekers):</p>
+                  <p tabIndex="0" title="For Applicants (Job Seekers)" className="font-bold mb-1">For Applicants (Job Seekers):</p>
                   <ul className="list-disc pl-6 space-y-1 font-medium">
-                    <li><strong>Personal Identifiers:</strong> Full name, contact number, residential address, and email address.</li>
-                    <li><strong>Sensitive Personal Information (SPI):</strong> Birthdate, specific disability type/classification, required workplace accommodations, and uploaded government-issued PWD identification cards.</li>
-                    <li><strong>Professional Credentials:</strong> Educational background, skills, work preferences, and uploaded resumes/curriculum vitae.</li>
-                    <li><strong>Location Data:</strong> Approximate geographical coordinates (latitude and longitude) and user-defined travel radius preferences (in kilometers).</li>
+                    <li tabIndex="0" title="Personal Identifiers: Full name, contact number, residential address, and email address."><strong>Personal Identifiers:</strong> Full name, contact number, residential address, and email address.</li>
+                    <li tabIndex="0" title="Sensitive Personal Information: Birthdate, specific disability type, required workplace accommodations, and PWD ID."><strong>Sensitive Personal Information (SPI):</strong> Birthdate, specific disability type/classification, required workplace accommodations, and uploaded government-issued PWD identification cards.</li>
+                    <li tabIndex="0" title="Professional Credentials: Educational background, skills, work preferences, and uploaded resumes."><strong>Professional Credentials:</strong> Educational background, skills, work preferences, and uploaded resumes/curriculum vitae.</li>
+                    <li tabIndex="0" title="Location Data: Approximate geographical coordinates and user-defined travel radius preferences."><strong>Location Data:</strong> Approximate geographical coordinates (latitude and longitude) and user-defined travel radius preferences (in kilometers).</li>
                   </ul>
                 </div>
                 <div>
-                  <p className="font-bold mb-1">For Employers:</p>
+                  <p tabIndex="0" title="For Employers" className="font-bold mb-1">For Employers:</p>
                   <ul className="list-disc pl-6 space-y-1 font-medium">
-                    <li><strong>Company and Representative Details:</strong> Company name, company description, industry classification, representative full name, business email, and contact number.</li>
-                    <li><strong>Verification Records:</strong> Uploaded business registration documents (e.g., DTI, SEC registration, or Mayor's or Business Permit).</li>
-                    <li><strong>Job Listing Data:</strong> Job vacancies, job descriptions, required skills, guaranteed workplace accommodations, and accepted disability types.</li>
+                    <li tabIndex="0" title="Company and Representative Details: Company name, description, industry, representative full name, email, and contact number."><strong>Company and Representative Details:</strong> Company name, company description, industry classification, representative full name, business email, and contact number.</li>
+                    <li tabIndex="0" title="Verification Records: Uploaded business registration documents."><strong>Verification Records:</strong> Uploaded business registration documents (e.g., DTI, SEC registration, or Mayor's or Business Permit).</li>
+                    <li tabIndex="0" title="Job Listing Data: Job vacancies, descriptions, required skills, accommodations, and accepted disability types."><strong>Job Listing Data:</strong> Job vacancies, job descriptions, required skills, guaranteed workplace accommodations, and accepted disability types.</li>
                   </ul>
                 </div>
                 <div>
-                  <p className="font-bold mb-1">System and Technical Metadata (All Users):</p>
-                  <p className="font-medium">Network Internet Protocol (IP) addresses, verification attempt logs, system security timestamps, accessibility settings (e.g., high-contrast theme, font scale), and in-app notification logs.</p>
+                  <p tabIndex="0" title="System and Technical Metadata (All Users)" className="font-bold mb-1">System and Technical Metadata (All Users):</p>
+                  <p tabIndex="0" title="Network Internet Protocol (IP) addresses, verification attempt logs, system security timestamps, accessibility settings, and notification logs." className="font-medium">Network Internet Protocol (IP) addresses, verification attempt logs, system security timestamps, accessibility settings (e.g., high-contrast theme, font scale), and in-app notification logs.</p>
                 </div>
               </div>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">2. Legal Basis and Purpose of Processing</h3>
-              <p className="font-medium mb-2">
+              <h3 tabIndex="0" title="2. Legal Basis and Purpose of Processing" className="text-base sm:text-xl font-black tracking-tight mb-2">2. Legal Basis and Purpose of Processing</h3>
+              <p tabIndex="0" title="In accordance with Sections 12 and 13 of the Data Privacy Act of 2012, personal and sensitive personal information is collected and processed based on explicit user consent and legitimate operational interests." className="font-medium mb-2">
                 In accordance with Sections 12 and 13 of the Data Privacy Act of 2012, personal and sensitive personal information is collected and processed based on explicit user consent and legitimate operational interests for the following purposes:
               </p>
               <ul className="list-disc pl-6 space-y-1 font-medium">
-                <li>Authenticating user credentials using cryptographic hashing (bcrypt).</li>
-                <li>Enforcing administrator document verification to maintain a verified, safe talent marketplace.</li>
-                <li>Powering the automated, rule-based Smart Matching Engine (evaluating skill alignments, accommodation guarantees, and Haversine distance calculations).</li>
-                <li>Enforcing system security protocols, such as cooldown intervals and network rate-limiting against fraudulent submissions.</li>
-                <li>Delivering transactional email notifications and One-Time Password (OTP) verifications via automated SMTP services.</li>
-                <li>Facilitating AI chatbot interactions through the ABBY assistant.</li>
+                <li tabIndex="0" title="Authenticating user credentials using cryptographic hashing (bcrypt).">Authenticating user credentials using cryptographic hashing (bcrypt).</li>
+                <li tabIndex="0" title="Enforcing administrator document verification to maintain a verified, safe talent marketplace.">Enforcing administrator document verification to maintain a verified, safe talent marketplace.</li>
+                <li tabIndex="0" title="Powering the automated, rule-based Smart Matching Engine.">Powering the automated, rule-based Smart Matching Engine (evaluating skill alignments, accommodation guarantees, and Haversine distance calculations).</li>
+                <li tabIndex="0" title="Enforcing system security protocols, such as cooldown intervals and network rate-limiting.">Enforcing system security protocols, such as cooldown intervals and network rate-limiting against fraudulent submissions.</li>
+                <li tabIndex="0" title="Delivering transactional email notifications and One-Time Password (OTP) verifications.">Delivering transactional email notifications and One-Time Password (OTP) verifications via automated SMTP services.</li>
+                <li tabIndex="0" title="Facilitating AI chatbot interactions through the ABBY assistant.">Facilitating AI chatbot interactions through the ABBY assistant.</li>
               </ul>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">3. Processing of Sensitive Personal Information (Disability and PWD Records)</h3>
-              <p className="font-medium">
+              <h3 tabIndex="0" title="3. Processing of Sensitive Personal Information (Disability and PWD Records)" className="text-base sm:text-xl font-black tracking-tight mb-2">3. Processing of Sensitive Personal Information (Disability and PWD Records)</h3>
+              <p tabIndex="0" title="Disability classifications and PWD ID documents are processed strictly to verify eligibility and ensure that matched workplaces meet necessary physical and sensory accommodations." className="font-medium">
                 Disability classifications and PWD ID documents are processed strictly to verify eligibility and ensure that matched workplaces meet necessary physical and sensory accommodations. PWD IDs and business verification files are stored in restricted server storage directories and are accessible exclusively to authorized system administrators for audit and approval purposes. Disability-related details are never sold, rented, or made visible to third-party advertising networks.
               </p>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">4. Artificial Intelligence and Third-Party Service Providers</h3>
-              <p className="font-medium mb-2">
+              <h3 tabIndex="0" title="4. Artificial Intelligence and Third-Party Service Providers" className="text-base sm:text-xl font-black tracking-tight mb-2">4. Artificial Intelligence and Third-Party Service Providers</h3>
+              <p tabIndex="0" title="To deliver modern web capabilities, ABLEWORK interfaces with selected third-party service providers under data protection principles." className="font-medium mb-2">
                 To deliver modern web capabilities, ABLEWORK interfaces with selected third-party service providers under data protection principles:
               </p>
               <ul className="list-disc pl-6 space-y-1 font-medium">
-                <li><strong>Google Gemini API:</strong> Powers the ABBY conversational assistant. Real-time account metadata (e.g., application count, current verification standing) is supplied contextually during active chat queries to provide dynamic help. No passwords, credentials, or official government documents are transmitted to the AI engine.</li>
-                <li><strong>Email Dispatch (Nodemailer and Google SMTP):</strong> Delivers automated system alerts, application updates, and security OTPs to user-registered email addresses.</li>
-                <li><strong>Mapping and Geolocation Services:</strong> Processes device-derived or user-selected coordinates to calculate distance scores relative to employer workplaces.</li>
+                <li tabIndex="0" title="Google Gemini API: Powers the ABBY conversational assistant."><strong>Google Gemini API:</strong> Powers the ABBY conversational assistant. Real-time account metadata (e.g., application count, current verification standing) is supplied contextually during active chat queries to provide dynamic help. No passwords, credentials, or official government documents are transmitted to the AI engine.</li>
+                <li tabIndex="0" title="Email Dispatch (Nodemailer and Google SMTP): Delivers automated system alerts."><strong>Email Dispatch (Nodemailer and Google SMTP):</strong> Delivers automated system alerts, application updates, and security OTPs to user-registered email addresses.</li>
+                <li tabIndex="0" title="Mapping and Geolocation Services: Processes coordinates to calculate distance scores."><strong>Mapping and Geolocation Services:</strong> Processes device-derived or user-selected coordinates to calculate distance scores relative to employer workplaces.</li>
               </ul>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">5. Data Access, Disclosure, and Visibility</h3>
+              <h3 tabIndex="0" title="5. Data Access, Disclosure, and Visibility" className="text-base sm:text-xl font-black tracking-tight mb-2">5. Data Access, Disclosure, and Visibility</h3>
               <ul className="list-disc pl-6 space-y-1 font-medium">
-                <li><strong>Between Users:</strong> When an applicant applies for an active job vacancy, their profile details (name, contact number, resume, skills, and accommodation requests) become accessible to that specific employer.</li>
-                <li><strong>Administrative Access:</strong> System administrators have role-restricted access to user directories, verification documents, and audit logs to approve accounts and manage operational integrity.</li>
-                <li><strong>Legal Compliance:</strong> We do not disclose personal information to external parties unless legally mandated by a valid subpoena, court order, or regulatory authority under Philippine jurisdiction.</li>
+                <li tabIndex="0" title="Between Users: Applicant profile details become accessible to the specific employer."><strong>Between Users:</strong> When an applicant applies for an active job vacancy, their profile details (name, contact number, resume, skills, and accommodation requests) become accessible to that specific employer.</li>
+                <li tabIndex="0" title="Administrative Access: System administrators have role-restricted access to user directories."><strong>Administrative Access:</strong> System administrators have role-restricted access to user directories, verification documents, and audit logs to approve accounts and manage operational integrity.</li>
+                <li tabIndex="0" title="Legal Compliance: We do not disclose personal information unless legally mandated."><strong>Legal Compliance:</strong> We do not disclose personal information to external parties unless legally mandated by a valid subpoena, court order, or regulatory authority under Philippine jurisdiction.</li>
               </ul>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">6. Data Storage, Security, and Protection Measures</h3>
-              <p className="font-medium mb-2">
+              <h3 tabIndex="0" title="6. Data Storage, Security, and Protection Measures" className="text-base sm:text-xl font-black tracking-tight mb-2">6. Data Storage, Security, and Protection Measures</h3>
+              <p tabIndex="0" title="ABLEWORK implements organizational, physical, and technical measures to protect stored data." className="font-medium mb-2">
                 ABLEWORK implements organizational, physical, and technical measures to protect stored data:
               </p>
               <ul className="list-disc pl-6 space-y-1 font-medium">
-                <li><strong>Cryptographic Protection:</strong> Passwords are mathematically hashed with unique cryptographic salts using bcrypt before database storage.</li>
-                <li><strong>Header and Transport Security:</strong> HTTP security headers (Helmet) and Cross-Origin Resource Sharing (CORS) rules protect API communication channels.</li>
-                <li><strong>Access Segregation:</strong> Verification documents and candidate resumes are isolated within designated upload directories linked only to validated database records.</li>
+                <li tabIndex="0" title="Cryptographic Protection: Passwords are mathematically hashed with unique salts."><strong>Cryptographic Protection:</strong> Passwords are mathematically hashed with unique cryptographic salts using bcrypt before database storage.</li>
+                <li tabIndex="0" title="Header and Transport Security: HTTP security headers and CORS rules protect API channels."><strong>Header and Transport Security:</strong> HTTP security headers (Helmet) and Cross-Origin Resource Sharing (CORS) rules protect API communication channels.</li>
+                <li tabIndex="0" title="Access Segregation: Verification documents are isolated within designated directories."><strong>Access Segregation:</strong> Verification documents and candidate resumes are isolated within designated upload directories linked only to validated database records.</li>
               </ul>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">7. Data Retention and Account Deletion</h3>
+              <h3 tabIndex="0" title="7. Data Retention and Account Deletion" className="text-base sm:text-xl font-black tracking-tight mb-2">7. Data Retention and Account Deletion</h3>
               <ul className="list-disc pl-6 space-y-1 font-medium">
-                <li>Personal data, application histories, and profile records are retained for the duration of the user's active participation on the platform.</li>
-                <li><strong>Account Deactivation:</strong> Users may deactivate their profile, rendering their account and job listings inactive (Disabled).</li>
-                <li><strong>Permanent Erasure:</strong> Users retain the right to request permanent account deletion via system settings. Account deletion permanently purges user profile records, application submissions, and authentication data from the production database upon password re-verification.</li>
+                <li tabIndex="0" title="Personal data is retained for the duration of the user's active participation.">Personal data, application histories, and profile records are retained for the duration of the user's active participation on the platform.</li>
+                <li tabIndex="0" title="Account Deactivation: Users may deactivate their profile."><strong>Account Deactivation:</strong> Users may deactivate their profile, rendering their account and job listings inactive (Disabled).</li>
+                <li tabIndex="0" title="Permanent Erasure: Users retain the right to request permanent account deletion."><strong>Permanent Erasure:</strong> Users retain the right to request permanent account deletion via system settings. Account deletion permanently purges user profile records, application submissions, and authentication data from the production database upon password re-verification.</li>
               </ul>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">8. User Rights under Republic Act No. 10173</h3>
-              <p className="font-medium mb-2">
+              <h3 tabIndex="0" title="8. User Rights under Republic Act No. 10173" className="text-base sm:text-xl font-black tracking-tight mb-2">8. User Rights under Republic Act No. 10173</h3>
+              <p tabIndex="0" title="As a data subject under the Philippine Data Privacy Act of 2012, you are entitled to:" className="font-medium mb-2">
                 As a data subject under the Philippine Data Privacy Act of 2012, you are entitled to:
               </p>
               <ul className="list-disc pl-6 space-y-1 font-medium">
-                <li><strong>Right to be Informed:</strong> The right to know how your personal and sensitive data is gathered, stored, and utilized.</li>
-                <li><strong>Right to Access:</strong> The right to review your registered data, job history, and application records.</li>
-                <li><strong>Right to Rectification:</strong> The right to update or correct inaccurate profile details and submit verification documents.</li>
-                <li><strong>Right to Erasure or Blocking:</strong> The right to deactivate or permanently delete your account records.</li>
-                <li><strong>Right to Damages:</strong> The right to seek indemnification for damages sustained due to inaccurate, incomplete, outdated, false, or unlawfully obtained personal data.</li>
+                <li tabIndex="0" title="Right to be Informed: The right to know how your data is gathered, stored, and utilized."><strong>Right to be Informed:</strong> The right to know how your personal and sensitive data is gathered, stored, and utilized.</li>
+                <li tabIndex="0" title="Right to Access: The right to review your registered data and job history."><strong>Right to Access:</strong> The right to review your registered data, job history, and application records.</li>
+                <li tabIndex="0" title="Right to Rectification: The right to update or correct inaccurate profile details."><strong>Right to Rectification:</strong> The right to update or correct inaccurate profile details and submit verification documents.</li>
+                <li tabIndex="0" title="Right to Erasure or Blocking: The right to deactivate or permanently delete your account records."><strong>Right to Erasure or Blocking:</strong> The right to deactivate or permanently delete your account records.</li>
+                <li tabIndex="0" title="Right to Damages: The right to seek indemnification for damages sustained."><strong>Right to Damages:</strong> The right to seek indemnification for damages sustained due to inaccurate, incomplete, outdated, false, or unlawfully obtained personal data.</li>
               </ul>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">9. Changes to This Privacy Policy</h3>
-              <p className="font-medium">
+              <h3 tabIndex="0" title="9. Changes to This Privacy Policy" className="text-base sm:text-xl font-black tracking-tight mb-2">9. Changes to This Privacy Policy</h3>
+              <p tabIndex="0" title="ABLEWORK reserves the right to revise this Privacy Policy to accommodate system improvements." className="font-medium">
                 ABLEWORK reserves the right to revise this Privacy Policy to accommodate system improvements, algorithmic enhancements, or updates in legal statutes. Updates will be reflected directly on the platform with an updated effective date.
               </p>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">10. Contact Information and Inquiries</h3>
-              <p className="font-medium mb-2">
+              <h3 tabIndex="0" title="10. Contact Information and Inquiries" className="text-base sm:text-xl font-black tracking-tight mb-2">10. Contact Information and Inquiries</h3>
+              <p tabIndex="0" title="For questions, data access requests, or privacy-related concerns regarding ABLEWORK, contact the project data custody team." className="font-medium mb-2">
                 For questions, data access requests, or privacy-related concerns regarding ABLEWORK, contact the project data custody team:
               </p>
               <ul className="list-disc pl-6 space-y-1 font-medium">
-                <li><strong>Platform:</strong> ABLEWORK Capstone Project</li>
-                <li><strong>Data Custody Team and Proponents:</strong> Paquio, Loueala Jean H., Pagado, Jesie Marie D., Astodillo, Felicite S., Gonzales, John Greg A., Gamboa, John Bryan T.</li>
-                <li><strong>Institution:</strong> STIWNU</li>
-                <li><strong>Official Support Email:</strong> ableworksys5i@gmail.com</li>
+                <li tabIndex="0" title="Platform: ABLEWORK Capstone Project"><strong>Platform:</strong> ABLEWORK Capstone Project</li>
+                <li tabIndex="0" title="Data Custody Team and Proponents: Paquio, Loueala Jean H., Pagado, Jesie Marie D., Astodillo, Felicite S., Gonzales, John Greg A., Gamboa, John Bryan T."><strong>Data Custody Team and Proponents:</strong> Paquio, Loueala Jean H., Pagado, Jesie Marie D., Astodillo, Felicite S., Gonzales, John Greg A., Gamboa, John Bryan T.</li>
+                <li tabIndex="0" title="Institution: STIWNU"><strong>Institution:</strong> STIWNU</li>
+                <li tabIndex="0" title="Official Support Email: ableworksys5i@gmail.com"><strong>Official Support Email:</strong> ableworksys5i@gmail.com</li>
               </ul>
             </section>
           </div>
@@ -958,145 +974,145 @@ export function Terms() {
         <div className={`p-4 sm:p-8 md:p-12 rounded-2xl sm:rounded-3xl border-2 backdrop-blur-sm ${isContrast ? 'bg-[var(--color-surface)]/50 text-[var(--color-text)] border-[var(--color-border)]' : 'bg-[var(--color-surface)]/50 text-[#03045E] border-white/40'}`}>
 
           <div className={`pb-6 sm:pb-8 mb-6 sm:mb-8 border-b ${isContrast ? 'border-[var(--color-border)]' : 'border-[#03045E]/10'}`}>
-            <span className="text-[var(--color-accent)] font-black text-[10px] sm:text-xs uppercase tracking-widest block mb-2">User Guidelines</span>
-            <h2 className={`text-lg sm:text-2xl font-black mb-2 sm:mb-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Platform Rules and Conditions</h2>
-            <p className={`text-xs sm:text-base font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'}`}>
+            <span tabIndex="0" title="User Guidelines" className="text-[var(--color-accent)] font-black text-[10px] sm:text-xs uppercase tracking-widest block mb-2">User Guidelines</span>
+            <h2 tabIndex="0" title="Platform Rules and Conditions" className={`text-lg sm:text-2xl font-black mb-2 sm:mb-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>Platform Rules and Conditions</h2>
+            <p tabIndex="0" title="Welcome to ABLEWORK, a web-based employment assistance system." className={`text-xs sm:text-base font-semibold leading-relaxed ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/90'}`}>
               Welcome to ABLEWORK, a web-based employment assistance system designed to connect persons with disabilities (PWDs) with suitable employment opportunities and help employers manage job vacancies and applications. By accessing or using ABLEWORK, you agree to comply with these Terms and Conditions. If you do not agree with any part of these terms, please do not use the system.
             </p>
           </div>
 
           <div className={`space-y-6 sm:space-y-8 text-sm sm:text-base leading-relaxed ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">1. Acceptance of Terms</h3>
-              <p className="font-medium">
+              <h3 tabIndex="0" title="1. Acceptance of Terms" className="text-base sm:text-xl font-black tracking-tight mb-2">1. Acceptance of Terms</h3>
+              <p tabIndex="0" title="By creating an account or using ABLEWORK, you confirm that you have read and agreed to these Terms." className="font-medium">
                 By creating an account or using ABLEWORK, you confirm that you have read, understood, and agreed to these Terms and Conditions. These terms apply to all applicants, employers, and authorized administrators using the platform.
               </p>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">2. Eligibility and User Accounts</h3>
-              <p className="font-medium">
+              <h3 tabIndex="0" title="2. Eligibility and User Accounts" className="text-base sm:text-xl font-black tracking-tight mb-2">2. Eligibility and User Accounts</h3>
+              <p tabIndex="0" title="Applicants must provide accurate information during registration. Users are responsible for keeping their login credentials confidential." className="font-medium">
                 Applicants must provide accurate and truthful information during registration. Applicants should provide information relevant to their skills, qualifications, work preferences, and workplace accommodation needs. Employers must provide accurate company information and valid business or verification documents when required. Users are responsible for keeping their login credentials confidential. Each user should maintain only one account unless otherwise authorized by the system administrator. ABLEWORK reserves the right to suspend or disable accounts that contain false information, violate these terms, or pose a security risk.
               </p>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">3. Account Verification</h3>
-              <p className="font-medium">
+              <h3 tabIndex="0" title="3. Account Verification" className="text-base sm:text-xl font-black tracking-tight mb-2">3. Account Verification</h3>
+              <p tabIndex="0" title="ABLEWORK requires applicants and employers to submit specific documents for account verification." className="font-medium">
                 ABLEWORK requires applicants and employers to submit specific documents for account verification. Applicants must submit a valid PWD ID, and Employers must submit valid business registration documents (e.g., DTI, SEC, or Business Permit). Submitted documents must be authentic and belong to the account holder or registered organization. Administrators may review submitted documents before approving an account. An account may remain restricted or pending until verification is completed. In the event a verification document is rejected by an administrator, the account will be subject to a mandatory 7-day security cooldown before a new document can be submitted. The system also actively monitors and limits repeated failed verification attempts to prevent abuse. Verification does not guarantee employment, hiring, or acceptance of any application.
               </p>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">4. Use of the System</h3>
-              <p className="font-medium mb-2">
+              <h3 tabIndex="0" title="4. Use of the System" className="text-base sm:text-xl font-black tracking-tight mb-2">4. Use of the System</h3>
+              <p tabIndex="0" title="Users agree to use ABLEWORK only for lawful employment-related purposes." className="font-medium mb-2">
                 Users agree to use ABLEWORK only for lawful employment-related purposes. Users must not:
               </p>
               <ul className="list-disc pl-6 space-y-1 font-medium">
-                <li>Submit false, misleading, or fraudulent information.</li>
-                <li>Post fake, discriminatory, or misleading job vacancies.</li>
-                <li>Use the system to harass, threaten, or discriminate against other users.</li>
-                <li>Access another person's account without permission.</li>
-                <li>Attempt to damage, disrupt, or gain unauthorized access to the system.</li>
-                <li>Upload harmful files, malicious code, or inappropriate content.</li>
-                <li>Collect or misuse another user's personal information.</li>
+                <li tabIndex="0" title="Submit false, misleading, or fraudulent information.">Submit false, misleading, or fraudulent information.</li>
+                <li tabIndex="0" title="Post fake, discriminatory, or misleading job vacancies.">Post fake, discriminatory, or misleading job vacancies.</li>
+                <li tabIndex="0" title="Use the system to harass, threaten, or discriminate against other users.">Use the system to harass, threaten, or discriminate against other users.</li>
+                <li tabIndex="0" title="Access another person's account without permission.">Access another person's account without permission.</li>
+                <li tabIndex="0" title="Attempt to damage, disrupt, or gain unauthorized access to the system.">Attempt to damage, disrupt, or gain unauthorized access to the system.</li>
+                <li tabIndex="0" title="Upload harmful files, malicious code, or inappropriate content.">Upload harmful files, malicious code, or inappropriate content.</li>
+                <li tabIndex="0" title="Collect or misuse another user's personal information.">Collect or misuse another user's personal information.</li>
               </ul>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">5. Job Listings and Applications</h3>
-              <p className="font-medium">
+              <h3 tabIndex="0" title="5. Job Listings and Applications" className="text-base sm:text-xl font-black tracking-tight mb-2">5. Job Listings and Applications</h3>
+              <p tabIndex="0" title="Employers are responsible for ensuring that their job postings are accurate. ABLEWORK provides job-matching services but does not guarantee hiring." className="font-medium">
                 Employers are responsible for ensuring that their job postings are accurate, complete, and up to date. Applicants are responsible for reviewing job requirements before submitting an application. ABLEWORK provides employment assistance and job-matching services but does not guarantee that an applicant will be hired. Employers are responsible for their own recruitment process, interviews, and final hiring decisions. ABLEWORK does not guarantee the availability, legitimacy, or continued existence of every job opportunity unless it has been specifically verified by the system or its administrators. Applicants should independently verify important employment details before accepting a job offer.
               </p>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">6. Job Matching and Recommendations</h3>
-              <p className="font-medium">
+              <h3 tabIndex="0" title="6. Job Matching and Recommendations" className="text-base sm:text-xl font-black tracking-tight mb-2">6. Job Matching and Recommendations</h3>
+              <p tabIndex="0" title="ABLEWORK provides job recommendations based on user profiles, skills, qualifications, and location." className="font-medium">
                 ABLEWORK provides job recommendations based on information such as user profiles, skills, qualifications, preferences, workplace requirements, and location. Recommendations are intended to assist users in finding potentially suitable opportunities but are not guarantees of employment or suitability. The matching algorithm strictly enforces specific requirements. If an employer cannot provide an applicant's required workplace accommodations, or if an applicant falls outside the employer's designated travel radius, the system will intentionally hide the job posting from that applicant to ensure safe and viable employment. Users should review the complete job description and determine whether the opportunity meets their needs. Location-based recommendations may depend on the accuracy of the location information provided or permitted by the user.
               </p>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">7. Accessibility Features</h3>
-              <p className="font-medium">
+              <h3 tabIndex="0" title="7. Accessibility Features" className="text-base sm:text-xl font-black tracking-tight mb-2">7. Accessibility Features</h3>
+              <p tabIndex="0" title="ABLEWORK may provide accessibility features such as display themes, font-size adjustments, and color-blindness support." className="font-medium">
                 ABLEWORK may provide accessibility features such as display themes, font-size adjustments, and color-blindness support. These features are intended to improve usability but may not meet every user's individual accessibility needs. Users are encouraged to report accessibility problems so the system can be improved.
               </p>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">8. Chatbot and Automated Assistance</h3>
-              <p className="font-medium mb-2">
+              <h3 tabIndex="0" title="8. Chatbot and Automated Assistance" className="text-base sm:text-xl font-black tracking-tight mb-2">8. Chatbot and Automated Assistance</h3>
+              <p tabIndex="0" title="ABLEWORK includes ABBY, a chatbot that provides guidance during the job-search process." className="font-medium mb-2">
                 ABLEWORK includes ABBY, a chatbot that provides guidance and assistance during the job-search and application process.
               </p>
               <ul className="list-disc pl-6 space-y-1 font-medium">
-                <li>ABBY is powered by third-party Artificial Intelligence (Google Gemini). While the chatbot is configured to assist with platform navigation and job inquiries, AI-generated responses can occasionally be inaccurate. Users should not rely on ABBY for binding legal or employment agreements.</li>
-                <li>Chatbot responses are intended for general assistance and may not always be accurate or complete. Users should verify important employment, account, and application information through the appropriate source.</li>
-                <li>The chatbot does not make final hiring decisions.</li>
-                <li>Users should not share passwords, payment information, or other unnecessary sensitive information through the chatbot.</li>
+                <li tabIndex="0" title="ABBY is powered by third-party Artificial Intelligence (Google Gemini).">ABBY is powered by third-party Artificial Intelligence (Google Gemini). While the chatbot is configured to assist with platform navigation and job inquiries, AI-generated responses can occasionally be inaccurate. Users should not rely on ABBY for binding legal or employment agreements.</li>
+                <li tabIndex="0" title="Chatbot responses are intended for general assistance.">Chatbot responses are intended for general assistance and may not always be accurate or complete. Users should verify important employment, account, and application information through the appropriate source.</li>
+                <li tabIndex="0" title="The chatbot does not make final hiring decisions.">The chatbot does not make final hiring decisions.</li>
+                <li tabIndex="0" title="Users should not share passwords or sensitive information through the chatbot.">Users should not share passwords, payment information, or other unnecessary sensitive information through the chatbot.</li>
               </ul>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">9. Location Services</h3>
-              <p className="font-medium mb-2">
+              <h3 tabIndex="0" title="9. Location Services" className="text-base sm:text-xl font-black tracking-tight mb-2">9. Location Services</h3>
+              <p tabIndex="0" title="If enabled, ABLEWORK uses location-related information to provide nearby job recommendations." className="font-medium mb-2">
                 If enabled, ABLEWORK uses location-related information to provide nearby job recommendations and location-based services.
               </p>
               <ul className="list-disc pl-6 space-y-1 font-medium">
-                <li>Users may be asked to allow location access to utilize the Travel Radius feature, which filters job recommendations based on maximum geographical distance. This data is strictly used for the matching algorithm.</li>
-                <li>Location-based features may not function accurately if location access is disabled or unavailable.</li>
-                <li>Users should only enable location services when they are comfortable sharing the required location information.</li>
+                <li tabIndex="0" title="Users may be asked to allow location access to utilize the Travel Radius feature.">Users may be asked to allow location access to utilize the Travel Radius feature, which filters job recommendations based on maximum geographical distance. This data is strictly used for the matching algorithm.</li>
+                <li tabIndex="0" title="Location-based features may not function accurately if location access is disabled.">Location-based features may not function accurately if location access is disabled or unavailable.</li>
+                <li tabIndex="0" title="Users should only enable location services when comfortable.">Users should only enable location services when they are comfortable sharing the required location information.</li>
               </ul>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">10. Intellectual Property</h3>
-              <p className="font-medium">
+              <h3 tabIndex="0" title="10. Intellectual Property" className="text-base sm:text-xl font-black tracking-tight mb-2">10. Intellectual Property</h3>
+              <p tabIndex="0" title="The ABLEWORK name, system design, and content are owned by the project proponents." className="font-medium">
                 The ABLEWORK name, system design, interface, content, and software components are owned by the project proponents or their respective rights holders, unless otherwise stated. Users may not copy, reproduce, modify, distribute, or commercially use the system or its materials without proper authorization.
               </p>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">11. System Availability and Limitations</h3>
-              <p className="font-medium">
+              <h3 tabIndex="0" title="11. System Availability and Limitations" className="text-base sm:text-xl font-black tracking-tight mb-2">11. System Availability and Limitations</h3>
+              <p tabIndex="0" title="ABLEWORK is provided as an employment assistance platform. The system may occasionally experience interruptions." className="font-medium">
                 ABLEWORK is provided as an employment assistance platform. The system may occasionally experience interruptions due to maintenance, technical issues, internet connectivity, or third-party services. The proponents do not guarantee that the system will always be available, error-free, or uninterrupted.
               </p>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">12. Account Suspension or Termination</h3>
-              <p className="font-medium mb-2">
+              <h3 tabIndex="0" title="12. Account Suspension or Termination" className="text-base sm:text-xl font-black tracking-tight mb-2">12. Account Suspension or Termination</h3>
+              <p tabIndex="0" title="ABLEWORK may suspend, restrict, or terminate an account if the user violates these terms." className="font-medium mb-2">
                 ABLEWORK may suspend, restrict, or terminate an account if the user:
               </p>
               <ul className="list-disc pl-6 space-y-1 font-medium">
-                <li>Violates these Terms and Conditions.</li>
-                <li>Provides false or fraudulent information.</li>
-                <li>Misuses personal data or system features.</li>
-                <li>Attempts unauthorized access.</li>
-                <li>Engages in harmful, abusive, or unlawful activities.</li>
+                <li tabIndex="0" title="Violates these Terms and Conditions.">Violates these Terms and Conditions.</li>
+                <li tabIndex="0" title="Provides false or fraudulent information.">Provides false or fraudulent information.</li>
+                <li tabIndex="0" title="Misuses personal data or system features.">Misuses personal data or system features.</li>
+                <li tabIndex="0" title="Attempts unauthorized access.">Attempts unauthorized access.</li>
+                <li tabIndex="0" title="Engages in harmful, abusive, or unlawful activities.">Engages in harmful, abusive, or unlawful activities.</li>
               </ul>
-              <p className="font-medium mt-2">
+              <p tabIndex="0" title="Users may contact the system administrator regarding account concerns." className="font-medium mt-2">
                 Users may contact the system administrator regarding account concerns or requests for account review.
               </p>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">13. Changes to These Terms</h3>
-              <p className="font-medium">
+              <h3 tabIndex="0" title="13. Changes to These Terms" className="text-base sm:text-xl font-black tracking-tight mb-2">13. Changes to These Terms</h3>
+              <p tabIndex="0" title="ABLEWORK may update these Terms and Conditions when necessary." className="font-medium">
                 ABLEWORK may update these Terms and Conditions when necessary to improve the system, address security concerns, or comply with applicable regulations and legal requirements. Continued use of the platform after such updates constitutes acceptance of the revised terms.
               </p>
             </section>
 
             <section>
-              <h3 className="text-base sm:text-xl font-black tracking-tight mb-2">14. Contact Information</h3>
-              <p className="font-medium mb-2">
+              <h3 tabIndex="0" title="14. Contact Information" className="text-base sm:text-xl font-black tracking-tight mb-2">14. Contact Information</h3>
+              <p tabIndex="0" title="For questions, concerns, or reports regarding these Terms and Conditions, please contact:" className="font-medium mb-2">
                 For questions, concerns, or reports regarding these Terms and Conditions, please contact:
               </p>
               <ul className="list-disc pl-6 space-y-1 font-medium">
-                <li><strong>System Name:</strong> ABLEWORK</li>
-                <li><strong>Project Team:</strong> 5i</li>
-                <li><strong>Email:</strong> ableworksys5i@gmail.com</li>
-                <li><strong>Address:</strong> Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</li>
+                <li tabIndex="0" title="System Name: ABLEWORK"><strong>System Name:</strong> ABLEWORK</li>
+                <li tabIndex="0" title="Project Team: 5i"><strong>Project Team:</strong> 5i</li>
+                <li tabIndex="0" title="Email: ableworksys5i@gmail.com"><strong>Email:</strong> ableworksys5i@gmail.com</li>
+                <li tabIndex="0" title="Address: Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines"><strong>Address:</strong> Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</li>
               </ul>
             </section>
           </div>
@@ -1116,25 +1132,25 @@ export function Contact() {
       <div className="grid md:grid-cols-2 gap-4 sm:gap-8">
         
         <InfoBox>
-          <h2 className="text-lg sm:text-2xl font-black mb-4 sm:mb-6">Get in Touch</h2>
+          <h2 tabIndex="0" title="Get in Touch" className="text-lg sm:text-2xl font-black mb-4 sm:mb-6">Get in Touch</h2>
           <div className="space-y-4 sm:space-y-6">
             <div>
-              <h3 className="text-xs sm:text-base font-black">Email</h3>
-              <p className="text-xs sm:text-base font-semibold">ableworksys5@gmail.com</p>
+              <h3 tabIndex="0" title="Email" className="text-xs sm:text-base font-black">Email</h3>
+              <p tabIndex="0" title="ableworksys5@gmail.com" className="text-xs sm:text-base font-semibold">ableworksys5@gmail.com</p>
             </div>
             <div>
-              <h3 className="text-xs sm:text-base font-black">Phone</h3>
-              <p className="text-xs sm:text-base font-semibold">+63 900 000 0000</p>
+              <h3 tabIndex="0" title="Phone" className="text-xs sm:text-base font-black">Phone</h3>
+              <p tabIndex="0" title="+63 900 000 0000" className="text-xs sm:text-base font-semibold">+63 900 000 0000</p>
             </div>
             <div>
-              <h3 className="text-xs sm:text-base font-black">Address</h3>
-              <p className="text-xs sm:text-base font-semibold">Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</p>
+              <h3 tabIndex="0" title="Address" className="text-xs sm:text-base font-black">Address</h3>
+              <p tabIndex="0" title="Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines" className="text-xs sm:text-base font-semibold">Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</p>
             </div>
           </div>
         </InfoBox>
 
         <InfoBox>
-          <h2 className="text-lg sm:text-2xl font-black mb-4 sm:mb-6">Send Us a Message</h2>
+          <h2 tabIndex="0" title="Send Us a Message" className="text-lg sm:text-2xl font-black mb-4 sm:mb-6">Send Us a Message</h2>
           <form className="space-y-3 sm:space-y-4">
             <div>
               <label htmlFor="contact-name" className="sr-only">Your Name</label>
@@ -1143,6 +1159,7 @@ export function Contact() {
                 type="text"
                 placeholder="Your Name"
                 aria-label="Your Name"
+                title="Your Name"
                 className={`w-full p-2.5 sm:p-3 bg-transparent border-2 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-[var(--color-accent)] ${
                   isContrast ? 'border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-textSubtle)]' : 'border-[#03045E]/30 text-[#03045E] placeholder-[#03045E]/70'
                 }`}
@@ -1155,6 +1172,7 @@ export function Contact() {
                 type="email"
                 placeholder="Your Email"
                 aria-label="Your Email"
+                title="Your Email"
                 className={`w-full p-2.5 sm:p-3 bg-transparent border-2 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-[var(--color-accent)] ${
                   isContrast ? 'border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-textSubtle)]' : 'border-[#03045E]/30 text-[#03045E] placeholder-[#03045E]/70'
                 }`}
@@ -1167,6 +1185,7 @@ export function Contact() {
                 rows="5"
                 placeholder="Your Message"
                 aria-label="Your Message"
+                title="Your Message"
                 className={`w-full p-2.5 sm:p-3 bg-transparent border-2 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-[var(--color-accent)] ${
                   isContrast ? 'border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-textSubtle)]' : 'border-[#03045E]/30 text-[#03045E] placeholder-[#03045E]/70'
                 }`}
@@ -1175,6 +1194,7 @@ export function Contact() {
             <button
               type="button"
               aria-label="Send Message"
+              title="Send Message"
               className={`w-full py-2.5 sm:py-3 rounded-full font-bold transition border-2 hover:brightness-125 text-xs sm:text-sm ${
                 isContrast 
                   ? 'bg-[var(--color-surface)]/50 text-[var(--color-text)] border-[var(--color-surface)] hover:text-[var(--color-background)] hover:border-[var(--color-accent)]' 
@@ -1242,7 +1262,7 @@ function PageLayout({ title, children }) {
 
         <main role="main" aria-label={`${title} Screen`} className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16 w-full">
 
-          <h1 className={`text-2xl sm:text-4xl md:text-5xl font-black text-center mb-8 sm:mb-12 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
+          <h1 tabIndex="0" title={title} className={`text-2xl sm:text-4xl md:text-5xl font-black text-center mb-8 sm:mb-12 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
             {title}
           </h1>
 
@@ -1276,12 +1296,23 @@ function SimpleFooter() {
             role="img"
             aria-label="AbleWork logo"
             tabIndex="0"
+            title="AbleWork Logo"
             className="h-8 sm:h-10 w-auto object-contain"
           />
-          <p className={`text-[10px] sm:text-sm font-semibold leading-relaxed text-white`}>
+          <p 
+            tabIndex="0"
+            aria-label="Building an inclusive workforce and equal employment opportunities for everyone."
+            title="Building an inclusive workforce and equal employment opportunities for everyone."
+            className={`text-[10px] sm:text-sm font-semibold leading-relaxed text-white`}
+          >
             Building an inclusive workforce and equal employment opportunities for everyone.
           </p>
-          <div className={`pt-1 flex items-center space-x-3 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-white`}>
+          <div 
+            tabIndex="0"
+            aria-label="Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines"
+            title="Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines"
+            className={`pt-1 flex items-center space-x-3 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-white`}
+          >
             <span> Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</span>
             <span></span>
             <span></span>
@@ -1289,20 +1320,27 @@ function SimpleFooter() {
         </div>
 
         <div>
-          <h4 className={`text-xs sm:text-base font-black mb-2 sm:mb-4 text-white`}>Quick Links</h4>
+          <h4 
+            tabIndex="0"
+            aria-label="Quick Links"
+            title="Quick Links"
+            className={`text-xs sm:text-base font-black mb-2 sm:mb-4 text-white`}
+          >
+            Quick Links
+          </h4>
           <ul className="space-y-1 sm:space-y-2 text-[10px] sm:text-sm font-semibold">
             <li>
-              <Link to="/" aria-label="Home Dashboard" className={`transition-colors text-white hover:text-white`}>
+              <Link to="/" aria-label="Home Dashboard" title="Home Dashboard" className={`transition-colors text-white hover:text-white`}>
                 Home Dashboard
               </Link>
             </li>
             <li>
-              <Link to="/about" aria-label="About Our Mission" className={`transition-colors text-white hover:text-white`}>
+              <Link to="/about" aria-label="About Our Mission" title="About Our Mission" className={`transition-colors text-white hover:text-white`}>
                 About Our Mission
               </Link>
             </li>
             <li>
-              <Link to="/contact" aria-label="Contact Support" className={`transition-colors text-white hover:text-white`}>
+              <Link to="/contact" aria-label="Contact Support" title="Contact Support" className={`transition-colors text-white hover:text-white`}>
                 Contact Support
               </Link>
             </li>
@@ -1310,15 +1348,22 @@ function SimpleFooter() {
         </div>
 
         <div>
-          <h4 className={`text-xs sm:text-base font-black mb-2 sm:mb-4 text-white`}>Legal and Support</h4>
+          <h4 
+            tabIndex="0"
+            aria-label="Legal and Support"
+            title="Legal and Support"
+            className={`text-xs sm:text-base font-black mb-2 sm:mb-4 text-white`}
+          >
+            Legal and Support
+          </h4>
           <ul className="space-y-1 sm:space-y-2 text-[10px] sm:text-sm font-semibold">
             <li>
-              <Link to="/policy" aria-label="Privacy Policy" className={`transition-colors text-white hover:text-white`}>
+              <Link to="/policy" aria-label="Privacy Policy" title="Privacy Policy" className={`transition-colors text-white hover:text-white`}>
                 Privacy Policy
               </Link>
             </li>
             <li>
-              <Link to="/terms" aria-label="Terms and Conditions" className={`transition-colors text-white hover:text-white`}>
+              <Link to="/terms" aria-label="Terms and Conditions" title="Terms and Conditions" className={`transition-colors text-white hover:text-white`}>
                 Terms and Conditions
               </Link>
             </li>
@@ -1326,13 +1371,26 @@ function SimpleFooter() {
         </div>
 
         <div>
-          <h4 className={`text-xs sm:text-base font-black mb-2 sm:mb-4 text-white`}>Get Started</h4>
-          <p className={`text-[10px] sm:text-sm font-semibold mb-2 sm:mb-4 text-white`}>
+          <h4 
+            tabIndex="0"
+            aria-label="Get Started"
+            title="Get Started"
+            className={`text-xs sm:text-base font-black mb-2 sm:mb-4 text-white`}
+          >
+            Get Started
+          </h4>
+          <p 
+            tabIndex="0"
+            aria-label="Are you an applicant or employer looking to join our network?"
+            title="Are you an applicant or employer looking to join our network?"
+            className={`text-[10px] sm:text-sm font-semibold mb-2 sm:mb-4 text-white`}
+          >
             Are you an applicant or employer looking to join our network?
           </p>
           <Link
             to="/register-select"
             aria-label="Register Now"
+            title="Register Now"
             className="register-btn inline-block bg-[var(--color-accent)] text-white px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-xl font-bold text-[9px] sm:text-xs uppercase tracking-wider shadow-md hover:brightness-125 hover:text-white transition-all border-2 border-[var(--color-accent)] hover:border-[var(--color-background)]"
           >
             Register Now
@@ -1341,7 +1399,12 @@ function SimpleFooter() {
 
       </div>
 
-      <div className={`max-w-[1700px] mx-auto pt-3 sm:pt-6 flex flex-col items-center justify-center gap-2 sm:gap-4 text-[9px] sm:text-xs font-bold text-white text-center`}>
+      <div 
+        tabIndex="0"
+        aria-label="Copyright information and slogan"
+        title="Copyright information and slogan"
+        className={`max-w-[1700px] mx-auto pt-3 sm:pt-6 flex flex-col items-center justify-center gap-2 sm:gap-4 text-[9px] sm:text-xs font-bold text-white text-center`}
+      >
         <p>© {new Date().getFullYear()} AgileWork Inc. All rights reserved.</p>
         <p className="font-bold">Empowering Abilities, Connecting Opportunities.</p>
       </div>
@@ -1356,7 +1419,7 @@ function Feature({ title, text }) {
   const id = `feature-${title.replace(/\s+/g, '-').toLowerCase()}`;
 
   return (
-    <div role="group" aria-labelledby={id} className="flex gap-3 sm:gap-4 items-start p-2 sm:p-3 rounded-xl sm:rounded-2xl">
+    <div role="group" aria-labelledby={id} title={`${title}: ${text}`} className="flex gap-3 sm:gap-4 items-start p-2 sm:p-3 rounded-xl sm:rounded-2xl" tabIndex="0" aria-label={`${title}: ${text}`}>
       <div aria-hidden="true" className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-[var(--color-accentSoft)] text-[var(--color-accent)] flex items-center justify-center font-bold text-xs sm:text-sm shrink-0 mt-0.5">
         ✓
       </div>
@@ -1382,6 +1445,9 @@ function InfoCard({ title, text }) {
       className={`rounded-2xl shadow-xl p-5 sm:p-7 border-2 backdrop-blur-sm ${isContrast ? 'bg-[var(--color-surface)]/50 text-[var(--color-text)] border-[var(--color-border)]' : 'bg-[var(--color-surface)]/50 text-[#03045E] border-white/40'}`}
       role="region"
       aria-labelledby={id}
+      tabIndex="0"
+      aria-label={`${title}: ${text}`}
+      title={`${title}: ${text}`}
     >
       <h3 id={id} className={`text-base sm:text-xl font-black mb-2 sm:mb-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
         {title}
@@ -1634,13 +1700,14 @@ export default function ApplicantRegister() {
         <div className="w-full h-14 px-4 flex items-center justify-between max-w-md mx-auto box-border">
           <div className="flex items-center gap-3">
             <div className="flex items-center flex-shrink-0 py-1">
-              <img src={(isAccessibilityMode || (mode && typeof mode === 'string' && mode.toLowerCase().includes('dark'))) ? darkLogo : lightLogo} alt="AbleWork logo" role="img" aria-label="AbleWork logo" tabIndex="0" className="h-9 w-auto object-contain max-h-full" />
+              <img src={(isAccessibilityMode || (mode && typeof mode === 'string' && mode.toLowerCase().includes('dark'))) ? darkLogo : lightLogo} alt="AbleWork logo" role="img" aria-label="AbleWork logo" tabIndex="0" title="AbleWork Logo" className="h-9 w-auto object-contain max-h-full" />
             </div>
           </div>
           <div className="flex items-center">
             <NavLink
               to="/login"
               aria-label="Log In"
+              title="Log In"
               className={({ isActive }) => 
                 `px-3 py-1.5 rounded-full bg-transparent text-[#03045E] text-xs font-bold border border-[#03045E]/30 hover:bg-[#2C7FFF] hover:text-white hover:border-[#2C7FFF] transition whitespace-nowrap ${
                   isActive 
@@ -1669,7 +1736,7 @@ export default function ApplicantRegister() {
         />
         <div className="absolute inset-0 bg-white/80 backdrop-blur-md pointer-events-none fixed" aria-hidden="true" />
 
-        <div className="w-full flex flex-col bg-[var(--color-surface)] text-[#03045E] rounded-3xl shadow-xl border border-[#03045E]/10 overflow-hidden relative z-50 animate-fadeIn p-5 sm:p-6 mb-10">
+        <div className="w-full flex flex-col bg-[var(--color-surface)] text-[#03045E] rounded-2xl shadow-xl border border-[#03045E]/10 overflow-hidden relative z-50 animate-fadeIn p-5 sm:p-6 mb-10">
           
           <div className="flex-shrink-0 pb-4 mb-4 border-b border-[#03045E]/10 flex items-center justify-between">
             <div>
@@ -1683,6 +1750,7 @@ export default function ApplicantRegister() {
           <Link
             to="/register-select"
             aria-label="Back to Role Selection"
+            title="Back to Role Selection"
             className="w-8 h-8 flex items-center justify-center rounded-full bg-[#03045E]/5 text-[#03045E] hover:bg-[#03045E] hover:text-white transition text-sm font-bold"
           >
             ✕
@@ -1709,35 +1777,35 @@ export default function ApplicantRegister() {
             <div className="flex flex-col gap-3.5">
               <div className="flex flex-col gap-1">
                 <label htmlFor="firstName" className="text-xs font-bold text-[#03045E]">First Name <span aria-hidden="true" className="text-[#2C7FFF]">*</span></label>
-                <input id="firstName" type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Enter your First Name" aria-label="Enter your First Name" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
+                <input id="firstName" type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Enter your First Name" aria-label="Enter your First Name" title="Enter your First Name" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
               </div>
               <div className="flex flex-col gap-1">
                 <label htmlFor="middleName" className="text-xs font-bold text-[#03045E]">Middle Name (Optional)</label>
-                <input id="middleName" type="text" value={middleName} onChange={(e) => setMiddleName(e.target.value)} placeholder="Enter your Middle Name" aria-label="Enter your Middle Name" className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
+                <input id="middleName" type="text" value={middleName} onChange={(e) => setMiddleName(e.target.value)} placeholder="Enter your Middle Name" aria-label="Enter your Middle Name" title="Enter your Middle Name" className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
               </div>
               <div className="flex flex-col gap-1">
                 <label htmlFor="lastName" className="text-xs font-bold text-[#03045E]">Last Name <span aria-hidden="true" className="text-[#2C7FFF]">*</span></label>
-                <input id="lastName" type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Enter your Last Name" aria-label="Enter your Last Name" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
+                <input id="lastName" type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Enter your Last Name" aria-label="Enter your Last Name" title="Enter your Last Name" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
               </div>
               <div className="flex flex-col gap-1">
                 <label htmlFor="phone" className="text-xs font-bold text-[#03045E]">Phone Number <span aria-hidden="true" className="text-[#2C7FFF]">*</span></label>
-                <input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Enter your Phone Number" aria-label="Enter your Phone Number" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
+                <input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Enter your Phone Number" aria-label="Enter your Phone Number" title="Enter your Phone Number" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
               </div>
               <div className="flex flex-col gap-1">
                 <label htmlFor="email" className="text-xs font-bold text-[#03045E]">Email Address <span aria-hidden="true" className="text-[#2C7FFF]">*</span></label>
-                <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your Email Address" aria-label="Enter your Email Address" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
+                <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your Email Address" aria-label="Enter your Email Address" title="Enter your Email Address" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
               </div>
               <div className="flex flex-col gap-1">
                 <label htmlFor="password" className="text-xs font-bold text-[#03045E]">Password <span aria-hidden="true" className="text-[#2C7FFF]">*</span></label>
-                <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your Password" aria-label="Enter your Password" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
+                <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your Password" aria-label="Enter your Password" title="Enter your Password" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
               </div>
               <div className="flex flex-col gap-1">
                 <label htmlFor="confirmPassword" className="text-xs font-bold text-[#03045E]">Confirm Password <span aria-hidden="true" className="text-[#2C7FFF]">*</span></label>
-                <input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm your Password" aria-label="Confirm your Password" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
+                <input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm your Password" aria-label="Confirm your Password" title="Confirm your Password" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
               </div>
               <div className="flex flex-col gap-1">
                 <label htmlFor="birthdate" className="text-xs font-bold text-[#03045E]">Birthdate (Must be 18+) <span aria-hidden="true" className="text-[#2C7FFF]">*</span></label>
-                <input id="birthdate" type="date" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} placeholder="Enter your Birthdate" aria-label="Enter your Birthdate" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
+                <input id="birthdate" type="date" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} placeholder="Enter your Birthdate" aria-label="Enter your Birthdate" title="Enter your Birthdate" required className="w-full p-2.5 text-sm font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 focus:outline-none focus:border-[#2C7FFF] transition shadow-sm" />
               </div>
             </div>
 
@@ -1745,10 +1813,10 @@ export default function ApplicantRegister() {
 
             <div className="flex flex-col gap-3.5 p-3.5 border border-[#2C7FFF]/20 rounded-2xl bg-[#2C7FFF]/5 shadow-sm">
               <label htmlFor="address" className="text-xs font-bold text-[#03045E]">Residential Address <span aria-hidden="true" className="text-[#2C7FFF]">*</span></label>
-              <button type="button" onClick={handleDetectLocation} disabled={isDetecting} aria-label={isDetecting ? 'Detecting Location' : 'Detect My Location'} className="bg-[#2C7FFF] text-white px-4 py-2 rounded-xl text-xs font-bold shadow hover:brightness-125 transition w-full flex items-center justify-center gap-1.5">
+              <button type="button" onClick={handleDetectLocation} disabled={isDetecting} aria-label={isDetecting ? 'Detecting Location' : 'Detect My Location'} title={isDetecting ? 'Detecting Location' : 'Detect My Location'} className="bg-[#2C7FFF] text-white px-4 py-2 rounded-xl text-xs font-bold shadow hover:brightness-125 transition w-full flex items-center justify-center gap-1.5">
                 {isDetecting ? 'Detecting Location...' : '📍 Detect My Location'}
               </button>
-              <input id="address" type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Enter your Residential Address (e.g. Block 4, Main Street, Manila)" aria-label="Enter your Residential Address" required className="w-full p-2.5 text-xs font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 shadow-sm" />
+              <input id="address" type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Enter your Residential Address (e.g. Block 4, Main Street, Manila)" aria-label="Enter your Residential Address" title="Enter your Residential Address" required className="w-full p-2.5 text-xs font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 shadow-sm" />
                
               <div className="mt-2 flex flex-col gap-2">
                 <div className="flex justify-between items-center">
@@ -1761,6 +1829,7 @@ export default function ApplicantRegister() {
                   id="radius" type="range" min="1" max="50" 
                   value={radius} onChange={(e) => setRadius(Number(e.target.value))} 
                   aria-label="Max Travel Radius"
+                  title="Max Travel Radius"
                   className="w-full h-2 accent-[#2C7FFF] cursor-pointer" 
                 />
                 <p className="text-[11px] font-semibold text-[#03045E]">Jobs beyond this distance will be filtered out automatically.</p>
@@ -1770,6 +1839,7 @@ export default function ApplicantRegister() {
                 <div 
                   role="region"
                   aria-label={`Interactive map showing your home location and a ${radius} kilometer travel radius.`}
+                  title={`Interactive map showing your home location and a ${radius} kilometer travel radius.`}
                   className="h-48 w-full mt-2 rounded-xl overflow-hidden border border-[#03045E]/25 z-0 relative shadow-inner">
                   <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-[1000] flex flex-col gap-2">
                     <button
@@ -1802,6 +1872,7 @@ export default function ApplicantRegister() {
                         type="button"
                         onClick={() => setLegendOpen(open => !open)}
                         aria-label="Map Legend"
+                        title="Map Legend"
                         aria-expanded={legendOpen}
                         aria-controls="applicant-reg-map-legend-panel"
                         className="w-full flex items-center gap-2 px-3 py-2.5 cursor-pointer"
@@ -1845,7 +1916,6 @@ export default function ApplicantRegister() {
                       </div>
                     </div>
                   </div>
-
                 <MapContainer center={[lat, lng]} zoom={11} scrollWheelZoom={false} style={{ height: '100%', width: '100%', zIndex: 0 }}>
                     {satelliteView ? (
                       <TileLayer
@@ -1886,6 +1956,7 @@ export default function ApplicantRegister() {
                       <button 
                         type="button" 
                         aria-label={`Remove ${disability}`}
+                        title={`Remove ${disability}`}
                         onClick={() => setSelectedDisabilities(selectedDisabilities.filter(d => d !== disability))}
                         className="hover:text-red-200 font-bold ml-0.5 text-xs"
                       >
@@ -1903,6 +1974,7 @@ export default function ApplicantRegister() {
                     key={disability}
                     onClick={() => toggleSelection(disability, selectedDisabilities, setSelectedDisabilities)}
                     aria-label={disability}
+                    title={disability}
                     className={`px-3 py-1 rounded-full text-[11px] font-bold border transition shadow-xs ${
                       selectedDisabilities.includes(disability)
                         ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:brightness-125'
@@ -1916,6 +1988,7 @@ export default function ApplicantRegister() {
                   type="button"
                   onClick={() => setShowOtherDisability(!showOtherDisability)}
                   aria-label="Other"
+                  title="Other"
                   className={`px-3 py-1 rounded-full text-[11px] font-bold border transition shadow-xs ${
                   showOtherDisability
                     ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:brightness-125'
@@ -1935,6 +2008,7 @@ export default function ApplicantRegister() {
                   onKeyDown={handleCustomDisabilityKeyDown}
                   placeholder="Type custom condition and press Enter..."
                   aria-label="Type custom condition and press Enter"
+                  title="Type custom condition and press Enter"
                   className="w-full p-2.5 text-xs font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 shadow-sm"
                 />
                 {otherDisability.length > 0 && (
@@ -1947,6 +2021,7 @@ export default function ApplicantRegister() {
                           key={suggestion}
                           type="button"
                           aria-label={suggestion}
+                          title={suggestion}
                           onClick={() => {
                             toggleSelection(suggestion, selectedDisabilities, setSelectedDisabilities);
                             setOtherDisability(''); 
@@ -1971,6 +2046,7 @@ export default function ApplicantRegister() {
                   key={option}
                   onClick={() => setIndependence(option)}
                   aria-label={option}
+                  title={option}
                   className={`px-3.5 py-1.5 rounded-full text-[11px] font-bold border transition shadow-xs ${
                     independence === option
                       ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:brightness-125'
@@ -1992,6 +2068,7 @@ export default function ApplicantRegister() {
                   key={acc}
                   onClick={() => toggleSelection(acc, selectedAccommodations, setSelectedAccommodations)}
                   aria-label={acc}
+                  title={acc}
                   className={`px-3 py-1 rounded-full text-[11px] font-bold border transition shadow-xs ${
                     selectedAccommodations.includes(acc)
                       ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:brightness-125'
@@ -2005,6 +2082,7 @@ export default function ApplicantRegister() {
                 type="button"
                 onClick={() => setShowOtherAccommodation(!showOtherAccommodation)}
                 aria-label="Other"
+                title="Other"
                 className={`px-3 py-1 rounded-full text-[11px] font-bold border transition shadow-xs ${
                   showOtherAccommodation
                     ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:brightness-125'
@@ -2023,6 +2101,7 @@ export default function ApplicantRegister() {
                   onChange={(e) => setOtherAccommodation(e.target.value)}
                   placeholder="Type custom accommodation and press Enter..."
                   aria-label="Type custom accommodation and press Enter"
+                  title="Type custom accommodation and press Enter"
                   className="w-full p-2.5 text-xs font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 shadow-sm"
                 />
                 {otherAccommodation.length > 0 && (
@@ -2035,6 +2114,7 @@ export default function ApplicantRegister() {
                           key={suggestion}
                           type="button"
                           aria-label={suggestion}
+                          title={suggestion}
                           onClick={() => {
                             toggleSelection(suggestion, selectedAccommodations, setSelectedAccommodations);
                             setOtherAccommodation(''); 
@@ -2062,6 +2142,7 @@ export default function ApplicantRegister() {
                     <button 
                       type="button" 
                       aria-label={`Remove ${skill}`}
+                      title={`Remove ${skill}`}
                       onClick={() => setSelectedSkills(selectedSkills.filter(s => s !== skill))}
                       className="hover:text-red-200 font-bold ml-0.5 text-xs"
                     >
@@ -2079,6 +2160,7 @@ export default function ApplicantRegister() {
                   key={skill}
                   onClick={() => toggleSelection(skill, selectedSkills, setSelectedSkills)}
                   aria-label={skill}
+                  title={skill}
                   className={`px-3 py-1 rounded-full text-[11px] font-bold border transition shadow-xs ${
                     selectedSkills.includes(skill)
                       ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:brightness-125'
@@ -2092,6 +2174,7 @@ export default function ApplicantRegister() {
                 type="button"
                 onClick={() => setShowOtherSkill(!showOtherSkill)}
                 aria-label="Other"
+                title="Other"
                 className={`px-3 py-1 rounded-full text-[11px] font-bold border transition shadow-xs ${
                   showOtherSkill
                     ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:brightness-125'
@@ -2111,6 +2194,7 @@ export default function ApplicantRegister() {
                   onKeyDown={handleCustomSkillKeyDown}
                   placeholder="Type custom skill and press Enter..."
                   aria-label="Type custom skill and press Enter"
+                  title="Type custom skill and press Enter"
                   className="w-full p-2.5 text-xs font-semibold border border-[#03045E]/20 rounded-xl bg-[var(--color-surface)] text-[#03045E] placeholder-[#03045E]/50 shadow-sm"
                 />
                 {otherSkill.length > 0 && (
@@ -2123,6 +2207,7 @@ export default function ApplicantRegister() {
                           key={suggestion}
                           type="button"
                           aria-label={suggestion}
+                          title={suggestion}
                           onClick={() => {
                             toggleSelection(suggestion, selectedSkills, setSelectedSkills);
                             setOtherSkill(''); 
@@ -2148,6 +2233,7 @@ export default function ApplicantRegister() {
               accept=".jpg,.jpeg"
               onChange={(e) => setPwdFile(e.target.files[0])}
               aria-label="Upload PWD ID or Certificates"
+              title="Upload PWD ID or Certificates"
               className="w-full text-xs font-semibold text-[#03045E] file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-[#2C7FFF] file:text-white file:font-bold cursor-pointer"
               required
             />
@@ -2160,14 +2246,15 @@ export default function ApplicantRegister() {
             type="submit"
             disabled={isLoading}
             aria-label={isLoading ? 'Submitting' : 'Complete Registration'}
-            className="mt-2 py-3 bg-[#03045E] text-white hover:bg-[#2C7FFF] hover:text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition disabled:opacity-50"
+            title={isLoading ? 'Submitting...' : 'Complete Registration'}
+            className="mt-2 py-3 bg-[#03045E] text-white hover:bg-[#2C7FFF] hover:text-white text-xs font-bold uppercase tracking-wider rounded-xl sm:rounded-2xl shadow-md transition disabled:opacity-50"
           >
             {isLoading ? 'Submitting...' : 'Complete Registration'}
           </button>
         </form>
 
         <p className="mt-5 text-center text-xs font-semibold text-[#03045E]">
-          <Link to="/register-select" aria-label="Back to Role Selection" className="font-bold text-[#2C7FFF] hover:underline">
+          <Link to="/register-select" aria-label="Back to Role Selection" title="Back to Role Selection" className="font-bold text-[#2C7FFF] hover:underline">
             ← Back to Role Selection
           </Link>
         </p>

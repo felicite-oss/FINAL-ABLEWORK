@@ -12,7 +12,7 @@ export default function ColorPalettePicker() {
       <p className="text-[8px] sm:text-[10px] font-bold text-[var(--color-textMuted)] -mt-1 mb-1 leading-snug">
         Choose colors that work best for your eyes
       </p>
-      <div className="grid grid-cols-2 gap-1.5 sm:gap-2 bg-[var(--color-surface)] border-2 border-[var(--color-border)] p-1.5 sm:p-2 rounded-2xl">
+      <div className="grid grid-cols-2 gap-1.5 sm:gap-2 bg-[var(--color-surface)] border-2 border-[var(--color-border)] p-1.5 sm:p-2 rounded-xl sm:rounded-2xl">
         {Object.entries(palettes).map(([key, p]) => {
           const selected = key === paletteKey;
           return (
@@ -21,7 +21,7 @@ export default function ColorPalettePicker() {
               onClick={() => setPaletteKey(key)}
               aria-pressed={selected}
               aria-label={`Select ${p.name} color palette`}
-              className={`relative w-full flex flex-col items-center justify-center gap-1 sm:gap-1.5 px-1.5 py-2 sm:px-3 sm:py-3 rounded-xl text-center transition-all cursor-pointer border-2 ${
+              className={`relative w-full flex flex-col items-center justify-center gap-1 sm:gap-1.5 px-1.5 py-2 sm:px-3 sm:py-3 rounded-lg sm:rounded-xl text-center transition-all cursor-pointer border-2 ${
                 selected
                   ? 'bg-[var(--color-accentSoft)] border-[var(--color-accent)] shadow-sm'
                   : 'bg-[var(--color-surface)] border-[var(--color-border)] hover:border-[var(--color-accent)]'

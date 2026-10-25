@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 export default function ApplicantJobTracker({ applications }) {
   const [filter, setFilter] = useState('All');
+  const [expandedApp, setExpandedApp] = useState(null);
 
  
   const getStatusStyle = (status) => {
@@ -41,6 +42,22 @@ export default function ApplicantJobTracker({ applications }) {
     return applications.filter(app => app.status === tabName).length;
   };
 
+  const getStatusMessage = (app) => {
+    if (app.employer_message) return app.employer_message;
+    switch (app.status) {
+      case 'Shortlisted':
+        return 'Employer may contact you soon';
+      case 'Under Review':
+        return 'Employer is viewing your profile';
+      case 'Hired':
+        return 'Congratulations on the new job!';
+      case 'Rejected':
+        return 'Unfortunately, your application was not selected.';
+      default:
+        return 'Application submitted.';
+    }
+  };
+
   return (
     <div className="animate-fadeIn w-full space-y-4 sm:space-y-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] pb-10">
       
@@ -49,7 +66,7 @@ export default function ApplicantJobTracker({ applications }) {
           <h2 aria-label="My Job Tracker" className="text-xl sm:text-3xl md:text-4xl font-extrabold text-[#03045E] break-words">
             My Job Tracker
           </h2>
-          <p aria-label="Monitor the status of your applications in real-time." className="text-[#2c7fff] mt-0.5 sm:mt-1.5 text-[11px] sm:text-sm md:text-base font-semibold">
+          <p aria-label="Monitor the status of your applications in real-time." className="text-[#03045e] mt-0.5 sm:mt-1.5 text-[11px] sm:text-sm md:text-base font-semibold">
             Monitor the status of your applications in real-time.
           </p>
         </div>
@@ -64,14 +81,14 @@ export default function ApplicantJobTracker({ applications }) {
       </div>
 
       {/* Adjusted container to allow full-width distribution */}
-      <div className="flex gap-1 p-1 sm:gap-2 sm:p-2 rounded-xl sm:rounded-[1.25rem] bg-[#f4f4f4] border border-[#03045E]/15 w-full overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+      <div className="flex gap-1 p-1 sm:gap-2 sm:p-2 rounded-lg sm:rounded-xl bg-[#f4f4f4] border border-[#03045E]/15 w-full overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
         {trackingTabs.map(tab => {
           const count = getTabCount(tab);
           return (
             <button 
               key={tab}
               onClick={() => setFilter(tab)}
-              className={`flex-1 min-w-fit px-1.5 py-1.5 sm:px-4 sm:py-2.5 rounded-lg sm:rounded-xl font-extrabold text-[9px] min-[380px]:text-[10px] sm:text-sm whitespace-nowrap transition-all flex items-center justify-center gap-1 sm:gap-2 cursor-pointer ${
+              className={`flex-1 min-w-fit px-1.5 py-1.5 sm:px-4 sm:py-2.5 rounded-md sm:rounded-lg font-extrabold text-[9px] min-[380px]:text-[10px] sm:text-sm whitespace-nowrap transition-all flex items-center justify-center gap-1 sm:gap-2 cursor-pointer ${
                 filter === tab 
                   ? 'bg-[#03045E] text-white shadow-md' 
                   : 'text-[#03045E]/70 hover:bg-white hover:text-[#03045E]'
@@ -97,7 +114,7 @@ export default function ApplicantJobTracker({ applications }) {
               key={app.application_id} 
               role="listitem"
               tabIndex={0}
-              className={`p-3.5 sm:p-8 rounded-xl sm:rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 transition-all duration-200 hover:shadow-lg flex flex-col gap-2.5 sm:gap-5 ${app.status === 'Rejected' ? 'opacity-80' : ''}`}
+              className={`p-3.5 sm:p-8 rounded-lg sm:rounded-xl bg-white shadow-md border border-[#03045E]/20 transition-all duration-200 hover:shadow-lg flex flex-col gap-2.5 sm:gap-5 ${app.status === 'Rejected' ? 'opacity-80' : ''}`}
             >
               <span className="sr-only">
                 Job Title: {app.job_title}. Company: {app.company_name}. Applied on: {new Date(app.applied_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. Status: {app.status}.
@@ -121,41 +138,29 @@ export default function ApplicantJobTracker({ applications }) {
                   </div>
 
                   <div className="flex flex-row md:flex-col items-center md:items-end gap-2 sm:gap-2 min-w-0 w-full md:w-auto shrink-0">
-                    <span 
-                      className={`px-2.5 py-1 sm:px-4 sm:py-2 text-[10px] sm:text-sm font-extrabold rounded-full border whitespace-nowrap ${getStatusStyle(app.status)}`}
+                    <button
+                      onClick={() => setExpandedApp(expandedApp === app.application_id ? null : app.application_id)}
+                      className={`px-2.5 py-1 sm:px-4 sm:py-2 text-[10px] sm:text-sm font-extrabold rounded-lg border whitespace-nowrap cursor-pointer transition-all flex items-center gap-1.5 sm:gap-2 ${getStatusStyle(app.status)}`}
                       style={getRejectedStyle(app.status)}
                     >
                       {app.status}
-                    </span>
-                    
-                    {app.status === 'Shortlisted' && !app.employer_message && (
-                      <p className="text-[8px] sm:text-[10px] font-extrabold text-[#03045E] uppercase tracking-wider">
-                        Employer may contact you soon
-                      </p>
-                    )}
-                    {app.status === 'Under Review' && (
-                      <p className="text-[8px] sm:text-[10px] font-extrabold text-[#2C7FFF] uppercase tracking-wider">
-                        Employer is viewing your profile
-                      </p>
-                    )}
-                    {app.status === 'Hired' && !app.employer_message && (
-                      <p className="text-[8px] sm:text-[10px] font-extrabold text-[#03045E] uppercase tracking-wider">
-                        Congratulations on the new job!
-                      </p>
-                    )}
+                      <svg className={`w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 transition-transform ${expandedApp === app.application_id ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </button>
                   </div>
                 </div>
 
-                {app.employer_message && (
-                  <div className="mt-1 bg-[#f4f4f4] p-3 sm:p-5 rounded-lg sm:rounded-[1.25rem] border border-[#03045E]/15 flex flex-col gap-1.5 sm:gap-2">
-                    <h4 className="text-[9px] sm:text-xs font-extrabold text-[#2C7FFF] uppercase tracking-widest flex items-center gap-1.5 sm:gap-2">
+                {expandedApp === app.application_id && (
+                  <div className="mt-1 bg-[#f4f4f4] p-3 sm:p-5 rounded-md sm:rounded-lg border border-[#03045E]/15 flex flex-col gap-1.5 sm:gap-2">
+                    <h4 tabIndex="0" aria-label={app.employer_message ? 'Message from Employer' : 'Status Update'} className="text-[9px] sm:text-xs font-extrabold text-[#2C7FFF] uppercase tracking-widest flex items-center gap-1.5 sm:gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit">
                       <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
                       </svg>
-                      Message from Employer
+                      {app.employer_message ? 'Message from Employer' : 'Status Update'}
                     </h4>
-                    <p className="text-[11px] sm:text-sm text-[#03045E] font-medium whitespace-pre-wrap leading-relaxed break-words">
-                      {app.employer_message}
+                    <p tabIndex="0" aria-label={getStatusMessage(app)} className="text-[11px] sm:text-sm text-[#03045E] font-medium whitespace-pre-wrap leading-relaxed break-words focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded p-1 -m-1">
+                      {getStatusMessage(app)}
                     </p>
                   </div>
                 )}
@@ -163,7 +168,7 @@ export default function ApplicantJobTracker({ applications }) {
             </div>
           ))
         ) : (
-          <div className="p-5 sm:p-12 rounded-xl sm:rounded-[2rem] border-2 border-dashed border-[#03045E]/30 bg-[#f4f4f4] flex flex-col items-center justify-center text-center min-h-[200px] sm:min-h-[280px]">
+          <div className="p-5 sm:p-12 rounded-lg sm:rounded-xl border-2 border-dashed border-[#03045E]/30 bg-[#f4f4f4] flex flex-col items-center justify-center text-center min-h-[200px] sm:min-h-[280px]">
             <div className="w-10 h-10 sm:w-16 sm:h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-3 sm:mb-5 border border-[#03045E]/20 text-[#2C7FFF]">
               <svg className="w-5 h-5 sm:w-8 sm:h-8" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>

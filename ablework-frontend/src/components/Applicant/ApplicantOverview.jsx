@@ -68,6 +68,7 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
   const [legendOpen, setLegendOpen] = useState(true);
   const [mapExpanded, setMapExpanded] = useState(false);
   const [satelliteView, setSatelliteView] = useState(false);
+  const [expandedApp, setExpandedApp] = useState(null);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -136,22 +137,37 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
     };
   };
 
+  const getStatusMessage = (app) => {
+    if (app.employer_message) return app.employer_message;
+    switch (app.status) {
+      case 'Shortlisted':
+        return 'Employer may contact you soon';
+      case 'Under Review':
+        return 'Employer is viewing your profile';
+      case 'Hired':
+        return 'Congratulations on the new job!';
+      case 'Rejected':
+        return 'Unfortunately, your application was not selected.';
+      default:
+        return 'Application submitted.';
+    }
+  };
+
   return (
-    <main role="main" aria-label="Applicant Dashboard Overview" className="animate-fadeIn w-full space-y-6 sm:space-y-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] pb-10">
+    <main role="main" aria-label="Applicant Dashboard Overview" className="animate-fadeIn w-full flex flex-col gap-6 sm:gap-9 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] pb-10">
       
       {/*header*/}
-      <section role="region" aria-label={`Welcome back ${profile.firstname}. Here is a quick snapshot of your job search progress today.`} className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4">
+      <section role="region" aria-label={`Welcome back ${profile.firstname}. Here is a quick snapshot of your job search progress today.`} className="relative z-20 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4">
         <div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#03045E]">
+          <h2 tabIndex="0" title={`Welcome back, ${profile.firstname}!`} aria-label={`Welcome back, ${profile.firstname}!`} className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#03045E] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded">
             Welcome back, {profile.firstname}!
           </h2>
-          <p className="text-[#03045E] mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-base font-semibold">
+          <p tabIndex="0" title="Here is a quick snapshot of your job search progress today." aria-label="Here is a quick snapshot of your job search progress today." className="text-[#03045E] mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-base font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded">
             Here is a quick snapshot of your job search progress today.
           </p>
         </div>
       </section>
-
-      {/* status(babaw)*/}
+      
       <section role="region" aria-label="Quick stats overview" className="grid grid-cols-3 gap-2 sm:gap-8">
         
      
@@ -161,7 +177,7 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
           aria-label={`Profile Strength, ${profileStrength} percent. Click to view your profile.`}
           onClick={() => setActiveTab('profile')}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveTab('profile'); } }}
-          className="relative overflow-hidden p-2.5 sm:p-8 rounded-[10px] sm:rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 flex flex-col justify-between cursor-pointer hover:border-[#2C7FFF] hover:shadow-xl transition-all duration-200"
+          className="relative overflow-hidden p-2.5 sm:p-8 rounded-xl sm:rounded-2xl bg-white shadow-md border border-[#03045E]/20 flex flex-col justify-between cursor-pointer hover:border-[#2C7FFF] hover:shadow-xl transition-all duration-200"
         >
           <div>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-0.5 sm:gap-0 mb-1.5 sm:mb-6">
@@ -194,9 +210,9 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
           aria-label={`Smart Matches, ${matchesCount} matching jobs. Click to explore jobs.`}
           onClick={() => setActiveTab('explore-jobs')}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveTab('explore-jobs'); } }}
-          className="p-2.5 sm:p-8 rounded-[10px] sm:rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-6 cursor-pointer hover:border-[#2C7FFF] hover:shadow-xl transition-all duration-200"
+          className="p-2.5 sm:p-8 rounded-xl sm:rounded-2xl bg-white shadow-md border border-[#03045E]/20 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-6 cursor-pointer hover:border-[#2C7FFF] hover:shadow-xl transition-all duration-200"
         >
-          <div aria-hidden="true" className="w-6 h-6 sm:w-16 sm:h-16 rounded-md sm:rounded-[1.25rem] bg-[#f4f4f4] flex items-center justify-center text-[#2C7FFF] shrink-0 border border-[#03045E]/20">
+          <div aria-hidden="true" className="w-6 h-6 sm:w-16 sm:h-16 rounded-lg sm:rounded-xl bg-[#f4f4f4] flex items-center justify-center text-[#2C7FFF] shrink-0 border border-[#03045E]/20">
             <svg aria-hidden="true" className="w-3.5 h-3.5 sm:w-8 sm:h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
             </svg>
@@ -214,9 +230,9 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
           aria-label={`Total Applications, ${applications.length} applications. Click to view job tracker.`}
           onClick={() => setActiveTab('tracker')}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveTab('tracker'); } }}
-          className="p-2.5 sm:p-8 rounded-[10px] sm:rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-6 cursor-pointer hover:border-[#2C7FFF] hover:shadow-xl transition-all duration-200"
+          className="p-2.5 sm:p-8 rounded-xl sm:rounded-2xl bg-white shadow-md border border-[#03045E]/20 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-6 cursor-pointer hover:border-[#2C7FFF] hover:shadow-xl transition-all duration-200"
         >
-          <div aria-hidden="true" className="w-6 h-6 sm:w-16 sm:h-16 rounded-md sm:rounded-[1.25rem] bg-[#f4f4f4] flex items-center justify-center text-[#2C7FFF] shrink-0 border border-[#03045E]/20">
+          <div aria-hidden="true" className="w-6 h-6 sm:w-16 sm:h-16 rounded-lg sm:rounded-xl bg-[#f4f4f4] flex items-center justify-center text-[#2C7FFF] shrink-0 border border-[#03045E]/20">
             <svg aria-hidden="true" className="w-3.5 h-3.5 sm:w-8 sm:h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
             </svg>
@@ -230,15 +246,23 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
       </section>
 
       {/* Map Container - Adjusted Padding & Flex for Mobile */}
-      <section aria-label="Job Discovery Map section" className="p-4 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 flex flex-col">
+      <section aria-label="Job Discovery Map section" className="p-4 sm:p-8 rounded-2xl sm:rounded-3xl bg-white shadow-md border border-[#03045E]/20 flex flex-col">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-4 sm:mb-6 gap-3 sm:gap-0">
           <div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <span aria-hidden="true" className="bg-[#2C7FFF]/15 text-[#2C7FFF] text-[10px] sm:text-xs font-extrabold px-2.5 sm:px-3 py-1 rounded-full uppercase tracking-wider border border-[#2C7FFF]/30 flex items-center gap-1.5">
-                <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-[#2C7FFF] animate-ping"></span> Live Radar
+            <button 
+              type="button"
+              onClick={() => setActiveTab('explore-jobs')}
+              aria-label="View Job Discovery Map"
+              className="flex flex-col items-start gap-2 w-fit group text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
+            >
+              <span aria-hidden="true" className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase border-2 transition-all group-hover:opacity-80 bg-[#2C7FFF]/15 border-[#2C7FFF]/30 text-[#2C7FFF]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#2C7FFF] animate-ping mr-1.5"></span>
+                LIVE RADAR
               </span>
-            </div>
-            <h3 className="text-lg sm:text-xl font-extrabold text-[#03045E]">Job Discovery Map</h3>
+              <h3 className="text-lg sm:text-xl font-extrabold text-[#03045E] transition-all group-hover:text-[#03045e]">
+                Job Discovery Map
+              </h3>
+            </button>
           </div>
         </div>
 
@@ -248,7 +272,7 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
             aria-label={`Interactive job discovery map showing jobs within ${radiusKm} kilometers of your home location.`}
             className={mapExpanded
             ? "fixed inset-0 z-[9999] bg-white rounded-none border-0"
-            : "h-[300px] sm:h-[400px] w-full rounded-[1rem] sm:rounded-[1.5rem] overflow-hidden border border-[#03045E]/20 z-0 relative shadow-inner"
+            : "h-[300px] sm:h-[400px] w-full rounded-xl sm:rounded-2xl overflow-hidden border border-[#03045E]/20 z-0 relative shadow-inner"
           }>
             <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-[1000] flex flex-col gap-2">
               <button
@@ -305,7 +329,7 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
             )}
 
             <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-[1000]">
-              <div className="w-[200px] sm:w-[228px] bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-[#03045E]/20 overflow-hidden">
+              <div className="w-[200px] sm:w-[228px] bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-[#03045E]/20 overflow-hidden">
                 <button
                   type="button"
                   onClick={() => setLegendOpen(open => !open)}
@@ -390,7 +414,7 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
               
               <Marker position={[userLat, userLng]}>
                 <Popup>
-                  <div className="p-0 min-w-[220px] rounded-2xl overflow-hidden bg-white shadow-xl">
+                  <div className="p-0 min-w-[220px] rounded-xl overflow-hidden bg-white shadow-xl">
                     <div aria-hidden="true" className="h-1.5 w-full bg-[#03045E]"></div>
                     <div className="px-4 pt-3.5 pb-3">
                       <div className="flex items-center justify-between gap-2 mb-2">
@@ -425,7 +449,7 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
                     icon={isMatch ? MatchJobIcon : OtherJobIcon}
                   >
                     <Popup>
-                      <div className="p-0 min-w-[240px] rounded-2xl overflow-hidden bg-white shadow-xl">
+                      <div className="p-0 min-w-[240px] rounded-xl overflow-hidden bg-white shadow-xl">
                         <div aria-hidden="true" className="h-1.5 w-full" style={{ backgroundColor: isMatch ? '#10B981' : '#2C7FFF' }}></div>
 
                         <div className="px-4 pt-3.5 pb-3">
@@ -456,7 +480,7 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
                           <button
                             onClick={() => setActiveTab('explore-jobs')}
                             aria-label={`View job details for ${job.job_title} at ${job.company_name}`}
-                            className="w-full py-2.5 text-white text-xs font-black rounded-xl cursor-pointer flex items-center justify-center gap-2 shadow-md"
+                            className="w-full py-2.5 text-white text-xs font-black rounded-lg cursor-pointer flex items-center justify-center gap-2 shadow-md"
                             style={{ backgroundColor: isMatch ? '#10B981' : '#2C7FFF' }}
                           >
                             View Job Details
@@ -475,7 +499,7 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
             </MapContainer>
           </div>
         ) : (
-          <div role="region" aria-label="Map unavailable" className="h-[300px] sm:h-[400px] w-full rounded-[1rem] sm:rounded-[1.5rem] border-2 border-dashed border-[#03045E]/30 bg-[#f4f4f4] flex flex-col items-center justify-center text-center p-4 sm:p-6">
+          <div role="region" aria-label="Map unavailable" className="h-[300px] sm:h-[400px] w-full rounded-xl sm:rounded-2xl border-2 border-dashed border-[#03045E]/30 bg-[#f4f4f4] flex flex-col items-center justify-center text-center p-4 sm:p-6">
             <div aria-hidden="true" className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-3 sm:mb-4 border border-[#03045E]/20 text-[#2C7FFF]">
               <svg aria-hidden="true" className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
             </div>
@@ -483,7 +507,7 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
             <p className="text-xs sm:text-sm font-semibold text-[#03045E]/70 mt-1 max-w-xs sm:max-w-sm">
               Please update your home address in your profile settings to enable the Job Discovery Map.
             </p>
-            <button onClick={() => setActiveTab('settings')} aria-label="Update your location in profile settings" className="mt-4 px-4 py-2 sm:px-5 sm:py-2.5 bg-[#2C7FFF] text-white font-bold text-xs sm:text-sm rounded-xl transition-colors shadow-sm cursor-pointer">
+            <button onClick={() => setActiveTab('settings')} aria-label="Update your location in profile settings" className="mt-4 px-4 py-2 sm:px-5 sm:py-2.5 bg-[#2C7FFF] text-white font-bold text-xs sm:text-sm rounded-lg transition-colors shadow-sm cursor-pointer">
               Update Location
             </button>
           </div>
@@ -494,13 +518,22 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
       <section role="region" aria-label="Recent applications and smart engine section" className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         
         {/* Recent Applications - Adjusted padding & list layout for mobile */}
-        <section aria-label="Recent Applications section" className="p-4 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 flex flex-col min-h-[350px] sm:min-h-[420px]">
+        <section aria-label="Recent Applications section" className="p-4 sm:p-8 rounded-2xl sm:rounded-3xl bg-white shadow-md border border-[#03045E]/20 flex flex-col min-h-[350px] sm:min-h-[420px]">
           <div className="flex justify-between items-end mb-4 sm:mb-6">
-            <div>
-              <h3 className="text-lg sm:text-xl font-extrabold text-[#03045E]">Recent Applications</h3>
-              <p className="text-xs sm:text-sm font-semibold text-[#03045E] mt-1">Track your latest moves.</p>
-            </div>
-            <button onClick={() => setActiveTab('tracker')} aria-label="View all applications" className="text-xs sm:text-sm font-extrabold text-[#2C7FFF] flex items-center gap-1 cursor-pointer">
+            <button 
+              type="button"
+              onClick={() => setActiveTab('tracker')}
+              aria-label="View all applications"
+              className="flex flex-col items-start gap-2 w-fit group text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
+            >
+              <h3 tabIndex="0" aria-label="Recent Applications" className="text-lg sm:text-xl font-extrabold text-[#03045E] transition-all group-hover:text-[#03045e] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit">
+                Recent Applications
+              </h3>
+              <p tabIndex="0" aria-label="Track your latest moves." className="text-xs sm:text-sm font-semibold text-[#03045E] transition-all group-hover:text-[#03045e] mt-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit">
+                Track your latest moves.
+              </p>
+            </button>
+            <button onClick={() => setActiveTab('tracker')} aria-label="View all applications" className="text-xs sm:text-sm font-extrabold text-[#2C7FFF] flex items-center gap-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded p-1">
               View All 
               <svg aria-hidden="true" className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
             </button>
@@ -513,35 +546,56 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
                   key={app.application_id} 
                   role="listitem"
                   tabIndex={0}
-                  className="p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-[#03045E]/20 bg-[#f4f4f4] flex justify-between items-center cursor-pointer hover:bg-[#f4f4f4]"
+                  className="p-3 sm:p-4 rounded-lg sm:rounded-xl border border-[#03045E]/20 bg-[#f4f4f4] flex flex-col gap-2.5"
                 >
                   <span className="sr-only">
                     Application for {app.job_title} at {app.company_name}. Status: {app.status}. Applied on: {new Date(app.applied_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}.
+                    {app.employer_message ? ` Message from Employer: ${app.employer_message}` : ''}
                   </span>
-                  <div aria-hidden="true" className="flex items-center gap-3 sm:gap-4">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white shadow-sm flex items-center justify-center border border-[#03045E]/20 text-[#2C7FFF] font-extrabold text-sm sm:text-lg shrink-0">
-                      {app.company_name.charAt(0)}
+                  <div aria-hidden="true" className="flex justify-between items-center w-full">
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white shadow-sm flex items-center justify-center border border-[#03045E]/20 text-[#2C7FFF] font-extrabold text-sm sm:text-lg shrink-0">
+                        {app.company_name.charAt(0)}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-extrabold text-[#03045E] text-sm sm:text-base leading-tight truncate">{app.job_title}</p>
+                        <p className="text-[10px] sm:text-xs font-bold text-[#03045E] mt-0.5 truncate">{app.company_name}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-extrabold text-[#03045E] text-sm sm:text-base leading-tight">{app.job_title}</p>
-                      <p className="text-[10px] sm:text-xs font-bold text-[#03045E] mt-0.5">{app.company_name}</p>
+                    <div className="flex flex-col items-end gap-1 sm:gap-1.5 shrink-0 ml-2">
+                      <button
+                        onClick={() => setExpandedApp(expandedApp === app.application_id ? null : app.application_id)}
+                        className={`text-[9px] sm:text-[11px] font-extrabold px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border whitespace-nowrap cursor-pointer transition-all flex items-center gap-1.5 ${getStatusStyle(app.status)}`}
+                        style={getRejectedStyle(app.status)}
+                      >
+                        {app.status}
+                        <svg className={`w-2.5 h-2.5 sm:w-3 sm:h-3 transition-transform ${expandedApp === app.application_id ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                      </button>
+                      <p className="text-[9px] sm:text-[10px] font-bold text-[#03045E] uppercase tracking-wider">
+                        {new Date(app.applied_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                      </p>
                     </div>
                   </div>
-                  <div aria-hidden="true" className="flex flex-col items-end gap-1 sm:gap-1.5 shrink-0">
-                    <span 
-                      className={`text-[9px] sm:text-[11px] font-extrabold px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border ${getStatusStyle(app.status)}`}
-                      style={getRejectedStyle(app.status)}
-                    >
-                      {app.status}
-                    </span>
-                    <p className="text-[9px] sm:text-[10px] font-bold text-[#03045E] uppercase tracking-wider">
-                      {new Date(app.applied_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                    </p>
-                  </div>
+
+                  {expandedApp === app.application_id && (
+                    <div className="mt-1 bg-white p-3 sm:p-4 rounded-md sm:rounded-lg border border-[#03045E]/15 flex flex-col gap-1.5 animate-fadeIn">
+                      <h4 tabIndex="0" aria-label={app.employer_message ? 'Message from Employer' : 'Status Update'} className="text-[9px] sm:text-xs font-extrabold text-[#2C7FFF] uppercase tracking-widest flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit">
+                        <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                        </svg>
+                        {app.employer_message ? 'Message from Employer' : 'Status Update'}
+                      </h4>
+                      <p tabIndex="0" aria-label={getStatusMessage(app)} className="text-[11px] sm:text-sm text-[#03045E] font-medium whitespace-pre-wrap leading-relaxed break-words focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded p-1 -m-1">
+                        {getStatusMessage(app)}
+                      </p>
+                    </div>
+                  )}
                 </div>
               ))
             ) : (
-              <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-[#03045E]/30 rounded-[1.5rem] p-6 sm:p-8 bg-[#f4f4f4] text-center">
+              <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-[#03045E]/30 rounded-2xl p-6 sm:p-8 bg-[#f4f4f4] text-center">
                 <div aria-hidden="true" className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-3 sm:mb-4 border border-[#03045E]/20">
                   <svg aria-hidden="true" className="w-6 h-6 sm:w-8 sm:h-8 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                 </div>
@@ -556,13 +610,36 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
         <div className="flex flex-col gap-6 sm:gap-8">
           
           {/* Smart Engine Card - Adjusted Padding & Fonts */}
-          <section aria-label="Smart Engine section" className="p-5 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] bg-white shadow-md border border-[#03045E]/20 flex flex-col justify-center">
-            <span aria-hidden="true" className="inline-block px-2.5 sm:px-3 py-1 bg-[#f4f4f4] border border-[#03045E]/20 rounded-full text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-[#2C7FFF] mb-3 sm:mb-4 w-fit">Smart Engine</span>
-            <h3 className="text-xl sm:text-2xl font-black mb-1.5 sm:mb-2 text-[#03045E] leading-tight">Find Your Perfect Fit</h3>
-            <p className="text-xs sm:text-sm font-semibold text-[#03045E] mb-4 sm:mb-6 max-w-[95%] sm:max-w-[90%] leading-relaxed">
-              We've analyzed your skills and travel radius to pinpoint jobs tailored exactly for you.
-            </p>
-            <button onClick={() => setActiveTab('explore-jobs')} aria-label="View your job matches" className={`flex items-center justify-center gap-2 w-full px-4 sm:px-6 py-3 sm:py-3.5 bg-white border-2 border-[#2C7FFF] font-extrabold text-xs sm:text-sm rounded-xl shadow-sm cursor-pointer text-[#03045E]`}>
+          <section aria-label="Smart Engine section" className="p-5 sm:p-8 rounded-2xl sm:rounded-3xl bg-white shadow-md border border-[#03045E]/20 flex flex-col justify-center">
+            <button 
+              type="button"
+              onClick={() => setActiveTab('explore-jobs')}
+              aria-label="View your job matches"
+              className="flex flex-col items-start gap-2 w-fit group text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 mb-3 sm:mb-4"
+            >
+              <span aria-hidden="true" className="inline-block px-2.5 sm:px-3 py-1 bg-[#f4f4f4] border border-[#03045E]/20 rounded-full text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-[#2C7FFF] w-fit">Smart Engine</span>
+            </button>
+            <button 
+              type="button"
+              onClick={() => setActiveTab('explore-jobs')}
+              aria-label="View your job matches"
+              className="flex flex-col items-start gap-2 w-fit group text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 mb-1.5 sm:mb-2"
+            >
+              <h3 className="text-xl sm:text-2xl font-black text-[#03045E] transition-all group-hover:text-[#03045e] leading-tight">
+                Find Your Perfect Fit
+              </h3>
+            </button>
+            <button 
+              type="button"
+              onClick={() => setActiveTab('explore-jobs')}
+              aria-label="View your job matches"
+              className="flex flex-col items-start gap-2 w-fit group text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 mb-4 sm:mb-6"
+            >
+              <p className="text-xs sm:text-sm font-semibold text-[#03045E] transition-all group-hover:text-[#03045e] max-w-[95%] sm:max-w-[90%] leading-relaxed">
+                We've analyzed your skills and travel radius to pinpoint jobs tailored exactly for you.
+              </p>
+            </button>
+            <button onClick={() => setActiveTab('explore-jobs')} aria-label="View your job matches" className={`flex items-center justify-center gap-2 w-full px-4 sm:px-6 py-3 sm:py-3.5 bg-white border-2 border-[#2C7FFF] font-extrabold text-xs sm:text-sm rounded-lg shadow-sm cursor-pointer text-[#03045E]`}>
               View Your Matches
               <svg aria-hidden="true" className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </button>

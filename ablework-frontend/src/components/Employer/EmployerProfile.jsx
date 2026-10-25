@@ -439,7 +439,7 @@ export default function EmployerSettings({ profile, refreshData }) {
         `}</style>
       )}
        
-        <div className={`mb-6 sm:mb-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 p-4 sm:p-8 rounded-2xl sm:rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border-2 ${cardBg}`}>
+        <div className={`mb-6 sm:mb-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 p-4 sm:p-8 rounded-xl sm:rounded-2xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border-2 ${cardBg}`}>
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full">
             <div className="relative group shrink-0">
               <div className={`w-20 h-20 sm:w-28 sm:h-28 rounded-full overflow-hidden border-4 shadow-md flex items-center justify-center ${isDark ? 'border-white bg-black' : 'border-white bg-white'}`}>
@@ -479,13 +479,13 @@ export default function EmployerSettings({ profile, refreshData }) {
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 items-stretch">
           
-          <div className={`flex flex-col justify-between gap-4 sm:gap-6 p-4 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl border-2 relative overflow-hidden ${cardBg}`}>
+          <div className={`flex flex-col justify-between gap-4 sm:gap-6 p-4 sm:p-8 rounded-xl sm:rounded-2xl shadow-xl border-2 relative overflow-hidden ${cardBg}`}>
             <div className={`absolute top-0 left-0 right-0 h-1.5 sm:h-2 ${topBar}`}></div>
             
             <div className="flex flex-col gap-4 sm:gap-6 relative z-10">
               <div className={`flex items-center justify-between border-b-2 pb-3 sm:pb-4 ${innerBorder}`}>
                 <div className="flex items-center gap-2 sm:gap-3">
-                  <div className={`p-2 sm:p-2.5 rounded-xl sm:rounded-2xl ${isDark ? 'bg-white/10 text-white' : 'bg-[#2C7FFF]/10 text-[#2C7FFF]'}`}>
+                  <div className={`p-2 sm:p-2.5 rounded-lg sm:rounded-xl ${isDark ? 'bg-white/10 text-white' : 'bg-[#2C7FFF]/10 text-[#2C7FFF]'}`}>
                     <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -508,7 +508,7 @@ export default function EmployerSettings({ profile, refreshData }) {
                   value={formData.company_name} 
                   onChange={handleChange} 
                   required 
-                  className={`p-2.5 sm:p-3.5 border-2 rounded-xl sm:rounded-2xl outline-none transition font-medium text-sm sm:text-base ${inputBg}`} 
+                  className={`p-2.5 sm:p-3.5 border-2 rounded-lg sm:rounded-xl outline-none transition font-medium text-sm sm:text-base ${inputBg}`} 
                 />
               </div>
 
@@ -525,7 +525,7 @@ export default function EmployerSettings({ profile, refreshData }) {
                   value={formData.email} 
                   onChange={handleChange} 
                   required 
-                  className={`p-2.5 sm:p-3.5 border-2 rounded-xl sm:rounded-2xl outline-none transition font-medium text-sm sm:text-base ${inputBg}`} 
+                  className={`p-2.5 sm:p-3.5 border-2 rounded-lg sm:rounded-xl outline-none transition font-medium text-sm sm:text-base ${inputBg}`} 
                 />
               </div>
 
@@ -542,7 +542,7 @@ export default function EmployerSettings({ profile, refreshData }) {
                   value={formData.industry} 
                   onChange={handleChange} 
                   required 
-                  className={`p-2.5 sm:p-3.5 border-2 rounded-xl sm:rounded-2xl outline-none transition font-medium text-sm sm:text-base ${inputBg}`} 
+                  className={`p-2.5 sm:p-3.5 border-2 rounded-lg sm:rounded-xl outline-none transition font-medium text-sm sm:text-base ${inputBg}`} 
                 />
               </div>
 
@@ -559,7 +559,7 @@ export default function EmployerSettings({ profile, refreshData }) {
                   value={formData.company_description} 
                   onChange={handleChange} 
                   required 
-                  className={`p-2.5 sm:p-3.5 border-2 rounded-xl sm:rounded-2xl resize-none outline-none transition font-medium text-sm sm:text-base ${inputBg}`}
+                  className={`p-2.5 sm:p-3.5 border-2 rounded-lg sm:rounded-xl resize-none outline-none transition font-medium text-sm sm:text-base ${inputBg}`}
                 ></textarea>
               </div>
             </div>
@@ -567,13 +567,13 @@ export default function EmployerSettings({ profile, refreshData }) {
             <div></div>
           </div>
 
-          <div className={`flex flex-col justify-between gap-4 sm:gap-6 p-4 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl border-2 relative overflow-hidden ${cardBg}`}>
+          <div className={`flex flex-col justify-between gap-4 sm:gap-6 p-4 sm:p-8 rounded-xl sm:rounded-2xl shadow-xl border-2 relative overflow-hidden ${cardBg}`}>
             <div className={`absolute top-0 left-0 right-0 h-1.5 sm:h-2 ${topBar}`}></div>
             
             <div className="flex flex-col gap-4 sm:gap-6 relative z-10">
               <div className={`flex items-center justify-between border-b-2 pb-3 sm:pb-4 ${innerBorder}`}>
                 <div className="flex items-center gap-2 sm:gap-3">
-                  <div className={`p-2 sm:p-2.5 rounded-xl sm:rounded-2xl ${isDark ? 'bg-white/10 text-white' : 'bg-[#2C7FFF]/10 text-[#2C7FFF]'}`}>
+                  <div className={`p-2 sm:p-2.5 rounded-lg sm:rounded-xl ${isDark ? 'bg-white/10 text-white' : 'bg-[#2C7FFF]/10 text-[#2C7FFF]'}`}>
                     <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -583,7 +583,7 @@ export default function EmployerSettings({ profile, refreshData }) {
                 </div>
               </div>
               
-              <p className={`text-[10px] sm:text-xs font-medium leading-relaxed p-3 sm:p-4 rounded-xl sm:rounded-2xl border-2 ${softBg} ${muted}`}>
+              <p className={`text-[10px] sm:text-xs font-medium leading-relaxed p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 ${softBg} ${muted}`}>
                 If your office moves, update your coordinates. The Smart Engine relies on these precise points to connect you with candidates within a safe travel radius.
               </p>
 
@@ -595,7 +595,7 @@ export default function EmployerSettings({ profile, refreshData }) {
                     name="latitude" 
                     value={formData.latitude} 
                     readOnly 
-                    className={`p-2.5 sm:p-3.5 border-2 rounded-xl sm:rounded-2xl outline-none font-mono text-[10px] sm:text-xs cursor-not-allowed ${readOnlyInput}`} 
+                    className={`p-2.5 sm:p-3.5 border-2 rounded-lg sm:rounded-xl outline-none font-mono text-[10px] sm:text-xs cursor-not-allowed ${readOnlyInput}`} 
                   />
                 </div>
                 <div className="flex-1 flex flex-col gap-1.5">
@@ -605,7 +605,7 @@ export default function EmployerSettings({ profile, refreshData }) {
                     name="longitude" 
                     value={formData.longitude} 
                     readOnly 
-                    className={`p-2.5 sm:p-3.5 border-2 rounded-xl sm:rounded-2xl outline-none font-mono text-[10px] sm:text-xs cursor-not-allowed ${readOnlyInput}`} 
+                    className={`p-2.5 sm:p-3.5 border-2 rounded-lg sm:rounded-xl outline-none font-mono text-[10px] sm:text-xs cursor-not-allowed ${readOnlyInput}`} 
                   />
                 </div>
               </div>
@@ -613,7 +613,7 @@ export default function EmployerSettings({ profile, refreshData }) {
               <button 
                 type="button" 
                 onClick={handleDetectLocation} 
-                className={`py-3 sm:py-3.5 font-bold rounded-xl sm:rounded-2xl border-2 flex items-center justify-center gap-2 sm:gap-2.5 text-xs sm:text-sm cursor-pointer ${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-gray-200'}`}
+                className={`py-3 sm:py-3.5 font-bold rounded-lg sm:rounded-xl border-2 flex items-center justify-center gap-2 sm:gap-2.5 text-xs sm:text-sm cursor-pointer ${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-gray-200'}`}
               >
                 <svg className={`w-4 h-4 sm:w-5 sm:h-5 ${isDark ? 'text-white' : 'text-[#03045E]'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -623,7 +623,7 @@ export default function EmployerSettings({ profile, refreshData }) {
 
               {formData.latitude && formData.longitude && (
                 !mapExpanded ? (
-                  <div className={`rounded-xl sm:rounded-2xl overflow-hidden border-2 h-[160px] sm:h-[220px] relative shadow-inner z-0 ${isDark ? 'border-white/40' : 'border-gray-200'}`}>
+                  <div className={`rounded-lg sm:rounded-xl overflow-hidden border-2 h-[160px] sm:h-[220px] relative shadow-inner z-0 ${isDark ? 'border-white/40' : 'border-gray-200'}`}>
                     {renderMapInner()}
                   </div>
                 ) : (
@@ -641,7 +641,7 @@ export default function EmployerSettings({ profile, refreshData }) {
                              <button 
                 type="submit" 
                 disabled={isSubmitting} 
-                className={`py-3 sm:py-4 font-bold rounded-xl sm:rounded-2xl transition-all duration-300 shadow-lg w-full flex items-center justify-center gap-2 text-xs sm:text-sm tracking-wide disabled:opacity-50 cursor-pointer border-2 ${isDark ? 'bg-[#2C7FFF] border-[#2C7FFF]' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+                className={`py-3 sm:py-4 font-bold rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg w-full flex items-center justify-center gap-2 text-xs sm:text-sm tracking-wide disabled:opacity-50 cursor-pointer border-2 ${isDark ? 'bg-[#2C7FFF] border-[#2C7FFF]' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
               >
                 {isSubmitting ? (
                   <>
@@ -670,15 +670,15 @@ export default function EmployerSettings({ profile, refreshData }) {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative w-full max-w-md rounded-[2rem] shadow-[0_25px_60px_rgba(3,4,94,0.25)] overflow-hidden animate-in zoom-in-95 duration-300 ${isDark ? 'bg-black' : 'bg-white'}`}>
+          <div className={`relative w-full max-w-md rounded-xl sm:rounded-2xl shadow-[0_25px_60px_rgba(3,4,94,0.25)] overflow-hidden animate-in zoom-in-95 duration-300 ${isDark ? 'bg-black' : 'bg-white'}`}>
             <div className={`absolute -top-20 -right-20 w-56 h-56 rounded-full ${isDark ? 'bg-white/10' : 'bg-[#2C7FFF]/10'}`}></div>
 
             <div className={`relative h-1.5 w-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`}></div>
 
             <div className="relative px-5 sm:px-8 pt-6 sm:pt-8 pb-6 sm:pb-8 flex flex-col items-center text-center">
               <div className="relative mb-4 sm:mb-5">
-                <div className={`absolute inset-0 rounded-2xl rotate-6 ${isDark ? 'bg-white/20' : 'bg-[#2C7FFF]/20'}`}></div>
-                                <div className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl shadow-lg flex items-center justify-center -rotate-3 ${isDark ? 'bg-[#2C7FFF]' : 'bg-[#2C7FFF]'}`}>
+                <div className={`absolute inset-0 rounded-xl rotate-6 ${isDark ? 'bg-white/20' : 'bg-[#2C7FFF]/20'}`}></div>
+                                <div className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl shadow-lg flex items-center justify-center -rotate-3 ${isDark ? 'bg-[#2C7FFF]' : 'bg-[#2C7FFF]'}`}>
                                   <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke={isDark ? (isContrast ? '#ffffff' : '#000000') : '#ffffff'} strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                   </svg>
@@ -716,7 +716,7 @@ export default function EmployerSettings({ profile, refreshData }) {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className={`group w-full px-4 sm:px-6 py-2.5 sm:py-3 border-2 border-dashed font-extrabold text-[10px] sm:text-xs rounded-xl sm:rounded-2xl transition-all mb-4 sm:mb-5 cursor-pointer flex items-center justify-center gap-2 ${isDark ? 'border-white/40 text-white' : 'border-[#03045E]/30 text-[#03045E] bg-[#f4f4f4]'}`}
+                className={`group w-full px-4 sm:px-6 py-2.5 sm:py-3 border-2 border-dashed font-extrabold text-[10px] sm:text-xs rounded-lg sm:rounded-xl transition-all mb-4 sm:mb-5 cursor-pointer flex items-center justify-center gap-2 ${isDark ? 'border-white/40 text-white' : 'border-[#03045E]/30 text-[#03045E] bg-[#f4f4f4]'}`}
               >
                 <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -729,7 +729,7 @@ export default function EmployerSettings({ profile, refreshData }) {
                   type="button"
                   disabled={isUpdatingPicture}
                   onClick={handleCancelChangePicture}
-                  className={`flex-1 py-2.5 sm:py-3.5 font-extrabold text-xs sm:text-sm rounded-xl sm:rounded-2xl transition-all cursor-pointer disabled:opacity-50 border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200 hover:border-gray-300'}`}
+                  className={`flex-1 py-2.5 sm:py-3.5 font-extrabold text-xs sm:text-sm rounded-lg sm:rounded-xl transition-all cursor-pointer disabled:opacity-50 border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200 hover:border-gray-300'}`}
                 >
                   Cancel
                 </button>
@@ -737,7 +737,7 @@ export default function EmployerSettings({ profile, refreshData }) {
                   type="button"
                   disabled={isUpdatingPicture}
                   onClick={handleConfirmChangePicture}
-                  className={`flex-1 py-2.5 sm:py-3.5 font-extrabold text-xs sm:text-sm rounded-xl sm:rounded-2xl cursor-pointer shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 ${isDark ? 'bg-[#2C7FFF] border-2 border-[#2C7FFF] !text-white' : 'bg-[#2C7FFF] text-white'}`}
+                  className={`flex-1 py-2.5 sm:py-3.5 font-extrabold text-xs sm:text-sm rounded-lg sm:rounded-xl cursor-pointer shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 ${isDark ? 'bg-[#2C7FFF] border-2 border-[#2C7FFF] !text-white' : 'bg-[#2C7FFF] text-white'}`}
                 >
                   {isUpdatingPicture ? (
                     <>
@@ -767,7 +767,7 @@ export default function EmployerSettings({ profile, refreshData }) {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative w-full max-w-sm rounded-[2rem] border-2 overflow-hidden animate-in zoom-in-95 duration-300 ${isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-gray-200'}`}>
+          <div className={`relative w-full max-w-sm rounded-xl sm:rounded-2xl border-2 overflow-hidden animate-in zoom-in-95 duration-300 ${isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-gray-200'}`}>
             <div className={`absolute top-0 left-0 right-0 h-1.5 sm:h-2 ${topBar}`}></div>
             <div className="px-5 sm:px-8 pt-6 sm:pt-10 pb-6 sm:pb-8 flex flex-col items-center text-center">
               <div className="relative mb-4 sm:mb-6">
@@ -822,7 +822,7 @@ export default function EmployerSettings({ profile, refreshData }) {
               </p>
 
               {locationStage === 'success' && (
-                <div className={`w-full rounded-xl sm:rounded-2xl p-3 sm:p-4 border-2 mb-4 sm:mb-6 text-left ${isDark ? 'bg-black border-white/40' : 'bg-white border-gray-200'}`}>
+                <div className={`w-full rounded-lg sm:rounded-xl p-3 sm:p-4 border-2 mb-4 sm:mb-6 text-left ${isDark ? 'bg-black border-white/40' : 'bg-white border-gray-200'}`}>
                   <div className="flex justify-between items-center mb-2 sm:mb-3">
                     <span className={`text-[10px] sm:text-[11px] font-black uppercase tracking-wider ${muted}`}>Latitude</span>
                     <span className="text-xs sm:text-sm font-black text-[#2C7FFF]">{locationCoords.lat}</span>
@@ -838,7 +838,7 @@ export default function EmployerSettings({ profile, refreshData }) {
               {locationStage !== 'processing' && (
                 <button
                   onClick={() => setShowLocationAlert(false)}
-                  className={`w-full py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDark ? 'bg-[#2C7FFF] text-black border-[#2C7FFF] hover:bg-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+                  className={`w-full py-3 sm:py-3.5 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDark ? 'bg-[#2C7FFF] text-black border-[#2C7FFF] hover:bg-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
                 >
                   <span style={{ color: '#ffffff' }}>{locationStage === 'error' ? 'Try Again' : 'Got it'}</span>
                 </button>
@@ -853,7 +853,7 @@ export default function EmployerSettings({ profile, refreshData }) {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative w-full max-w-sm rounded-[2rem] border-2 overflow-hidden ${isDark ? 'bg-black border-[#2C7FFF]' : 'bg-[#F4F4F4] border-[#2C7FFF]'}`}>
+          <div className={`relative w-full max-w-sm rounded-xl sm:rounded-2xl border-2 overflow-hidden ${isDark ? 'bg-black border-[#2C7FFF]' : 'bg-[#F4F4F4] border-[#2C7FFF]'}`}>
             <div className="h-1.5 sm:h-2 w-full bg-[#2C7FFF]" />
 
             <div className="px-5 sm:px-8 pt-6 sm:pt-10 pb-6 sm:pb-8 flex flex-col items-center text-center">
@@ -881,7 +881,7 @@ export default function EmployerSettings({ profile, refreshData }) {
 
               <button
                 onClick={() => setSaveSuccess({ isOpen: false, message: '' })}
-                className={`w-full py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDark ? 'bg-[#2C7FFF] border-[#2C7FFF] hover:bg-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+                className={`w-full py-3 sm:py-3.5 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer border-2 ${isDark ? 'bg-[#2C7FFF] border-[#2C7FFF] hover:bg-white' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
               >
                 <span style={{ color: '#ffffff' }}>Got it</span>
               </button>

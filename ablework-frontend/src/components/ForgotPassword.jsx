@@ -15,6 +15,7 @@ export default function ForgotPassword({ onClose }) {
   const isDarkMode = mode && typeof mode === 'string' && (mode.toLowerCase().includes('dark') || mode.toLowerCase().includes('comfort'));
   const isAccessibilityMode = paletteKey === 'highContrast' || paletteKey === 'darkComfort';
   const isDefaultPalette = paletteKey === 'default';
+  const isDarkActive = mode && typeof mode === 'string' && mode.toLowerCase().includes('dark');
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
   const [otpCode, setOtpCode] = useState('');
@@ -226,34 +227,25 @@ export default function ForgotPassword({ onClose }) {
               <img
                 src={isContrast ? darkLogo : lightLogo}
                 alt="AbleWork Logo"
+                title="AbleWork Logo"
+                tabIndex="0"
                 className="h-9 sm:h-12 md:h-14 w-auto object-contain max-h-full"
               />
             </div>
             <nav className={`hidden md:flex items-center gap-6 text-[15px] font-medium ${isAccessibilityMode ? '!text-white' : (isContrast ? 'text-white' : 'text-[#03045E]')}`}>
-              <Link to="/" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : isContrast ? 'text-white hover:text-blue-400' : 'text-[#03045E] hover:text-[#2C7FFF]'} transition`}>Home</Link>
-              <Link to="/about" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : isContrast ? 'hover:text-blue-400' : 'hover:text-[#2C7FFF]'} transition`}>About Us</Link>
-              <Link to="/policy" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : isContrast ? 'hover:text-blue-400' : 'hover:text-[#2C7FFF]'} transition`}>Policy</Link>
+              <Link to="/" title="Home" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : isContrast ? 'text-white hover:text-blue-400' : 'text-[#03045E] hover:text-[#03045E]'} transition pb-0.5`}>Home</Link>
+              <Link to="/about" title="About Us" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : isContrast ? 'hover:text-blue-400' : 'text-[#03045E] hover:text-[#03045E]'} transition`}>About Us</Link>
+              <Link to="/policy" title="Policy" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : isContrast ? 'hover:text-blue-400' : 'text-[#03045E] hover:text-[#03045E]'} transition`}>Policy</Link>
             </nav>
           </div>
 
           <div className="hidden md:flex items-center">
-            <button
-              type="button"
-              onClick={handleBack}
-              className={`px-5 py-2 rounded-full text-sm font-bold border-2 transition ${
-                isAccessibilityMode
-                  ? '!text-white border-white hover:bg-[#2C7FFF] hover:!text-white hover:border-[#2C7FFF]'
-                  : isContrast
-                    ? 'text-white border-white hover:bg-[#2C7FFF] hover:text-white hover:border-[#2C7FFF]'
-                    : 'text-[#03045E] border-[#03045E] hover:bg-[#2C7FFF] hover:text-[#f4f4f4] hover:border-[#2C7FFF]'
-              } ${isAccessibilityMode && isDarkMode ? 'fp-accessibility-dark-login-text fp-accessibility-dark-login-container' : ''}`}
-            >
-              Login
-            </button>
+            <NavLink to="/login" aria-label="Log In" title="Log In" className={({ isActive }) => `px-5 py-2 rounded-full ${isDarkActive ? 'bg-black text-white border-2 border-white' : isAccessibilityMode ? 'bg-transparent !text-white border-2 border-white' : 'bg-transparent text-[#03045E] border-2 border-[#03045E]'} text-sm font-bold hover:bg-[#2C7FFF] hover:text-[#f4f4f4] hover:border-[#2C7FFF] hover:brightness-125 transform duration-200 transition whitespace-nowrap ${isActive ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] underline font-semibold' : ''}`}>Log In</NavLink>
           </div>
 
           <button
-            className={`md:hidden flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl border-2 shadow-sm cursor-pointer transition-all duration-200 shrink-0 ${
+            title="Menu"
+            className={`md:hidden flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg border-2 shadow-sm cursor-pointer transition-all duration-200 shrink-0 ${
               isContrast ? 'bg-zinc-900 text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/20'
             }`}
             onClick={() => setIsOpen(!isOpen)}
@@ -283,8 +275,9 @@ export default function ForgotPassword({ onClose }) {
             >
               <Link
                 to="/"
+                title="Home"
                 onClick={() => setIsOpen(false)}
-                className="relative flex items-center gap-2.5 sm:gap-3 text-left px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-xl text-xs sm:text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25 shadow-sm"
+                className="relative flex items-center gap-2.5 sm:gap-3 text-left px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-lg text-xs sm:text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25 shadow-sm"
               >
                 <div className="shrink-0 flex items-center justify-center border-none w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-[#03045E]/10 text-[#03045E]">
                   <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -296,8 +289,9 @@ export default function ForgotPassword({ onClose }) {
 
               <Link
                 to="/about"
+                title="About Us"
                 onClick={() => setIsOpen(false)}
-                className="relative flex items-center gap-2.5 sm:gap-3 text-left px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-xl text-xs sm:text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25 shadow-sm"
+                className="relative flex items-center gap-2.5 sm:gap-3 text-left px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-lg text-xs sm:text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25 shadow-sm"
               >
                 <div className="shrink-0 flex items-center justify-center border-none w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-[#03045E]/10 text-[#03045E]">
                   <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -309,8 +303,9 @@ export default function ForgotPassword({ onClose }) {
 
               <Link
                 to="/policy"
+                title="Policy"
                 onClick={() => setIsOpen(false)}
-                className="relative flex items-center gap-2.5 sm:gap-3 text-left px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-xl text-xs sm:text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25 shadow-sm"
+                className="relative flex items-center gap-2.5 sm:gap-3 text-left px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-lg text-xs sm:text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25 shadow-sm"
               >
                 <div className="shrink-0 flex items-center justify-center border-none w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-[#03045E]/10 text-[#03045E]">
                   <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -324,8 +319,9 @@ export default function ForgotPassword({ onClose }) {
 
               <button
                 type="button"
+                title="Login"
                 onClick={() => { setIsOpen(false); handleBack(); }}
-                className="relative flex items-center gap-2.5 sm:gap-3 text-left px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-xl text-xs sm:text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25 shadow-sm"
+                className="relative flex items-center gap-2.5 sm:gap-3 text-left px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-lg text-xs sm:text-[13px] font-black transition-all capitalize cursor-pointer border-2 overflow-hidden bg-white text-[#03045E] border-[#03045E]/25 shadow-sm"
               >
                 <div className="shrink-0 flex items-center justify-center border-none w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-[#03045E]/10 text-[#03045E]">
                   <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -345,7 +341,7 @@ export default function ForgotPassword({ onClose }) {
       >
         <div
           className={`w-full ${isAssist ? 'max-w-[480px] sm:max-w-xl' : 'max-w-[400px] sm:max-w-lg'} flex flex-col items-center justify-start gap-4 sm:gap-6 relative z-10
-            ${isContrast ? 'bg-black text-white border-2 border-blue-400 shadow-[0_0_25px_rgba(0,204,21,0.4)]' : isDarkMode ? 'bg-zinc-900 text-white border-2 border-blue-500/50 shadow-2xl' : 'bg-white/90 text-[#03045E] border border-[#03045E]/15'} backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-2xl
+            ${isContrast ? 'bg-black text-white border-2 border-blue-400 shadow-[0_0_25px_rgba(0,204,21,0.4)]' : isDarkMode ? 'bg-zinc-900 text-white border-2 border-blue-500/50 shadow-2xl' : 'bg-white/90 text-[#03045E] border border-[#03045E]/15'} backdrop-blur-md rounded-xl sm:rounded-2xl shadow-2xl
             pt-8 px-5 pb-8 sm:pt-12 sm:px-10 sm:pb-14 md:mt-4 mr-0 md:mr-2 lg:mr-6`}
         >
           <div className="w-full flex items-center justify-start">
@@ -355,17 +351,17 @@ export default function ForgotPassword({ onClose }) {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </span>
-              <span className={`text-[9px] sm:text-xs font-black uppercase tracking-widest ${(isContrast || isDarkMode) ? 'text-blue-400' : 'text-[#2C7FFF]'}`}>
+              <span tabIndex="0" title="Account Recovery" className={`text-[9px] sm:text-xs font-black uppercase tracking-widest ${(isContrast || isDarkMode) ? 'text-blue-400' : 'text-[#2C7FFF]'}`}>
                 Account Recovery
               </span>
             </div>
           </div>
 
           <div className="text-center w-full">
-            <h1 className={`${titleSize} ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#03045E]'} tracking-tight mb-2`}>
+            <h1 tabIndex="0" title={step === 1 ? 'Reset Password' : 'Create New Password'} className={`${titleSize} ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#03045E]'} tracking-tight mb-2`}>
               {step === 1 ? 'Reset Password' : 'Create New Password'}
             </h1>
-            <p className={`${subtitleSize} ${(isContrast || isDarkMode) ? 'text-white/80' : 'text-[#03045E]/70'}`}>
+            <p tabIndex="0" title={step === 1 ? 'Enter your email to receive a recovery code.' : 'Enter your recovery code and set a new password.'} className={`${subtitleSize} ${(isContrast || isDarkMode) ? 'text-white/80' : 'text-[#03045E]/70'}`}>
               {step === 1
                 ? 'Enter your email to receive a recovery code.'
                 : 'Enter your recovery code and set a new password.'}
@@ -379,7 +375,9 @@ export default function ForgotPassword({ onClose }) {
 
           {message.text && (
             <div
-              className={`w-full p-3 sm:p-3.5 rounded-xl font-bold text-xs sm:text-sm text-center border-2 shadow-sm bg-white ${
+              tabIndex="0"
+              title={message.text}
+              className={`w-full p-3 sm:p-3.5 rounded-lg font-bold text-xs sm:text-sm text-center border-2 shadow-sm bg-white ${
                 message.type === 'success'
                   ? 'text-green-600 border-green-500'
                   : 'text-red-600 border-red-500'
@@ -392,7 +390,7 @@ export default function ForgotPassword({ onClose }) {
           {step === 1 ? (
             <form onSubmit={requestOtp} className="flex flex-col gap-4 sm:gap-5 w-full" autoComplete="off">
               <div className="flex flex-col gap-1.5 sm:gap-2">
-                <label htmlFor="fpEmail" className={`${labelSize} ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#03045E]'}`}>
+                <label htmlFor="fpEmail" title="Email Address" tabIndex="0" className={`${labelSize} ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#03045E]'}`}>
                   Email Address
                 </label>
                 <div className="relative">
@@ -405,18 +403,21 @@ export default function ForgotPassword({ onClose }) {
                     id="fpEmail"
                     name="fpEmail"
                     type="email"
+                    title="Email Address"
+                    aria-label="Enter your registered email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     autoComplete="off"
                     placeholder="Enter your registered email"
-                    className={`w-full ${inputSize} pl-10 sm:pl-12 ${(isContrast || isDarkMode) ? 'border-2 border-blue-400 bg-zinc-800 text-white placeholder:text-gray-400 focus:border-blue-300' : 'border-2 border-[#03045E]/20 bg-white text-[#03045E] placeholder:text-gray-400 focus:border-[#2C7FFF]'} rounded-xl sm:rounded-2xl focus:outline-none shadow-sm transition`}
+                    className={`w-full ${inputSize} pl-10 sm:pl-12 ${(isContrast || isDarkMode) ? 'border-2 border-blue-400 bg-zinc-800 text-white placeholder:text-gray-400 focus:border-blue-300' : 'border-2 border-[#03045E]/20 bg-white text-[#03045E] placeholder:text-gray-400 focus:border-[#2C7FFF]'} rounded-lg sm:rounded-xl focus:outline-none shadow-sm transition`}
                   />
                 </div>
               </div>
 <button
   type="submit"
   disabled={isLoading}
+  title={isLoading ? 'Sending Code...' : 'Send Recovery Code'}
   style={
     isAccessibilityMode && isDarkMode
       ? { backgroundColor: '#262626', color: '#ffffff', borderColor: '#404040', borderRadius: '9999px' }
@@ -430,10 +431,10 @@ export default function ForgotPassword({ onClose }) {
       : isAccessibilityMode
         ? 'border rounded-full shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed mt-2'
         : (isContrast || isDarkMode)
-          ? 'bg-blue-400 hover:bg-blue-300 border border-blue-400 text-black rounded-full shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed mt-2'
+          ? 'bg-blue-400 hover:bg-blue-300 border border-blue-400 text-black rounded-xl sm:rounded-2xl shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed mt-2'
           : isDefaultPalette && isDarkMode
-            ? 'fp-default-dark-send-btn border rounded-full shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed mt-2'
-            : 'bg-[#03045E] hover:bg-[#2C7FFF] text-white rounded-full shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed mt-2'
+            ? 'fp-default-dark-send-btn border rounded-xl sm:rounded-2xl shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed mt-2'
+            : 'bg-[#03045E] hover:bg-[#2C7FFF] text-white rounded-xl sm:rounded-2xl shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed mt-2'
   }`}
 >
   {isLoading ? 'Sending Code...' : 'Send Recovery Code'}
@@ -445,13 +446,14 @@ export default function ForgotPassword({ onClose }) {
               <input type="password" name="fakepasswordremembered" autoComplete="new-password" style={{ display: 'none' }} tabIndex={-1} />
 
               <div className="flex flex-col gap-1.5 sm:gap-2">
-                <label htmlFor="fpOtp" className={`${labelSize} ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#03045E]'}`}>
+                <label htmlFor="fpOtp" title="6-Digit Recovery Code" tabIndex="0" className={`${labelSize} ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#03045E]'}`}>
                   6-Digit Recovery Code
                 </label>
                 <input
                   id="fpOtp"
                   name="fpOtp"
                   type="text"
+                  title="6-Digit Recovery Code"
                   inputMode="numeric"
                   maxLength="6"
                   value={otpCode}
@@ -459,12 +461,12 @@ export default function ForgotPassword({ onClose }) {
                   required
                   autoComplete="off"
                   placeholder="000000"
-                  className={`w-full ${inputSize} text-center tracking-[0.4em] sm:tracking-[0.6em] ${(isContrast || isDarkMode) ? 'border-2 border-blue-400 bg-zinc-800 text-white placeholder:text-gray-400 focus:border-blue-300' : 'border-2 border-[#03045E]/20 bg-white text-[#03045E] placeholder:text-gray-400 focus:border-[#2C7FFF]'} rounded-xl sm:rounded-2xl focus:outline-none shadow-sm transition font-black`}
+                  className={`w-full ${inputSize} text-center tracking-[0.4em] sm:tracking-[0.6em] ${(isContrast || isDarkMode) ? 'border-2 border-blue-400 bg-zinc-800 text-white placeholder:text-gray-400 focus:border-blue-300' : 'border-2 border-[#03045E]/20 bg-white text-[#03045E] placeholder:text-gray-400 focus:border-[#2C7FFF]'} rounded-lg sm:rounded-xl focus:outline-none shadow-sm transition font-black`}
                 />
               </div>
 
               <div className="flex flex-col gap-1.5 sm:gap-2">
-                <label htmlFor="fpNewPass" className={`${labelSize} ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#03045E]'}`}>
+                <label htmlFor="fpNewPass" title="New Password" tabIndex="0" className={`${labelSize} ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#03045E]'}`}>
                   New Password
                 </label>
                 <div className="relative">
@@ -477,15 +479,18 @@ export default function ForgotPassword({ onClose }) {
                     id="fpNewPass"
                     name="fpNewPass"
                     type={showPassword ? "text" : "password"}
+                    title="New Password"
+                    aria-label="Enter new password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
                     autoComplete="new-password"
                     placeholder="Enter new password"
-                    className={`w-full ${inputSize} pl-10 sm:pl-12 pr-10 sm:pr-12 ${(isContrast || isDarkMode) ? 'border-2 border-blue-400 bg-zinc-800 text-white placeholder:text-gray-400 focus:border-blue-300' : 'border-2 border-[#03045E]/20 bg-white text-[#03045E] placeholder:text-gray-400 focus:border-[#2C7FFF]'} rounded-xl sm:rounded-2xl focus:outline-none shadow-sm transition`}
+                    className={`w-full ${inputSize} pl-10 sm:pl-12 pr-10 sm:pr-12 ${(isContrast || isDarkMode) ? 'border-2 border-blue-400 bg-zinc-800 text-white placeholder:text-gray-400 focus:border-blue-300' : 'border-2 border-[#03045E]/20 bg-white text-[#03045E] placeholder:text-gray-400 focus:border-[#2C7FFF]'} rounded-lg sm:rounded-xl focus:outline-none shadow-sm transition`}
                   />
                   <button
                     type="button"
+                    title="Show password"
                     onClick={() => setShowPassword(!showPassword)}
                     className={`absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 transition cursor-pointer ${isAccessibilityMode ? 'text-white hover:text-white' : (isContrast || isDarkMode) ? 'text-white/60 hover:text-white' : 'text-[#03045E]/50 hover:text-[#2C7FFF]'}`}
                   >
@@ -504,7 +509,7 @@ export default function ForgotPassword({ onClose }) {
               </div>
 
               <div className="flex flex-col gap-1.5 sm:gap-2">
-                <label htmlFor="fpConfirmPass" className={`${labelSize} ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#03045E]'}`}>
+                <label htmlFor="fpConfirmPass" title="Confirm New Password" tabIndex="0" className={`${labelSize} ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#03045E]'}`}>
                   Confirm New Password
                 </label>
                 <div className="relative">
@@ -517,15 +522,18 @@ export default function ForgotPassword({ onClose }) {
                     id="fpConfirmPass"
                     name="fpConfirmPass"
                     type={showConfirmPassword ? "text" : "password"}
+                    title="Confirm New Password"
+                    aria-label="Confirm new password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                     autoComplete="new-password"
                     placeholder="Confirm new password"
-                    className={`w-full ${inputSize} pl-10 sm:pl-12 pr-10 sm:pr-12 ${(isContrast || isDarkMode) ? 'border-2 border-blue-400 bg-zinc-800 text-white placeholder:text-gray-400 focus:border-blue-300' : 'border-2 border-[#03045E]/20 bg-white text-[#03045E] placeholder:text-gray-400 focus:border-[#2C7FFF]'} rounded-xl sm:rounded-2xl focus:outline-none shadow-sm transition`}
+                    className={`w-full ${inputSize} pl-10 sm:pl-12 pr-10 sm:pr-12 ${(isContrast || isDarkMode) ? 'border-2 border-blue-400 bg-zinc-800 text-white placeholder:text-gray-400 focus:border-blue-300' : 'border-2 border-[#03045E]/20 bg-white text-[#03045E] placeholder:text-gray-400 focus:border-[#2C7FFF]'} rounded-lg sm:rounded-xl focus:outline-none shadow-sm transition`}
                   />
                   <button
                     type="button"
+                    title="Show confirm password"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className={`absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 transition cursor-pointer ${isAccessibilityMode ? 'text-white hover:text-white' : (isContrast || isDarkMode) ? 'text-white/60 hover:text-white' : 'text-[#03045E]/50 hover:text-[#2C7FFF]'}`}
                   >
@@ -545,6 +553,7 @@ export default function ForgotPassword({ onClose }) {
 <button
   type="submit"
   disabled={isLoading}
+  title={isLoading ? 'Resetting...' : 'Save New Password'}
   style={
     isAccessibilityMode && isDarkMode
       ? { backgroundColor: '#262626', color: '#ffffff', borderColor: '#404040', borderRadius: '9999px' }
@@ -558,10 +567,10 @@ export default function ForgotPassword({ onClose }) {
       : isAccessibilityMode
         ? 'border rounded-full shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed mt-2'
         : (isContrast || isDarkMode)
-          ? 'bg-blue-400 hover:bg-blue-300 border border-blue-400 text-black rounded-full shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed mt-2'
+          ? 'bg-blue-400 hover:bg-blue-300 border border-blue-400 text-black rounded-xl sm:rounded-2xl shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed mt-2'
           : isDefaultPalette && isDarkMode
-            ? 'fp-default-dark-send-btn border rounded-full shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed mt-2'
-            : 'bg-[#2C7FFF] hover:bg-[#03045E] text-white rounded-full shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed mt-2'
+            ? 'fp-default-dark-send-btn border rounded-xl sm:rounded-2xl shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed mt-2'
+            : 'bg-[#2C7FFF] hover:bg-[#03045E] text-white rounded-xl sm:rounded-2xl shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed mt-2'
   }`}
 >
   {isLoading ? 'Resetting...' : 'Save New Password'}
@@ -571,12 +580,13 @@ export default function ForgotPassword({ onClose }) {
 
           <div className="w-full flex items-center gap-3">
             <span className={`flex-1 h-px ${(isContrast || isDarkMode) ? 'bg-white/15' : 'bg-[#03045E]/10'}`} />
-            <span className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest ${(isContrast || isDarkMode) ? 'text-white/50' : 'text-[#03045E]/40'}`}>or</span>
+            <span tabIndex="0" title="or" className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest ${(isContrast || isDarkMode) ? 'text-white/50' : 'text-[#03045E]/40'}`}>or</span>
             <span className={`flex-1 h-px ${(isContrast || isDarkMode) ? 'bg-white/15' : 'bg-[#03045E]/10'}`} />
           </div>
 
           <button
             type="button"
+            title="Back to Log In"
             onClick={handleBack}
             className={`text-xs sm:text-sm font-bold transition hover:underline ${(isContrast || isDarkMode || isAccessibilityMode) ? 'text-white hover:text-white' : 'text-[#2C7FFF] hover:text-[#03045E]'}`}
           >
@@ -633,12 +643,14 @@ export default function ForgotPassword({ onClose }) {
             <img
               src={darkLogo}
               alt="AbleWork Logo"
+              title="AbleWork Logo"
+              tabIndex="0"
               className="h-8 sm:h-10 w-auto object-contain"
             />
-            <p className={`text-[10px] sm:text-sm font-semibold leading-relaxed text-white/85`}>
+            <p title="Building an inclusive workforce and equal employment opportunities for everyone." tabIndex="0" className={`text-[10px] sm:text-sm font-semibold leading-relaxed text-white/85`}>
               Building an inclusive workforce and equal employment opportunities for everyone.
             </p>
-            <div className={`pt-1 sm:pt-2 flex items-center space-x-3 text-[8px] sm:text-xs font-bold uppercase tracking-wider text-white/70`}>
+            <div title="Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines" tabIndex="0" className={`pt-1 sm:pt-2 flex items-center space-x-3 text-[8px] sm:text-xs font-bold uppercase tracking-wider text-white/70`}>
               <span> Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</span>
               <span></span>
               <span></span>
@@ -646,20 +658,20 @@ export default function ForgotPassword({ onClose }) {
           </div>
 
           <div>
-            <h4 className={`font-black text-[11px] sm:text-base mb-2 sm:mb-4 text-white`}>Quick Links</h4>
+            <h4 title="Quick Links" tabIndex="0" className={`font-black text-[11px] sm:text-base mb-2 sm:mb-4 text-white`}>Quick Links</h4>
             <ul className="space-y-1.5 sm:space-y-2 text-[9px] sm:text-sm font-semibold">
               <li>
-                <Link to="/" className={`transition-colors text-white/85 hover:text-[#7FB0FF]`}>
+                <Link to="/" title="Home Dashboard" className={`transition-colors text-white/85 hover:text-[#7FB0FF]`}>
                   Home Dashboard
                 </Link>
               </li>
               <li>
-                <Link to="/about" className={`transition-colors text-white/85 hover:text-[#7FB0FF]`}>
+                <Link to="/about" title="About Our Mission" className={`transition-colors text-white/85 hover:text-[#7FB0FF]`}>
                   About Our Mission
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className={`transition-colors text-white/85 hover:text-[#7FB0FF]`}>
+                <Link to="/contact" title="Contact Support" className={`transition-colors text-white/85 hover:text-[#7FB0FF]`}>
                   Contact Support
                 </Link>
               </li>
@@ -667,15 +679,15 @@ export default function ForgotPassword({ onClose }) {
           </div>
 
           <div>
-            <h4 className={`font-black text-[11px] sm:text-base mb-2 sm:mb-4 text-white`}>Legal & Support</h4>
+            <h4 title="Legal & Support" tabIndex="0" className={`font-black text-[11px] sm:text-base mb-2 sm:mb-4 text-white`}>Legal & Support</h4>
             <ul className="space-y-1.5 sm:space-y-2 text-[9px] sm:text-sm font-semibold">
               <li>
-                <Link to="/policy" className={`transition-colors text-white/85 hover:text-[#7FB0FF]`}>
+                <Link to="/policy" title="Privacy Policy" className={`transition-colors text-white/85 hover:text-[#7FB0FF]`}>
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link to="/terms" className={`transition-colors text-white/85 hover:text-[#7FB0FF]`}>
+                <Link to="/terms" title="Terms of Service" className={`transition-colors text-white/85 hover:text-[#7FB0FF]`}>
                   Terms of Service
                 </Link>
               </li>
@@ -683,12 +695,13 @@ export default function ForgotPassword({ onClose }) {
           </div>
 
           <div>
-            <h4 className={`font-black text-[11px] sm:text-base mb-2 sm:mb-4 text-white`}>Get Started</h4>
-            <p className={`text-[9px] sm:text-sm font-semibold mb-2 sm:mb-4 text-white/85`}>
+            <h4 title="Get Started" tabIndex="0" className={`font-black text-[11px] sm:text-base mb-2 sm:mb-4 text-white`}>Get Started</h4>
+            <p title="Are you an applicant or employer looking to join our network?" tabIndex="0" className={`text-[9px] sm:text-sm font-semibold mb-2 sm:mb-4 text-white/85`}>
               Are you an applicant or employer looking to join our network?
             </p>
             <Link
               to="/register-select"
+              title="Register Now"
               className={`inline-block bg-[#2C7FFF] px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-xl font-bold text-[8px] sm:text-xs uppercase tracking-wider shadow-md transition-all border-2 border-[#2C7FFF] ${
                 isAccessibilityMode && isDarkMode
                   ? 'fp-accessibility-dark-register-text'
@@ -703,7 +716,7 @@ export default function ForgotPassword({ onClose }) {
 
         </div>
 
-        <div className={`max-w-[1700px] mx-auto pt-4 sm:pt-6 flex flex-col items-center justify-center gap-2 sm:gap-4 text-[8px] sm:text-xs font-bold text-center text-white/75`}>
+        <div title="Copyright information and slogan" tabIndex="0" className={`max-w-[1700px] mx-auto pt-4 sm:pt-6 flex flex-col items-center justify-center gap-2 sm:gap-4 text-[8px] sm:text-xs font-bold text-center text-white/75`}>
           <p>© {new Date().getFullYear()} AgileWork Inc. All rights reserved.</p>
           <p className="font-bold">Empowering Abilities, Connecting Opportunities.</p>
         </div>

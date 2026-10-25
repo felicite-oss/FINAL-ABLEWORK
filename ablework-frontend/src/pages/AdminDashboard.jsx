@@ -292,7 +292,7 @@ const handleToggleDark = () => {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${isDark ? 'bg-black border-white' : 'bg-white border-[#2C7FFF]'} border-2`}>
+          <div className={`relative w-full max-w-md rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${isDark ? 'bg-black border-white' : 'bg-white border-[#2C7FFF]'} border-2`}>
             <div className={`h-2 w-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
             <div className="relative px-8 pt-10 pb-8 flex flex-col items-center text-center">
               <div className="relative mb-5">
@@ -328,7 +328,7 @@ const handleToggleDark = () => {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${isDark ? 'bg-black border-white' : 'bg-white border-[#2C7FFF]'} border-2`}>
+          <div className={`relative w-full max-w-md rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${isDark ? 'bg-black border-white' : 'bg-white border-[#2C7FFF]'} border-2`}>
             <div className={`h-2 w-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
             <div className="relative px-8 pt-10 pb-8 flex flex-col items-center text-center">
               <div className="relative mb-5">
@@ -365,7 +365,7 @@ const handleToggleDark = () => {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${isDark ? 'bg-black border-white' : 'bg-white border-[#2C7FFF]'} border-2`}>
+          <div className={`relative w-full max-w-md rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${isDark ? 'bg-black border-white' : 'bg-white border-[#2C7FFF]'} border-2`}>
             <div className={`h-2 w-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
 
             <div className="relative px-8 pt-10 pb-8 flex flex-col items-center text-center">
@@ -393,13 +393,13 @@ const handleToggleDark = () => {
               <div className="flex flex-row gap-3 w-full">
                 <button
                   onClick={() => setShowLogoutConfirm(false)}
-                  className={`flex-1 py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 ${isDark ? 'text-[#16a34a] border-[#16a34a]' : 'text-[#16a34a] border-[#16a34a]'}`}
+                  className={`flex-1 py-4 rounded-xl font-black text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 ${isDark ? 'text-[#16a34a] border-[#16a34a]' : 'text-[#16a34a] border-[#16a34a]'}`}
                 >
                   No, Stay
                 </button>
                 <button
                   onClick={handleLogout}
-                  className={`flex-1 py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 ${isDark ? 'text-[#DC2626] border-[#DC2626]' : 'text-[#DC2626] border-[#DC2626]'}`}
+                  className={`flex-1 py-4 rounded-xl font-black text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 ${isDark ? 'text-[#DC2626] border-[#DC2626]' : 'text-[#DC2626] border-[#DC2626]'}`}
                 >
                   Yes, Logout
                 </button>
@@ -414,7 +414,7 @@ const handleToggleDark = () => {
           className="fixed inset-0 z-[99999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${isDark ? 'bg-black border-white' : `bg-white ${confirmAccentBorder}`} border-2`}>
+          <div className={`relative w-full max-w-md rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${isDark ? 'bg-black border-white' : `bg-white ${confirmAccentBorder}`} border-2`}>
             <div className={`h-2 w-full ${isDark ? 'bg-white' : confirmBarColor}`} />
 
             <div className="relative px-8 pt-10 pb-8 flex flex-col items-center text-center">
@@ -473,14 +473,14 @@ const handleToggleDark = () => {
                 <button
                   onClick={() => setConfirmPopup({ isOpen: false, type: null, userId: null, reason: null, loading: false })}
                   disabled={confirmPopup.loading}
-                  className={`flex-1 py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 disabled:opacity-50 ${isDark ? 'text-white border-white hover:bg-white hover:text-black' : 'text-[#03045E] border-[#03045E]'}`}
+                  className={`flex-1 py-4 rounded-xl font-black text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 disabled:opacity-50 ${isDark ? 'text-white border-white hover:bg-white hover:text-black' : 'text-[#03045E] border-[#03045E]'}`}
                 >
                   No, Cancel
                 </button>
                 <button
                   onClick={executeConfirmedAction}
                   disabled={confirmPopup.loading}
-                  className={`flex-1 py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 disabled:opacity-70 flex items-center justify-center gap-2 ${isDark ? 'text-white border-white hover:bg-white hover:text-black' : `${confirmAccentText} ${confirmAccentBorder}`}`}
+                  className={`flex-1 py-4 rounded-xl font-black text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 disabled:opacity-70 flex items-center justify-center gap-2 ${isDark ? 'text-white border-white hover:bg-white hover:text-black' : `${confirmAccentText} ${confirmAccentBorder}`}`}
                 >
                   {confirmPopup.loading ? (
                     <>
@@ -523,7 +523,7 @@ const handleToggleDark = () => {
                 onClick={() => setShowNotifications((prev) => !prev)}
                 aria-label="Notifications"
                 aria-pressed={showNotifications}
-                className={`relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl ${cardBg} ${txtMain} border-2 ${bdrMain} shadow-sm cursor-pointer transition-all duration-200 shrink-0`}
+                className={`relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-lg ${cardBg} ${txtMain} border-2 ${bdrMain} shadow-sm cursor-pointer transition-all duration-200 shrink-0`}
               >
                 <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -538,7 +538,7 @@ const handleToggleDark = () => {
               {showNotifications && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)}></div>
-                  <div className={`fixed sm:absolute right-3 sm:right-0 left-3 sm:left-auto top-16 sm:top-full sm:mt-3 w-auto sm:w-80 rounded-2xl sm:rounded-3xl border-2 shadow-[0_20px_50px_rgba(3,4,94,0.25)] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 max-h-[calc(100vh-5rem)] overflow-y-auto ${isDark ? 'bg-black border-white' : 'bg-white border-[#03045E]/20'}`}>
+                  <div className={`fixed sm:absolute right-3 sm:right-0 left-3 sm:left-auto top-16 sm:top-full sm:mt-3 w-auto sm:w-80 rounded-xl sm:rounded-2xl border-2 shadow-[0_20px_50px_rgba(3,4,94,0.25)] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 max-h-[calc(100vh-5rem)] overflow-y-auto ${isDark ? 'bg-black border-white' : 'bg-white border-[#03045E]/20'}`}>
                     <div className={`px-4 py-3 border-b-2 ${isDark ? 'border-white/20' : 'border-[#03045E]/10'}`}>
                       <h3 className={`text-sm font-black tracking-tight ${txtMain}`}>Notifications</h3>
                       <p className={`text-[10px] font-bold ${txtMuted}`}>
@@ -556,10 +556,10 @@ const handleToggleDark = () => {
                                 setListFilter('Pending');
                                 setShowNotifications(false);
                               }}
-                              className={`w-full text-left p-3 rounded-xl border-2 transition-all cursor-pointer ${isDark ? 'bg-black border-white/20 hover:border-white' : 'bg-[#f4f4f4] border-[#f59e0b]/30 hover:border-[#f59e0b]'}`}
+                              className={`w-full text-left p-3 rounded-lg border-2 transition-all cursor-pointer ${isDark ? 'bg-black border-white/20 hover:border-white' : 'bg-[#f4f4f4] border-[#f59e0b]/30 hover:border-[#f59e0b]'}`}
                             >
                               <div className="flex items-center gap-3">
-                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border-2 ${isDark ? 'bg-black text-white border-white/40' : 'bg-[#FEF3C7] text-[#B45309] border-[#f59e0b]'}`}>
+                                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border-2 ${isDark ? 'bg-black text-white border-white/40' : 'bg-[#FEF3C7] text-[#B45309] border-[#f59e0b]'}`}>
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                   </svg>
@@ -579,10 +579,10 @@ const handleToggleDark = () => {
                                 setListFilter('Pending');
                                 setShowNotifications(false);
                               }}
-                              className={`w-full text-left p-3 rounded-xl border-2 transition-all cursor-pointer ${isDark ? 'bg-black border-white/20 hover:border-white' : 'bg-[#f4f4f4] border-[#f59e0b]/30 hover:border-[#f59e0b]'}`}
+                              className={`w-full text-left p-3 rounded-lg border-2 transition-all cursor-pointer ${isDark ? 'bg-black border-white/20 hover:border-white' : 'bg-[#f4f4f4] border-[#f59e0b]/30 hover:border-[#f59e0b]'}`}
                             >
                               <div className="flex items-center gap-3">
-                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border-2 ${isDark ? 'bg-black text-white border-white/40' : 'bg-[#FEF3C7] text-[#B45309] border-[#f59e0b]'}`}>
+                                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border-2 ${isDark ? 'bg-black text-white border-white/40' : 'bg-[#FEF3C7] text-[#B45309] border-[#f59e0b]'}`}>
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                   </svg>
@@ -597,7 +597,7 @@ const handleToggleDark = () => {
                         </div>
                       ) : (
                         <div className="py-6 flex flex-col items-center text-center">
-                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-2 border-2 ${isDark ? 'bg-white/10 text-white border-white/30' : 'bg-[#10B981]/15 text-[#10B981] border-[#10B981]/30'}`}>
+                          <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-2 border-2 ${isDark ? 'bg-white/10 text-white border-white/30' : 'bg-[#10B981]/15 text-[#10B981] border-[#10B981]/30'}`}>
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                             </svg>
@@ -628,7 +628,7 @@ const handleToggleDark = () => {
             </div>
 
             <button
-              className={`md:hidden relative z-[60] flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl ${cardBg} ${txtMain} border-2 ${bdrMain} shadow-sm cursor-pointer transition-all duration-200 shrink-0`}
+              className={`md:hidden relative z-[60] flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-lg ${cardBg} text-[#03045E] border-2 ${bdrMain} shadow-sm cursor-pointer transition-all duration-200 shrink-0`}
               onClick={() => setIsOpen(!isOpen)}
             >
               {isOpen ? (
@@ -671,7 +671,7 @@ const handleToggleDark = () => {
                       setListFilter('Pending'); 
                       setIsOpen(false); 
                     }}
-                    className={`relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${
+                    className={`relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${
                       isActive
                         ? `${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-[#03045E]'} shadow-md`
                         : `${isDark ? 'bg-black text-white border-white/25' : 'bg-white text-[#03045E] border-[#03045E]/25'}`
@@ -680,7 +680,7 @@ const handleToggleDark = () => {
                     {isActive && (
                       <span className={`absolute left-0 top-0 bottom-0 w-1.5 ${isDark ? 'bg-white' : 'bg-[#03045E]'}`}></span>
                     )}
-                    <div className={`p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}>
+                    <div className={`p-1.5 rounded-lg transition-all duration-300 shrink-0 flex items-center justify-center border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}>
                       {tab.icon}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -701,9 +701,9 @@ const handleToggleDark = () => {
               <button
                 disabled={isLoggingOut}
                 onClick={() => { setIsOpen(false); setShowLogoutConfirm(true); }}
-                className={`relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isDark ? 'bg-black text-white border-white/40' : 'bg-white text-[#03045E] border-[#DC2626]/40'} disabled:opacity-50`}
+                className={`relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isDark ? 'bg-black text-white border-white/40' : 'bg-white text-[#03045E] border-[#DC2626]/40'} disabled:opacity-50`}
               >
-                <div className={`p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#DC2626] text-white border-[#DC2626]'}`}>
+                <div className={`p-1.5 rounded-lg transition-all duration-300 shrink-0 flex items-center justify-center border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#DC2626] text-white border-[#DC2626]'}`}>
                   {isLoggingOut ? (
                     <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -732,7 +732,7 @@ const handleToggleDark = () => {
   aria-label="Toggle sidebar"
   aria-expanded={showDesktopSidebar}
   title={showDesktopSidebar ? 'Hide navigation' : 'Show navigation'}
-  className={`hidden md:flex fixed top-[4.5rem] left-4 z-[60] w-11 h-11 items-center justify-center rounded-2xl border-2 shadow-lg transition-all duration-200 cursor-pointer ${isDark ? 'bg-white text-black border-white hover:bg-white/90' : 'bg-[#03045E] text-white border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'}`}
+  className={`hidden md:flex fixed top-[4.5rem] left-4 z-[60] w-11 h-11 items-center justify-center rounded-xl border-2 shadow-lg transition-all duration-200 cursor-pointer ${isDark ? 'bg-white text-black border-white hover:bg-white/90' : 'bg-[#f4f4f4] text-[#03045E] border-[#03045E]/20'}`}
 >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
           {showDesktopSidebar ? (
@@ -760,7 +760,7 @@ const handleToggleDark = () => {
                     <button 
                       key={tab.id} 
                       onClick={() => { setActiveTab(tab.id); setListFilter('Pending'); }} 
-                      className={`relative flex items-center gap-3.5 text-left pl-4 pr-3.5 py-3.5 rounded-2xl font-extrabold transition-all duration-300 capitalize cursor-pointer border-2 group overflow-hidden ${
+                      className={`relative flex items-center gap-3.5 text-left pl-4 pr-3.5 py-3.5 rounded-xl font-extrabold transition-all duration-300 capitalize cursor-pointer border-2 group overflow-hidden ${
                         isActive
                           ? `${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-[#03045E]'} shadow-md`
                           : `${isDark ? 'bg-black text-white border-white/25' : 'bg-white text-[#03045E] border-[#03045E]/25'}`
@@ -770,7 +770,7 @@ const handleToggleDark = () => {
                         <span className={`absolute left-0 top-0 bottom-0 w-1.5 ${isDark ? 'bg-white' : 'bg-[#03045E]'}`}></span>
                       )}
                       <div 
-                        className={`p-2.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}
+                        className={`p-2.5 rounded-lg transition-all duration-300 shrink-0 flex items-center justify-center border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}
                       >
                         {tab.id === 'Overview' && (
                           <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
@@ -818,7 +818,7 @@ const handleToggleDark = () => {
             ) : (
             <>
             <div className={`sticky top-16 z-40 ${isDark ? 'bg-black' : 'bg-[#f4f4f4]'} flex flex-col`}>
-              <div className={`pt-9 sm:pt-12 md:pt-14 pb-5 border-b-2 ${isDark ? 'border-white/20' : 'border-[#03045E]/15'} flex flex-col sm:flex-row sm:items-center justify-between gap-4`}>
+              <div className={`pt-4 sm:pt-6 md:pt-8 pb-5 border-b-2 ${isDark ? 'border-white/20' : 'border-[#03045E]/15'} flex flex-col sm:flex-row sm:items-center justify-between gap-4 pl-4`}>
                 <div>
                   <h1 className={`text-3xl font-black tracking-tight ${txtMain}`}>Admin Control Center</h1>
                   <p className={`text-sm font-bold mt-1 ${txtMuted}`}>
@@ -829,7 +829,7 @@ const handleToggleDark = () => {
 
               {(activeTab === 'Employers' || activeTab === 'Applicants') && (
                 <div className="pt-6 pb-2">
-                  <div className={`flex items-center gap-0.5 sm:gap-2 ${cardBg} p-1 sm:p-4 rounded-xl sm:rounded-[2rem] border-2 ${bdrMain} w-full shadow-md overflow-hidden`}>
+                  <div className={`flex items-center gap-0.5 sm:gap-2 ${cardBg} p-1 sm:p-4 rounded-lg sm:rounded-xl border-2 ${bdrMain} w-full shadow-md overflow-hidden`}>
                     {['Pending', 'Approved', 'Rejected', 'Disabled'].map(filter => {
                       const targetList = activeTab === 'Employers' ? employers : applicants;
                       let count = 0;
@@ -879,7 +879,7 @@ const handleToggleDark = () => {
                         <button
                           key={filter}
                           onClick={() => setListFilter(filter)}
-                          className={`flex-1 min-w-0 px-0.5 sm:px-4 py-1.5 sm:py-3 rounded-md sm:rounded-xl text-[8px] sm:text-sm font-black transition-all cursor-pointer flex items-center justify-center gap-0.5 sm:gap-2 tracking-tight sm:tracking-normal border-2 ${isActive && isDark ? 'border-white/20' : 'border-transparent'}`}
+                          className={`flex-1 min-w-0 px-0.5 sm:px-4 py-1.5 sm:py-3 rounded sm:rounded-lg text-[8px] sm:text-sm font-black transition-all cursor-pointer flex items-center justify-center gap-0.5 sm:gap-2 tracking-tight sm:tracking-normal border-2 ${isActive && isDark ? 'border-white/20' : 'border-transparent'}`}
                           style={{
                             backgroundColor: isActive ? activeBg : 'transparent',
                             color: isActive ? activeText : inactiveText
@@ -959,8 +959,8 @@ const handleToggleDark = () => {
                     />
                   </div>
 
-                  <div className={`w-full lg:w-2/3 ${isAnalyticsExpanded ? 'fixed inset-0 z-[9999] flex flex-col p-4 sm:p-8 md:p-12 bg-black/80 backdrop-blur-sm' : `${cardBg} p-3 sm:p-8 rounded-2xl sm:rounded-[2rem] shadow-sm border-2 ${bdrMain}`}`}>
-                    <div className={`${isAnalyticsExpanded ? `${cardBg} w-full h-full max-w-[1400px] mx-auto rounded-2xl sm:rounded-[2rem] shadow-2xl border-2 ${bdrMain} p-4 sm:p-8 flex flex-col overflow-hidden` : 'flex flex-col h-full'}`}>
+                  <div className={`w-full lg:w-2/3 ${isAnalyticsExpanded ? 'fixed inset-0 z-[9999] flex flex-col p-4 sm:p-8 md:p-12 bg-black/80 backdrop-blur-sm' : `${cardBg} p-3 sm:p-8 rounded-xl sm:rounded-2xl shadow-sm border-2 ${bdrMain}`}`}>
+                    <div className={`${isAnalyticsExpanded ? `${cardBg} w-full h-full max-w-[1400px] mx-auto rounded-xl sm:rounded-2xl shadow-2xl border-2 ${bdrMain} p-4 sm:p-8 flex flex-col overflow-hidden` : 'flex flex-col h-full'}`}>
                       <div className="mb-4 sm:mb-6 flex items-start justify-between gap-4 shrink-0">
                         <div>
                           <h2 className={`${isAnalyticsExpanded ? 'text-xl sm:text-2xl md:text-3xl' : 'text-base sm:text-xl'} font-black tracking-tight transition-all duration-300 ${txtMain}`}>Annual Platform Growth</h2>
@@ -968,7 +968,7 @@ const handleToggleDark = () => {
                         </div>
                         <button
                           onClick={() => setIsAnalyticsExpanded(!isAnalyticsExpanded)}
-                          className={`p-2 rounded-xl border-2 ${bdrMain} ${txtMain} hover:bg-white/10 transition-all cursor-pointer shrink-0`}
+                          className={`p-2 rounded-lg border-2 ${bdrMain} ${txtMain} hover:bg-white/10 transition-all cursor-pointer shrink-0`}
                           title={isAnalyticsExpanded ? 'Minimize' : 'Maximize'}
                         >
                           {isAnalyticsExpanded ? (
@@ -1032,7 +1032,7 @@ const handleToggleDark = () => {
                   </div>
                 </div>
 
-                <div className={`${cardBg} p-4 sm:p-8 rounded-2xl sm:rounded-[2rem] shadow-sm border-2 ${bdrMain} flex flex-col gap-4 sm:gap-6`}>
+                <div className={`${cardBg} p-4 sm:p-8 rounded-xl sm:rounded-2xl shadow-sm border-2 ${bdrMain} flex flex-col gap-4 sm:gap-6`}>
                   <div className={`flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4 border-b-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/10'} pb-3 sm:pb-4`}>
                     <div>
                       <h2 className={`text-base sm:text-xl font-black tracking-tight leading-tight ${txtMain}`}>All Registered Users Overview</h2>
@@ -1042,33 +1042,10 @@ const handleToggleDark = () => {
                       <span className={`px-3 sm:px-4 py-1 sm:py-1.5 ${isDark ? 'bg-white/10 text-white border-white/20' : 'bg-[#03045E]/10 text-[#03045E] border-[#03045E]/20'} font-black text-[10px] sm:text-xs rounded-lg sm:rounded-xl border w-fit`}>
                         Showing: {currentUsers.length} of {filteredOverviewUsers.length} Users
                       </span>
-                      {totalPages > 1 && (
-                        <div className="flex flex-col gap-1 items-end">
-                          <span className={`text-[10px] font-bold ${isDark ? 'text-white/70' : 'text-[#03045E]/70'}`}>
-                            Page {currentPage} of {totalPages}
-                          </span>
-                          <div className="flex flex-col gap-1">
-                            <button
-                              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                              disabled={currentPage === 1}
-                              className={`px-4 py-1.5 rounded-lg font-black text-[10px] uppercase tracking-wider transition-all cursor-pointer border-2 disabled:opacity-50 disabled:cursor-not-allowed ${isDark ? 'bg-black text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/30'}`}
-                            >
-                              Previous
-                            </button>
-                            <button
-                              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                              disabled={currentPage === totalPages}
-                              className={`px-4 py-1.5 rounded-lg font-black text-[10px] uppercase tracking-wider transition-all cursor-pointer border-2 disabled:opacity-50 disabled:cursor-not-allowed ${isDark ? 'bg-black text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/30'}`}
-                            >
-                              Next
-                            </button>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   </div>
 
-                  <div className={`flex items-center gap-0.5 sm:gap-2 ${surfaceBg} p-1 sm:p-2 rounded-xl sm:rounded-2xl border-2 ${isDark ? 'border-white/10' : 'border-[#03045E]/10'} w-full overflow-x-auto mb-2`}>
+                  <div className={`flex items-center gap-0.5 sm:gap-2 ${surfaceBg} p-1 sm:p-2 rounded-lg sm:rounded-xl border-2 ${isDark ? 'border-white/10' : 'border-[#03045E]/10'} w-full overflow-x-auto mb-2`}>
                     {['All', 'Pending', 'Approved', 'Rejected', 'Disabled'].map(filter => {
                       let count = 0;
                       if (filter === 'All') {
@@ -1121,7 +1098,7 @@ const handleToggleDark = () => {
                         <button
                           key={filter}
                           onClick={() => setOverviewFilter(filter)}
-                          className={`flex-1 min-w-0 px-2 sm:px-4 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl text-[9px] sm:text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap border-2 ${isActive && isDark ? 'border-white/20' : 'border-transparent'}`}
+                          className={`flex-1 min-w-0 px-2 sm:px-4 py-1.5 sm:py-2.5 rounded-md sm:rounded-lg text-[9px] sm:text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap border-2 ${isActive && isDark ? 'border-white/20' : 'border-transparent'}`}
                           style={{
                             backgroundColor: isActive ? activeBg : 'transparent',
                             color: isActive ? activeText : inactiveText
@@ -1145,10 +1122,10 @@ const handleToggleDark = () => {
                   <div className="flex flex-col gap-2.5 sm:gap-3 max-h-[500px] overflow-y-auto pr-1">
                     {currentUsers.length > 0 ? (
                       currentUsers.map((user) => (
-                        <div key={user.user_id} className={`p-3 sm:p-5 rounded-xl sm:rounded-2xl ${surfaceBg} border-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/15'} flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 transition-all ${user.account_status === 'Disabled' ? 'opacity-70' : ''}`}>
+                        <div key={user.user_id} className={`p-3 sm:p-5 rounded-lg sm:rounded-xl ${surfaceBg} border-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/15'} flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 transition-all ${user.account_status === 'Disabled' ? 'opacity-70' : ''}`}>
 
                           <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 w-full sm:w-auto">
-                            <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl ${isDark ? 'bg-white text-black' : 'bg-[#03045E] text-white'} flex items-center justify-center font-black text-xs sm:text-sm shrink-0 shadow-sm`}>
+                            <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-md sm:rounded-lg ${isDark ? 'bg-white text-black' : 'bg-[#03045E] text-white'} flex items-center justify-center font-black text-xs sm:text-sm shrink-0 shadow-sm`}>
                               {user.userType === 'Employer' ? (user.company_name?.[0] || 'E') : (user.firstname?.[0] || 'A')}
                             </div>
                             <div className="min-w-0 flex-1">
@@ -1161,12 +1138,12 @@ const handleToggleDark = () => {
 
                           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 w-full sm:w-auto justify-start sm:justify-end flex-wrap">
                             <span
-                              className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[8px] sm:text-[10px] font-black tracking-wider uppercase border ${isDark ? 'bg-white/10 text-white border-white/20' : 'bg-[#03045E]/10 text-[#03045E] border-[#03045E]/20'}`}
+                              className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-sm sm:rounded-md text-[8px] sm:text-[10px] font-black tracking-wider uppercase border ${isDark ? 'bg-white/10 text-white border-white/20' : 'bg-[#03045E]/10 text-[#03045E] border-[#03045E]/20'}`}
                             >
                               {user.userType}
                             </span>
                             <span
-                              className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[8px] sm:text-[10px] font-black tracking-wider uppercase border`}
+                              className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-sm sm:rounded-md text-[8px] sm:text-[10px] font-black tracking-wider uppercase border`}
                               style={{
   backgroundColor: user.account_status === 'Disabled' ? 'rgba(220,38,38,0.1)' :
     user.verification_status === 'Approved' ? 'rgba(16,185,129,0.1)' :
@@ -1191,6 +1168,28 @@ const handleToggleDark = () => {
                       <div className={`p-8 text-center text-xs font-bold ${txtMuted}`}>No {overviewFilter.toLowerCase()} users found.</div>
                     )}
                   </div>
+
+                  {totalPages > 1 && (
+                    <div className={`flex justify-between items-center gap-3 w-full pt-3 border-t-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/10'}`}>
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all cursor-pointer border-2 disabled:opacity-50 disabled:cursor-not-allowed ${isDark ? 'bg-black text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/30'}`}
+                      >
+                        Previous
+                      </button>
+                      <span className={`text-[10px] sm:text-xs font-black ${txtMuted}`}>
+                        Page {currentPage} of {totalPages}
+                      </span>
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all cursor-pointer border-2 disabled:opacity-50 disabled:cursor-not-allowed ${isDark ? 'bg-black text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/30'}`}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -1200,11 +1199,11 @@ const handleToggleDark = () => {
                 <div className="flex flex-col gap-2.5 sm:gap-4">
                   {filterList(activeTab === 'Employers' ? employers : applicants).length > 0 ? (
                     filterList(activeTab === 'Employers' ? employers : applicants).map(user => (
-                      <div key={user.user_id} className={`${cardBg} p-3 sm:p-7 rounded-2xl sm:rounded-[2rem] shadow-sm border-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/15'} flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-6 transition-all hover:shadow-md ${listFilter === 'Disabled' ? 'opacity-70' : ''}`}>
+                      <div key={user.user_id} className={`${cardBg} p-3 sm:p-7 rounded-xl sm:rounded-2xl shadow-sm border-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/15'} flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-6 transition-all hover:shadow-md ${listFilter === 'Disabled' ? 'opacity-70' : ''}`}>
 
                         <div className="flex items-start gap-2.5 sm:gap-4 flex-1 min-w-0 w-full">
                           <div
-                            className={`w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 border-2 font-black text-sm sm:text-lg ${isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}
+                            className={`w-9 h-9 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0 border-2 font-black text-sm sm:text-lg ${isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}
                           >
                             {activeTab === 'Employers' ? (user.company_name?.[0] || 'E') : (user.firstname?.[0] || 'A')}
                           </div>
@@ -1213,7 +1212,7 @@ const handleToggleDark = () => {
                               {activeTab === 'Employers' ? user.company_name : `${user.firstname} ${user.lastname}`}
                             </h3>
                             <div className={`flex flex-wrap items-center gap-1 sm:gap-2 text-[9px] sm:text-sm font-bold mt-1 ${txtMuted}`}>
-                              <span className={`${surfaceBg} px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg border ${isDark ? 'border-white/10' : 'border-[#03045E]/10'}`}>
+                              <span className={`${surfaceBg} px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-sm sm:rounded-md border ${isDark ? 'border-white/10' : 'border-[#03045E]/10'}`}>
                                 {activeTab === 'Employers' ? 'Industry:' : 'Disability:'} <strong className={txtMain}>{activeTab === 'Employers' ? (user.industry || 'N/A') : (user.disability_type || 'N/A')}</strong>
                               </span>
                               <span className="hidden sm:inline">•</span>
@@ -1235,7 +1234,7 @@ const handleToggleDark = () => {
                             {activeTab === 'Employers' && user.verification_document && (
                               <button
                                 onClick={() => setEmployerModal({ isOpen: true, user: user })}
-                                className={`flex-1 min-w-0 text-center px-2 sm:px-4 py-2 sm:py-2.5 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 transition flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm cursor-pointer ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-[#2C7FFF]/10 text-[#2c7fff] border-[#2c7fff]'}`}
+                                className={`flex-1 min-w-0 text-center px-2 sm:px-4 py-2 sm:py-2.5 font-black text-[10px] sm:text-sm rounded-md sm:rounded-lg border-2 transition flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm cursor-pointer ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-[#2C7FFF]/10 text-[#2c7fff] border-[#2c7fff]'}`}
                               >
                                 <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -1247,7 +1246,7 @@ const handleToggleDark = () => {
                             {activeTab === 'Applicants' && user.pwd_document_path && (
                               <button
                                 onClick={() => setPwdModal({ isOpen: true, user: user })}
-                                className={`flex-1 min-w-0 text-center px-2 sm:px-4 py-2 sm:py-2.5 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 transition flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm cursor-pointer ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-[#2C7FFF]/10 text-[#2c7fff] border-[#2c7fff]'}`}
+                                className={`flex-1 min-w-0 text-center px-2 sm:px-4 py-2 sm:py-2.5 font-black text-[10px] sm:text-sm rounded-md sm:rounded-lg border-2 transition flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm cursor-pointer ${isDark ? 'bg-black text-white border-white hover:bg-white hover:text-black' : 'bg-[#2C7FFF]/10 text-[#2c7fff] border-[#2c7fff]'}`}
                               >
                                 <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path>
@@ -1257,7 +1256,7 @@ const handleToggleDark = () => {
                             )}
 
                             {(!user.verification_document && !user.pwd_document_path) && (
-                              <div className={`flex-1 min-w-0 text-center px-2 sm:px-4 py-2 sm:py-2.5 ${surfaceBg} ${isDark ? 'text-white/50 border-white/10' : 'text-[#03045E]/50 border-[#03045E]/10'} font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 flex items-center justify-center gap-1.5 sm:gap-2`}>
+                              <div className={`flex-1 min-w-0 text-center px-2 sm:px-4 py-2 sm:py-2.5 ${surfaceBg} ${isDark ? 'text-white/50 border-white/10' : 'text-[#03045E]/50 border-[#03045E]/10'} font-black text-[10px] sm:text-sm rounded-md sm:rounded-lg border-2 flex items-center justify-center gap-1.5 sm:gap-2`}>
                                 No Document Attached
                               </div>
                             )}
@@ -1269,7 +1268,7 @@ const handleToggleDark = () => {
                                 <>
                                   <button
                                     onClick={() => setRejectModal({ isOpen: true, userId: user.user_id, reason: '' })}
-                                    className={`flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-2 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 transition cursor-pointer shadow-sm flex items-center justify-center gap-1.5 bg-[#FEE2E2] text-[#B91C1C] border-[#DC2626]`}
+                                    className={`flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-2 font-black text-[10px] sm:text-sm rounded-md sm:rounded-lg border-2 transition cursor-pointer shadow-sm flex items-center justify-center gap-1.5 bg-[#FEE2E2] text-[#B91C1C] border-[#DC2626]`}
                                   >
                                     <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path>
@@ -1278,7 +1277,7 @@ const handleToggleDark = () => {
                                   </button>
                                   <button
                                     onClick={() => setConfirmPopup({ isOpen: true, type: 'approve', userId: user.user_id, reason: null, loading: false })}
-                                    className={`flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-2 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 shadow-sm transition cursor-pointer flex items-center justify-center gap-1.5 bg-[#10b981] text-white border-[#10b981]`}
+                                    className={`flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-2 font-black text-[10px] sm:text-sm rounded-md sm:rounded-lg border-2 shadow-sm transition cursor-pointer flex items-center justify-center gap-1.5 bg-[#10b981] text-white border-[#10b981]`}
                                   >
                                     <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path>
@@ -1290,7 +1289,7 @@ const handleToggleDark = () => {
                               {listFilter === 'Approved' && (
                                 <button
                                   onClick={() => setConfirmPopup({ isOpen: true, type: 'disable', userId: user.user_id, reason: null, loading: false })}
-                                  className={`flex-1 min-w-0 py-2 sm:py-2.5 px-3 sm:px-4 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 shadow-sm cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 bg-[#FEE2E2] text-[#B91C1C] border-[#DC2626]`}
+                                  className={`flex-1 min-w-0 py-2 sm:py-2.5 px-3 sm:px-4 font-black text-[10px] sm:text-sm rounded-md sm:rounded-lg border-2 shadow-sm cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 bg-[#FEE2E2] text-[#B91C1C] border-[#DC2626]`}
                                 >
                                   <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
@@ -1301,7 +1300,7 @@ const handleToggleDark = () => {
                               {listFilter === 'Rejected' && (
                                 <button
                                   onClick={() => setConfirmPopup({ isOpen: true, type: 'approve', userId: user.user_id, reason: null, loading: false })}
-                                  className={`flex-1 min-w-0 py-2 sm:py-2.5 px-3 sm:px-4 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 shadow-sm transition cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 bg-[#D1FAE5] text-[#047857] border-[#10B981]`}
+                                  className={`flex-1 min-w-0 py-2 sm:py-2.5 px-3 sm:px-4 font-black text-[10px] sm:text-sm rounded-md sm:rounded-lg border-2 shadow-sm transition cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 bg-[#D1FAE5] text-[#047857] border-[#10B981]`}
                                 >
                                   <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -1312,7 +1311,7 @@ const handleToggleDark = () => {
                               {listFilter === 'Disabled' && (
                                 <button
                                   onClick={() => setConfirmPopup({ isOpen: true, type: 'restore', userId: user.user_id, reason: null, loading: false })}
-                                  className={`flex-1 min-w-0 py-2 sm:py-2.5 px-3 sm:px-4 font-black text-[10px] sm:text-sm rounded-lg sm:rounded-xl border-2 shadow-sm cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 bg-[#2C7FFF] text-white border-[#2C7FFF]`}
+                                  className={`flex-1 min-w-0 py-2 sm:py-2.5 px-3 sm:px-4 font-black text-[10px] sm:text-sm rounded-md sm:rounded-lg border-2 shadow-sm cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 bg-[#2C7FFF] text-white border-[#2C7FFF]`}
                                 >
                                   <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -1326,8 +1325,8 @@ const handleToggleDark = () => {
                       </div>
                     ))
                   ) : (
-                    <div className={`p-8 sm:p-16 text-center border-2 border-dashed ${isDark ? 'border-white/20 bg-black' : 'border-[#03045E]/20 bg-white'} rounded-2xl sm:rounded-[2rem] shadow-sm flex flex-col items-center justify-center`}>
-                      <div className={`w-12 h-12 sm:w-14 sm:h-14 ${isDark ? 'bg-white/10 text-white border-white/30' : 'bg-[#2C7FFF]/15 text-[#2C7FFF] border-[#2C7FFF]/30'} rounded-2xl flex items-center justify-center mb-3 sm:mb-4 border-2`}>
+                    <div className={`p-8 sm:p-16 text-center border-2 border-dashed ${isDark ? 'border-white/20 bg-black' : 'border-[#03045E]/20 bg-white'} rounded-xl sm:rounded-2xl shadow-sm flex flex-col items-center justify-center`}>
+                      <div className={`w-12 h-12 sm:w-14 sm:h-14 ${isDark ? 'bg-white/10 text-white border-white/30' : 'bg-[#2C7FFF]/15 text-[#2C7FFF] border-[#2C7FFF]/30'} rounded-lg flex items-center justify-center mb-3 sm:mb-4 border-2`}>
                         <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
                         </svg>
@@ -1345,7 +1344,7 @@ const handleToggleDark = () => {
                 className="fixed inset-0 z-[9999999] flex items-center justify-center p-2 sm:p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300 overflow-y-auto"
                 style={{ backgroundColor: 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
               >
-                <div className={`${cardBg} rounded-[2rem] sm:rounded-[2.5rem] w-full max-w-[95vw] sm:max-w-7xl my-4 sm:my-0 shadow-[0_25px_60px_rgba(3,4,94,0.4)] border-2 ${isDark ? 'border-white/20' : 'border-[#03045E]/20'} flex flex-col overflow-hidden h-auto max-h-[95vh] sm:h-[90vh]`}>
+                <div className={`${cardBg} rounded-xl sm:rounded-2xl w-full max-w-[95vw] sm:max-w-7xl my-4 sm:my-0 shadow-[0_25px_60px_rgba(3,4,94,0.4)] border-2 ${isDark ? 'border-white/20' : 'border-[#03045E]/20'} flex flex-col overflow-hidden h-auto max-h-[95vh] sm:h-[90vh]`}>
                   
                   <div className={`px-3 sm:px-6 py-3 sm:py-4 ${surfaceBg} border-b-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/15'} flex items-center justify-between shrink-0 gap-2`}>
                     <div className="min-w-0 flex-1">
@@ -1358,10 +1357,9 @@ const handleToggleDark = () => {
                     </div>
                     <button
                       onClick={() => setPwdModal({ isOpen: false, user: null })}
-                      className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full ${cardBg} ${txtMain} border-2 ${isDark ? 'border-white/20 hover:bg-white hover:text-black' : 'border-[#03045E]/20 hover:bg-[#03045E] hover:text-white'} flex items-center justify-center font-black transition cursor-pointer shrink-0 text-xs sm:text-base`}
+                      className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg ${cardBg} ${txtMain} border-2 ${isDark ? 'border-white/20' : 'border-[#03045E]/20'} flex items-center justify-center font-black transition cursor-pointer shrink-0 text-xs sm:text-base`}
                     >
-                      ✕
-                    </button>
+                      ✕                    </button>
                   </div>
 
                   <div className={`flex-1 flex flex-col lg:grid lg:grid-cols-3 lg:divide-x-2 ${isDark ? 'divide-white/15' : 'divide-[#03045E]/15'} overflow-y-auto lg:overflow-hidden`}>
@@ -1370,7 +1368,7 @@ const handleToggleDark = () => {
                       <div className="flex items-center justify-between shrink-0 gap-2 flex-wrap">
                         <span className={`text-[10px] sm:text-xs font-black uppercase tracking-wider ${txtMain}`}>Applicant Uploaded ID</span>
                         <span 
-                          className={`px-2 sm:px-3 py-1 rounded-lg text-[10px] sm:text-xs font-black border whitespace-nowrap ${isDark ? 'bg-white/10 text-white border-white/30' : ''}`}
+                          className={`px-2 sm:px-3 py-1 rounded-md text-[10px] sm:text-xs font-black border whitespace-nowrap ${isDark ? 'bg-white/10 text-white border-white/30' : ''}`}
                           style={!isDark ? {
                             backgroundColor: 'rgba(59,130,246,0.1)',
                             color: '#1d4ed8',
@@ -1381,19 +1379,19 @@ const handleToggleDark = () => {
                         </span>
                       </div>
 
-                      <div className={`min-h-[200px] sm:min-h-[350px] lg:flex-1 ${surfaceBg} rounded-2xl border-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/15'} overflow-hidden flex items-center justify-center relative shadow-inner p-2`}>
+                      <div className={`min-h-[200px] sm:min-h-[350px] lg:flex-1 ${surfaceBg} rounded-xl border-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/15'} overflow-hidden flex items-center justify-center relative shadow-inner p-2`}>
                         {pwdModal.user.pwd_document_path ? (
                           pwdModal.user.pwd_document_path.match(/\.(jpeg|jpg|png|gif)$/i) ? (
                             <img
                               src={`http://localhost:5001/uploads/${pwdModal.user.pwd_document_path.replace(/^uploads[\\/]/, '')}`}
                               alt="Applicant PWD ID"
-                              className="max-h-full max-w-full object-contain rounded-xl shadow-md"
+                              className="max-h-full max-w-full object-contain rounded-lg shadow-md"
                             />
                           ) : (
                             <iframe
                               src={`http://localhost:5001/uploads/${pwdModal.user.pwd_document_path.replace(/^uploads[\\/]/, '')}`}
                               title="PWD ID Document PDF"
-                              className="w-full h-full rounded-xl"
+                              className="w-full h-full rounded-lg"
                             ></iframe>
                           )
                         ) : (
@@ -1408,7 +1406,7 @@ const handleToggleDark = () => {
                             setPwdModal({ isOpen: false, user: null });
                             setRejectModal({ isOpen: true, userId: userId, reason: '' });
                           }}
-                          className={`flex-1 py-3 sm:py-3.5 font-black text-xs sm:text-sm rounded-xl border-2 transition cursor-pointer shadow-sm flex items-center justify-center gap-2 bg-[#FEE2E2] text-[#B91C1C] border-[#DC2626]`}
+                          className={`flex-1 py-3 sm:py-3.5 font-black text-xs sm:text-sm rounded-lg border-2 transition cursor-pointer shadow-sm flex items-center justify-center gap-2 bg-[#FEE2E2] text-[#B91C1C] border-[#DC2626]`}
                         >
                           ✕ Reject & Cooldown
                         </button>
@@ -1418,7 +1416,7 @@ const handleToggleDark = () => {
                             setPwdModal({ isOpen: false, user: null });
                             setConfirmPopup({ isOpen: true, type: 'approve', userId: userId, reason: null, loading: false });
                           }}
-                          className={`flex-1 py-3 sm:py-3.5 font-black text-xs sm:text-sm rounded-xl border-2 shadow-md transition cursor-pointer flex items-center justify-center gap-2 bg-[#10b981] text-white border-[#10b981]`}
+                          className={`flex-1 py-3 sm:py-3.5 font-black text-xs sm:text-sm rounded-lg border-2 shadow-md transition cursor-pointer flex items-center justify-center gap-2 bg-[#10b981] text-white border-[#10b981]`}
                         >
                           ✓ Approve PWD ID
                         </button>
@@ -1428,7 +1426,7 @@ const handleToggleDark = () => {
 
                     <div className={`lg:col-span-1 flex flex-col ${surfaceBg} p-3 sm:p-6 justify-center items-center text-center lg:h-full lg:overflow-y-auto`}>
                       <div 
-                        className={`w-10 h-10 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center mb-2 sm:mb-4 border shadow-sm ${isDark ? 'bg-white/10 text-white border-white/30' : 'bg-[#2C7FFF]/15 text-[#2C7FFF] border-[#2C7FFF]/30'}`}
+                        className={`w-10 h-10 sm:w-14 sm:h-14 rounded-lg flex items-center justify-center mb-2 sm:mb-4 border shadow-sm ${isDark ? 'bg-white/10 text-white border-white/30' : 'bg-[#2C7FFF]/15 text-[#2C7FFF] border-[#2C7FFF]/30'}`}
                       >
                         <svg className="w-5 h-5 sm:w-7 sm:h-7" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
@@ -1440,7 +1438,7 @@ const handleToggleDark = () => {
                       </p>
                       <button
                         onClick={handleDohPortalLaunch}
-                        className={`w-full py-2.5 sm:py-3.5 ${isDark ? 'bg-white text-black hover:bg-white/90' : 'bg-[#03045E] text-white hover:bg-[#2C7FFF]'} font-black text-[10px] sm:text-xs uppercase tracking-wider rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer`}
+                        className={`w-full py-2.5 sm:py-3.5 ${isDark ? 'bg-white text-black hover:bg-white/90' : 'bg-[#03045E] text-white hover:bg-[#2C7FFF]'} font-black text-[10px] sm:text-xs uppercase tracking-wider rounded-lg shadow-md transition flex items-center justify-center gap-2 cursor-pointer`}
                       >
                         Launch Portal ↗
                       </button>
@@ -1456,7 +1454,7 @@ const handleToggleDark = () => {
                 className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
                 style={{ backgroundColor: 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
               >
-                <div className={`${cardBg} rounded-[2.5rem] w-full max-w-4xl h-[85vh] shadow-[0_25px_60px_rgba(3,4,94,0.4)] border-2 ${isDark ? 'border-white/20' : 'border-[#03045E]/20'} flex flex-col overflow-hidden`}>
+                <div className={`${cardBg} rounded-xl sm:rounded-2xl w-full max-w-4xl h-[85vh] shadow-[0_25px_60px_rgba(3,4,94,0.4)] border-2 ${isDark ? 'border-white/20' : 'border-[#03045E]/20'} flex flex-col overflow-hidden`}>
                   
                   <div className={`px-6 py-4 ${surfaceBg} border-b-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/15'} flex items-center justify-between shrink-0`}>
                     <div>
@@ -1469,7 +1467,7 @@ const handleToggleDark = () => {
                     </div>
                     <button
                       onClick={() => setEmployerModal({ isOpen: false, user: null })}
-                      className={`w-10 h-10 rounded-full ${cardBg} ${txtMain} border-2 ${isDark ? 'border-white/20 hover:bg-white hover:text-black' : 'border-[#03045E]/20 hover:bg-[#03045E] hover:text-white'} flex items-center justify-center font-black transition cursor-pointer`}
+                      className={`w-10 h-10 rounded-lg ${cardBg} ${txtMain} border-2 ${isDark ? 'border-white/20' : 'border-[#03045E]/20'} flex items-center justify-center font-black transition cursor-pointer`}
                     >
                       ✕
                     </button>
@@ -1479,25 +1477,25 @@ const handleToggleDark = () => {
                     <div className="flex items-center justify-between shrink-0">
                       <span className={`text-xs font-black uppercase tracking-wider ${txtMain}`}>Uploaded Verification File</span>
                       <span 
-                        className={`px-3 py-1 rounded-lg text-xs font-black border ${isDark ? 'bg-white/10 text-white border-white/30' : 'bg-[#8b5cf6]/10 text-[#6d28d9] border-[#8b5cf6]'}`}
+                        className={`px-3 py-1 rounded-md text-xs font-black border ${isDark ? 'bg-white/10 text-white border-white/30' : 'bg-[#8b5cf6]/10 text-[#6d28d9] border-[#8b5cf6]'}`}
                       >
                         Industry: {employerModal.user.industry || 'N/A'}
                       </span>
                     </div>
 
-                    <div className={`flex-1 ${surfaceBg} rounded-2xl border-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/15'} overflow-hidden flex items-center justify-center relative shadow-inner p-2`}>
+                    <div className={`flex-1 ${surfaceBg} rounded-xl border-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/15'} overflow-hidden flex items-center justify-center relative shadow-inner p-2`}>
                       {employerModal.user.verification_document ? (
                         employerModal.user.verification_document.match(/\.(jpeg|jpg|png|gif)$/i) ? (
                           <img
                             src={`http://localhost:5001/uploads/${employerModal.user.verification_document.replace(/^uploads[\\/]/, '')}`}
                             alt="Business Verification Document"
-                            className="max-h-full max-w-full object-contain rounded-xl shadow-md"
+                            className="max-h-full max-w-full object-contain rounded-lg shadow-md"
                           />
                         ) : (
                           <iframe
                             src={`http://localhost:5001/uploads/${employerModal.user.verification_document.replace(/^uploads[\\/]/, '')}`}
                             title="Business Document PDF"
-                            className="w-full h-full rounded-xl"
+                            className="w-full h-full rounded-lg"
                           ></iframe>
                         )
                       ) : (
@@ -1512,7 +1510,7 @@ const handleToggleDark = () => {
                           setEmployerModal({ isOpen: false, user: null });
                           setRejectModal({ isOpen: true, userId: userId, reason: '' });
                         }}
-                        className={`flex-1 py-3.5 font-black text-sm rounded-xl border-2 transition cursor-pointer shadow-sm flex items-center justify-center gap-2 bg-[#FEE2E2] text-[#B91C1C] border-[#DC2626]`}
+                        className={`flex-1 py-3.5 font-black text-sm rounded-lg border-2 transition cursor-pointer shadow-sm flex items-center justify-center gap-2 bg-[#FEE2E2] text-[#B91C1C] border-[#DC2626]`}
                       >
                         ✕ Reject & Cooldown
                       </button>
@@ -1522,7 +1520,7 @@ const handleToggleDark = () => {
                           setEmployerModal({ isOpen: false, user: null });
                           setConfirmPopup({ isOpen: true, type: 'approve', userId: userId, reason: null, loading: false });
                         }}
-                        className={`flex-1 py-3.5 font-black text-sm rounded-xl border-2 shadow-md transition cursor-pointer flex items-center justify-center gap-2 bg-[#10b981] text-white border-[#10b981]`}
+                        className={`flex-1 py-3.5 font-black text-sm rounded-lg border-2 shadow-md transition cursor-pointer flex items-center justify-center gap-2 bg-[#10b981] text-white border-[#10b981]`}
                       >
                         ✓ Approve Employer Permit
                       </button>
@@ -1539,7 +1537,7 @@ const handleToggleDark = () => {
                 style={{ backgroundColor: 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
               >
                 <div 
-                  className={`${cardBg} rounded-[2rem] w-full max-w-lg p-6 sm:p-8 shadow-[0_25px_60px_rgba(3,4,94,0.3)] border-2 flex flex-col gap-5`}
+                  className={`${cardBg} rounded-xl sm:rounded-2xl w-full max-w-lg p-6 sm:p-8 shadow-[0_25px_60px_rgba(3,4,94,0.3)] border-2 flex flex-col gap-5`}
                   style={{ borderColor: isDark ? '#ffffff' : '#dc2626' }}
                 >
                   <div>
@@ -1560,7 +1558,7 @@ const handleToggleDark = () => {
                         type="button"
                         disabled={rejectLoading}
                         onClick={() => setRejectModal({ ...rejectModal, reason: standardReason })}
-                        className={`text-left px-3 py-2 text-xs font-black rounded-xl border-2 cursor-pointer disabled:opacity-50 bg-[#FEE2E2] text-[#B91C1C] border-[#DC2626]`}
+                        className={`text-left px-3 py-2 text-xs font-black rounded-lg border-2 cursor-pointer disabled:opacity-50 bg-[#FEE2E2] text-[#B91C1C] border-[#DC2626]`}
                       >
                         + {standardReason.split('.')[0]}
                       </button>
@@ -1572,21 +1570,21 @@ const handleToggleDark = () => {
                     value={rejectModal.reason}
                     onChange={(e) => setRejectModal({ ...rejectModal, reason: e.target.value })}
                     placeholder="Select a reason above or type a custom reason here..."
-                    className={`w-full p-4 border-2 ${isDark ? 'border-white/20 text-white placeholder-white/40 bg-black' : 'border-[#03045E]/20 text-[#03045E] placeholder-[#03045E]/40 bg-[#f4f4f4]'} rounded-2xl resize-none focus:outline-none focus:ring-2 transition min-h-[140px] text-sm font-bold leading-relaxed disabled:opacity-50`}
+                    className={`w-full p-4 border-2 ${isDark ? 'border-white/20 text-white placeholder-white/40 bg-black' : 'border-[#03045E]/20 text-[#03045E] placeholder-[#03045E]/40 bg-[#f4f4f4]'} rounded-xl resize-none focus:outline-none focus:ring-2 transition min-h-[140px] text-sm font-bold leading-relaxed disabled:opacity-50`}
                   ></textarea>
                   
                   <div className="flex gap-3 mt-2">
                     <button 
                       disabled={rejectLoading}
                       onClick={() => setConfirmPopup({ isOpen: true, type: 'cancel', userId: rejectModal.userId, reason: null, loading: false })}
-                      className={`flex-1 py-3 ${surfaceBg} ${txtMain} font-black text-sm rounded-xl border-2 ${isDark ? 'border-white/20' : 'border-[#03045E]/20'} cursor-pointer disabled:opacity-50`}
+                      className={`flex-1 py-3 ${surfaceBg} ${txtMain} font-black text-sm rounded-lg border-2 ${isDark ? 'border-white/20' : 'border-[#03045E]/20'} cursor-pointer disabled:opacity-50`}
                     >
                       Cancel
                     </button>
                     <button 
                       disabled={rejectLoading}
                       onClick={submitRejection}
-                      className={`flex-1 py-3 font-black text-sm rounded-xl border-2 shadow-md transition flex justify-center items-center gap-2 cursor-pointer disabled:opacity-80 bg-[#dc2626] text-white border-[#dc2626]`}
+                      className={`flex-1 py-3 font-black text-sm rounded-lg border-2 shadow-md transition flex justify-center items-center gap-2 cursor-pointer disabled:opacity-80 bg-[#dc2626] text-white border-[#dc2626]`}
                     >
                       {rejectLoading ? (
                         <>
@@ -1634,7 +1632,7 @@ function StatCard({ title, value, icon, alert, onClick, color = 'default', isDar
   return (
     <div
       onClick={onClick}
-      className={`flex items-center justify-between p-4 sm:p-5 rounded-2xl shadow-sm border-2 transition-all duration-200 ${isDark ? 'bg-black border-white/15' : 'bg-white border-[#03045E]/15'} ${onClick ? 'cursor-pointer hover:shadow-lg hover:-translate-y-0.5' : ''}`}
+      className={`flex items-center justify-between p-4 sm:p-5 rounded-xl shadow-sm border-2 transition-all duration-200 ${isDark ? 'bg-black border-white/15' : 'bg-white border-[#03045E]/15'} ${onClick ? 'cursor-pointer hover:shadow-lg hover:-translate-y-0.5' : ''}`}
     >
       <div className="flex flex-col min-w-0">
         <h3 className={`text-[10px] sm:text-xs font-black uppercase tracking-wider leading-tight ${isDark ? 'text-white/70' : 'text-[#03045E]/70'} truncate`}>
@@ -1645,7 +1643,7 @@ function StatCard({ title, value, icon, alert, onClick, color = 'default', isDar
         </p>
       </div>
       <div
-        className="p-2 sm:p-3 rounded-xl border flex items-center justify-center shrink-0 ml-3"
+        className="p-2 sm:p-3 rounded-lg border flex items-center justify-center shrink-0 ml-3"
         style={{
           borderColor: scheme.border,
           color: scheme.accent

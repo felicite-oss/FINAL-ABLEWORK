@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AccessibilityContext } from '../../context/AccessibilityContext';
 import { useColorPalette } from '../../context/ColorPaletteContext';
@@ -50,6 +50,39 @@ export default function ApplicantAccountSettings({ profile }) {
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const [deactivateStage, setDeactivateStage] = useState('confirm');
   const [deactivateTargetState, setDeactivateTargetState] = useState(false);
+
+  const deleteModalRef = useRef(null);
+  const emailSuccessRef = useRef(null);
+  const passwordSuccessRef = useRef(null);
+  const deactivateModalRef = useRef(null);
+
+  useEffect(() => {
+    if (showDeleteModal && deleteModalRef.current) {
+      const timer = setTimeout(() => deleteModalRef.current.focus(), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [showDeleteModal]);
+
+  useEffect(() => {
+    if (showEmailSuccess && emailSuccessRef.current) {
+      const timer = setTimeout(() => emailSuccessRef.current.focus(), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [showEmailSuccess]);
+
+  useEffect(() => {
+    if (showPasswordSuccess && passwordSuccessRef.current) {
+      const timer = setTimeout(() => passwordSuccessRef.current.focus(), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [showPasswordSuccess]);
+
+  useEffect(() => {
+    if (showDeactivateModal && deactivateModalRef.current) {
+      const timer = setTimeout(() => deactivateModalRef.current.focus(), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [showDeactivateModal]);
 
   let daysLeft = 0;
   let canResubmit = false;
@@ -315,13 +348,13 @@ export default function ApplicantAccountSettings({ profile }) {
         aria-label="Account Settings header. Manage your security credentials and verification documents."
         className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4"
       >
-        <div>
+        <div className="flex flex-col items-start gap-2 w-fit text-left">
           <h2
             role="heading"
             aria-level="1"
             aria-label="Account Settings"
             tabIndex="0"
-            className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#03045E]"
+            className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#03045E] break-words transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
           >
             Account Settings
           </h2>
@@ -329,7 +362,7 @@ export default function ApplicantAccountSettings({ profile }) {
             role="text"
             aria-label="Manage your security credentials and verification documents."
             tabIndex="0"
-            className="text-[#03045E] mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-base font-semibold"
+            className="text-[#03045E] mt-1.5 sm:mt-2 text-xs sm:text-sm md:text-base font-bold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
           >
             Manage your security credentials and verification documents.
           </p>
@@ -338,7 +371,7 @@ export default function ApplicantAccountSettings({ profile }) {
 
       <div className="flex flex-col gap-4 sm:gap-8">
         
-        <div className={`bg-white rounded-2xl sm:rounded-[2rem] border shadow-md overflow-hidden transition-all duration-300 ${openSection === 'verification' ? 'border-[#2C7FFF]/40' : 'border-[#03045E]/20 hover:border-[#2C7FFF]/30'}`}>
+        <div className={`bg-white rounded-xl sm:rounded-2xl border shadow-md overflow-hidden transition-all duration-300 ${openSection === 'verification' ? 'border-[#2C7FFF]/40' : 'border-[#03045E]/20 hover:border-[#2C7FFF]/30'}`}>
           <button
             type="button"
             onClick={() => toggleSection('verification')}
@@ -349,9 +382,19 @@ export default function ApplicantAccountSettings({ profile }) {
             <span className="sr-only">
               Verification Status. Check your standing and manage your uploaded PWD ID.
             </span>
-            <div aria-hidden="true" className="text-left">
-              <h2 className="text-base sm:text-xl font-extrabold text-[#03045E]">Verification Status</h2>
-              <p className="text-[11px] sm:text-sm text-[#03045e]/90 mt-0.5 sm:mt-1 font-semibold">Check your standing and manage your uploaded PWD ID.</p>
+            <div className="flex flex-col items-start gap-2 w-fit text-left">
+              <h2 
+                tabIndex="0"
+                className="text-base sm:text-xl font-extrabold text-[#03045E] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
+              >
+                Verification Status
+              </h2>
+              <p 
+                tabIndex="0"
+                className="text-[11px] sm:text-sm text-[#03045e]/90 mt-0.5 sm:mt-1 font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
+              >
+                Check your standing and manage your uploaded PWD ID.
+              </p>
             </div>
             <ChevronIcon isOpen={openSection === 'verification'} />
           </button>
@@ -365,12 +408,13 @@ export default function ApplicantAccountSettings({ profile }) {
             >
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start">
                 <div className="flex-1">
-                  <p className="text-[10px] sm:text-xs font-extrabold text-[#2c7fff]/60 uppercase tracking-widest mb-2">Current Standing</p>
+                  <p tabIndex="0" className="text-[10px] sm:text-xs font-extrabold text-[#2c7fff]/60 uppercase tracking-widest mb-2 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2">Current Standing</p>
                   {profile?.verification_status === 'Approved' && (
                     <span
                       role="status"
                       aria-label="Verification status: Approved"
-                      className="inline-flex items-center gap-1.5 px-3 py-1 sm:px-4 sm:py-1.5 bg-[#f4f4f4] text-[#03045E] font-extrabold text-xs sm:text-sm rounded-xl border border-[#03045E]/20"
+                      tabIndex="0"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 sm:px-4 sm:py-1.5 bg-[#f4f4f4] text-[#03045E] font-extrabold text-xs sm:text-sm rounded-lg border border-[#03045E]/20 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2"
                     >
                       <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                       Approved
@@ -380,7 +424,8 @@ export default function ApplicantAccountSettings({ profile }) {
                     <span
                       role="status"
                       aria-label="Verification status: Pending Review"
-                      className="inline-flex items-center gap-1.5 px-3 py-1 sm:px-4 sm:py-1.5 bg-[#2C7FFF]/10 text-[#2C7FFF] font-extrabold text-xs sm:text-sm rounded-xl border border-[#2C7FFF]/30"
+                      tabIndex="0"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 sm:px-4 sm:py-1.5 bg-[#2C7FFF]/10 text-[#2C7FFF] font-extrabold text-xs sm:text-sm rounded-lg border border-[#2C7FFF]/30 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2"
                     >
                       <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                       Pending Review
@@ -390,7 +435,8 @@ export default function ApplicantAccountSettings({ profile }) {
                     <span
                       role="status"
                       aria-label="Verification status: Action Required"
-                      className="inline-flex items-center gap-1.5 px-3 py-1 sm:px-4 sm:py-1.5 bg-[#f4f4f4] text-[#03045E] font-extrabold text-xs sm:text-sm rounded-xl border border-[#03045E]/25"
+                      tabIndex="0"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 sm:px-4 sm:py-1.5 bg-[#f4f4f4] text-[#03045E] font-extrabold text-xs sm:text-sm rounded-lg border border-[#03045E]/25 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2"
                     >
                       <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                       Action Required
@@ -403,7 +449,8 @@ export default function ApplicantAccountSettings({ profile }) {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label="View Document on File, opens in new tab"
-                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-extrabold text-[#2C7FFF] hover:underline"
+                      tabIndex="0"
+                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-extrabold text-[#2C7FFF] hover:underline rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2"
                     >
                       <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                       View Document on File
@@ -412,7 +459,7 @@ export default function ApplicantAccountSettings({ profile }) {
                 </div>
 
                 {isRejected && (
-                  <div className="flex-1 bg-[#f4f4f4] p-4 sm:p-5 rounded-xl sm:rounded-[1.5rem] border border-[#03045E]/15 w-full">
+                  <div className="flex-1 bg-[#f4f4f4] p-4 sm:p-5 rounded-lg sm:rounded-xl border border-[#03045E]/15 w-full">
                     <h3 className="text-xs sm:text-sm font-extrabold text-[#03045E] mb-1.5 sm:mb-2">Re-verify Account</h3>
                     <p className="text-[10px] sm:text-xs text-[#03045E]/70 mb-3 sm:mb-4 font-semibold">
                       {canResubmit ? "Your cooldown has expired. Please upload a clear, valid PWD ID image (Max 5MB)." : `Security lock active. You can upload a new document in ${daysLeft} days.`}
@@ -422,7 +469,7 @@ export default function ApplicantAccountSettings({ profile }) {
                       <div
                         role={verStatus.type === 'error' ? 'alert' : 'status'}
                         aria-live="assertive"
-                        className={`p-2.5 sm:p-3 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl mb-3 sm:mb-4 border ${verStatus.type === 'error' ? 'bg-white text-[#03045E] border-[#03045E]/20' : 'bg-[#2C7FFF]/10 text-[#2C7FFF] border-[#2C7FFF]/30'}`}
+                        className={`p-2.5 sm:p-3 text-[10px] sm:text-xs font-bold rounded-md sm:rounded-lg mb-3 sm:mb-4 border ${verStatus.type === 'error' ? 'bg-white text-[#03045E] border-[#03045E]/20' : 'bg-[#2C7FFF]/10 text-[#2C7FFF] border-[#2C7FFF]/30'}`}
                       >
                         {verStatus.msg}
                       </div>
@@ -435,14 +482,14 @@ export default function ApplicantAccountSettings({ profile }) {
                         disabled={!canResubmit || isResubmitting} 
                         onChange={(e) => setVerificationDoc(e.target.files[0])} 
                         aria-label="Upload a new PWD ID picture file. Only JPG, JPEG, and PNG formats are allowed. Maximum size 5 megabytes."
-                        className="text-[10px] sm:text-xs text-[#03045E] file:mr-2 sm:file:mr-4 file:py-1.5 sm:file:py-2 file:px-3 sm:file:px-4 file:rounded-lg sm:file:rounded-xl file:border-0 file:text-[10px] sm:file:text-xs file:font-bold file:bg-[#03045E] file:text-white hover:file:bg-[#2C7FFF] disabled:opacity-50 cursor-pointer" 
+                        className="text-[10px] sm:text-xs text-[#03045E] file:mr-2 sm:file:mr-4 file:py-1.5 sm:file:py-2 file:px-3 sm:file:px-4 file:rounded-md sm:file:rounded-lg file:border-0 file:text-[10px] sm:file:text-xs file:font-bold file:bg-[#03045E] file:text-white hover:file:bg-[#2C7FFF] disabled:opacity-50 cursor-pointer" 
                       />
                       {canResubmit && (
                         <button
                           type="submit"
                           disabled={isResubmitting || !verificationDoc}
                           aria-label={isResubmitting ? 'Uploading new document, please wait' : 'Submit New Document'}
-                          className="mt-1 sm:mt-2 py-2 sm:py-2.5 bg-[#03045E] hover:bg-[#2C7FFF] text-white font-extrabold text-xs sm:text-sm rounded-lg sm:rounded-xl transition disabled:opacity-50 shadow-sm cursor-pointer"
+                          className="mt-1 sm:mt-2 py-2 sm:py-2.5 bg-[#03045E] hover:bg-[#2C7FFF] text-white font-extrabold text-xs sm:text-sm rounded-md sm:rounded-lg transition disabled:opacity-50 shadow-sm cursor-pointer"
                         >
                           {isResubmitting ? 'Uploading...' : 'Submit New Document'}
                         </button>
@@ -455,7 +502,7 @@ export default function ApplicantAccountSettings({ profile }) {
           )}
         </div>
 
-        <div className={`bg-white rounded-2xl sm:rounded-[2rem] border shadow-md overflow-hidden transition-all duration-300 ${openSection === 'email' ? 'border-[#2C7FFF]/40' : 'border-[#03045E]/20 hover:border-[#2C7FFF]/30'}`}>
+        <div className={`bg-white rounded-xl sm:rounded-2xl border shadow-md overflow-hidden transition-all duration-300 ${openSection === 'email' ? 'border-[#2C7FFF]/40' : 'border-[#03045E]/20 hover:border-[#2C7FFF]/30'}`}>
           <button
             type="button"
             onClick={() => toggleSection('email')}
@@ -466,9 +513,19 @@ export default function ApplicantAccountSettings({ profile }) {
             <span className="sr-only">
               Email Address. Update your login email with OTP verification.
             </span>
-            <div aria-hidden="true" className="text-left">
-              <h2 className="text-base sm:text-xl font-extrabold text-[#03045E]">Email Address</h2>
-              <p className="text-[11px] sm:text-sm text-[#03045E]/90 mt-0.5 sm:mt-1 font-semibold">Update your login email with OTP verification.</p>
+            <div className="flex flex-col items-start gap-2 w-fit text-left">
+              <h2 
+                tabIndex="0"
+                className="text-base sm:text-xl font-extrabold text-[#03045E] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
+              >
+                Email Address
+              </h2>
+              <p 
+                tabIndex="0"
+                className="text-[11px] sm:text-sm text-[#03045E]/90 mt-0.5 sm:mt-1 font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
+              >
+                Update your login email with OTP verification.
+              </p>
             </div>
             <ChevronIcon isOpen={openSection === 'email'} />
           </button>
@@ -485,7 +542,7 @@ export default function ApplicantAccountSettings({ profile }) {
                 <div
                   role={emailStatus.type === 'error' ? 'alert' : 'status'}
                   aria-live="assertive"
-                  className={`p-3 sm:p-4 mb-4 sm:mb-6 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold border-2 ${emailStatus.type === 'error' ? errorMsg : successMsg}`}
+                  className={`p-3 sm:p-4 mb-4 sm:mb-6 rounded-md sm:rounded-lg text-xs sm:text-sm font-bold border-2 ${emailStatus.type === 'error' ? errorMsg : successMsg}`}
                 >
                   {emailStatus.msg}
                 </div>
@@ -503,14 +560,14 @@ export default function ApplicantAccountSettings({ profile }) {
                       required
                       placeholder="Enter new email address"
                       aria-label="Enter new email address"
-                      className="w-full p-3 sm:p-3.5 border border-[#03045E]/20 rounded-lg sm:rounded-xl bg-[#f4f4f4] focus:border-[#2C7FFF] focus:bg-white outline-none transition font-medium text-xs sm:text-sm text-[#03045E]"
+                      className="w-full p-3 sm:p-3.5 border border-[#03045E]/20 rounded-md sm:rounded-lg bg-[#f4f4f4] focus:border-[#2C7FFF] focus:bg-white outline-none transition font-medium text-xs sm:text-sm text-[#03045E]"
                     />
                   </div>
                   <button
                     type="submit"
                     disabled={email === profile?.email}
                     aria-label="Send verification code to new email"
-                    className="w-full sm:w-auto px-4 sm:px-6 py-3 sm:py-3.5 bg-[#f4f4f4] border border-[#03045E]/20 text-[#03045E] font-extrabold text-xs sm:text-sm rounded-lg sm:rounded-xl shadow-sm transition disabled:opacity-50 cursor-pointer"
+                    className="w-full sm:w-auto px-4 sm:px-6 py-3 sm:py-3.5 bg-[#f4f4f4] border border-[#03045E]/20 text-[#03045E] font-extrabold text-xs sm:text-sm rounded-md sm:rounded-lg shadow-sm transition disabled:opacity-50 cursor-pointer"
                   >
                     Send Code
                   </button>
@@ -519,18 +576,18 @@ export default function ApplicantAccountSettings({ profile }) {
                 <form onSubmit={handleVerifyAndUpdateEmail} aria-label="Verify and update email form" className="flex flex-col gap-3 sm:gap-4">
                   <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-end">
                     <div className="flex-1 w-full">
-                      <label htmlFor="account-settings-new-email-disabled" className="text-[10px] sm:text-xs font-extrabold text-[#03045E]/60 uppercase tracking-widest mb-1 sm:mb-1.5 block">New Email</label>
+                      <label htmlFor="account-settings-new-email-disabled" tabIndex="0" className="text-[10px] sm:text-xs font-extrabold text-[#03045E]/60 uppercase tracking-widest mb-1 sm:mb-1.5 block rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit">New Email</label>
                       <input
                         id="account-settings-new-email-disabled"
                         type="email"
                         value={email}
                         disabled
                         aria-label={`New email address: ${email}. This field is locked.`}
-                        className="w-full p-3 sm:p-3.5 bg-[#f4f4f4] border border-[#03045E]/15 rounded-lg sm:rounded-xl text-[#03045E]/50 outline-none cursor-not-allowed font-medium text-xs sm:text-sm"
+                        className="w-full p-3 sm:p-3.5 bg-[#f4f4f4] border border-[#03045E]/15 rounded-md sm:rounded-lg text-[#03045E]/50 outline-none cursor-not-allowed font-medium text-xs sm:text-sm"
                       />
                     </div>
                     <div className="flex-1 w-full">
-                      <label htmlFor="account-settings-email-otp" className="text-[10px] sm:text-xs font-extrabold text-[#03045E]/60 uppercase tracking-widest mb-1 sm:mb-1.5 block">Verification Code</label>
+                      <label htmlFor="account-settings-email-otp" tabIndex="0" className="text-[10px] sm:text-xs font-extrabold text-[#03045E]/60 uppercase tracking-widest mb-1 sm:mb-1.5 block rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit">Verification Code</label>
                       <input
                         id="account-settings-email-otp"
                         type="text"
@@ -540,7 +597,7 @@ export default function ApplicantAccountSettings({ profile }) {
                         placeholder="6-digit code"
                         maxLength="6"
                         aria-label="Enter the 6-digit verification code sent to your new email address"
-                        className="w-full p-3 sm:p-3.5 border border-[#03045E]/20 rounded-lg sm:rounded-xl bg-[#f4f4f4] focus:border-[#2C7FFF] focus:bg-white outline-none transition tracking-widest font-mono text-xs sm:text-sm text-[#03045E]"
+                        className="w-full p-3 sm:p-3.5 border border-[#03045E]/20 rounded-md sm:rounded-lg bg-[#f4f4f4] focus:border-[#2C7FFF] focus:bg-white outline-none transition tracking-widest font-mono text-xs sm:text-sm text-[#03045E]"
                       />
                     </div>
                   </div>
@@ -549,7 +606,7 @@ export default function ApplicantAccountSettings({ profile }) {
                       type="button"
                       aria-label="Cancel email change"
                       onClick={() => { setEmailStep(1); setEmailStatus({type:'', msg:''}); }}
-                      className="px-4 sm:px-6 py-3 sm:py-3.5 bg-[#f4f4f4] border border-[#03045E]/15 text-[#03045E] font-extrabold text-xs sm:text-sm rounded-lg sm:rounded-xl hover:bg-white transition cursor-pointer"
+                      className="px-4 sm:px-6 py-3 sm:py-3.5 bg-[#f4f4f4] border border-[#03045E]/15 text-[#03045E] font-extrabold text-xs sm:text-sm rounded-md sm:rounded-lg hover:bg-white transition cursor-pointer"
                     >
                       Cancel
                     </button>
@@ -558,7 +615,7 @@ export default function ApplicantAccountSettings({ profile }) {
                       disabled={isUpdatingEmail || emailOtp.length < 6}
                       aria-label={isUpdatingEmail ? 'Verifying code, please wait' : 'Verify and update email'}
                     style={{ color: isDarkMode ? '#000000' : '#03045E' }}
-                      className="px-4 sm:px-6 py-3 sm:py-3.5 bg-[#03045E] font-extrabold text-xs sm:text-sm rounded-lg sm:rounded-xl shadow-md hover:bg-[#2C7FFF] transition disabled:opacity-50 cursor-pointer w-full sm:w-auto"
+                      className="px-4 sm:px-6 py-3 sm:py-3.5 bg-[#03045E] font-extrabold text-xs sm:text-sm rounded-md sm:rounded-lg shadow-md hover:bg-[#2C7FFF] transition disabled:opacity-50 cursor-pointer w-full sm:w-auto"
                     >
                       {isUpdatingEmail ? 'Verifying...' : 'Verify & Update Email'}
                     </button>
@@ -569,7 +626,7 @@ export default function ApplicantAccountSettings({ profile }) {
           )}
         </div>
 
-        <div className={`bg-white rounded-2xl sm:rounded-[2rem] border shadow-md overflow-hidden transition-all duration-300 ${openSection === 'password' ? 'border-[#2C7FFF]/40' : 'border-[#03045E]/20 hover:border-[#2C7FFF]/30'}`}>
+        <div className={`bg-white rounded-xl sm:rounded-2xl border shadow-md overflow-hidden transition-all duration-300 ${openSection === 'password' ? 'border-[#2C7FFF]/40' : 'border-[#03045E]/20 hover:border-[#2C7FFF]/30'}`}>
           <button
             type="button"
             onClick={() => toggleSection('password')}
@@ -580,9 +637,19 @@ export default function ApplicantAccountSettings({ profile }) {
             <span className="sr-only">
               Change Password. Update your account password securely.
             </span>
-            <div aria-hidden="true" className="text-left">
-              <h2 className="text-base sm:text-xl font-extrabold text-[#03045E]">Change Password</h2>
-              <p className="text-[11px] sm:text-sm text-[#03045E]/90 mt-0.5 sm:mt-1 font-semibold">Update your account password securely.</p>
+            <div className="flex flex-col items-start gap-2 w-fit text-left">
+              <h2 
+                tabIndex="0"
+                className="text-base sm:text-xl font-extrabold text-[#03045E] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
+              >
+                Change Password
+              </h2>
+              <p 
+                tabIndex="0"
+                className="text-[11px] sm:text-sm text-[#03045E]/90 mt-0.5 sm:mt-1 font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
+              >
+                Update your account password securely.
+              </p>
             </div>
             <ChevronIcon isOpen={openSection === 'password'} />
           </button>
@@ -599,7 +666,7 @@ export default function ApplicantAccountSettings({ profile }) {
                 <div
                   role={passwordStatus.type === 'error' ? 'alert' : 'status'}
                   aria-live="assertive"
-                  className={`p-3 sm:p-4 mb-4 sm:mb-6 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold border-2 ${passwordStatus.type === 'error' ? errorMsg : successMsg}`}
+                  className={`p-3 sm:p-4 mb-4 sm:mb-6 rounded-md sm:rounded-lg text-xs sm:text-sm font-bold border-2 ${passwordStatus.type === 'error' ? errorMsg : successMsg}`}
                 >
                   {passwordStatus.msg}
                 </div>
@@ -608,7 +675,7 @@ export default function ApplicantAccountSettings({ profile }) {
               {passwordStep === 1 ? (
                 <form onSubmit={handleRequestPasswordUpdate} aria-label="Request password change form" className="flex flex-col gap-4 sm:gap-5">
                   <div className="flex flex-col gap-1 sm:gap-1.5 w-full sm:max-w-md">
-                    <label htmlFor="account-settings-current-password" className="text-[10px] sm:text-xs font-extrabold text-[#2C7FFF]/60 uppercase tracking-widest">Current Password</label>
+                    <label htmlFor="account-settings-current-password" tabIndex="0" className="text-[10px] sm:text-xs font-extrabold text-[#2C7FFF]/60 uppercase tracking-widest rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit">Current Password</label>
                     <div className="relative">
                       <input 
                         id="account-settings-current-password"
@@ -618,7 +685,7 @@ export default function ApplicantAccountSettings({ profile }) {
                         required 
                         disabled={isRequestingPassword}
                         aria-label="Enter your current password"
-                        className="w-full p-3 pr-10 sm:p-3.5 sm:pr-12 border border-[#03045E]/20 rounded-lg sm:rounded-xl bg-[#f4f4f4] focus:border-[#2C7FFF] focus:bg-white outline-none transition font-medium text-xs sm:text-sm text-[#03045E] disabled:opacity-60" 
+                        className="w-full p-3 pr-10 sm:p-3.5 sm:pr-12 border border-[#03045E]/20 rounded-md sm:rounded-lg bg-[#f4f4f4] focus:border-[#2C7FFF] focus:bg-white outline-none transition font-medium text-xs sm:text-sm text-[#03045E] disabled:opacity-60" 
                       />
                       <button
                         type="button"
@@ -637,7 +704,7 @@ export default function ApplicantAccountSettings({ profile }) {
 
                   <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 w-full">
                     <div className="flex flex-col gap-1 sm:gap-1.5 flex-1">
-                      <label htmlFor="account-settings-new-password" className="text-[10px] sm:text-xs font-extrabold text-[#2C7FFF]/60 uppercase tracking-widest">New Password</label>
+                      <label htmlFor="account-settings-new-password" tabIndex="0" className="text-[10px] sm:text-xs font-extrabold text-[#2C7FFF]/60 uppercase tracking-widest rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit">New Password</label>
                       <div className="relative">
                         <input 
                           id="account-settings-new-password"
@@ -647,7 +714,7 @@ export default function ApplicantAccountSettings({ profile }) {
                           required 
                           disabled={isRequestingPassword}
                           aria-label="Enter your new password"
-                          className="w-full p-3 pr-10 sm:p-3.5 sm:pr-12 border border-[#03045E]/20 rounded-lg sm:rounded-xl bg-[#f4f4f4] focus:border-[#2C7FFF] focus:bg-white outline-none transition font-medium text-xs sm:text-sm text-[#03045E] disabled:opacity-60" 
+                          className="w-full p-3 pr-10 sm:p-3.5 sm:pr-12 border border-[#03045E]/20 rounded-md sm:rounded-lg bg-[#f4f4f4] focus:border-[#2C7FFF] focus:bg-white outline-none transition font-medium text-xs sm:text-sm text-[#03045E] disabled:opacity-60" 
                         />
                         <button
                           type="button"
@@ -665,7 +732,7 @@ export default function ApplicantAccountSettings({ profile }) {
                     </div>
                     
                     <div className="flex flex-col gap-1 sm:gap-1.5 flex-1">
-                      <label htmlFor="account-settings-confirm-password" className="text-[10px] sm:text-xs font-extrabold text-[#2C7FFF]/60 uppercase tracking-widest">Confirm New Password</label>
+                      <label htmlFor="account-settings-confirm-password" tabIndex="0" className="text-[10px] sm:text-xs font-extrabold text-[#2C7FFF]/60 uppercase tracking-widest rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit">Confirm New Password</label>
                       <div className="relative">
                         <input 
                           id="account-settings-confirm-password"
@@ -675,7 +742,7 @@ export default function ApplicantAccountSettings({ profile }) {
                           required 
                           disabled={isRequestingPassword}
                           aria-label="Confirm your new password"
-                          className="w-full p-3 pr-10 sm:p-3.5 sm:pr-12 border border-[#03045E]/20 rounded-lg sm:rounded-xl bg-[#f4f4f4] focus:border-[#2C7FFF] focus:bg-white outline-none transition font-medium text-xs sm:text-sm text-[#03045E] disabled:opacity-60" 
+                          className="w-full p-3 pr-10 sm:p-3.5 sm:pr-12 border border-[#03045E]/20 rounded-md sm:rounded-lg bg-[#f4f4f4] focus:border-[#2C7FFF] focus:bg-white outline-none transition font-medium text-xs sm:text-sm text-[#03045E] disabled:opacity-60" 
                         />
                         <button
                           type="button"
@@ -698,7 +765,7 @@ export default function ApplicantAccountSettings({ profile }) {
                     disabled={isRequestingPassword}
                     aria-label={isRequestingPassword ? 'Sending verification code, please wait' : 'Request Password Change'}
                     style={{ color: isDarkMode ? '#000000' : '#ffffff' }}
-                    className="mt-2 w-full sm:max-w-md px-4 sm:px-6 py-3 sm:py-3.5 bg-[#03045E] font-extrabold text-xs sm:text-sm rounded-lg sm:rounded-xl shadow-md hover:bg-[#2C7FFF] transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="mt-2 w-full sm:max-w-md px-4 sm:px-6 py-3 sm:py-3.5 bg-[#03045E] font-extrabold text-xs sm:text-sm rounded-md sm:rounded-lg shadow-md hover:bg-[#2C7FFF] transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {isRequestingPassword ? (
                       <>
@@ -717,7 +784,7 @@ export default function ApplicantAccountSettings({ profile }) {
                 <form onSubmit={handleVerifyAndUpdatePassword} aria-label="Verify and update password form" className="flex flex-col gap-3 sm:gap-4">
                   <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-end">
                     <div className="flex-1 w-full">
-                      <label htmlFor="account-settings-password-otp" className="text-[10px] sm:text-xs font-extrabold text-[#03045E]/60 uppercase tracking-widest mb-1 sm:mb-1.5 block">Verification Code</label>
+                      <label htmlFor="account-settings-password-otp" tabIndex="0" className="text-[10px] sm:text-xs font-extrabold text-[#03045E]/60 uppercase tracking-widest mb-1 sm:mb-1.5 block rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit">Verification Code</label>
                       <input
                         id="account-settings-password-otp"
                         type="text"
@@ -727,7 +794,7 @@ export default function ApplicantAccountSettings({ profile }) {
                         placeholder="6-digit code sent to email"
                         maxLength="6"
                         aria-label="Enter the 6-digit verification code sent to your email"
-                        className="w-full p-3 sm:p-3.5 border border-[#03045E]/20 rounded-lg sm:rounded-xl bg-[#f4f4f4] focus:border-[#2C7FFF] focus:bg-white outline-none transition tracking-widest font-mono text-xs sm:text-sm text-[#03045E]"
+                        className="w-full p-3 sm:p-3.5 border border-[#03045E]/20 rounded-md sm:rounded-lg bg-[#f4f4f4] focus:border-[#2C7FFF] focus:bg-white outline-none transition tracking-widest font-mono text-xs sm:text-sm text-[#03045E]"
                       />
                     </div>
                   </div>
@@ -736,7 +803,7 @@ export default function ApplicantAccountSettings({ profile }) {
                       type="button"
                       aria-label="Cancel password change"
                       onClick={() => { setPasswordStep(1); setPasswordStatus({type:'', msg:''}); }}
-                      className="px-4 sm:px-6 py-3 sm:py-3.5 bg-[#f4f4f4] border border-[#03045E]/15 text-[#03045E] font-extrabold text-xs sm:text-sm rounded-lg sm:rounded-xl hover:bg-white transition cursor-pointer"
+                      className="px-4 sm:px-6 py-3 sm:py-3.5 bg-[#f4f4f4] border border-[#03045E]/15 text-[#03045E] font-extrabold text-xs sm:text-sm rounded-md sm:rounded-lg hover:bg-white transition cursor-pointer"
                     >
                       Cancel
                     </button>
@@ -745,7 +812,7 @@ export default function ApplicantAccountSettings({ profile }) {
                       disabled={isUpdatingPassword || passwordOtp.length < 6}
                       aria-label={isUpdatingPassword ? 'Verifying code, please wait' : 'Verify and update password'}
                       style={{ color: isDarkMode ? '#000000' : '#ffffff' }}
-                      className="px-4 sm:px-6 py-3 sm:py-3.5 bg-[#03045E] font-extrabold text-xs sm:text-sm rounded-lg sm:rounded-xl shadow-md hover:bg-[#2C7FFF] transition disabled:opacity-50 cursor-pointer w-full sm:w-auto"
+                      className="px-4 sm:px-6 py-3 sm:py-3.5 bg-[#03045E] font-extrabold text-xs sm:text-sm rounded-md sm:rounded-lg shadow-md hover:bg-[#2C7FFF] transition disabled:opacity-50 cursor-pointer w-full sm:w-auto"
                     >
                       {isUpdatingPassword ? 'Verifying...' : 'Verify & Update Password'}
                     </button>
@@ -756,7 +823,7 @@ export default function ApplicantAccountSettings({ profile }) {
           )}
         </div>
 
-        <div className={`bg-white rounded-2xl sm:rounded-[2rem] border shadow-md overflow-hidden transition-all duration-300 ${openSection === 'danger' ? 'border-[#03045E]/40' : 'border-[#03045E]/20 hover:border-[#03045E]/30'}`}>
+        <div className={`bg-white rounded-xl sm:rounded-2xl border shadow-md overflow-hidden transition-all duration-300 ${openSection === 'danger' ? 'border-[#03045E]/40' : 'border-[#03045E]/20 hover:border-[#03045E]/30'}`}>
           <button
             type="button"
             onClick={() => toggleSection('danger')}
@@ -767,9 +834,19 @@ export default function ApplicantAccountSettings({ profile }) {
             <span className="sr-only">
               Danger Zone. Deactivate or permanently delete your account.
             </span>
-            <div aria-hidden="true" className="text-left">
-              <h2 className="text-base sm:text-xl font-extrabold text-[#ff0000]">Danger Zone</h2>
-              <p className="text-[11px] sm:text-sm text-[#ff0000]/90 mt-0.5 sm:mt-1 font-semibold">Deactivate or permanently delete your account.</p>
+            <div className="flex flex-col items-start gap-2 w-fit text-left">
+              <h2 
+                tabIndex="0"
+                className="text-base sm:text-xl font-extrabold text-[#ff0000] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
+              >
+                Danger Zone
+              </h2>
+              <p 
+                tabIndex="0"
+                className="text-[11px] sm:text-sm text-[#ff0000]/90 mt-0.5 sm:mt-1 font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
+              >
+                Deactivate or permanently delete your account.
+              </p>
             </div>
             <ChevronIcon isOpen={openSection === 'danger'} />
           </button>
@@ -782,12 +859,12 @@ export default function ApplicantAccountSettings({ profile }) {
               className="px-4 pb-4 sm:px-8 sm:pb-8 border-t border-[#03045E]/10 pt-4 sm:pt-6 animate-fadeIn"
             >
               
-              <div className="flex flex-col md:flex-row gap-4 sm:gap-6 justify-between items-start md:items-center p-4 sm:p-5 rounded-xl sm:rounded-[1.5rem] bg-[#f4f4f4] border border-[#03045E]/15">
+              <div className="flex flex-col md:flex-row gap-4 sm:gap-6 justify-between items-start md:items-center p-4 sm:p-5 rounded-lg sm:rounded-xl bg-[#f4f4f4] border border-[#03045E]/15">
                 <div>
-                  <h3 className="text-xs sm:text-sm font-extrabold" style={{ color: '#ff0000' }}>
+                  <h3 tabIndex="0" className="text-xs sm:text-sm font-extrabold rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit" style={{ color: '#ff0000' }}>
                     {isDeactivated ? 'Account is Currently Deactivated' : 'Deactivate Account'}
                   </h3>
-                  <p className="text-[10px] sm:text-xs mt-1 font-semibold" style={{ color: '#ff0000' }}>
+                  <p tabIndex="0" className="text-[10px] sm:text-xs mt-1 font-semibold rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2" style={{ color: '#ff0000' }}>
                     {isDeactivated 
                       ? 'Your profile is hidden from employers. Reactivate to resume your job search.' 
                       : 'Temporarily hide your profile and applications. You can reactivate later.'}
@@ -797,7 +874,7 @@ export default function ApplicantAccountSettings({ profile }) {
                   type="button"
                   onClick={handleToggleDeactivation}
                   aria-label={isDeactivated ? 'Reactivate Account' : 'Deactivate Account'}
-                  className="px-4 sm:px-6 py-2 sm:py-2.5 font-extrabold text-xs sm:text-sm rounded-lg sm:rounded-xl whitespace-nowrap cursor-pointer bg-transparent border-2"
+                  className="px-4 sm:px-6 py-2 sm:py-2.5 font-extrabold text-xs sm:text-sm rounded-md sm:rounded-lg whitespace-nowrap cursor-pointer bg-transparent border-2"
                   style={{ color: '#ff0000', borderColor: '#ff0000' }}
                 >
                   {isDeactivated ? 'Reactivate Account' : 'Deactivate Account'}
@@ -808,14 +885,14 @@ export default function ApplicantAccountSettings({ profile }) {
 
               <div className="flex flex-col md:flex-row gap-4 sm:gap-6 justify-between items-start md:items-center">
                 <div>
-                  <h3 className="text-xs sm:text-sm font-extrabold" style={{ color: '#ff0000' }}>Delete Account</h3>
-                  <p className="text-[10px] sm:text-xs mt-1 font-semibold" style={{ color: '#ff0000' }}>Permanently erase your data. This action cannot be undone.</p>
+                  <h3 tabIndex="0" className="text-xs sm:text-sm font-extrabold rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit" style={{ color: '#ff0000' }}>Delete Account</h3>
+                  <p tabIndex="0" className="text-[10px] sm:text-xs mt-1 font-semibold rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2" style={{ color: '#ff0000' }}>Permanently erase your data. This action cannot be undone.</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowDeleteModal(true)}
                   aria-label="Delete Account"
-                  className="px-4 sm:px-6 py-2 sm:py-2.5 font-extrabold text-xs sm:text-sm rounded-lg sm:rounded-xl shadow-sm transition whitespace-nowrap cursor-pointer bg-transparent border-2"
+                  className="px-4 sm:px-6 py-2 sm:py-2.5 font-extrabold text-xs sm:text-sm rounded-md sm:rounded-lg shadow-sm transition whitespace-nowrap cursor-pointer bg-transparent border-2"
                   style={{ color: '#ff0000', borderColor: '#ff0000' }}
                 >
                   Delete Account
@@ -838,15 +915,19 @@ export default function ApplicantAccountSettings({ profile }) {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className="bg-white rounded-2xl sm:rounded-[2rem] w-full max-w-md p-5 sm:p-8 shadow-2xl border border-[#03045E]/10 flex flex-col gap-3 sm:gap-4 animate-fadeIn">
-            <h3 id="delete-modal-title" className="text-lg sm:text-xl font-extrabold text-[#03045E]">Confirm Deletion</h3>
-            <p id="delete-modal-desc" className="text-xs sm:text-sm font-medium text-[#03045E]/70">This will permanently delete your account, documents, and application history. Please enter your password to confirm.</p>
+          <div
+            ref={deleteModalRef}
+            tabIndex={-1}
+            className="bg-white rounded-xl sm:rounded-2xl w-full max-w-md p-5 sm:p-8 shadow-2xl border border-[#03045E]/10 flex flex-col gap-3 sm:gap-4 animate-fadeIn focus:outline-none"
+          >
+            <h3 id="delete-modal-title" tabIndex="0" className="text-lg sm:text-xl font-extrabold text-[#03045E] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit">Confirm Deletion</h3>
+            <p id="delete-modal-desc" tabIndex="0" className="text-xs sm:text-sm font-medium text-[#03045E]/70 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit">This will permanently delete your account, documents, and application history. Please enter your password to confirm.</p>
             
             {dangerStatus.msg && (
               <div
                 role="alert"
                 aria-live="assertive"
-                className="p-2.5 sm:p-3 bg-[#f4f4f4] border border-[#03045E]/20 text-[#03045E] text-xs sm:text-sm font-bold rounded-lg sm:rounded-xl"
+                className="p-2.5 sm:p-3 bg-[#f4f4f4] border border-[#03045E]/20 text-[#03045E] text-xs sm:text-sm font-bold rounded-md sm:rounded-lg"
               >
                 {dangerStatus.msg}
               </div>
@@ -863,7 +944,7 @@ export default function ApplicantAccountSettings({ profile }) {
                   required 
                   placeholder="Enter password"
                   aria-label="Enter password to confirm account deletion"
-                  className="w-full p-3 pr-10 sm:p-3.5 sm:pr-12 border border-[#03045E]/20 rounded-lg sm:rounded-xl bg-[#f4f4f4] focus:border-[#2C7FFF] focus:bg-white outline-none transition text-[#03045E] font-medium text-xs sm:text-sm" 
+                  className="w-full p-3 pr-10 sm:p-3.5 sm:pr-12 border border-[#03045E]/20 rounded-md sm:rounded-lg bg-[#f4f4f4] focus:border-[#2C7FFF] focus:bg-white outline-none transition text-[#03045E] font-medium text-xs sm:text-sm" 
                 />
                 <button
                   type="button"
@@ -884,7 +965,7 @@ export default function ApplicantAccountSettings({ profile }) {
                   type="button"
                   onClick={() => setShowDeleteModal(false)}
                   aria-label="Cancel account deletion"
-                  className="flex-1 py-3 sm:py-3.5 bg-[#f4f4f4] border border-[#03045E]/15 text-[#03045E] font-extrabold text-xs sm:text-sm rounded-lg sm:rounded-xl hover:bg-white transition cursor-pointer"
+                  className="flex-1 py-3 sm:py-3.5 bg-[#f4f4f4] border border-[#03045E]/15 text-[#03045E] font-extrabold text-xs sm:text-sm rounded-md sm:rounded-lg hover:bg-white transition cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -892,7 +973,7 @@ export default function ApplicantAccountSettings({ profile }) {
                   type="submit"
                   aria-label="Confirm Delete Account"
                   style={{ color: '#ffffff' }}
-                  className={`flex-1 py-3 sm:py-3.5 font-extrabold text-xs sm:text-sm rounded-lg sm:rounded-xl shadow-md transition cursor-pointer ${isDarkMode ? 'bg-black border-2 border-white' : 'bg-[#03045E] hover:bg-[#2C7FFF]'}`}
+                  className={`flex-1 py-3 sm:py-3.5 font-extrabold text-xs sm:text-sm rounded-md sm:rounded-lg shadow-md transition cursor-pointer ${isDarkMode ? 'bg-black border-2 border-white' : 'bg-[#03045E] hover:bg-[#2C7FFF]'}`}
                 >
                   Confirm Delete
                 </button>
@@ -913,7 +994,11 @@ export default function ApplicantAccountSettings({ profile }) {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className="relative w-full max-w-sm rounded-2xl sm:rounded-[2rem] border-2 overflow-hidden bg-[#F4F4F4] border-[#2C7FFF]">
+          <div
+            ref={emailSuccessRef}
+            tabIndex={-1}
+            className="relative w-full max-w-sm rounded-xl sm:rounded-2xl border-2 overflow-hidden bg-[#F4F4F4] border-[#2C7FFF] focus:outline-none"
+          >
             <div aria-hidden="true" className="h-2 w-full bg-[#2C7FFF]" />
 
             <div className="px-5 pt-8 pb-6 sm:px-8 sm:pt-10 sm:pb-8 flex flex-col items-center text-center">
@@ -928,14 +1013,14 @@ export default function ApplicantAccountSettings({ profile }) {
                 </div>
               </div>
 
-              <span aria-hidden="true" className="inline-block px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-2 sm:mb-3 border-2 text-[#03045E] bg-white border-[#2C7FFF]">
+              <span tabIndex="0" className="inline-block px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-2 sm:mb-3 border-2 text-[#03045E] bg-white border-[#2C7FFF] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2">
                 Email Updated
               </span>
 
-              <h2 id="email-success-title" className="text-xl sm:text-2xl font-black tracking-tight mb-2 text-[#03045E]">
+              <h2 id="email-success-title" tabIndex="0" className="text-xl sm:text-2xl font-black tracking-tight mb-2 text-[#03045E] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit">
                 Email Successfully Updated!
               </h2>
-              <p id="email-success-desc" className="text-xs sm:text-sm font-bold leading-relaxed mb-5 sm:mb-6 max-w-xs text-[#03045E]/80">
+              <p id="email-success-desc" tabIndex="0" className="text-xs sm:text-sm font-bold leading-relaxed mb-5 sm:mb-6 max-w-xs text-[#03045E]/80 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit">
                 Your new email address is now linked to your account. Use it the next time you log in.
               </p>
 
@@ -944,7 +1029,7 @@ export default function ApplicantAccountSettings({ profile }) {
                 aria-label="Got it, close email success confirmation"
                 onClick={() => setShowEmailSuccess(false)}
                 style={{ color: isDarkMode ? '#000000' : '#ffffff' }}
-                className="w-full py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer border-2 bg-[#03045E] border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF]"
+                className="w-full py-3 sm:py-3.5 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer border-2 bg-[#03045E] border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF] focus:outline-none"
               >
                 Got it
               </button>
@@ -964,7 +1049,11 @@ export default function ApplicantAccountSettings({ profile }) {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative w-full max-w-sm rounded-2xl sm:rounded-[2rem] shadow-2xl border-2 overflow-hidden animate-in zoom-in-95 duration-300 ${isDarkScreen ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#2C7FFF]/30'}`}>
+          <div
+            ref={passwordSuccessRef}
+            tabIndex={-1}
+            className={`relative w-full max-w-sm rounded-xl sm:rounded-2xl shadow-2xl border-2 overflow-hidden animate-in zoom-in-95 duration-300 focus:outline-none ${isDarkScreen ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#2C7FFF]/30'}`}
+          >
             {passwordProcessing ? (
               <div className="px-5 py-10 sm:px-8 sm:py-12 flex flex-col items-center text-center">
                 <div aria-hidden="true" className="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mb-5 sm:mb-6">
@@ -972,10 +1061,10 @@ export default function ApplicantAccountSettings({ profile }) {
                   <div className="absolute inset-0 rounded-full border-4 border-t-[#2C7FFF] border-r-transparent border-b-[#03045E] border-l-transparent animate-spin" />
                   <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-[#03045E] shadow-lg animate-ping opacity-70 absolute" />
                 </div>
-                <h2 id="password-success-title" className="text-lg sm:text-xl font-black text-[#03045E] tracking-tight mb-1.5">
+                <h2 id="password-success-title" tabIndex="0" className="text-lg sm:text-xl font-black text-[#03045E] tracking-tight mb-1.5 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit">
                   Verifying Password
                 </h2>
-                <p id="password-success-desc" className="text-[11px] sm:text-xs font-bold text-[#03045E]/70">
+                <p id="password-success-desc" tabIndex="0" className="text-[11px] sm:text-xs font-bold text-[#03045E]/70 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit">
                   Please wait while we secure your account...
                 </p>
                 <div aria-hidden="true" className="flex items-center gap-1.5 mt-4 sm:mt-5">
@@ -996,10 +1085,10 @@ export default function ApplicantAccountSettings({ profile }) {
                   </div>
                 </div>
 
-                <h2 id="password-success-title" className={`text-xl sm:text-2xl font-black tracking-tight mb-2 ${isDarkScreen ? 'text-white' : 'text-[#03045E]'}`}>
+                <h2 id="password-success-title" tabIndex="0" className={`text-xl sm:text-2xl font-black tracking-tight mb-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit ${isDarkScreen ? 'text-white' : 'text-[#03045E]'}`}>
                   Password Updated!
                 </h2>
-                <p id="password-success-desc" className={`text-xs sm:text-sm font-semibold leading-relaxed mb-5 sm:mb-6 max-w-xs ${isDarkScreen ? 'text-white/70' : 'text-[#03045E]/70'}`}>
+                <p id="password-success-desc" tabIndex="0" className={`text-xs sm:text-sm font-semibold leading-relaxed mb-5 sm:mb-6 max-w-xs transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit ${isDarkScreen ? 'text-white/70' : 'text-[#03045E]/70'}`}>
                   Your new password has been saved securely. Use it the next time you log in.
                 </p>
 
@@ -1008,7 +1097,7 @@ export default function ApplicantAccountSettings({ profile }) {
                   aria-label="Got it, close password updated confirmation"
                   onClick={() => setShowPasswordSuccess(false)}
                   style={{ color: isDarkMode ? '#000000' : '#ffffff' }}
-                  className={`w-full py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-[#2C7FFF] font-black text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all cursor-pointer`}
+                  className={`w-full py-3 sm:py-3.5 rounded-lg sm:rounded-xl bg-[#2C7FFF] font-black text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all cursor-pointer focus:outline-none`}
                 >
                   Got it
                 </button>
@@ -1029,7 +1118,11 @@ export default function ApplicantAccountSettings({ profile }) {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative w-full max-w-sm rounded-2xl sm:rounded-[2rem] shadow-2xl border-2 overflow-hidden animate-fadeIn ${isColorVision ? 'bg-[#FEF3C7] border-[#B45309]' : 'bg-[#f4f4f4] border-[#2C7FFF]'}`}>
+          <div
+            ref={deactivateModalRef}
+            tabIndex={-1}
+            className={`relative w-full max-w-sm rounded-xl sm:rounded-2xl shadow-2xl border-2 overflow-hidden animate-fadeIn focus:outline-none ${isColorVision ? 'bg-[#FEF3C7] border-[#B45309]' : 'bg-[#f4f4f4] border-[#2C7FFF]'}`}
+          >
             <div aria-hidden="true" className={`h-2 w-full ${isColorVision ? 'bg-[#B45309]' : 'bg-[#2C7FFF]'}`} />
 
             {deactivateStage === 'confirm' && (
@@ -1050,14 +1143,14 @@ export default function ApplicantAccountSettings({ profile }) {
                   </div>
                 </div>
 
-                <span aria-hidden="true" className={`inline-block px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-2 sm:mb-3 ${isColorVision ? 'bg-[#B45309]/20 text-[#92400E]' : 'bg-[#2C7FFF]/15 text-[#2C7FFF]'}`}>
+                <span tabIndex="0" className={`inline-block px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-2 sm:mb-3 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 ${isColorVision ? 'bg-[#B45309]/20 text-[#92400E]' : 'bg-[#2C7FFF]/15 text-[#2C7FFF]'}`}>
                   {deactivateTargetState ? 'Confirm Reactivation' : 'Confirm Deactivation'}
                 </span>
 
-                <h2 id="deactivate-modal-title" className={`text-xl sm:text-2xl font-black tracking-tight mb-2 ${isColorVision ? 'text-[#92400E]' : 'text-[#03045E]'}`}>
+                <h2 id="deactivate-modal-title" tabIndex="0" className={`text-xl sm:text-2xl font-black tracking-tight mb-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit ${isColorVision ? 'text-[#92400E]' : 'text-[#03045E]'}`}>
                   {deactivateTargetState ? 'Reactivate Account?' : 'Deactivate Account?'}
                 </h2>
-                <p id="deactivate-modal-desc" className={`text-xs sm:text-sm font-semibold leading-relaxed mb-5 sm:mb-6 max-w-xs ${isColorVision ? 'text-[#B45309]/90' : 'text-[#2c7fff]/75'}`}>
+                <p id="deactivate-modal-desc" tabIndex="0" className={`text-xs sm:text-sm font-semibold leading-relaxed mb-5 sm:mb-6 max-w-xs transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit ${isColorVision ? 'text-[#B45309]/90' : 'text-[#2c7fff]/75'}`}>
                   {deactivateTargetState
                     ? 'Your profile will be visible to employers again and you can resume applying for jobs.'
                     : 'Your profile and applications will be temporarily hidden. You can reactivate anytime by logging back in.'}
@@ -1068,7 +1161,7 @@ export default function ApplicantAccountSettings({ profile }) {
                     type="button"
                     aria-label="Cancel account status change"
                     onClick={() => setShowDeactivateModal(false)}
-                    className={`flex-1 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider border-2 transition-all duration-300 cursor-pointer ${isColorVision ? 'bg-[#FEF3C7] text-[#92400E] border-[#92400E]' : 'bg-[#f4f4f4] text-[#03045E] border-[#03045E]'}`}
+                    className={`flex-1 py-3 sm:py-3.5 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider border-2 transition-all duration-300 cursor-pointer focus:outline-none ${isColorVision ? 'bg-[#FEF3C7] text-[#92400E] border-[#92400E]' : 'bg-[#f4f4f4] text-[#03045E] border-[#03045E]'}`}
                   >
                     Cancel
                   </button>
@@ -1076,7 +1169,7 @@ export default function ApplicantAccountSettings({ profile }) {
                     type="button"
                     aria-label={deactivateTargetState ? 'Confirm reactivate account' : 'Confirm deactivate account'}
                     onClick={confirmToggleDeactivation}
-                    className={`flex-1 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all duration-300 cursor-pointer border-2 ${isColorVision ? 'bg-[#B45309] border-[#B45309]' : 'bg-[#2C7FFF] border-[#2C7FFF]'}`}
+                    className={`flex-1 py-3 sm:py-3.5 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all duration-300 cursor-pointer border-2 focus:outline-none ${isColorVision ? 'bg-[#B45309] border-[#B45309]' : 'bg-[#2C7FFF] border-[#2C7FFF]'}`}
                     style={{ color: '#ffffff' }}
                   >
                     {deactivateTargetState ? 'Reactivate' : 'Deactivate'}
@@ -1092,10 +1185,10 @@ export default function ApplicantAccountSettings({ profile }) {
                   <div className={`absolute inset-0 rounded-full border-4 border-r-transparent border-l-transparent animate-spin ${isColorVision ? 'border-t-[#B45309] border-b-[#92400E]' : 'border-t-[#2C7FFF] border-b-[#03045E]'}`} />
                   <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full shadow-lg animate-ping opacity-70 absolute ${isColorVision ? 'bg-[#92400E]' : 'bg-[#03045E]'}`} />
                 </div>
-                <h2 id="deactivate-modal-title" className={`text-lg sm:text-xl font-black tracking-tight mb-1.5 ${isColorVision ? 'text-[#92400E]' : 'text-[#03045E]'}`}>
+                <h2 id="deactivate-modal-title" tabIndex="0" className={`text-lg sm:text-xl font-black tracking-tight mb-1.5 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit ${isColorVision ? 'text-[#92400E]' : 'text-[#03045E]'}`}>
                   {deactivateTargetState ? 'Reactivating Account' : 'Deactivating Account'}
                 </h2>
-                <p id="deactivate-modal-desc" className={`text-[11px] sm:text-xs font-bold ${isColorVision ? 'text-[#92400E]/70' : 'text-[#03045E]/70'}`}>
+                <p id="deactivate-modal-desc" tabIndex="0" className={`text-[11px] sm:text-xs font-bold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit ${isColorVision ? 'text-[#92400E]/70' : 'text-[#03045E]/70'}`}>
                   Applying your account status change...
                 </p>
                 <div aria-hidden="true" className="flex items-center gap-1.5 mt-4 sm:mt-5">
@@ -1119,14 +1212,14 @@ export default function ApplicantAccountSettings({ profile }) {
                   </div>
                 </div>
 
-                <span aria-hidden="true" className={`inline-block px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-2 sm:mb-3 ${isColorVision ? 'bg-[#B45309]/20 text-[#92400E]' : 'bg-[#2C7FFF]/15 text-[#2C7FFF]'}`}>
+                <span tabIndex="0" className={`inline-block px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-2 sm:mb-3 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 ${isColorVision ? 'bg-[#B45309]/20 text-[#92400E]' : 'bg-[#2C7FFF]/15 text-[#2C7FFF]'}`}>
                   Account Status Updated
                 </span>
 
-                <h2 id="deactivate-modal-title" className={`text-xl sm:text-2xl font-black tracking-tight mb-2 ${isColorVision ? 'text-[#92400E]' : 'text-[#03045E]'}`}>
+                <h2 id="deactivate-modal-title" tabIndex="0" className={`text-xl sm:text-2xl font-black tracking-tight mb-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit ${isColorVision ? 'text-[#92400E]' : 'text-[#03045E]'}`}>
                   {deactivateTargetState ? 'Account Reactivated!' : 'Account Deactivated!'}
                 </h2>
-                <p id="deactivate-modal-desc" className={`text-xs sm:text-sm font-semibold leading-relaxed mb-5 sm:mb-6 max-w-xs ${isColorVision ? 'text-[#B45309]/90' : 'text-[#2c7fff]/75'}`}>
+                <p id="deactivate-modal-desc" tabIndex="0" className={`text-xs sm:text-sm font-semibold leading-relaxed mb-5 sm:mb-6 max-w-xs transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit ${isColorVision ? 'text-[#B45309]/90' : 'text-[#2c7fff]/75'}`}>
                   {deactivateTargetState
                     ? 'Your profile is now active. Welcome back and good luck with your job search!'
                     : 'Your profile is now hidden. Log back in anytime to reactivate your account.'}
@@ -1137,7 +1230,7 @@ export default function ApplicantAccountSettings({ profile }) {
                   aria-label="Got it, close account status confirmation"
                   onClick={() => setShowDeactivateModal(false)}
                   style={{ color: (isHighContrastOrDarkComfort || isColorVision) ? '#ffffff' : (isDarkMode ? '#000000' : '#03045E') }}
-                  className={`w-full py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all duration-300 cursor-pointer border-2 ${isColorVision ? 'bg-[#B45309] border-[#B45309]' : 'bg-white border-white'}`}
+                  className={`w-full py-3 sm:py-3.5 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all duration-300 cursor-pointer border-2 focus:outline-none ${isColorVision ? 'bg-[#B45309] border-[#B45309]' : 'bg-white border-white'}`}
                 >
                   Got it
                 </button>
@@ -1156,14 +1249,14 @@ export default function ApplicantAccountSettings({ profile }) {
                   </div>
                 </div>
 
-                <span aria-hidden="true" className={`inline-block px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-2 sm:mb-3 ${isColorVision ? 'bg-[#B45309]/20 text-[#92400E]' : 'bg-[#2C7FFF]/15 text-[#2C7FFF]'}`}>
+                <span tabIndex="0" className={`inline-block px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-2 sm:mb-3 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 ${isColorVision ? 'bg-[#B45309]/20 text-[#92400E]' : 'bg-[#2C7FFF]/15 text-[#2C7FFF]'}`}>
                   Action Failed
                 </span>
 
-                <h2 id="deactivate-modal-title" className={`text-xl sm:text-2xl font-black tracking-tight mb-2 ${isColorVision ? 'text-[#92400E]' : 'text-[#03045E]'}`}>
+                <h2 id="deactivate-modal-title" tabIndex="0" className={`text-xl sm:text-2xl font-black tracking-tight mb-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit ${isColorVision ? 'text-[#92400E]' : 'text-[#03045E]'}`}>
                   Something went wrong
                 </h2>
-                <p id="deactivate-modal-desc" className={`text-xs sm:text-sm font-semibold leading-relaxed mb-5 sm:mb-6 max-w-xs ${isColorVision ? 'text-[#92400E]/75' : 'text-[#03045E]/75'}`}>
+                <p id="deactivate-modal-desc" tabIndex="0" className={`text-xs sm:text-sm font-semibold leading-relaxed mb-5 sm:mb-6 max-w-xs transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit ${isColorVision ? 'text-[#92400E]/75' : 'text-[#03045E]/75'}`}>
                   We couldn't update your account status. Please try again in a moment.
                 </p>
 
@@ -1172,7 +1265,7 @@ export default function ApplicantAccountSettings({ profile }) {
                   aria-label="Close error dialog"
                   onClick={() => setShowDeactivateModal(false)}
                   style={{ color: isDarkMode ? '#000000' : '#ffffff' }}
-                  className={`w-full py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all duration-300 cursor-pointer border-2 ${isColorVision ? 'bg-[#B45309] border-[#B45309]' : 'bg-[#03045E] border-[#03045E]'}`}
+                  className={`w-full py-3 sm:py-3.5 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all duration-300 cursor-pointer border-2 focus:outline-none ${isColorVision ? 'bg-[#B45309] border-[#B45309]' : 'bg-[#03045E] border-[#03045E]'}`}
                 >
                   Close
                 </button>

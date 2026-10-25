@@ -45,7 +45,7 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 mb-1">
         <div className="flex items-center gap-2 sm:gap-2.5">
-          <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm" style={{ backgroundColor: 'color-mix(in srgb, var(--color-primary, #2C7FFF) 15%, transparent)', border: '1px solid color-mix(in srgb, var(--color-primary, #2C7FFF) 30%, transparent)', color: 'var(--color-primary, #2C7FFF)' }}>
+          <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-sm" style={{ backgroundColor: 'color-mix(in srgb, var(--color-primary, #2C7FFF) 15%, transparent)', border: '1px solid color-mix(in srgb, var(--color-primary, #2C7FFF) 30%, transparent)', color: 'var(--color-primary, #2C7FFF)' }}>
             <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
@@ -61,7 +61,7 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
             title={analyticsExpanded ? 'Exit fullscreen' : 'Expand analytics'}
             className="relative flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-full bg-white/95 backdrop-blur-md shadow-[0_4px_20px_rgba(3,4,94,0.15)] border border-[#03045E]/15 cursor-pointer"
           >
-            <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#2C7FFF]/10 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shrink-0">
+            <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg sm:rounded-xl bg-[#2C7FFF]/10 border border-[#2C7FFF]/30 flex items-center justify-center text-[#2C7FFF] shrink-0">
               {analyticsExpanded ? (
                 <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -116,7 +116,7 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
   return (
     <div className="animate-fadeIn max-w-9xl mx-auto pb-6 sm:pb-10 px-1 sm:px-0">
       
-      <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 ${isDark ? 'bg-black border-white' : 'bg-[#f4f4f4]/90 border-[#03045E]/20'} backdrop-blur-md p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border`}>
+      <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 ${isDark ? 'bg-black border-white' : 'bg-[#f4f4f4]/90 border-[#03045E]/20'} backdrop-blur-md p-4 sm:p-6 rounded-3xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border`}>
         <div>
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1 sm:mb-1.5">
             <span className={`text-[10px] sm:text-xs font-extrabold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full uppercase tracking-wider border ${isDark ? 'bg-white/10 text-white border-white/40' : 'border-[color:color-mix(in_srgb,var(--color-primary,#2C7FFF)_30%,transparent)]'}`} style={!isDark ? { backgroundColor: 'color-mix(in srgb, var(--color-primary, #2C7FFF) 15%, transparent)', color: 'var(--color-primary, #2C7FFF)' } : undefined}>Employer Hub</span>
@@ -137,11 +137,11 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
             type="button"
             onClick={() => setActiveTab && setActiveTab('jobs')}
             aria-label={`Active Postings, ${stats.activeJobs}. Click to view your job listings.`}
-            className={`text-left relative overflow-hidden p-2 sm:p-6 rounded-xl sm:rounded-3xl ${isDark ? 'bg-black border-white' : 'bg-[#f4f4f4] border-[#03045E]/20'} shadow-[0_10px_30px_rgba(3,4,94,0.06)] border flex flex-col lg:flex-row items-center justify-between group transition-all duration-300 cursor-pointer`}
+            className={`text-left relative overflow-hidden p-2 sm:p-6 rounded-2xl sm:rounded-3xl ${isDark ? 'bg-black border-white' : 'bg-[#f4f4f4] border-[#03045E]/20'} shadow-[0_10px_30px_rgba(3,4,94,0.06)] border flex flex-col lg:flex-row items-center justify-between group transition-all duration-300 cursor-pointer`}
           >
             <div className="absolute top-0 right-0 w-16 sm:w-32 h-16 sm:h-32 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 10%, transparent), transparent)' }}></div>
             <div className="flex flex-col lg:flex-row items-center gap-1.5 sm:gap-4 relative z-10 w-full">
-              <div className="w-7 h-7 sm:w-16 sm:h-16 rounded-lg sm:rounded-2xl flex items-center justify-center shadow-sm group-hover:rotate-6 transition-transform shrink-0" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 15%, transparent), color-mix(in srgb, var(--color-primary, #2C7FFF) 25%, transparent))', border: '1px solid color-mix(in srgb, var(--color-primary, #2C7FFF) 30%, transparent)', color: 'var(--color-primary, #2C7FFF)' }}>
+              <div className="w-7 h-7 sm:w-16 sm:h-16 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm group-hover:rotate-6 transition-transform shrink-0" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 15%, transparent), color-mix(in srgb, var(--color-primary, #2C7FFF) 25%, transparent))', border: '1px solid color-mix(in srgb, var(--color-primary, #2C7FFF) 30%, transparent)', color: 'var(--color-primary, #2C7FFF)' }}>
                 <svg className="w-3.5 h-3.5 sm:w-8 sm:h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                 </svg>
@@ -160,11 +160,11 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
             type="button"
             onClick={() => setActiveTab && setActiveTab('applications')}
             aria-label={`Pending Review, ${stats.pendingApps}. Click to view applications.`}
-            className={`text-left relative overflow-hidden p-2 sm:p-6 rounded-xl sm:rounded-3xl ${isDark ? 'bg-black border-white' : 'bg-[#f4f4f4] border-[#03045E]/20'} shadow-[0_10px_30px_rgba(3,4,94,0.06)] border flex flex-col lg:flex-row items-center justify-between group transition-all duration-300 cursor-pointer`}
+            className={`text-left relative overflow-hidden p-2 sm:p-6 rounded-2xl sm:rounded-3xl ${isDark ? 'bg-black border-white' : 'bg-[#f4f4f4] border-[#03045E]/20'} shadow-[0_10px_30px_rgba(3,4,94,0.06)] border flex flex-col lg:flex-row items-center justify-between group transition-all duration-300 cursor-pointer`}
           >
             <div className="absolute top-0 right-0 w-16 sm:w-32 h-16 sm:h-32 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 10%, transparent), transparent)' }}></div>
             <div className="flex flex-col lg:flex-row items-center gap-1.5 sm:gap-4 relative z-10 w-full">
-              <div className="w-7 h-7 sm:w-16 sm:h-16 rounded-lg sm:rounded-2xl flex items-center justify-center shadow-sm group-hover:rotate-6 transition-transform shrink-0" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 15%, transparent), color-mix(in srgb, var(--color-primary, #2C7FFF) 25%, transparent))', border: '1px solid color-mix(in srgb, var(--color-primary, #2C7FFF) 30%, transparent)', color: 'var(--color-primary, #2C7FFF)' }}>
+              <div className="w-7 h-7 sm:w-16 sm:h-16 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm group-hover:rotate-6 transition-transform shrink-0" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 15%, transparent), color-mix(in srgb, var(--color-primary, #2C7FFF) 25%, transparent))', border: '1px solid color-mix(in srgb, var(--color-primary, #2C7FFF) 30%, transparent)', color: 'var(--color-primary, #2C7FFF)' }}>
                 <svg className="w-3.5 h-3.5 sm:w-8 sm:h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -183,11 +183,11 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
             type="button"
             onClick={() => setActiveTab && setActiveTab('applications')}
             aria-label={`Shortlisted, ${stats.shortlistedApps}. Click to view applications.`}
-            className={`text-left relative overflow-hidden p-2 sm:p-6 rounded-xl sm:rounded-3xl ${isDark ? 'bg-black border-white' : 'bg-[#f4f4f4] border-[#03045E]/20'} shadow-[0_10px_30px_rgba(3,4,94,0.06)] border flex flex-col lg:flex-row items-center justify-between group transition-all duration-300 cursor-pointer`}
+            className={`text-left relative overflow-hidden p-2 sm:p-6 rounded-2xl sm:rounded-3xl ${isDark ? 'bg-black border-white' : 'bg-[#f4f4f4] border-[#03045E]/20'} shadow-[0_10px_30px_rgba(3,4,94,0.06)] border flex flex-col lg:flex-row items-center justify-between group transition-all duration-300 cursor-pointer`}
           >
             <div className="absolute top-0 right-0 w-16 sm:w-32 h-16 sm:h-32 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 10%, transparent), transparent)' }}></div>
             <div className="flex flex-col lg:flex-row items-center gap-1.5 sm:gap-4 relative z-10 w-full">
-              <div className="w-7 h-7 sm:w-16 sm:h-16 rounded-lg sm:rounded-2xl flex items-center justify-center shadow-sm group-hover:rotate-6 transition-transform shrink-0" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 15%, transparent), color-mix(in srgb, var(--color-primary, #2C7FFF) 25%, transparent))', border: '1px solid color-mix(in srgb, var(--color-primary, #2C7FFF) 30%, transparent)', color: 'var(--color-primary, #2C7FFF)' }}>
+              <div className="w-7 h-7 sm:w-16 sm:h-16 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm group-hover:rotate-6 transition-transform shrink-0" style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--color-primary, #2C7FFF) 15%, transparent), color-mix(in srgb, var(--color-primary, #2C7FFF) 25%, transparent))', border: '1px solid color-mix(in srgb, var(--color-primary, #2C7FFF) 30%, transparent)', color: 'var(--color-primary, #2C7FFF)' }}>
                 <svg className="w-3.5 h-3.5 sm:w-8 sm:h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                 </svg>
@@ -275,7 +275,7 @@ export function AccessibilityToolbar() {
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => handleThemeChange('Standard')}
-                className={`py-2 text-xs font-bold rounded border cursor-pointer ${
+                className={`py-2 text-xs font-bold rounded-xl border cursor-pointer ${
                   mode === 'Standard' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-800 border-gray-300'
                 }`}
                 aria-label="Standard Mode"
@@ -284,7 +284,7 @@ export function AccessibilityToolbar() {
               </button>
               <button
                 onClick={() => handleThemeChange('High Contrast')}
-                className={`py-2 text-xs font-bold rounded border cursor-pointer ${
+                className={`py-2 text-xs font-bold rounded-xl border cursor-pointer ${
                   mode === 'High Contrast' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-800 border-gray-300'
                 }`}
                 aria-label="High Contrast Mode"
@@ -299,7 +299,7 @@ export function AccessibilityToolbar() {
             <div className="grid grid-cols-3 gap-1.5">
               <button
                 onClick={() => handleFontSizeChange('normal')}
-                className={`py-1.5 text-xs font-bold rounded border cursor-pointer ${
+                className={`py-1.5 text-xs font-bold rounded-xl border cursor-pointer ${
                   fontSize === 'normal' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-800 border-gray-300'
                 }`}
                 aria-label="Normal Font Size"
@@ -308,7 +308,7 @@ export function AccessibilityToolbar() {
               </button>
               <button
                 onClick={() => handleFontSizeChange('large')}
-                className={`py-1.5 text-sm font-bold rounded border cursor-pointer ${
+                className={`py-1.5 text-sm font-bold rounded-xl border cursor-pointer ${
                   fontSize === 'large' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-800 border-gray-300'
                 }`}
                 aria-label="Large Font Size"
@@ -317,7 +317,7 @@ export function AccessibilityToolbar() {
               </button>
               <button
                 onClick={() => handleFontSizeChange('xlarge')}
-                className={`py-1.5 px-1 text-sm font-bold rounded border cursor-pointer flex items-center justify-center whitespace-nowrap ${
+                className={`py-1.5 px-1 text-sm font-bold rounded-xl border cursor-pointer flex items-center justify-center whitespace-nowrap ${
                   fontSize === 'xlarge' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-800 border-gray-300'
                 }`}
                 aria-label="Extra Large Font Size"

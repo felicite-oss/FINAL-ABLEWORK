@@ -30,7 +30,7 @@ function MapRecenter({ lat, lng }) {
 
 export default function ApplicantRegister() {
   const { mode } = useContext(AccessibilityContext);
-  const { paletteKey } = useColorPalette();
+  const { paletteKey, colors } = useColorPalette();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const isContrast = mode && typeof mode === 'string' && mode.toLowerCase().includes('contrast');
@@ -38,6 +38,8 @@ export default function ApplicantRegister() {
   const isAccessibilityMode = paletteKey === 'highContrast' || paletteKey === 'darkComfort';
   const isAccessibilityDarkMode = isAccessibilityMode && mode && typeof mode === 'string' && mode.toLowerCase().includes('dark');
   const isDefaultDarkMode = isDarkMode && !isAccessibilityMode;
+  const primaryColor = colors?.primary || '#2C7FFF';
+  const secondaryColor = colors?.secondary || '#03045E';
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -319,9 +321,9 @@ export default function ApplicantRegister() {
               />
             </div>
             <nav aria-label="Main navigation" className={`hidden md:flex items-center gap-6 text-[15px] font-medium ${isAccessibilityMode ? '!text-white' : (isContrast ? 'text-white' : 'text-[#03045E]')}`}>
-              <Link to="/" aria-label="Home" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#2C7FFF]')} transition`}>Home</Link>
-              <Link to="/about" aria-label="About Us" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#2C7FFF]')} transition`}>About Us</Link>
-              <Link to="/policy" aria-label="Policy" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#2C7FFF]')} transition`}>Policy</Link>
+              <Link to="/" aria-label="Home" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#03045e]')} transition`}>Home</Link>
+              <Link to="/about" aria-label="About Us" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#03045e]')} transition`}>About Us</Link>
+              <Link to="/policy" aria-label="Policy" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#03045e]')} transition`}>Policy</Link>
             </nav>
           </div>
           <div className="hidden md:flex items-center">
@@ -350,7 +352,7 @@ export default function ApplicantRegister() {
             aria-label="Menu"
             aria-expanded={isOpen}
             aria-controls="mobile-menu"
-            className={`md:hidden flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl border-2 shadow-sm cursor-pointer transition-all duration-200 shrink-0 ${isContrast ? 'bg-zinc-900 text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/20'}`}
+            className={`md:hidden flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg border-2 shadow-sm cursor-pointer transition-all duration-200 shrink-0 ${isContrast ? 'bg-zinc-900 text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/20'}`}
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? (
@@ -376,8 +378,8 @@ export default function ApplicantRegister() {
         >
           <div className={`w-full ${isContrast ? 'bg-black' : 'bg-white'}`}>
             <nav aria-label="Mobile navigation" className={`flex flex-col px-2.5 pt-2.5 pb-2.5 gap-2 sm:px-3 sm:pt-3 sm:pb-3 sm:gap-2.5 ${isContrast ? 'text-white' : 'text-[#03045E]'}`}>
-              <Link to="/" aria-label="Home" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
-                <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+              <Link to="/" aria-label="Home" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-lg font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
+                <div aria-hidden="true" className="p-1.5 rounded-md transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                   </svg>
@@ -390,8 +392,8 @@ export default function ApplicantRegister() {
                 </svg>
               </Link>
 
-              <Link to="/about" aria-label="About Us" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
-                <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+              <Link to="/about" aria-label="About Us" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-lg font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
+                <div aria-hidden="true" className="p-1.5 rounded-md transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -404,8 +406,8 @@ export default function ApplicantRegister() {
                 </svg>
               </Link>
 
-              <Link to="/policy" aria-label="Policy" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
-                <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+              <Link to="/policy" aria-label="Policy" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-lg font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E]/25">
+                <div aria-hidden="true" className="p-1.5 rounded-md transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
@@ -420,11 +422,11 @@ export default function ApplicantRegister() {
 
               <div aria-hidden="true" className={`h-px my-0.5 ${isContrast ? 'bg-[#2C7FFF]/30' : 'bg-[#03045E]/15'}`}></div>
 
-              <NavLink to="/login" aria-label="Log In" onClick={() => setIsOpen(false)} className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-2xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}>
+              <NavLink to="/login" aria-label="Log In" onClick={() => setIsOpen(false)} className={({ isActive }) => `relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-lg font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${isActive ? 'bg-white text-[#03045E] border-[#03045E] shadow-md' : 'bg-white text-[#03045E] border-[#03045E]/25'}`}>
                 {({ isActive }) => (
                   <>
                     {isActive && <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>}
-                    <div aria-hidden="true" className="p-1.5 rounded-xl transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
+                    <div aria-hidden="true" className="p-1.5 rounded-md transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                       </svg>
@@ -449,7 +451,7 @@ export default function ApplicantRegister() {
         aria-label="Applicant registration area"
       >
 
-        <div className="w-full max-w-2xl h-[80vh] sm:h-[85vh] max-h-full flex flex-col bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-2xl border border-[#03045E]/10 overflow-hidden relative z-50 animate-fadeIn">
+        <div className="w-full max-w-2xl h-[80vh] sm:h-[85vh] max-h-full flex flex-col bg-white/95 backdrop-blur-md rounded-lg sm:rounded-xl shadow-2xl border border-[#03045E]/10 overflow-hidden relative z-50 animate-fadeIn">
 
           <div className="flex-shrink-0 px-4 pt-5 pb-3 sm:px-6 sm:pt-6 sm:pb-4 border-b border-[#03045E]/10 bg-white/90">
             <div className="flex items-center gap-3">
@@ -463,10 +465,10 @@ export default function ApplicantRegister() {
                 </svg>
               </Link>
               <div>
-                <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-[#03045E]">
+                <h1 tabIndex="0" title="Job Seeker Registration" className="text-xl sm:text-3xl md:text-4xl font-bold text-[#03045E]">
                   Job Seeker Registration
                 </h1>
-                <p className="text-xs sm:text-sm text-[#03045E]/70 mt-0.5">
+                <p tabIndex="0" title="Build your accessible career profile" className="text-xs sm:text-sm text-[#03045E]/70 mt-0.5">
                   Build your accessible career profile
                 </p>
               </div>
@@ -479,7 +481,7 @@ export default function ApplicantRegister() {
 
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="firstName" className="text-xs sm:text-sm font-semibold text-[#03045E]">First Name <span className="text-[#03045E]">*</span></label>
+                  <label htmlFor="firstName" tabIndex="0" title="First Name" className="text-xs sm:text-sm font-semibold text-[#03045E] focus:outline-none">First Name <span className="text-[#03045E]">*</span></label>
                   <input 
                     id="firstName" 
                     type="text" 
@@ -487,26 +489,26 @@ export default function ApplicantRegister() {
                     onChange={(e) => setFirstName(e.target.value)} 
                     placeholder="Enter your First Name" 
                     required 
-                    className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" 
+                    className="w-full p-3 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" 
                     title="Please enter your legal first name."
                     aria-label="First Name. Please enter your legal first name."
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="middleName" className="text-xs sm:text-sm font-semibold text-[#03045E]">Middle Name (Optional)</label>
+                  <label htmlFor="middleName" tabIndex="0" title="Middle Name (Optional)" className="text-xs sm:text-sm font-semibold text-[#03045E] focus:outline-none">Middle Name (Optional)</label>
                   <input 
                     id="middleName" 
                     type="text" 
                     value={middleName} 
                     onChange={(e) => setMiddleName(e.target.value)} 
                     placeholder="Enter your Middle Name" 
-                    className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" 
+                    className="w-full p-3 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" 
                     title="Please enter your middle name if you have one. This is optional."
                     aria-label="Middle Name. Please enter your middle name if you have one. This is optional."
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="lastName" className="text-xs sm:text-sm font-semibold text-[#03045E]">Last Name <span className="text-[#03045E]">*</span></label>
+                  <label htmlFor="lastName" tabIndex="0" title="Last Name" className="text-xs sm:text-sm font-semibold text-[#03045E] focus:outline-none">Last Name <span className="text-[#03045E]">*</span></label>
                   <input 
                     id="lastName" 
                     type="text" 
@@ -514,13 +516,13 @@ export default function ApplicantRegister() {
                     onChange={(e) => setLastName(e.target.value)} 
                     placeholder="Enter your Last Name" 
                     required 
-                    className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" 
+                    className="w-full p-3 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" 
                     title="Please enter your legal last name."
                     aria-label="Last Name. Please enter your legal last name."
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="phone" className="text-xs sm:text-sm font-semibold text-[#03045E]">Phone Number <span className="text-[#03045E]">*</span></label>
+                  <label htmlFor="phone" tabIndex="0" title="Phone Number" className="text-xs sm:text-sm font-semibold text-[#03045E] focus:outline-none">Phone Number <span className="text-[#03045E]">*</span></label>
                   <input 
                     id="phone" 
                     type="tel" 
@@ -528,13 +530,13 @@ export default function ApplicantRegister() {
                     onChange={(e) => setPhone(e.target.value)} 
                     placeholder="Enter your Phone Number" 
                     required 
-                    className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" 
+                    className="w-full p-3 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" 
                     title="Please enter your active contact phone number."
                     aria-label="Phone Number. Please enter your active contact phone number."
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="email" className="text-xs sm:text-sm font-semibold text-[#03045E]">Email Address <span className="text-[#03045E]">*</span></label>
+                  <label htmlFor="email" tabIndex="0" title="Email Address" className="text-xs sm:text-sm font-semibold text-[#03045E] focus:outline-none">Email Address <span className="text-[#03045E]">*</span></label>
                   <input 
                     id="email" 
                     type="email" 
@@ -542,13 +544,13 @@ export default function ApplicantRegister() {
                     onChange={(e) => setEmail(e.target.value)} 
                     placeholder="Enter your Email Address" 
                     required 
-                    className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" 
+                    className="w-full p-3 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" 
                     title="Please enter a valid email address for your account."
                     aria-label="Email Address. Please enter a valid email address for your account."
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="password" className="text-xs sm:text-sm font-semibold text-[#03045E]">Password <span className="text-[#03045E]">*</span></label>
+                  <label htmlFor="password" tabIndex="0" title="Password" className="text-xs sm:text-sm font-semibold text-[#03045E] focus:outline-none">Password <span className="text-[#03045E]">*</span></label>
                   <div className="relative">
                     <input 
                       id="password" 
@@ -557,7 +559,7 @@ export default function ApplicantRegister() {
                       onChange={(e) => setPassword(e.target.value)} 
                       placeholder="Enter your Password" 
                       required 
-                      className="w-full p-3 pr-12 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" 
+                      className="w-full p-3 pr-12 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" 
                       title="Please create a secure password with at least 6 characters."
                       aria-label="Password. Please create a secure password with at least 6 characters."
                     />
@@ -581,7 +583,7 @@ export default function ApplicantRegister() {
                   </div>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="confirmPassword" className="text-xs sm:text-sm font-semibold text-[#03045E]">Confirm Password <span className="text-[#03045E]">*</span></label>
+                  <label htmlFor="confirmPassword" tabIndex="0" title="Confirm Password" className="text-xs sm:text-sm font-semibold text-[#03045E] focus:outline-none">Confirm Password <span className="text-[#03045E]">*</span></label>
                   <div className="relative">
                     <input 
                       id="confirmPassword" 
@@ -590,7 +592,7 @@ export default function ApplicantRegister() {
                       onChange={(e) => setConfirmPassword(e.target.value)} 
                       placeholder="Confirm your Password" 
                       required 
-                      className="w-full p-3 pr-12 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" 
+                      className="w-full p-3 pr-12 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" 
                       title="Please re-enter your password to confirm it matches."
                       aria-label="Confirm Password. Please re-enter your password to confirm it matches."
                     />
@@ -614,7 +616,7 @@ export default function ApplicantRegister() {
                   </div>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="birthdate" className="text-xs sm:text-sm font-semibold text-[#03045E]">Birthdate (Must be 18+) <span className="text-[#03045E]">*</span></label>
+                  <label htmlFor="birthdate" tabIndex="0" title="Birthdate (Must be 18+)" className="text-xs sm:text-sm font-semibold text-[#03045E] focus:outline-none">Birthdate (Must be 18+) <span className="text-[#03045E]">*</span></label>
                   <div className="relative">
                     <input 
                       id="birthdate" 
@@ -623,37 +625,42 @@ export default function ApplicantRegister() {
                       onChange={(e) => setBirthdate(e.target.value)} 
                       placeholder="Enter your Birthdate" 
                       required 
-                      className="w-full p-3 pr-12 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-12 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer" 
+                      className="w-full p-3 pr-12 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-12 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer" 
                       title="Please select your date of birth. You must be at least 18 years old to register."
                       aria-label="Birthdate. Please select your date of birth. You must be at least 18 years old to register."
                     />
-                    <span aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#03045E]">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                        <line x1="16" y1="2" x2="16" y2="6" />
-                        <line x1="8" y1="2" x2="8" y2="6" />
-                        <line x1="3" y1="10" x2="21" y2="10" />
-                        <circle cx="8" cy="14" r="0.5" fill="currentColor" />
-                        <circle cx="12" cy="14" r="0.5" fill="currentColor" />
-                        <circle cx="16" cy="14" r="0.5" fill="currentColor" />
-                        <circle cx="8" cy="18" r="0.5" fill="currentColor" />
-                        <circle cx="12" cy="18" r="0.5" fill="currentColor" />
-                        <circle cx="16" cy="18" r="0.5" fill="currentColor" />
-                      </svg>
-                    </span>
+                                                   <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <span role="img" aria-label="Calendar icon for selecting birthdate" tabIndex="0" className="peer pointer-events-none block text-[#03045E] focus:text-[#03045e] focus:outline-none focus:ring-2 focus:ring-[#2C7FFF] rounded cursor-default">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                          <line x1="16" y1="2" x2="16" y2="6" />
+                          <line x1="8" y1="2" x2="8" y2="6" />
+                          <line x1="3" y1="10" x2="21" y2="10" />
+                          <circle cx="8" cy="14" r="0.5" fill="currentColor" />
+                          <circle cx="12" cy="14" r="0.5" fill="currentColor" />
+                          <circle cx="16" cy="14" r="0.5" fill="currentColor" />
+                          <circle cx="8" cy="18" r="0.5" fill="currentColor" />
+                          <circle cx="12" cy="18" r="0.5" fill="currentColor" />
+                          <circle cx="16" cy="18" r="0.5" fill="currentColor" />
+                        </svg>
+                      </span>
+                      <span className="pointer-events-none absolute right-full mr-2 top-1/2 -translate-y-1/2 whitespace-nowrap rounded bg-[#03045E] px-2 py-1 text-[10px] font-semibold text-white opacity-0 transition-opacity peer-focus:opacity-100">
+                        Select your birthdate
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
 
               <hr aria-hidden="true" className="border-[#03045E]/10" />
 
-              <div className="flex flex-col gap-3 p-5 border border-[#2C7FFF]/30 rounded-2xl bg-[var(--color-accentSoft)]">
-                <label htmlFor="address" className="text-lg sm:text-xl font-bold text-[#03045E]">Residential Address <span className="text-[#03045E]">*</span></label>
+              <div className="flex flex-col gap-3 p-5 border border-[#2C7FFF]/30 rounded-lg bg-[var(--color-accentSoft)]">
+                <label htmlFor="address" tabIndex="0" title="Residential Address" className="text-lg sm:text-xl font-bold text-[#03045E] focus:outline-none">Residential Address <span className="text-[#03045E]">*</span></label>
                 <button 
                   type="button" 
                   onClick={handleDetectLocation} 
                   disabled={isDetecting} 
-                  className={`inline-flex items-center justify-center gap-2 bg-[#2C7FFF] ${isAccessibilityDarkMode ? '!text-black' : isAccessibilityMode ? '!text-white' : isDarkMode ? '!text-black' : 'text-white'} px-5 py-2.5 rounded-full text-sm font-semibold shadow-md transition ${isAccessibilityMode || isContrast || isDarkMode ? '' : 'hover:bg-[#03045E]'}`}
+                  className={`inline-flex items-center justify-center gap-2 bg-[#2C7FFF] ${isAccessibilityDarkMode ? '!text-black' : isAccessibilityMode ? '!text-white' : isDarkMode ? '!text-black' : 'text-white'} px-5 py-2.5 rounded-md text-sm font-semibold shadow-md transition ${isAccessibilityMode || isContrast || isDarkMode ? '' : 'hover:bg-[#03045E]'}`}
                   title="Click to automatically detect and fill your current location."
                   aria-label="Detect My Location. Click to automatically detect and fill your current location."
                 >
@@ -670,17 +677,17 @@ export default function ApplicantRegister() {
                   onChange={(e) => setAddress(e.target.value)} 
                   placeholder="Enter your Residential Address (e.g. Block 4, Main Street, Manila)" 
                   required 
-                  className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E]" 
+                  className="w-full p-3 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E]" 
                   title="Please enter your full residential address or use the detect location button."
                   aria-label="Residential Address. Please enter your full residential address or use the detect location button."
                 />
 
                 <div className="mt-4 flex flex-col gap-2">
                   <div className="flex justify-between items-center">
-                    <label htmlFor="radius" className="text-xs sm:text-sm font-semibold text-[#03045E]">
+                    <label htmlFor="radius" tabIndex="0" title="Max Travel Radius:" className="text-xs sm:text-sm font-semibold text-[#03045E] focus:outline-none">
                       Max Travel Radius:
                     </label>
-                    <span className={`font-black text-base sm:text-lg px-3 py-1 rounded-lg border shadow-sm ${isAccessibilityMode ? '!text-white !bg-zinc-900 !border-white' : 'text-[#2C7FFF] bg-white border-[#2C7FFF]/20'}`}>{radius} km</span>
+                   <span tabIndex="0" title="10 km" className={`font-black text-base sm:text-lg px-3 py-1 rounded-lg border shadow-sm ${isAccessibilityMode ? '!text-white !bg-transparent !border-white' : 'text-[#03045E] bg-transparent border-[#03045E]'}`}>{radius} km</span>
                   </div>
                   <input 
                     id="radius" 
@@ -693,11 +700,11 @@ export default function ApplicantRegister() {
                     title="Adjust the slider to set your maximum travel distance for work in kilometers."
                     aria-label="Maximum travel radius slider. Adjust the slider to set your maximum travel distance for work in kilometers."
                   />
-                  <p className="text-xs text-gray-500">Jobs beyond this distance will be filtered out automatically.</p>
+                  <p tabIndex="0" title="Jobs beyond this distance will be filtered out automatically." className="text-xs text-[#03045E] focus:outline-none">Jobs beyond this distance will be filtered out automatically.</p>
                 </div>
 
                 {lat && lng ? (
-                  <div className="h-48 sm:h-64 w-full mt-4 rounded-xl overflow-hidden border border-[#03045E]/20 z-0 relative shadow-inner" aria-label="Interactive map showing your location and travel radius.">
+                  <div className="h-48 sm:h-64 w-full mt-4 rounded-md overflow-hidden border border-[#03045E]/20 z-0 relative shadow-inner" aria-label="Interactive map showing your location and travel radius.">
                     <MapContainer center={[lat, lng]} zoom={11} scrollWheelZoom={false} style={{ height: '100%', width: '100%', zIndex: 0 }}>
                       <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -709,9 +716,9 @@ export default function ApplicantRegister() {
                     </MapContainer>
                   </div>
                 ) : (
-                  <div className={`h-36 sm:h-40 w-full mt-4 rounded-xl border-2 border-dashed ${isAccessibilityDarkMode ? 'border-[#03045E]/20 bg-white/50 text-black' : 'border-[#03045E]/20 bg-white/50 text-[#03045E]/50'} flex flex-col items-center justify-center`}>
+                  <div className={`h-36 sm:h-40 w-full mt-4 rounded-md border-2 border-dashed ${isAccessibilityDarkMode ? 'border-[#03045E]/20 bg-white/50 text-black' : 'border-[#03045E]/20 bg-white/50 text-[#03045E]/50'} flex flex-col items-center justify-center`}>
                     <svg aria-hidden="true" className={`w-8 h-8 mb-2 ${isAccessibilityDarkMode ? 'text-black' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    <span className={`text-xs sm:text-sm font-semibold ${isAccessibilityDarkMode ? 'text-black' : ''}`}>Click 'Detect My Location' to view your travel zone.</span>
+                    <span tabIndex="0" title="Click 'Detect My Location' to view your travel zone." className={`text-xs sm:text-sm font-semibold focus:outline-none ${isAccessibilityDarkMode ? 'text-black' : ''}`}>Click 'Detect My Location' to view your travel zone.</span>
                   </div>
                 )}
               </div>
@@ -719,14 +726,14 @@ export default function ApplicantRegister() {
               <hr aria-hidden="true" className="border-[#03045E]/10" />
 
               <fieldset className="flex flex-col gap-3">
-                <legend className="text-xs sm:text-sm font-bold text-[#03045E]">Physical &amp; Sensory Profile (Work-Enabled) <span className="text-[#03045E]">*</span></legend>
-                <p className="text-[11px] sm:text-xs text-gray-500">Select applicable physical or sensory categories for tailored job accommodation matching.</p>
+                <legend tabIndex="0" title="Physical &amp; Sensory Profile (Work-Enabled)" className="text-xs sm:text-sm font-bold text-[#03045E] focus:outline-none">Physical &amp; Sensory Profile (Work-Enabled) <span className="text-[#03045E]">*</span></legend>
+                <p tabIndex="0" title="Select applicable physical or sensory categories for tailored job accommodation matching." className="text-[11px] sm:text-xs text-[#03045E] focus:outline-none">Select applicable physical or sensory categories for tailored job accommodation matching.</p>
 
                 {selectedDisabilities.length > 0 && (
-                  <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                  <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
                     <span className="w-full text-xs font-bold text-gray-500 uppercase tracking-wider">Selected Profile:</span>
                     {selectedDisabilities.map(disability => (
-                      <span key={disability} className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#03045E]/15 text-[#03045E] text-[10px] sm:text-xs font-bold rounded-full shadow-sm border border-[#03045E]/30">
+                      <span key={disability} className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#03045E]/15 text-[#03045E] text-[10px] sm:text-xs font-bold rounded-md shadow-sm border border-[#03045E]/30">
                         {disability}
                         <button 
                           type="button" 
@@ -748,7 +755,7 @@ export default function ApplicantRegister() {
                       type="button"
                       key={disability}
                       onClick={() => toggleSelection(disability, selectedDisabilities, setSelectedDisabilities)}
-                      className={`px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold border transition ${
+                      className={`px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold border transition ${
                         selectedDisabilities.includes(disability)
                           ? 'bg-[#03045E] text-white border-[#03045E]'
                           : 'bg-white text-[#03045E] border-[#03045E]/30 hover:border-[#2C7FFF]'
@@ -763,7 +770,7 @@ export default function ApplicantRegister() {
                   <button
                     type="button"
                     onClick={() => setShowOtherDisability(!showOtherDisability)}
-                    className={`px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold border transition ${
+                    className={`px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold border transition ${
                       showOtherDisability
                         ? 'bg-[#03045E] text-white border-[#03045E]'
                         : 'bg-white text-[#03045E] border-[#03045E]/30 hover:border-[#2C7FFF]'
@@ -784,7 +791,7 @@ export default function ApplicantRegister() {
                       onChange={(e) => setOtherDisability(e.target.value)}
                       onKeyDown={handleCustomDisabilityKeyDown}
                       placeholder="Type custom condition and press Enter (or pick below)..."
-                      className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E]"
+                      className="w-full p-3 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E]"
                       title="Type a custom physical or sensory condition and press Enter."
                       aria-label="Custom condition input. Type a custom physical or sensory condition and press Enter to add it."
                     />
@@ -801,7 +808,7 @@ export default function ApplicantRegister() {
                                 toggleSelection(suggestion, selectedDisabilities, setSelectedDisabilities);
                                 setOtherDisability(''); 
                               }}
-                              className={`suggestion-btn px-3 py-1.5 bg-[#2C7FFF]/10 ${isDarkMode ? 'text-white' : 'text-[#03045E]'} text-[10px] sm:text-xs font-bold rounded-full border border-[#2C7FFF]/20`}
+                              className={`suggestion-btn px-3 py-1.5 bg-[#2C7FFF]/10 ${isDarkMode ? 'text-white' : 'text-[#03045E]'} text-[10px] sm:text-xs font-bold rounded-md border border-[#2C7FFF]/20`}
                               title={`Click to add ${suggestion}`}
                               aria-label={`Add suggested condition ${suggestion}`}
                             >
@@ -815,14 +822,14 @@ export default function ApplicantRegister() {
               </fieldset>
 
               <fieldset className="flex flex-col gap-3">
-                <legend className="text-xs sm:text-sm font-bold text-[#03045E]">Workplace Independence <span className="text-[#03045E]">*</span></legend>
+                <legend tabIndex="0" title="Workplace Independence" className="text-xs sm:text-sm font-bold text-[#03045E] focus:outline-none">Workplace Independence <span className="text-[#03045E]">*</span></legend>
                 <div className="flex flex-wrap gap-2">
                   {['Independent', 'Requires Assistance'].map((option) => (
                     <button
                       type="button"
                       key={option}
                       onClick={() => setIndependence(option)}
-                      className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-[10px] sm:text-xs font-semibold border transition ${
+                      className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold border transition ${
                         independence === option
                           ? 'bg-[#03045E] text-white border-[#03045E]'
                           : 'bg-white text-[#03045E] border-[#03045E]/30 hover:border-[#2C7FFF]'
@@ -838,14 +845,14 @@ export default function ApplicantRegister() {
               </fieldset>
 
               <fieldset className="flex flex-col gap-3">
-                <legend className="text-xs sm:text-sm font-bold text-[#03045E]"> Accommodations <span className="text-gray-400 font-normal ml-1">(Optional)</span></legend>
+                <legend tabIndex="0" title="Accommodations (Optional)" className="text-xs sm:text-sm font-bold text-[#03045E] focus:outline-none"> Accommodations <span className="text-[#03045E] font-normal ml-1">(Optional)</span></legend>
                 <div className="flex flex-wrap gap-2">
                   {availableAccommodations.map((acc) => (
                     <button
                       type="button"
                       key={acc}
                       onClick={() => toggleSelection(acc, selectedAccommodations, setSelectedAccommodations)}
-                      className={`px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold border transition ${
+                      className={`px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold border transition ${
                         selectedAccommodations.includes(acc)
                           ? 'bg-[#03045E] text-white border-[#03045E]'
                           : 'bg-white text-[#03045E] border-[#03045E]/30 hover:border-[#2C7FFF]'
@@ -860,7 +867,7 @@ export default function ApplicantRegister() {
                   <button
                     type="button"
                     onClick={() => setShowOtherAccommodation(!showOtherAccommodation)}
-                    className={`px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold border transition ${
+                    className={`px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold border transition ${
                       showOtherAccommodation
                         ? 'bg-[#03045E] text-white border-[#03045E]'
                         : 'bg-white text-[#03045E] border-[#03045E]/30 hover:border-[#2C7FFF]'
@@ -880,7 +887,7 @@ export default function ApplicantRegister() {
                       value={otherAccommodation}
                       onChange={(e) => setOtherAccommodation(e.target.value)}
                       placeholder="Type custom accommodation and press Enter..."
-                      className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E]"
+                      className="w-full p-3 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E]"
                       title="Type a custom workplace accommodation and press Enter."
                       aria-label="Custom accommodation input. Type a custom workplace accommodation and press Enter to add it."
                     />
@@ -897,7 +904,7 @@ export default function ApplicantRegister() {
                                 toggleSelection(suggestion, selectedAccommodations, setSelectedAccommodations);
                                 setOtherAccommodation(''); 
                               }}
-                              className={`suggestion-btn px-3 py-1.5 bg-[#2C7FFF]/10 ${isDarkMode ? 'text-white' : 'text-[#03045E]'} text-[10px] sm:text-xs font-bold rounded-full border border-[#2C7FFF]/20`}
+                              className={`suggestion-btn px-3 py-1.5 bg-[#2C7FFF]/10 ${isDarkMode ? 'text-white' : 'text-[#03045E]'} text-[10px] sm:text-xs font-bold rounded-md border border-[#2C7FFF]/20`}
                               title={`Click to add ${suggestion}`}
                               aria-label={`Add suggested accommodation ${suggestion}`}
                             >
@@ -911,13 +918,13 @@ export default function ApplicantRegister() {
               </fieldset>
 
               <fieldset className="flex flex-col gap-3">
-                <legend className="text-xs sm:text-sm font-bold text-[#03045E]">Your Skills <span className="text-[#03045E]">*</span></legend>
+                <legend tabIndex="0" title="Your Skills" className="text-xs sm:text-sm font-bold text-[#03045E] focus:outline-none">Your Skills <span className="text-[#03045E]">*</span></legend>
 
                 {selectedSkills.length > 0 && (
-                  <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                  <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
                     <span className="w-full text-xs font-bold text-gray-500 uppercase tracking-wider">Selected Skills:</span>
                     {selectedSkills.map(skill => (
-                      <span key={skill} className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#03045E]/15 text-[#03045E] text-[10px] sm:text-xs font-bold rounded-full shadow-sm border border-[#03045E]/30">
+                      <span key={skill} className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#03045E]/15 text-[#03045E] text-[10px] sm:text-xs font-bold rounded-md shadow-sm border border-[#03045E]/30">
                         {skill}
                         <button 
                           type="button" 
@@ -939,7 +946,7 @@ export default function ApplicantRegister() {
                       type="button"
                       key={skill}
                       onClick={() => toggleSelection(skill, selectedSkills, setSelectedSkills)}
-                      className={`px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold border transition ${
+                      className={`px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold border transition ${
                         selectedSkills.includes(skill)
                           ? 'bg-[#03045E] text-white border-[#03045E]'
                           : 'bg-white text-[#03045E] border-[#03045E]/30 hover:border-[#2C7FFF]'
@@ -954,7 +961,7 @@ export default function ApplicantRegister() {
                   <button
                     type="button"
                     onClick={() => setShowOtherSkill(!showOtherSkill)}
-                    className={`px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold border transition ${
+                    className={`px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold border transition ${
                       showOtherSkill
                         ? 'bg-[#03045E] text-white border-[#03045E]'
                         : 'bg-white text-[#03045E] border-[#03045E]/30 hover:border-[#2C7FFF]'
@@ -975,7 +982,7 @@ export default function ApplicantRegister() {
                       onChange={(e) => setOtherSkill(e.target.value)}
                       onKeyDown={handleCustomSkillKeyDown}
                       placeholder="Type custom skill and press Enter (or pick below)..."
-                      className="w-full p-3 border border-[#03045E]/20 rounded-xl bg-white text-[#03045E]"
+                      className="w-full p-3 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E]"
                       title="Type a custom professional skill and press Enter."
                       aria-label="Custom skill input. Type a custom professional skill and press Enter to add it."
                     />
@@ -992,7 +999,7 @@ export default function ApplicantRegister() {
                                 toggleSelection(suggestion, selectedSkills, setSelectedSkills);
                                 setOtherSkill(''); 
                               }}
-                              className={`suggestion-btn px-3 py-1.5 bg-[#2C7FFF]/10 ${isDarkMode ? 'text-white' : 'text-[#03045E]'} text-[10px] sm:text-xs font-bold rounded-full border border-[#2C7FFF]/20`}
+                              className={`suggestion-btn px-3 py-1.5 bg-[#2C7FFF]/10 ${isDarkMode ? 'text-white' : 'text-[#03045E]'} text-[10px] sm:text-xs font-bold rounded-md border border-[#2C7FFF]/20`}
                               title={`Click to add ${suggestion}`}
                               aria-label={`Add suggested skill ${suggestion}`}
                             >
@@ -1007,19 +1014,20 @@ export default function ApplicantRegister() {
 
               <hr aria-hidden="true" className="border-[#03045E]/10" />
 
-              <div className="p-4 rounded-2xl border-2 border-dashed border-[#03045E]/20 bg-[#f4f4f4]/50">
-                <label htmlFor="pwdId" className="block text-xs sm:text-sm font-bold text-[#03045E] mb-1">Upload PWD ID / Certificates <span className="text-[#03045E]">*</span></label>
+              <div className="p-4 rounded-md border-2 border-dashed border-[#03045E]/20 bg-[#f4f4f4]/50">
+                <label htmlFor="pwdId" tabIndex="0" title="Upload PWD ID / Certificates" className="block text-xs sm:text-sm font-bold text-[#03045E] mb-1 focus:outline-none">Upload PWD ID / Certificates <span className="text-[#03045E]">*</span></label>
                 <input
                   id="pwdId"
                   type="file"
                   accept=".jpg,.jpeg"
                   onChange={(e) => setPwdFile(e.target.files[0])}
-                  className={`w-full text-xs sm:text-sm ${isAccessibilityMode ? 'text-black' : isContrast || isDarkMode ? 'text-black' : 'text-[#03045E]'} file:mr-4 file:py-2 file:px-4 file:rounded-[10px] file:border-2 file:border-[#03045E]/30 file:bg-white ${isAccessibilityMode ? 'file:text-black' : isContrast || isDarkMode ? 'file:text-black' : 'file:text-[#03045E]'} file:font-semibold cursor-pointer`}
+                  className={`w-full text-xs sm:text-sm ${isAccessibilityMode ? 'text-black' : isContrast || isDarkMode ? 'text-black' : 'text-[#03045E]'} file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-2 file:border-[#03045E]/30 file:bg-white ${isAccessibilityMode ? 'file:text-black' : isContrast || isDarkMode ? 'file:text-black' : 'file:text-[#03045E]'} file:font-semibold cursor-pointer`}
+                  style={{ color: primaryColor }}
                   required
                   title="Please upload a clear image of your PWD ID. Max size 5MB."
                   aria-label="PWD ID document upload. Please upload a clear image of your PWD ID. Max size 5 Megabytes."
                 />
-                <p className="text-[10px] sm:text-xs text-[#03045E]/70 mt-2 font-semibold">
+                <p tabIndex="0" title="Supported formats: .jpg, .jpeg (Max size: 5MB)" className="text-[10px] sm:text-xs text-[#03045E] mt-2 font-semibold focus:outline-none">
                   Supported formats: .jpg, .jpeg (Max size: 5MB)
                 </p>
               </div>
@@ -1035,7 +1043,7 @@ export default function ApplicantRegister() {
                     title="Check this box to agree to the Terms and Conditions."
                     aria-label="Terms and Conditions agreement checkbox. Check to agree."
                   />
-                  <span className="text-[10px] sm:text-xs font-bold text-[#03045E] leading-tight">
+                  <span tabIndex="0" title="I have read and agree to the ABLEWORK Terms and Conditions." className="text-[10px] sm:text-xs font-bold text-[#03045E] leading-tight focus:outline-none">
                     I have read and agree to the <Link to="/terms" target="_blank" className="text-[#2C7FFF] underline hover:text-[#03045E]" aria-label="Open ABLEWORK Terms and Conditions in a new tab">ABLEWORK Terms and Conditions</Link>.
                   </span>
                 </label>
@@ -1050,7 +1058,7 @@ export default function ApplicantRegister() {
                     title="Check this box to agree to the Privacy Policy."
                     aria-label="Privacy Policy agreement checkbox. Check to agree."
                   />
-                  <span className="text-[10px] sm:text-xs font-bold text-[#03045E] leading-tight">
+                  <span tabIndex="0" title="I have read and understood the ABLEWORK Privacy Policy and consent to the collection and processing of my personal information for employment assistance purposes." className="text-[10px] sm:text-xs font-bold text-[#03045E] leading-tight focus:outline-none">
                     I have read and understood the <Link to="/policy" target="_blank" className="text-[#2C7FFF] underline hover:text-[#03045E]" aria-label="Open ABLEWORK Privacy Policy in a new tab">ABLEWORK Privacy Policy</Link> and consent to the collection and processing of my personal information for employment assistance purposes.
                   </span>
                 </label>
@@ -1060,7 +1068,7 @@ export default function ApplicantRegister() {
                 <div
                   role="alert"
                   aria-live="assertive"
-                  className={`p-4 rounded-xl font-bold text-center border-2 ${
+                  className={`p-4 rounded-md font-bold text-center border-2 ${
                     statusMessage.type === 'success'
                       ? 'bg-green-100 text-green-800 border-green-400'
                       : isDarkMode
@@ -1075,7 +1083,7 @@ export default function ApplicantRegister() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`submit-register-btn mt-1 py-3 sm:py-3.5 bg-[#03045E] hover:bg-[#2C7FFF] ${isAccessibilityDarkMode ? '!text-black' : isAccessibilityMode ? '!text-white' : isDarkMode ? '!text-black' : 'text-white'} text-sm sm:text-base font-semibold rounded-full shadow-md transition disabled:opacity-50`}
+                className={`submit-register-btn mt-1 py-3 sm:py-3.5 bg-[#03045E] hover:bg-[#2C7FFF] ${isAccessibilityDarkMode ? '!text-black' : isAccessibilityMode ? '!text-white' : isDarkMode ? '!text-black' : 'text-white'} text-sm sm:text-base font-semibold rounded-lg shadow-md transition disabled:opacity-50`}
                 title="Submit your registration"
                 aria-label="Complete Registration button. Click to submit your profile."
               >
@@ -1103,7 +1111,7 @@ export default function ApplicantRegister() {
           aria-live="assertive"
           tabIndex="-1"
         >
-          <div className={`relative w-full max-w-md rounded-2xl sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${(isContrast || isDarkMode) ? 'bg-black border-2 border-white' : 'bg-white border-2 border-[#2C7FFF]'}`}>
+          <div className={`relative w-full max-w-md rounded-lg sm:rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${(isContrast || isDarkMode) ? 'bg-black border-2 border-white' : 'bg-white border-2 border-[#2C7FFF]'}`}>
             <div aria-hidden="true" className="h-2 w-full bg-[#2C7FFF]" />
 
             <div className="relative px-5 pt-8 pb-6 sm:px-8 sm:pt-10 sm:pb-8 flex flex-col items-center text-center">
