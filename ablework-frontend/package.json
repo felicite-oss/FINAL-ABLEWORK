@@ -10,10 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@scragg0x/react-google-autocomplete": "^3.2.1",
     "@tailwindcss/vite": "^4.3.3",
     "leaflet": "^1.9.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "react-google-autocomplete": "^2.7.5",
     "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.18.2",
     "recharts": "^3.10.1"

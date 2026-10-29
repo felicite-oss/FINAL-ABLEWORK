@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Circle, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -10,6 +10,7 @@ import darkLogo from '../assets/DARK MODE.png';
 import backgroundImg from '../assets/BG.png';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
 let DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow,
@@ -60,9 +61,11 @@ export default function ApplicantRegister() {
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const typingTimer = useRef(null);
 
   const toggleSelection = (item, selectedArray, setSelectedArray) => {
     if (selectedArray.includes(item)) {
@@ -194,6 +197,53 @@ export default function ApplicantRegister() {
         setIsDetecting(false);
       }
     );
+  };
+
+const handleAddressType = (e) => {
+    const text = e.target.value;
+    setAddress(text);
+
+    if (text.length < 3) {
+      setSuggestions([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    if (typingTimer.current) {
+      clearTimeout(typingTimer.current);
+    }
+
+    typingTimer.current = setTimeout(async () => {
+      try {
+        const query = encodeURIComponent(text);
+        const mapboxToken = import.meta.env.VITE_MAPBOX_API_KEY;
+        const res = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json?country=ph&autocomplete=true&limit=5&access_token=${mapboxToken}`);
+        const data = await res.json();
+        
+        if (data.features && data.features.length > 0) {
+          setSuggestions(data.features);
+          setShowDropdown(true);
+        } else {
+          setSuggestions([]);
+          setShowDropdown(false);
+        }
+      } catch (error) {
+        console.error("Error fetching Mapbox suggestions:", error);
+      }
+    }, 400); // Slightly faster 400ms delay since Mapbox can handle it
+  };
+
+  const handleSelectSuggestion = (place) => {
+    // Mapbox provides a beautifully formatted string automatically
+    setAddress(place.place_name); 
+    
+    // Mapbox returns coordinates as [longitude, latitude]
+    if (place.center) {
+      setLng(place.center[0]);
+      setLat(place.center[1]);
+    }
+    
+    setShowDropdown(false);
   };
 
   const handleSubmit = async (e) => {
@@ -549,6 +599,7 @@ export default function ApplicantRegister() {
                     aria-label="Email Address. Please enter a valid email address for your account."
                   />
                 </div>
+
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="password" tabIndex="0" title="Password" className="text-xs sm:text-sm font-semibold text-[#03045E] focus:outline-none">Password <span className="text-[#03045E]">*</span></label>
                   <div className="relative">
@@ -559,9 +610,10 @@ export default function ApplicantRegister() {
                       onChange={(e) => setPassword(e.target.value)} 
                       placeholder="Enter your Password" 
                       required 
-                      className="w-full p-3 pr-12 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" 
-                      title="Please create a secure password with at least 6 characters."
-                      aria-label="Password. Please create a secure password with at least 6 characters."
+                      // Turns the border red instantly if they start typing and the format is wrong
+                      className={`w-full p-3 pr-12 border rounded-lg bg-white text-[#03045E] focus:outline-none transition ${password.length > 0 && !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password) ? 'border-red-500 focus:border-red-500' : 'border-[#03045E]/20 focus:border-[#2C7FFF]'}`} 
+                      title="Please create a secure password with at least 8 characters."
+                      aria-label="Password. Please create a secure password with at least 8 characters."
                     />
                     <button
                       type="button"
@@ -581,7 +633,14 @@ export default function ApplicantRegister() {
                       )}
                     </button>
                   </div>
+                  {/* Real-time inline error message that disappears once the format is correct */}
+                  {password.length > 0 && !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password) && (
+                    <p className="text-xs text-red-500 font-semibold mt-1" aria-live="polite">
+                      Must be 8+ chars and include an uppercase letter, lowercase letter, number, and special character.
+                    </p>
+                  )}
                 </div>
+
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="confirmPassword" tabIndex="0" title="Confirm Password" className="text-xs sm:text-sm font-semibold text-[#03045E] focus:outline-none">Confirm Password <span className="text-[#03045E]">*</span></label>
                   <div className="relative">
@@ -592,7 +651,7 @@ export default function ApplicantRegister() {
                       onChange={(e) => setConfirmPassword(e.target.value)} 
                       placeholder="Confirm your Password" 
                       required 
-                      className="w-full p-3 pr-12 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition" 
+                      className={`w-full p-3 pr-12 border rounded-lg bg-white text-[#03045E] focus:outline-none transition ${confirmPassword.length > 0 && password !== confirmPassword ? 'border-red-500 focus:border-red-500' : 'border-[#03045E]/20 focus:border-[#2C7FFF]'}`} 
                       title="Please re-enter your password to confirm it matches."
                       aria-label="Confirm Password. Please re-enter your password to confirm it matches."
                     />
@@ -614,7 +673,14 @@ export default function ApplicantRegister() {
                       )}
                     </button>
                   </div>
+                  {/* Real-time inline error message for mismatched passwords */}
+                  {confirmPassword.length > 0 && password !== confirmPassword && (
+                    <p className="text-xs text-red-500 font-semibold mt-1" aria-live="polite">
+                      Passwords do not match.
+                    </p>
+                  )}
                 </div>
+                
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="birthdate" tabIndex="0" title="Birthdate (Must be 18+)" className="text-xs sm:text-sm font-semibold text-[#03045E] focus:outline-none">Birthdate (Must be 18+) <span className="text-[#03045E]">*</span></label>
                   <div className="relative">
@@ -670,17 +736,47 @@ export default function ApplicantRegister() {
                   </svg>
                   <span className={`${isAccessibilityDarkMode ? '!text-black' : isAccessibilityMode ? '!text-white' : isDarkMode ? '!text-black' : 'text-white'}`}>{isDetecting ? 'Detecting Location...' : 'Detect My Location'}</span>
                 </button>
-                <input 
-                  id="address" 
-                  type="text" 
-                  value={address} 
-                  onChange={(e) => setAddress(e.target.value)} 
-                  placeholder="Enter your Residential Address (e.g. Block 4, Main Street, Manila)" 
-                  required 
-                  className="w-full p-3 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E]" 
-                  title="Please enter your full residential address or use the detect location button."
-                  aria-label="Residential Address. Please enter your full residential address or use the detect location button."
-                />
+
+              
+                <div className="relative flex flex-col gap-1.5 w-full">
+                  <div className="relative w-full mt-2">
+                    <input
+                      id="address"
+                      type="text"
+                      value={address}
+                      onChange={handleAddressType}
+                      placeholder="Enter your Address (e.g. Bacolod City)"
+                      required
+                      aria-label="Address autocomplete"
+                      aria-autocomplete="list"
+                      aria-controls="address-suggestions"
+                      aria-expanded={showDropdown && suggestions.length > 0}
+                      role="combobox"
+                      className="w-full p-3 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
+                    />
+
+                    {showDropdown && suggestions.length > 0 && (
+                      <ul
+                        id="address-suggestions"
+                        role="listbox"
+                        aria-label="Address suggestions list"
+                        className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+                      >
+                        {suggestions.map((place, index) => (
+                          <li
+                            key={index}
+                            role="option"
+                            aria-selected="false"
+                            onClick={() => handleSelectSuggestion(place)}
+                            className="p-3 cursor-pointer hover:bg-gray-100 text-[#03045E] text-sm border-b last:border-b-0"
+                          >
+                            {place.place_name}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
 
                 <div className="mt-4 flex flex-col gap-2">
                   <div className="flex justify-between items-center">
