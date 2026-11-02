@@ -33,6 +33,11 @@ export default function ApplicantDashboard() {
   const [selectedJobFromMap, setSelectedJobFromMap] = useState(null);
   const [isOpen, setIsOpen] = useState(false); 
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false); 
+  const [settingsAuthOpen, setSettingsAuthOpen] = useState(false);
+  const [authPassword, setAuthPassword] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [isAuthVerifying, setIsAuthVerifying] = useState(false);
+  const [showAuthPassword, setShowAuthPassword] = useState(false);
   const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false); 
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -46,6 +51,31 @@ export default function ApplicantDashboard() {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSettingsAuth = async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    setIsAuthVerifying(true);
+    try {
+      const res = await fetch(`http://localhost:5001/api/users/${profile.user_id}/verify-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: authPassword })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSettingsAuthOpen(false);
+        setAuthPassword('');
+        handleTabChange('settings');
+      } else {
+        setAuthError(data.message || 'Incorrect password.');
+      }
+    } catch (err) {
+      setAuthError('Server connection error.');
+    } finally {
+      setIsAuthVerifying(false);
+    }
   };
 
   const [profile, setProfile] = useState(() => {
@@ -66,6 +96,7 @@ export default function ApplicantDashboard() {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setProfileDropdownOpen(false);
+        setSettingsAuthOpen(false);
       }
       if (notifRef.current && !notifRef.current.contains(event.target)) {
         setNotificationDropdownOpen(false);
@@ -85,13 +116,13 @@ export default function ApplicantDashboard() {
   }, [notificationDropdownOpen]);
 
   useEffect(() => {
-    if (profileDropdownOpen && profilePanelRef.current) {
+    if ((profileDropdownOpen || settingsAuthOpen) && profilePanelRef.current) {
       const timer = setTimeout(() => {
         profilePanelRef.current.focus();
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [profileDropdownOpen]);
+  }, [profileDropdownOpen, settingsAuthOpen]);
 
   useEffect(() => {
     if (showLogoutConfirm && logoutPanelRef.current) {
@@ -226,7 +257,7 @@ export default function ApplicantDashboard() {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col selection:bg-[#2C7FFF] selection:text-white relative overflow-x-hidden w-full max-w-[100vw] ${(isContrast || isDarkMode) ? 'bg-black text-white' : 'bg-[#f4f4f4] text-[#03045E]'}`}>
+ <div className={`min-h-screen flex flex-col w-full overflow-x-hidden selection:bg-[#2C7FFF] selection:text-white ${(isContrast || isDarkMode) ? 'bg-black text-white' : 'bg-[#f4f4f4] text-[#03045E]'}`}>
       
       {isLoading && (
         <div
@@ -267,7 +298,7 @@ export default function ApplicantDashboard() {
               <div className="relative mb-3 sm:mb-5">
                 <div className={`w-14 h-14 sm:w-24 sm:h-24 rounded-full flex items-center justify-center ${(isContrast || isDarkMode) ? 'bg-transparent border-4 border-white' : 'bg-transparent border-4 border-[#2C7FFF]'}`}>
                   <svg className={`w-7 h-7 sm:w-12 sm:h-12 animate-spin ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
                   </svg>
                 </div>
                 <div className={`absolute -top-1 -right-1 w-4 h-4 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[9px] sm:text-xs font-bold ${(isContrast || isDarkMode) ? 'bg-white text-black' : 'bg-[#03045E] text-white'}`}>✓</div>
@@ -338,8 +369,8 @@ export default function ApplicantDashboard() {
                 <button
                   onClick={() => setShowLogoutConfirm(false)}
                   aria-label="Cancel logout and stay on page"
-                  className="flex-1 py-2.5 sm:py-4 rounded-lg sm:rounded-xl font-black text-[11px] sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 focus:outline-none"
-                  style={{ color: '#16a34a', borderColor: '#16a34a' }}
+                  className="flex-1 py-2.5 sm:py-4 rounded-lg sm:rounded-xl font-black text-[2px] sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-1 focus:outline-none"
+                  style={{ color: '#4c4d5b', borderColor: '#4c4d5b' }}
                 >
                   No, Stay
                 </button>
@@ -358,8 +389,8 @@ export default function ApplicantDashboard() {
       )}
 
       {/* HEADER */}
-      <header role="banner" className={`w-full border-b-2 fixed top-0 left-0 z-50 transition-all duration-300 shadow-sm ${isContrast ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/15'}`}>
-        <div className="w-full h-14 sm:h-16 pl-3 pr-3 sm:pl-4 sm:pr-4 md:pr-8 flex items-center justify-between max-w-[1700px] mx-auto box-border">
+     <header role="banner" className={`w-full fixed top-0 left-0 z-50 ${isContrast ? 'bg-black border-b-2 border-[#2C7FFF]' : 'bg-white border-b border-[#03045E]/15'}`}>
+       <div className="w-full h-14 sm:h-16 pl-3 pr-3 sm:pl-4 sm:pr-4 md:pr-8 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-3 md:gap-6 min-w-0">
             <div className="flex items-center flex-shrink-0 py-1">
               <img
@@ -492,8 +523,11 @@ export default function ApplicantDashboard() {
 
             <div className="hidden md:block relative" ref={dropdownRef}>
               <button
-                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                aria-expanded={profileDropdownOpen}
+                onClick={() => {
+                  setProfileDropdownOpen(!profileDropdownOpen);
+                  if (settingsAuthOpen) setSettingsAuthOpen(false);
+                }}
+                aria-expanded={profileDropdownOpen || settingsAuthOpen}
                 aria-haspopup="true"
                 aria-label={`Profile Menu for ${profile?.firstname || profile?.full_name || 'User'}`}
                 className={`w-10 h-10 rounded-full overflow-hidden border-2 transition-all duration-200 cursor-pointer shadow-sm hover:border-[#2C7FFF] flex items-center justify-center shrink-0 p-0 focus:outline-none ${
@@ -514,115 +548,175 @@ export default function ApplicantDashboard() {
                 )}
               </button>
 
-              {profileDropdownOpen && (
+              {(profileDropdownOpen || settingsAuthOpen) && (
                 <div 
                   ref={profilePanelRef}
                   tabIndex={-1}
                   role="region" 
-                  aria-label={`Profile menu panel. Logged in as ${profile?.firstname || profile?.full_name || 'Applicant'}.`} 
+                  aria-label={settingsAuthOpen ? "Security Check" : `Profile menu panel. Logged in as ${profile?.firstname || profile?.full_name || 'Applicant'}.`} 
                   className={`absolute right-0 mt-3 w-72 rounded-xl sm:rounded-2xl shadow-[0_20px_50px_rgba(3,4,94,0.25)] border-2 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 focus:outline-none ${isContrast ? 'bg-black border-[#2C7FFF]/60' : 'bg-white border-[#03045E]/20'}`}>
-                  <div className={`relative p-4 pb-5 ${isContrast ? 'bg-black border-b border-[#2C7FFF]/30' : 'bg-[#f4f4f4] border-b border-[#03045E]/10'}`}>
-                    <div className="flex items-center gap-3.5">
-                      <div className="relative shrink-0">
-                        <div tabIndex="0" aria-label={`Profile picture of ${profile?.firstname || profile?.full_name || 'User'}`} className={`w-14 h-14 rounded-lg sm:rounded-xl overflow-hidden border-2 border-[#2C7FFF] shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2`}>
-                          {getHeaderImageSrc() ? (
-                            <img src={getHeaderImageSrc()} alt={`Profile picture of ${profile?.firstname || profile?.full_name || 'User'}`} className="w-full h-full object-cover" />
-                          ) : (
-                            <div aria-hidden="true" className={`w-full h-full flex items-center justify-center font-black text-lg ${isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white'}`}>
-                              {profile?.firstname?.[0] || profile?.full_name?.[0] || 'U'}
-                            </div>
-                          )}
+                  
+                  {settingsAuthOpen ? (
+                    <div className="p-5">
+                      <h3 className={`text-lg font-black mb-2 text-center ${isContrast || isDarkMode ? 'text-white' : 'text-[#03045E]'}`}>Security Check</h3>
+                      <p className={`text-xs text-center font-bold mb-4 ${isContrast || isDarkMode ? 'text-white/70' : 'text-[#03045E]/70'}`}>Please enter your password to access Settings.</p>
+                   {authError && (
+  <div className={`mb-3 p-2 rounded-lg text-xs text-center font-bold bg-transparent border-2 ${isContrast || isDarkMode ? 'text-red-500 border-red-500' : 'text-red-600 border-red-600'}`}>
+    {authError}
+  </div>
+)}
+                      <form onSubmit={handleSettingsAuth} className="flex flex-col gap-4">
+                        <div className="relative">
+                          <input
+                            type={showAuthPassword ? "text" : "password"}
+                            value={authPassword}
+                            onChange={(e) => setAuthPassword(e.target.value)}
+                            placeholder="Enter your password"
+                            required
+                            className={`w-full p-3 border-2 rounded-xl font-bold outline-none transition text-sm ${isContrast || isDarkMode ? 'bg-black border-white/30 text-white focus:border-white' : 'bg-[#f4f4f4] border-[#03045E]/20 text-[#03045E] focus:border-[#2C7FFF]'}`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowAuthPassword(!showAuthPassword)}
+                            className={`absolute right-3 top-1/2 -translate-y-1/2 ${isContrast || isDarkMode ? 'text-white/50 hover:text-white' : 'text-[#03045E]/50 hover:text-[#2C7FFF]'}`}
+                          >
+                            {showAuthPassword ? (
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            ) : (
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
+                            )}
+                          </button>
                         </div>
-                        <span aria-hidden="true" className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white shadow-md"></span>
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p tabIndex="0" aria-label="Welcome back" className={`text-[10px] font-black uppercase tracking-[0.15em] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit ${isContrast ? 'text-[#2C7FFF]' : 'text-[#2C7FFF]'}`}>Welcome back</p>
-                        <p tabIndex="0" aria-label={profile?.firstname ? `${profile.firstname} ${profile.lastname || ''}`.trim() : (profile?.full_name || 'Applicant')} className={`text-sm font-black truncate leading-tight mt-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit ${isContrast ? 'text-white' : 'text-[#03045E]'}`}>
-                          {profile?.firstname ? `${profile.firstname} ${profile.lastname || ''}`.trim() : (profile?.full_name || 'Applicant')}
-                        </p>
-                        <p tabIndex="0" aria-label={profile?.email || 'job.seeker@ablework.ph'} className={`text-[11px] font-semibold truncate mt-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit ${isContrast ? 'text-white/60' : 'text-[#03045E]/60'}`}>
-                          {profile?.email || 'job.seeker@ablework.ph'}
-                        </p>
-                      </div>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => { setSettingsAuthOpen(false); setAuthError(''); setAuthPassword(''); }}
+                            className={`flex-1 py-3 rounded-xl font-black text-xs uppercase tracking-wider border-2 transition-all cursor-pointer ${isContrast || isDarkMode ? 'bg-black text-white border-white/30 hover:bg-white/10' : 'bg-white text-[#03045E] border-[#03045E]/30 hover:bg-[#f4f4f4]'}`}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            disabled={isAuthVerifying}
+                            className={`flex-1 py-3 rounded-xl font-black text-xs uppercase tracking-wider border-2 transition-all cursor-pointer disabled:opacity-50 ${isContrast || isDarkMode ? 'bg-white text-black border-white hover:bg-white/90' : 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:bg-[#03045E]'}`}
+                          >
+                            {isAuthVerifying ? 'Verifying...' : 'Unlock'}
+                          </button>
+                        </div>
+                      </form>
                     </div>
-                  </div>
-
-                  <div className="p-2">
-                    <p tabIndex="0" aria-label="Account" className={`px-3 pt-1.5 pb-2 text-[10px] font-black uppercase tracking-[0.15em] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit ${isContrast ? 'text-white/50' : 'text-[#03045E]/50'}`}>Account</p>
-                    <button
-                      role="menuitem"
-                      onClick={() => { handleTabChange('profile'); setProfileDropdownOpen(false); }}
-                      aria-label="Edit Profile"
-                      aria-current={activeTab === 'profile' ? 'page' : undefined}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg sm:rounded-xl text-sm font-black transition-colors text-left cursor-pointer focus:outline-none ${
-                        activeTab === 'profile'
-                          ? (isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white')
-                          : (isContrast ? 'text-white' : 'text-[#03045E]')
-                      }`}
-                    >
-                      <div aria-hidden="true" className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                        activeTab === 'profile'
-                          ? (isContrast ? 'bg-white text-[#2C7FFF]' : 'bg-white text-[#03045E]')
-                          : (isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white')
-                      }`}>
-                        <svg aria-hidden="true" className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
+                  ) : (
+                    <>
+                      <div className={`relative p-4 pb-5 ${isContrast ? 'bg-black border-b border-[#2C7FFF]/30' : 'bg-[#f4f4f4] border-b border-[#03045E]/10'}`}>
+                        <div className="flex items-center gap-3.5">
+                          <div className="relative shrink-0">
+                            <div tabIndex="0" aria-label={`Profile picture of ${profile?.firstname || profile?.full_name || 'User'}`} className={`w-14 h-14 rounded-lg sm:rounded-xl overflow-hidden border-2 border-[#2C7FFF] shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2`}>
+                              {getHeaderImageSrc() ? (
+                                <img src={getHeaderImageSrc()} alt={`Profile picture of ${profile?.firstname || profile?.full_name || 'User'}`} className="w-full h-full object-cover" />
+                              ) : (
+                                <div aria-hidden="true" className={`w-full h-full flex items-center justify-center font-black text-lg ${isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white'}`}>
+                                  {profile?.firstname?.[0] || profile?.full_name?.[0] || 'U'}
+                                </div>
+                              )}
+                            </div>
+                            <span aria-hidden="true" className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white shadow-md"></span>
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p tabIndex="0" aria-label="Welcome back" className={`text-[10px] font-black uppercase tracking-[0.15em] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit ${isContrast ? 'text-[#2C7FFF]' : 'text-[#2C7FFF]'}`}>Welcome back</p>
+                            <p tabIndex="0" aria-label={profile?.firstname ? `${profile.firstname} ${profile.lastname || ''}`.trim() : (profile?.full_name || 'Applicant')} className={`text-sm font-black truncate leading-tight mt-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit ${isContrast ? 'text-white' : 'text-[#03045E]'}`}>
+                              {profile?.firstname ? `${profile.firstname} ${profile.lastname || ''}`.trim() : (profile?.full_name || 'Applicant')}
+                            </p>
+                            <p tabIndex="0" aria-label={profile?.email || 'job.seeker@ablework.ph'} className={`text-[11px] font-semibold truncate mt-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit ${isContrast ? 'text-white/60' : 'text-[#03045E]/60'}`}>
+                              {profile?.email || 'job.seeker@ablework.ph'}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0"><span className="truncate block">Edit Profile</span></div>
-                      {activeTab === 'profile' && <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${isContrast ? 'bg-[#2C7FFF]' : 'bg-white'}`}></span>}
-                    </button>
 
-                    <button
-                      role="menuitem"
-                      onClick={() => { handleTabChange('settings'); setProfileDropdownOpen(false); }}
-                      aria-label="Settings"
-                      aria-current={activeTab === 'settings' ? 'page' : undefined}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg sm:rounded-xl text-sm font-black transition-colors text-left cursor-pointer focus:outline-none ${
-                        activeTab === 'settings'
-                          ? (isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white')
-                          : (isContrast ? 'text-white' : 'text-[#03045E]')
-                      }`}
-                    >
-                      <div aria-hidden="true" className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                        activeTab === 'settings'
-                          ? (isContrast ? 'bg-white text-[#2C7FFF]' : 'bg-white text-[#03045E]')
-                          : (isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white')
-                      }`}>
-                        <svg aria-hidden="true" className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
+                      <div className="p-2">
+                        <p tabIndex="0" aria-label="Account" className={`px-3 pt-1.5 pb-2 text-[10px] font-black uppercase tracking-[0.15em] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit ${isContrast ? 'text-white/50' : 'text-[#03045E]/50'}`}>Account</p>
+                        <button
+                          role="menuitem"
+                          onClick={() => { handleTabChange('profile'); setProfileDropdownOpen(false); }}
+                          aria-label="Edit Profile"
+                          aria-current={activeTab === 'profile' ? 'page' : undefined}
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg sm:rounded-xl text-sm font-black transition-colors text-left cursor-pointer focus:outline-none ${
+                            activeTab === 'profile'
+                              ? (isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white')
+                              : (isContrast ? 'text-white' : 'text-[#03045E]')
+                          }`}
+                        >
+                          <div aria-hidden="true" className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                            activeTab === 'profile'
+                              ? (isContrast ? 'bg-white text-[#2C7FFF]' : 'bg-white text-[#03045E]')
+                              : (isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white')
+                          }`}>
+                            <svg aria-hidden="true" className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                          </div>
+                          <div className="flex-1 min-w-0"><span className="truncate block">Edit Profile</span></div>
+                          {activeTab === 'profile' && <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${isContrast ? 'bg-[#2C7FFF]' : 'bg-white'}`}></span>}
+                        </button>
+
+                        <button
+                          role="menuitem"
+                          onClick={() => { 
+                            setProfileDropdownOpen(false); 
+                            setSettingsAuthOpen(true); 
+                            setAuthPassword('');
+                            setAuthError('');
+                            setShowAuthPassword(false);
+                          }}
+                          aria-label="Settings"
+                          aria-current={activeTab === 'settings' ? 'page' : undefined}
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg sm:rounded-xl text-sm font-black transition-colors text-left cursor-pointer focus:outline-none ${
+                            activeTab === 'settings'
+                              ? (isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white')
+                              : (isContrast ? 'text-white' : 'text-[#03045E]')
+                          }`}
+                        >
+                          <div aria-hidden="true" className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                            activeTab === 'settings'
+                              ? (isContrast ? 'bg-white text-[#2C7FFF]' : 'bg-white text-[#03045E]')
+                              : (isContrast ? 'bg-[#2C7FFF] text-white' : 'bg-[#03045E] text-white')
+                          }`}>
+                            <svg aria-hidden="true" className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                          </div>
+                          <div className="flex-1 min-w-0"><span className="truncate block">Settings</span></div>
+                          {activeTab === 'settings' && <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${isContrast ? 'bg-[#2C7FFF]' : 'bg-white'}`}></span>}
+                        </button>
+
+                        <div aria-hidden="true" className={`h-px my-2 mx-2 ${isContrast ? 'bg-[#2C7FFF]/30' : 'bg-[#03045E]/10'}`}></div>
+
+                        <button
+                          role="menuitem"
+                          disabled={isLoggingOut}
+                          onClick={() => { setProfileDropdownOpen(false); setShowLogoutConfirm(true); }}
+                          style={{ color: '#DC2626' }}
+                          aria-label={isLoggingOut ? 'Logging out' : 'Log Out'}
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg sm:rounded-xl text-sm font-black transition-colors text-left cursor-pointer disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#DC2626] focus:ring-inset`}
+                        >
+                          <div aria-hidden="true" style={{ backgroundColor: '#FEE2E2', color: '#DC2626' }} className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0`}>
+                            {isLoggingOut ? (
+                              <svg aria-hidden="true" className="w-4 h-4 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                              </svg>
+                            ) : (
+                              <svg aria-hidden="true" className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                              </svg>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0"><span className="truncate block">{isLoggingOut ? 'Logging out...' : 'Log Out'}</span></div>
+                        </button>
                       </div>
-                      <div className="flex-1 min-w-0"><span className="truncate block">Settings</span></div>
-                      {activeTab === 'settings' && <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${isContrast ? 'bg-[#2C7FFF]' : 'bg-white'}`}></span>}
-                    </button>
-
-                    <div aria-hidden="true" className={`h-px my-2 mx-2 ${isContrast ? 'bg-[#2C7FFF]/30' : 'bg-[#03045E]/10'}`}></div>
-
-                    <button
-                      role="menuitem"
-                      disabled={isLoggingOut}
-                      onClick={() => { setProfileDropdownOpen(false); setShowLogoutConfirm(true); }}
-                      style={{ color: '#DC2626' }}
-                      aria-label={isLoggingOut ? 'Logging out' : 'Log Out'}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg sm:rounded-xl text-sm font-black transition-colors text-left cursor-pointer disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#DC2626] focus:ring-inset`}
-                    >
-                      <div aria-hidden="true" style={{ backgroundColor: '#FEE2E2', color: '#DC2626' }} className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0`}>
-                        {isLoggingOut ? (
-                          <svg aria-hidden="true" className="w-4 h-4 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                          </svg>
-                        ) : (
-                          <svg aria-hidden="true" className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
-                          </svg>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0"><span className="truncate block">{isLoggingOut ? 'Logging out...' : 'Log Out'}</span></div>
-                    </button>
-                  </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -799,7 +893,9 @@ export default function ApplicantDashboard() {
         aria-expanded={showDesktopSidebar}
         aria-controls="sidebar-navigation"
         title={showDesktopSidebar ? 'Hide navigation' : 'Show navigation'}
-        className={`hidden md:flex fixed top-[4.5rem] left-4 z-40 w-11 h-11 items-center justify-center rounded-lg border-2 shadow-md transition-all duration-200 cursor-pointer focus:outline-none ${
+        className={`hidden md:flex fixed top-[4.5rem] z-40 w-11 h-11 items-center justify-center rounded-lg border-2 shadow-md transition-all duration-300 cursor-pointer focus:outline-none ${
+          showDesktopSidebar ? 'left-4' : 'left-[1.125rem]'
+        } ${
           isContrast || isDarkMode
             ? 'bg-black text-white border-white'
             : 'bg-white text-[#03045E] border-[#03045E]/15'
@@ -815,86 +911,80 @@ export default function ApplicantDashboard() {
       </button>
 
       {/* MAIN CONTAINER - MATCHING ADMIN DASHBOARD STRUCTURE */}
-      <div className="flex flex-col w-full max-w-[1700px] mx-auto min-w-0 box-border pt-16 flex-1 transition-all duration-300">
-        <div className="flex flex-col md:flex-row flex-1 w-full min-w-0">
-          
-          <aside id="sidebar-navigation" className={`!hidden md:!flex shrink-0 flex-col z-10 ${(isContrast || isDarkMode) ? 'bg-black border-r-2 border-white/20' : 'bg-[#f4f4f4] border-r-2 border-[#f4f4f4]'} !w-72 fixed top-16 left-0 h-[calc(100vh-4rem)] shadow-[4px_0_24px_rgba(3,4,94,0.2)] overflow-y-auto focus:outline-none transition-transform duration-300 ease-in-out ${showDesktopSidebar ? 'translate-x-0' : '-translate-x-full'}`}>
-            <div className="w-full flex flex-col h-full min-w-0 focus:outline-none">
-              <nav className="flex-1 pl-4 pr-3 pt-15 pb-6 flex flex-col gap-3 focus:outline-none">
-                {[
-                  { id: 'overview', label: 'Overview', desc: 'Your snapshot', icon: (
-                    <svg aria-hidden="true" className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                  )},
-                  { id: 'explore-jobs', label: 'Explore Jobs', desc: 'Browse openings', icon: (
-                    <svg aria-hidden="true" className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                  )},
-                  { id: 'tracker', label: 'Job Tracker', desc: 'Your progress', icon: (
-                    <svg aria-hidden="true" className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+          <div className={`flex flex-col md:flex-row flex-1 min-h-screen pt-10 transition-all duration-300 ${(isContrast || isDarkMode) ? 'bg-black' : ''}`}>
+        
+        <aside id="sidebar-navigation" role="complementary" aria-label="Sidebar navigation" className={`hidden md:flex flex-col z-10 border-r-2 pt-16 pb-4 justify-between shadow-sm flex-shrink-0 fixed top-16 left-0 h-[calc(100vh-4rem)] overflow-y-auto overflow-x-hidden focus:outline-none transition-all duration-300 ease-in-out ${(isContrast || isDarkMode) ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/15'} ${showDesktopSidebar ? 'w-72 px-4' : 'w-20 px-2'}`}>
+          <nav className="flex flex-col space-y-3 w-full" aria-label="Sidebar navigation links">
+            {[
+              { id: 'overview', label: 'Overview', desc: 'Your snapshot', icon: (
+                <svg aria-hidden="true" className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+              )},
+              { id: 'explore-jobs', label: 'Explore Jobs', desc: 'Browse openings', icon: (
+                <svg aria-hidden="true" className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              )},
+              { id: 'tracker', label: 'Job Tracker', desc: 'Your progress', icon: (
+                <svg aria-hidden="true" className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+              )}
+            ].map((item) => {
+              const isActive = activeTab === item.id;
+              return (
+                <button 
+                  key={item.id} 
+                  onClick={() => handleTabChange(item.id)} 
+                  aria-label={`${item.label}. ${item.desc}`}
+                  title={!showDesktopSidebar ? item.label : undefined}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`relative flex items-center py-3.5 rounded-lg font-extrabold transition-all duration-300 ease-in-out capitalize cursor-pointer border-2 group overflow-hidden focus:outline-none w-full ${
+                    showDesktopSidebar ? 'justify-start pl-4 pr-3.5' : 'justify-center px-0'
+                  } ${
+                    isActive
+                      ? 'bg-white text-[#03045E] border-[#03045E] shadow-md'
+                      : 'bg-white text-[#03045E] border-[#03045E]/25'
+                  }`}
+                >
+                  {isActive && (
+                    <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E] transition-all duration-300"></span>
                   )}
-                ].map((item) => {
-                  const isActive = activeTab === item.id;
-                  return (
-                    <button 
-                      key={item.id} 
-                      onClick={() => handleTabChange(item.id)} 
-                      aria-label={`${item.label}. ${item.desc}`}
-                      aria-current={isActive ? 'page' : undefined}
-                      className={`relative flex items-center gap-3.5 text-left pl-4 pr-3.5 py-3.5 rounded-lg font-extrabold transition-all duration-300 capitalize cursor-pointer border-2 group overflow-hidden focus:outline-none ${
-                        isActive
-                          ? 'bg-white text-[#03045E] border-[#03045E] shadow-md'
-                          : 'bg-white text-[#03045E] border-[#03045E]/25'
-                      }`}
-                    >
-                      {isActive && (
-                        <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>
-                      )}
-                      <div 
-                        aria-hidden="true"
-                        className={`p-2.5 rounded-lg transition-all duration-300 shrink-0 flex items-center justify-center border-2 ${
-                          isActive
-                            ? 'bg-[#03045E] text-white border-[#03045E]'
-                            : 'bg-[#03045E] text-white border-[#03045E]'
-                        }`}
-                      >
-                        {item.icon}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <span className={`text-[15px] tracking-wide font-black truncate block leading-tight ${
-                          isActive ? 'text-[#03045E]' : 'text-[#03045E]'
-                        }`}>{item.label}</span>
-                        <span 
-                          className={`text-[10px] font-bold uppercase tracking-widest block mt-0.5 truncate ${
-                            isActive
-                              ? 'text-[#03045E]/85'
-                              : 'text-[#03045E]/70'
-                          }`}
-                        >
-                          {item.desc}
-                        </span>
-                      </div>
-                      <svg 
-                        aria-hidden="true"
-                        className={`w-4 h-4 shrink-0 transition-transform duration-300 ${
-                          isActive
-                            ? 'text-[#03045E]'
-                            : 'text-[#03045E]'
-                        }`}
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2.5" 
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
-                  );
-                })}
-              </nav>
-            </div>
-          </aside>
+                  <div 
+                    aria-hidden="true"
+                    className={`p-2.5 rounded-lg transition-all duration-300 shrink-0 flex items-center justify-center border-2 ${
+                      isActive
+                        ? 'bg-[#03045E] text-white border-[#03045E]'
+                        : 'bg-[#03045E] text-white border-[#03045E]'
+                    }`}
+                  >
+                    {item.icon}
+                  </div>
+                  <div className={`flex flex-col text-left transition-all duration-300 ease-in-out overflow-hidden whitespace-nowrap ${
+                    showDesktopSidebar ? 'opacity-100 max-w-[150px] ml-3.5 flex-1' : 'opacity-0 max-w-0 ml-0 flex-none'
+                  }`}>
+                    <span className={`text-[15px] tracking-wide font-black truncate block leading-tight text-[#03045E]`}>{item.label}</span>
+                    <span className={`text-[10px] font-bold uppercase tracking-widest block mt-0.5 truncate text-[#03045E]/70`}>
+                      {item.desc}
+                    </span>
+                  </div>
+                  <svg 
+                    aria-hidden="true"
+                    className={`shrink-0 transition-all duration-300 ease-in-out text-[#03045E] ${
+                      showDesktopSidebar ? 'w-4 h-4 opacity-100 ml-2' : 'w-0 h-0 opacity-0 ml-0'
+                    }`}
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2.5" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              );
+            })}
+          </nav>
+        </aside>
 
-          <main className={`!flex-1 px-3 sm:px-4 md:px-5 pb-3 sm:pb-4 md:pb-5 pt-0 relative w-full min-w-0 transition-all duration-300 flex flex-col box-border focus:outline-none ${showDesktopSidebar ? 'md:ml-72' : 'md:ml-0'} ${(isContrast || isDarkMode) ? 'bg-black' : ''}`}>
-            <div className="flex flex-col gap-6 animate-in fade-in duration-300 mt-12">
+        <main role="main" aria-label="Dashboard content area" className={`flex-1 p-3 pt-6 sm:p-6 sm:pt-10 md:p-10 md:pt-14 relative min-w-0 transition-all duration-300 ease-in-out flex flex-col box-border ${showDesktopSidebar ? 'md:ml-72' : 'md:ml-20'} ${(isContrast || isDarkMode) ? 'bg-black' : ''}`}>
+          <div className="flex items-start gap-4 w-full min-w-0">
+            <div className="w-full flex-1 min-w-0 overflow-x-hidden">
+              
               {isRejected && (
                 <div 
                   role="alert"
@@ -982,6 +1072,7 @@ export default function ApplicantDashboard() {
                 <ApplicantExploreJobs 
                 profile={profile} 
                 jobs={matches} 
+                applications={applications}
                 refreshData={refreshData} 
                 initialSelectedJob={selectedJobFromMap}
                 clearJobFromMap={() => setSelectedJobFromMap(null)}/>
@@ -1011,11 +1102,11 @@ export default function ApplicantDashboard() {
                 <ApplicantContact onBack={() => handleTabChange('overview')} />
               )}
             </div>
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
 
-      <div className={`transition-all duration-300 ${showDesktopSidebar ? 'md:ml-72' : 'md:ml-0'}`}>
+      <div className={`transition-all duration-300 ease-in-out ${showDesktopSidebar ? 'md:ml-72' : 'md:ml-20'}`}>
         <ApplicantFooter activeTab={activeTab} setActiveTab={handleTabChange} isContrast={isContrast} />
       </div>
     </div>

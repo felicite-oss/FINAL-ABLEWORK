@@ -26,7 +26,12 @@ export default function EmployerDashboard() {
   const [stats, setStats] = useState({ activeJobs: 0, pendingApps: 0, shortlistedApps: 0, recentActivity: [] });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [settingsAuthOpen, setSettingsAuthOpen] = useState(false);
+  const [authPassword, setAuthPassword] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [isAuthVerifying, setIsAuthVerifying] = useState(false);
+  const [showAuthPassword, setShowAuthPassword] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showDesktopSidebar, setShowDesktopSidebar] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -37,16 +42,42 @@ export default function EmployerDashboard() {
   const notifRef = useRef(null);
   const notifPanelRef = useRef(null);
   const profilePanelRef = useRef(null);
-
-  const handleTabChange = (tab) => {
+  const logoutPanelRef = useRef(null);
+    const handleTabChange = (tab) => {
     setActiveTab(tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  useEffect(() => {
+  const handleSettingsAuth = async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    setIsAuthVerifying(true);
+    try {
+      const res = await fetch(`http://localhost:5001/api/users/${profile.user_id}/verify-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: authPassword })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSettingsAuthOpen(false);
+        setAuthPassword('');
+        handleTabChange('settings');
+      } else {
+        setAuthError(data.message || 'Incorrect password.');
+      }
+    } catch (err) {
+      setAuthError('Server connection error.');
+    } finally {
+      setIsAuthVerifying(false);
+    }
+  };
+
+   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowProfileDropdown(false);
+        setSettingsAuthOpen(false);
       }
       if (notifRef.current && !notifRef.current.contains(event.target)) {
         setNotificationDropdownOpen(false);
@@ -172,7 +203,7 @@ export default function EmployerDashboard() {
   return (
     <div className={`min-h-screen flex flex-col w-full overflow-x-hidden ${dark ? 'bg-black text-white' : 'bg-[#f4f4f4] text-[#03045E]'}`}>
       
-      {isLoggingOut && (
+       {isLoggingOut && (
         <div
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
@@ -188,8 +219,8 @@ export default function EmployerDashboard() {
             <div className="relative px-4 pt-6 pb-5 sm:px-8 sm:pt-10 sm:pb-8 flex flex-col items-center text-center">
               <div className="relative mb-3 sm:mb-5">
                 <div className={`w-14 h-14 sm:w-24 sm:h-24 rounded-full flex items-center justify-center ${(isContrast || isDarkMode) ? 'bg-transparent border-4 border-white' : 'bg-transparent border-4 border-[#2C7FFF]'}`}>
-                  <svg className={`w-7 h-7 sm:w-12 sm:h-12 animate-spin ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  <svg className={`w-7 h-7 sm:w-12 sm:h-12 animate-spin ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
                   </svg>
                 </div>
                 <div className={`absolute -top-1 -right-1 w-4 h-4 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[9px] sm:text-xs font-bold ${(isContrast || isDarkMode) ? 'bg-white text-black' : 'bg-[#03045E] text-white'}`}>✓</div>
@@ -217,7 +248,7 @@ export default function EmployerDashboard() {
         </div>
       )}
 
-      {showLogoutConfirm && (
+         {showLogoutConfirm && (
         <div
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
@@ -227,44 +258,48 @@ export default function EmployerDashboard() {
           aria-describedby="logout-desc"
           tabIndex="-1"
         >
-          <div className={`relative w-full max-w-md rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${(isContrast || isDarkMode) ? 'bg-black border-2 border-white' : 'bg-white border-2 border-[#2C7FFF]'}`}>
+          <div
+            ref={logoutPanelRef}
+            tabIndex={-1}
+            className={`relative w-full max-w-md rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 focus:outline-none ${(isContrast || isDarkMode) ? 'bg-black border-2 border-white' : 'bg-white border-2 border-[#2C7FFF]'}`}
+          >
             <div className="h-1.5 sm:h-2 w-full bg-[#2C7FFF]" />
 
             <div className="relative px-4 pt-6 pb-5 sm:px-8 sm:pt-10 sm:pb-8 flex flex-col items-center text-center">
               <div className="relative mb-3 sm:mb-5">
                 <div className={`w-14 h-14 sm:w-24 sm:h-24 rounded-full flex items-center justify-center ${(isContrast || isDarkMode) ? 'bg-transparent border-4 border-white' : 'bg-transparent border-4 border-[#2C7FFF]'}`}>
-                  <svg className={`w-7 h-7 sm:w-12 sm:h-12 ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg className={`w-7 h-7 sm:w-12 sm:h-12 ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
                   </svg>
                 </div>
                 <div className={`absolute -top-1 -right-1 w-4 h-4 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[9px] sm:text-xs font-bold ${(isContrast || isDarkMode) ? 'bg-white text-black' : 'bg-[#03045E] text-white'}`}>!</div>
               </div>
 
-              <span className={`inline-flex items-center gap-1 sm:gap-1.5 px-2.5 py-0.5 sm:px-4 sm:py-1.5 rounded-full text-[8px] sm:text-[10px] font-black uppercase tracking-widest mb-2.5 sm:mb-4 border-2 ${(isContrast || isDarkMode) ? 'text-white bg-transparent border-white' : 'text-[#2C7FFF] bg-transparent border-[#2C7FFF]'}`}>
+              <span tabIndex="0" className={`inline-flex items-center gap-1 sm:gap-1.5 px-2.5 py-0.5 sm:px-4 sm:py-1.5 rounded-full text-[8px] sm:text-[10px] font-black uppercase tracking-widest mb-2.5 sm:mb-4 border-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 ${(isContrast || isDarkMode) ? 'text-white bg-transparent border-white' : 'text-[#2C7FFF] bg-transparent border-[#2C7FFF]'}`}>
                 <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-[#10B981]"></span>
                 Notice
               </span>
 
-              <h2 id="logout-title" className={`text-lg sm:text-3xl font-black tracking-tight mb-1 sm:mb-2 ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#03045E]'}`}>
+              <h2 id="logout-title" tabIndex="0" className={`text-lg sm:text-3xl font-black tracking-tight mb-1 sm:mb-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#03045E]'}`}>
                 Are you sure to logout?
               </h2>
-              <p id="logout-desc" className={`text-[11px] sm:text-sm font-bold leading-relaxed mb-5 sm:mb-8 max-w-xs ${(isContrast || isDarkMode) ? 'text-white/80' : 'text-[#03045E]/80'}`}>
+              <p id="logout-desc" tabIndex="0" className={`text-[11px] sm:text-sm font-bold leading-relaxed mb-5 sm:mb-8 max-w-xs transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit ${(isContrast || isDarkMode) ? 'text-white/80' : 'text-[#03045E]/80'}`}>
                 You will be signed out of your account and returned to the login page.
               </p>
 
               <div className="flex flex-row gap-2 sm:gap-3 w-full">
-                                <button
+                <button
                   onClick={() => setShowLogoutConfirm(false)}
                   aria-label="Cancel logout and stay on page"
-                  className={`flex-1 py-2.5 sm:py-4 rounded-xl sm:rounded-2xl font-black text-[11px] sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2`}
-                  style={{ color: '#16a34a', borderColor: '#16a34a' }}
+                  className="flex-1 py-2.5 sm:py-4 rounded-lg sm:rounded-xl font-black text-[2px] sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-1 focus:outline-none"
+                  style={{ color: '#4c4d5b', borderColor: '#4c4d5b' }}
                 >
                   No, Stay
                 </button>
                 <button
                   onClick={handleLogout}
                   aria-label="Confirm logout and end session"
-                  className={`flex-1 py-2.5 sm:py-4 rounded-xl sm:rounded-2xl font-black text-[11px] sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2`}
+                  className="flex-1 py-2.5 sm:py-4 rounded-lg sm:rounded-xl font-black text-[11px] sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 focus:outline-none"
                   style={{ color: '#DC2626', borderColor: '#DC2626' }}
                 >
                   Yes, Logout
@@ -409,13 +444,16 @@ export default function EmployerDashboard() {
           </div>
 
           <div className="hidden md:block relative" ref={dropdownRef}>
-            <button
-              onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-              aria-expanded={showProfileDropdown}
+                      <button
+              onClick={() => {
+                setShowProfileDropdown(!showProfileDropdown);
+                if (settingsAuthOpen) setSettingsAuthOpen(false);
+              }}
+              aria-expanded={showProfileDropdown || settingsAuthOpen}
               aria-haspopup="true"
               aria-label={`Profile Menu for ${profile?.company_name || 'Employer'}`}
               className={`w-10 h-10 rounded-full overflow-hidden border-2 transition-all duration-200 cursor-pointer shadow-sm flex items-center justify-center shrink-0 p-0 ${
-                showProfileDropdown || activeTab === 'profile' || activeTab === 'settings' ? 'border-[#2C7FFF] ring-2 ring-[#2C7FFF]/30' : (isContrast ? 'bg-zinc-900 border-white/30' : 'bg-white border-[#03045E]/20')
+                showProfileDropdown || settingsAuthOpen || activeTab === 'profile' || activeTab === 'settings' ? 'border-[#2C7FFF] ring-2 ring-[#2C7FFF]/30' : (isContrast ? 'bg-zinc-900 border-white/30' : 'bg-white border-[#03045E]/20')
               }`}
               title="Profile Menu"
             >
@@ -428,14 +466,66 @@ export default function EmployerDashboard() {
               )}
             </button>
 
-            {showProfileDropdown && (
+                       {(showProfileDropdown || settingsAuthOpen) && (
               <div 
                 ref={profilePanelRef}
                 tabIndex={-1}
                 role="region" 
-                aria-label={`Profile menu panel. Logged in as ${profile?.company_name || 'Employer'}.`} 
+                aria-label={settingsAuthOpen ? "Security Check" : `Profile menu panel. Logged in as ${profile?.company_name || 'Employer'}.`} 
                 className={`absolute right-0 mt-3 w-72 rounded-lg sm:rounded-xl shadow-[0_20px_50px_rgba(3,4,94,0.25)] border-2 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 focus:outline-none ${isContrast ? 'bg-black border-[#2C7FFF]/60' : 'bg-white border-[#03045E]/20'}`}>
-                <div className={`relative p-4 pb-5 ${isContrast ? 'bg-black border-b border-[#2C7FFF]/30' : 'bg-[#f4f4f4] border-b border-[#03045E]/10'}`}>
+                
+                {settingsAuthOpen ? (
+                  <div className="p-5">
+                    <h3 className={`text-lg font-black mb-2 text-center ${isContrast || isDarkMode ? 'text-white' : 'text-[#03045E]'}`}>Security Check</h3>
+                    <p className={`text-xs text-center font-bold mb-4 ${isContrast || isDarkMode ? 'text-white/70' : 'text-[#03045E]/70'}`}>Please enter your password to access Settings.</p>
+                    {authError && (
+                      <div className={`mb-3 p-2 rounded-lg text-xs text-center font-bold bg-transparent border-2 ${isContrast || isDarkMode ? 'text-red-500 border-red-500' : 'text-red-600 border-red-600'}`}>
+                        {authError}
+                      </div>
+                    )}
+                    <form onSubmit={handleSettingsAuth} className="flex flex-col gap-4">
+                      <div className="relative">
+                        <input
+                          type={showAuthPassword ? "text" : "password"}
+                          value={authPassword}
+                          onChange={(e) => setAuthPassword(e.target.value)}
+                          placeholder="Enter your password"
+                          required
+                          className={`w-full p-3 border-2 rounded-xl font-bold outline-none transition text-sm ${isContrast || isDarkMode ? 'bg-black border-white/30 text-white focus:border-white' : 'bg-[#f4f4f4] border-[#03045E]/20 text-[#03045E] focus:border-[#2C7FFF]'}`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowAuthPassword(!showAuthPassword)}
+                          className={`absolute right-3 top-1/2 -translate-y-1/2 ${isContrast || isDarkMode ? 'text-white/50 hover:text-white' : 'text-[#03045E]/50 hover:text-[#2C7FFF]'}`}
+                        >
+                          {showAuthPassword ? (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                          ) : (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
+                          )}
+                        </button>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => { setSettingsAuthOpen(false); setAuthError(''); setAuthPassword(''); }}
+                          className={`flex-1 py-3 rounded-xl font-black text-xs uppercase tracking-wider border-2 transition-all cursor-pointer ${isContrast || isDarkMode ? 'bg-black text-white border-white/30 hover:bg-white/10' : 'bg-white text-[#03045E] border-[#03045E]/30 hover:bg-[#f4f4f4]'}`}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={isAuthVerifying}
+                          className={`flex-1 py-3 rounded-xl font-black text-xs uppercase tracking-wider border-2 transition-all cursor-pointer disabled:opacity-50 ${isContrast || isDarkMode ? 'bg-white text-black border-white hover:bg-white/90' : 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:bg-[#03045E]'}`}
+                        >
+                          {isAuthVerifying ? 'Verifying...' : 'Unlock'}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                ) : (
+                  <>
+                    <div className={`relative p-4 pb-5 ${isContrast ? 'bg-black border-b border-[#2C7FFF]/30' : 'bg-[#f4f4f4] border-b border-[#03045E]/10'}`}>
                   <div className="flex items-center gap-3.5">
                     <div className="relative shrink-0">
                       <div className={`w-14 h-14 rounded-lg sm:rounded-xl overflow-hidden border-2 border-[#2C7FFF] shadow-md`}>
@@ -489,7 +579,13 @@ export default function EmployerDashboard() {
 
                   <button
                     role="menuitem"
-                    onClick={() => { handleTabChange('settings'); setShowProfileDropdown(false); }}
+                    onClick={() => { 
+                      setShowProfileDropdown(false); 
+                      setSettingsAuthOpen(true); 
+                      setAuthPassword('');
+                      setAuthError('');
+                      setShowAuthPassword(false);
+                    }}
                     aria-label="Settings"
                     aria-current={activeTab === 'settings' ? 'page' : undefined}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg sm:rounded-xl text-sm font-black transition-colors text-left cursor-pointer focus:outline-none ${
@@ -535,8 +631,10 @@ export default function EmployerDashboard() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0"><span className="truncate block">{isLoggingOut ? 'Logging out...' : 'Log Out'}</span></div>
-                  </button>
+                                </button>
                 </div>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -721,26 +819,26 @@ export default function EmployerDashboard() {
       <div className={`flex flex-col md:flex-row flex-1 min-h-screen pt-20 transition-all duration-300 ${dark ? 'bg-black' : ''}`}>
         
 
-        <aside id="sidebar-navigation" role="complementary" aria-label="Sidebar navigation" className={`hidden md:flex w-72 flex-col z-10 border-r-2 px-4 pt-16 pb-4 justify-between shadow-sm flex-shrink-0 fixed top-16 left-0 h-[calc(100vh-4rem)] overflow-y-auto transition-transform duration-300 ease-in-out ${dark ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/15'} ${showDesktopSidebar ? 'translate-x-0' : '-translate-x-full'}`}>
+             <aside id="sidebar-navigation" role="complementary" aria-label="Sidebar navigation" className={`hidden md:flex flex-col z-10 border-r-2 pt-16 pb-4 justify-between shadow-sm flex-shrink-0 fixed top-16 left-0 h-[calc(100vh-4rem)] overflow-y-auto overflow-x-hidden focus:outline-none transition-all duration-300 ease-in-out ${dark ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/15'} ${showDesktopSidebar ? 'w-72 px-4' : 'w-20 px-2'}`}>
           <nav className="flex flex-col space-y-3 w-full" aria-label="Sidebar navigation links">
 
-            {[
-              { id: 'overview', label: 'Analytics Dashboard', icon: (
+                    {[
+              { id: 'overview', label: 'Analytics Dashboard', desc: 'View metrics', icon: (
                 <svg aria-hidden="true" className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               )},
-              { id: 'post-job', label: 'Post a New Job', icon: (
+              { id: 'post-job', label: 'Post a New Job', desc: 'Create listing', icon: (
                 <svg aria-hidden="true" className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               )},
-              { id: 'jobs', label: 'My Job Listings', icon: (
+              { id: 'jobs', label: 'My Job Listings', desc: 'Manage jobs', icon: (
                 <svg aria-hidden="true" className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
               )},
-              { id: 'applications', label: 'Review Applicants', icon: (
+              { id: 'applications', label: 'Review Applicants', desc: 'View candidates', icon: (
                 <svg aria-hidden="true" className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
@@ -748,19 +846,22 @@ export default function EmployerDashboard() {
             ].map((tabItem) => {
               const isActive = activeTab === tabItem.id;
               return (
-                <button 
+                         <button 
                   key={tabItem.id} 
                   onClick={() => handleTabChange(tabItem.id)} 
-                  aria-label={tabItem.label}
+                  aria-label={`${tabItem.label}. ${tabItem.desc}`}
+                  title={!showDesktopSidebar ? tabItem.label : undefined}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`relative flex items-center gap-3.5 text-left pl-4 pr-3.5 py-3.5 rounded-lg font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden ${
+                  className={`relative flex items-center py-3.5 rounded-lg font-extrabold transition-all duration-300 ease-in-out capitalize cursor-pointer border-2 group overflow-hidden focus:outline-none w-full ${
+                    showDesktopSidebar ? 'justify-start pl-4 pr-3.5' : 'justify-center px-0'
+                  } ${
                     isActive
                       ? 'bg-white text-[#03045E] border-[#03045E] shadow-md'
                       : 'bg-white text-[#03045E] border-[#03045E]/25'
                   }`}
                 >
                   {isActive && (
-                    <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>
+                    <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E] transition-all duration-300"></span>
                   )}
                   <div 
                     aria-hidden="true"
@@ -772,12 +873,19 @@ export default function EmployerDashboard() {
                   >
                     {tabItem.icon}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-[15px] tracking-wide font-black block leading-tight text-[#03045E] break-words">{tabItem.label}</span>
+                              <div className={`flex flex-col text-left transition-all duration-300 ease-in-out overflow-hidden whitespace-nowrap ${
+                    showDesktopSidebar ? 'opacity-100 max-w-full ml-3.5 flex-1 min-w-0' : 'opacity-0 max-w-0 ml-0 flex-none'
+                  }`}>
+                    <span className={`text-[13px] tracking-wide font-black block leading-tight text-[#03045E]`}>{tabItem.label}</span>
+                    <span className={`text-[10px] font-bold uppercase tracking-widest block mt-0.5 truncate text-[#03045E]/70`}>
+                      {tabItem.desc}
+                    </span>
                   </div>
                   <svg 
                     aria-hidden="true"
-                    className="w-4 h-4 shrink-0 transition-transform duration-300 text-[#03045E]"
+                    className={`shrink-0 transition-all duration-300 ease-in-out text-[#03045E] ${
+                      showDesktopSidebar ? 'w-4 h-4 opacity-100 ml-2' : 'w-0 h-0 opacity-0 ml-0'
+                    }`}
                     fill="none" 
                     stroke="currentColor" 
                     strokeWidth="2.5" 
@@ -792,7 +900,7 @@ export default function EmployerDashboard() {
         </aside>
 
 
-        <main role="main" aria-label="Dashboard content area" className={`flex-1 p-3 pt-6 sm:p-6 sm:pt-10 md:p-10 md:pt-14 relative min-w-0 transition-all duration-300 ease-in-out flex flex-col box-border ${showDesktopSidebar ? 'md:ml-72' : 'md:ml-0'} ${dark ? 'bg-black' : ''}`}>
+                     <main role="main" aria-label="Dashboard content area" className={`flex-1 p-3 pt-4 sm:p-6 sm:pt-6 md:p-10 md:pt-5 relative min-w-0 transition-all duration-300 ease-in-out flex flex-col box-border ${showDesktopSidebar ? 'md:ml-72' : 'md:ml-20'} ${dark ? 'bg-black' : ''}`}>
           <div className="flex items-start gap-4 w-full min-w-0">
             <div className="w-full flex-1 min-w-0 overflow-x-hidden">
 
@@ -884,7 +992,7 @@ export default function EmployerDashboard() {
       </div>
 
 
-      <div className={`transition-all duration-300 ease-in-out ${showDesktopSidebar ? 'md:ml-72' : 'md:ml-0'}`}>
+      <div className={`transition-all duration-300 ease-in-out ${showDesktopSidebar ? 'md:ml-72' : 'md:ml-20'}`}>
         <EmployerFooter activeTab={activeTab} setActiveTab={handleTabChange} />
       </div>
       

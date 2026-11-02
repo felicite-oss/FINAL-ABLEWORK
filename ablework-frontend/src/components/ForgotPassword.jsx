@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { AccessibilityContext } from '../context/AccessibilityContext';
 import { useColorPalette } from '../context/ColorPaletteContext';
@@ -25,7 +25,16 @@ export default function ForgotPassword({ onClose }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [isLoading, setIsLoading] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+   const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const handleResize = () => {
+      window.scrollTo(0, 0);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const isAPlusPlus = mode === 'A++' || mode === 'Assist' || mode === 'a++' || mode === 'assist';
   const isAPlus = mode === 'A+' || mode === 'a+';
@@ -221,7 +230,7 @@ export default function ForgotPassword({ onClose }) {
       <header
         className={`w-full ${isContrast ? 'bg-black border-b-2 border-[#2C7FFF]' : 'bg-white border-b-2 border-[#03045E]/15'} fixed top-0 left-0 z-50 transition-all duration-300 shadow-sm`}
       >
-        <div className="w-full h-14 sm:h-16 pl-3 pr-3 sm:pl-4 sm:pr-4 md:pr-8 flex items-center justify-between max-w-[1700px] mx-auto box-border">
+      <div className="w-full h-14 sm:h-16 pl-3 pr-3 sm:pl-4 sm:pr-4 md:pr-8 flex items-center justify-between box-border">
           <div className="flex items-center gap-3 sm:gap-8">
             <div className="flex items-center flex-shrink-0 py-1">
               <img
@@ -270,9 +279,9 @@ export default function ForgotPassword({ onClose }) {
           }`}
         >
           <div className={`w-full ${isContrast ? 'bg-black' : 'bg-white'}`}>
-            <nav
-              className={`flex flex-col px-2.5 pt-2.5 pb-2.5 gap-2 sm:px-3 sm:pt-3 sm:pb-3 sm:gap-2.5 ${isContrast ? 'text-white' : 'text-[#03045E]'} max-w-[1700px] mx-auto`}
-            >
+         <nav
+  className={`flex flex-col px-2.5 pt-2.5 pb-2.5 gap-2 sm:px-3 sm:pt-3 sm:pb-3 sm:gap-2.5 ${isContrast ? 'text-white' : 'text-[#03045E]'}`}
+>
               <Link
                 to="/"
                 title="Home"
@@ -334,16 +343,15 @@ export default function ForgotPassword({ onClose }) {
           </div>
         </div>
       </header>
-
-      <div
-        className="flex-grow pt-16 pb-12 flex flex-col items-center md:items-end justify-center px-3 sm:pl-4 sm:pr-4 md:pr-12 lg:pr-16 md:pl-8 max-w-[1700px] mx-auto w-full box-border relative bg-no-repeat bg-center bg-[size:600px_auto] md:bg-[size:1100px_auto] md:bg-left min-h-[110vh] md:min-h-[105vh] transition-all duration-300"
-        style={{ backgroundImage: `url(${backgroundImg})` }}
-      >
-        <div
-          className={`w-full ${isAssist ? 'max-w-[480px] sm:max-w-xl' : 'max-w-[400px] sm:max-w-lg'} flex flex-col items-center justify-start gap-4 sm:gap-6 relative z-10
-            ${isContrast ? 'bg-black text-white border-2 border-blue-400 shadow-[0_0_25px_rgba(0,204,21,0.4)]' : isDarkMode ? 'bg-zinc-900 text-white border-2 border-blue-500/50 shadow-2xl' : 'bg-white/90 text-[#03045E] border border-[#03045E]/15'} backdrop-blur-md rounded-xl sm:rounded-2xl shadow-2xl
-            pt-8 px-5 pb-8 sm:pt-12 sm:px-10 sm:pb-14 md:mt-4 mr-0 md:mr-2 lg:mr-6`}
-        >
+<div
+  className="flex-grow pt-20 pb-12 flex flex-col items-center md:items-end justify-center p-3 sm:p-6 md:p-10 w-full box-border relative bg-no-repeat bg-center bg-[size:600px_auto] md:bg-[size:1100px_auto] md:bg-left min-h-[110vh] md:min-h-[105vh] transition-all duration-300"
+  style={{ backgroundImage: `url(${backgroundImg})` }}
+>
+<div
+  className={`w-full ${isAssist ? 'max-w-[480px] sm:max-w-xl' : 'max-w-[400px] sm:max-w-lg'} flex flex-col items-center justify-start gap-4 sm:gap-6 relative z-10
+    ${isContrast ? 'bg-black text-white border-2 border-blue-400 shadow-[0_0_25px_rgba(0,204,21,0.4)]' : isDarkMode ? 'bg-zinc-900 text-white border-2 border-blue-500/50 shadow-2xl' : 'bg-white/90 text-[#03045E] border border-[#03045E]/15'} backdrop-blur-md rounded-xl sm:rounded-2xl shadow-2xl
+    pt-8 px-5 pb-8 sm:pt-12 sm:px-10 sm:pb-14 mr-0 md:mr-4 lg:mr-8`}
+>
           <div className="w-full flex items-center justify-start">
             <div className="flex items-center gap-2">
               <span className={`w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center ${isContrast ? 'bg-blue-400 text-black' : isDarkMode ? 'bg-blue-500/20 text-blue-400' : 'bg-[#2C7FFF]/10 text-[#2C7FFF]'}`}>
@@ -637,7 +645,7 @@ export default function ForgotPassword({ onClose }) {
       <footer
         className={`py-8 sm:py-12 px-4 sm:px-6 mt-auto border-t-2 shadow-inner bg-[#03045E] text-white ${isContrast ? 'border-white/20' : 'border-[#03045E]/20'}`}
       >
-        <div className={`max-w-[1700px] mx-auto grid grid-cols-3 md:grid-cols-4 gap-4 sm:gap-8 pb-6 sm:pb-10 border-b ${isContrast ? 'border-white/10' : 'border-[#03045E]/10'}`}>
+       <div className={`w-full grid grid-cols-3 md:grid-cols-4 gap-4 sm:gap-8 pb-6 sm:pb-10 border-b ${isContrast ? 'border-white/10' : 'border-[#03045E]/10'}`}>
           
           <div className="col-span-3 md:col-span-1 space-y-2 sm:space-y-3">
             <img
@@ -650,11 +658,11 @@ export default function ForgotPassword({ onClose }) {
             <p title="Building an inclusive workforce and equal employment opportunities for everyone." tabIndex="0" className={`text-[10px] sm:text-sm font-semibold leading-relaxed text-white/85`}>
               Building an inclusive workforce and equal employment opportunities for everyone.
             </p>
-            <div title="Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines" tabIndex="0" className={`pt-1 sm:pt-2 flex items-center space-x-3 text-[8px] sm:text-xs font-bold uppercase tracking-wider text-white/70`}>
-              <span> Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</span>
-              <span></span>
-              <span></span>
-            </div>
+           <div title="Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines" tabIndex="0" className={`pt-1 sm:pt-2 flex items-center space-x-3 text-[8px] sm:text-xs font-bold tracking-wider text-white/70`}>
+  <span> Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</span>
+  <span></span>
+  <span></span>
+</div>
           </div>
 
           <div>
@@ -716,12 +724,12 @@ export default function ForgotPassword({ onClose }) {
 
         </div>
 
-        <div title="Copyright information and slogan" tabIndex="0" className={`max-w-[1700px] mx-auto pt-4 sm:pt-6 flex flex-col items-center justify-center gap-2 sm:gap-4 text-[8px] sm:text-xs font-bold text-center text-white/75`}>
+      <div title="Copyright information and slogan" tabIndex="0" className={`w-full pt-4 sm:pt-6 flex flex-col items-center justify-center gap-2 sm:gap-4 text-[8px] sm:text-xs font-bold text-center text-white/75`}>
           <p>© {new Date().getFullYear()} AgileWork Inc. All rights reserved.</p>
           <p className="font-bold">Empowering Abilities, Connecting Opportunities.</p>
         </div>
 
       </footer>
     </main>
-  );
+  );q
 }

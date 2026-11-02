@@ -17,9 +17,18 @@ export default function Login() {
   const [errorMessage, setErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  useEffect(() => {
+   useEffect(() => {
     setEmail('');
     setPassword('');
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const handleResize = () => {
+      window.scrollTo(0, 0);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const isContrast = mode && typeof mode === 'string' && mode.toLowerCase().includes('contrast');
@@ -131,15 +140,15 @@ export default function Login() {
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative w-full max-w-md rounded-2xl sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${(isContrast || isDarkMode || isAccessibilityMode) ? 'bg-black border-2 border-white' : 'bg-white border-2 border-[#2C7FFF]'}`}>
-            <div aria-hidden="true" className="h-2 w-full bg-[#2C7FFF]" />
+          <div className={`relative w-full max-w-md rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${(isContrast || isDarkMode || isAccessibilityMode) ? 'bg-black border-2 border-white' : 'bg-white border-2 border-[#2C7FFF]'}`}>
+            <div aria-hidden="true" className="h-1.5 sm:h-2 w-full bg-[#2C7FFF]" />
 
             <div className="relative px-5 pt-8 pb-6 sm:px-8 sm:pt-10 sm:pb-8 flex flex-col items-center text-center">
-              <div aria-hidden="true" className="relative mb-4 sm:mb-5">
+              <div aria-hidden="true" className="relative mb-4 sm:mb-5 flex items-center justify-center mx-auto">
                 <div className={`w-16 h-16 sm:w-24 sm:h-24 rounded-full flex items-center justify-center ${(isContrast || isDarkMode || isAccessibilityMode) ? 'bg-transparent border-4 border-white' : 'bg-transparent border-4 border-[#2C7FFF]'}`}>
-                  <svg className={`w-8 h-8 sm:w-12 sm:h-12 animate-spin ${(isContrast || isDarkMode || isAccessibilityMode) ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <svg className={`w-8 h-8 sm:w-12 sm:h-12 animate-spin [animation-direction:reverse] ${(isContrast || isDarkMode || isAccessibilityMode) ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    <path className="opacity-75" fill="currentColor" d="M12 12H4a8 8 0 018-8v8z"></path>
                   </svg>
                 </div>
                 <div className={`absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold ${(isContrast || isDarkMode || isAccessibilityMode) ? 'bg-white text-black' : 'bg-[#03045E] text-white'}`}>✓</div>
@@ -167,10 +176,10 @@ export default function Login() {
         </div>
       )}
    
-      <header
+        <header
         className={`w-full ${isContrast ? 'bg-black border-b-1 border-[#2C7FFF]' : 'bg-[#f4f4f4] border-b border-[#03045E]/10'} fixed top-0 left-0 z-50`}
       >
-        <div className="w-full h-14 sm:h-16 pl-3 pr-3 sm:pl-4 sm:pr-4 md:pr-8 flex items-center justify-between max-w-[1700px] mx-auto box-border">
+      <div className="w-full h-14 sm:h-16 pl-3 pr-3 sm:pl-4 sm:pr-4 md:pr-8 flex items-center justify-between box-border">
           <div className="flex items-center gap-8">
             <div className="flex items-center flex-shrink-0 py-1">
               <img
@@ -188,16 +197,6 @@ export default function Login() {
               <Link to="/about" aria-label="About Us" title="About Us" className="text-[#03045E] hover:text-[#03045E] transition">About Us</Link>
               <Link to="/policy" aria-label="Policy" title="Policy" className="text-[#03045E] hover:text-[#03045E] transition">Policy</Link>
             </nav>
-          </div>
-
-          <div className="hidden md:flex items-center">
-            <span
-              aria-label="Log In"
-              title="Log In"
-              className={`px-5 py-2 rounded-full ${isAccessibilityMode ? 'bg-white text-black border border-white' : (isContrast || isDarkMode) ? 'bg-blue-400 text-black border border-blue-400' : 'bg-transparent text-[#03045E] border border-[#03045E]'} text-sm font-medium cursor-default`}
-            >
-              Log In
-            </span>
           </div>
 
           <button
@@ -225,8 +224,8 @@ export default function Login() {
           }`}
         >
           <div className={`w-full ${isContrast ? 'bg-black' : 'bg-white'}`}>
-                      <nav
-              className={`flex flex-col px-2.5 pt-2.5 pb-2.5 gap-2 sm:px-3 sm:pt-3 sm:pb-3 sm:gap-2.5 ${isContrast ? 'text-white' : 'text-[#03045E]'} max-w-[1700px] mx-auto`}
+            <nav
+              className={`flex flex-col px-2.5 pt-2.5 pb-2.5 gap-2 sm:px-3 sm:pt-3 sm:pb-3 sm:gap-2.5 ${isContrast ? 'text-white' : 'text-[#03045E]'}`}
             >
               <Link
                 to="/"
@@ -299,46 +298,23 @@ export default function Login() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
-
-              <div aria-hidden="true" className={`h-px my-0.5 ${isContrast ? 'bg-[#2C7FFF]/30' : 'bg-[#03045E]/15'}`}></div>
-
-              <span
-                aria-label="Log In"
-                title="Log In"
-                className="relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-xl font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden bg-white text-[#03045E] border-[#03045E] shadow-md"
-              >
-                <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#03045E]"></span>
-                <div aria-hidden="true" className="p-1.5 rounded-lg transition-all duration-300 shrink-0 flex items-center justify-center border-2 bg-[#03045E] text-white border-[#03045E]">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                  </svg>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <span aria-hidden="true" className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Log In</span>
-                </div>
-                <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </span>
             </nav>
           </div>
         </div>
       </header>
 
-      <div
-        className={`flex-grow pt-16 pb-12 flex flex-col items-center md:items-end justify-center px-3 sm:pl-4 sm:pr-4 md:pr-12 lg:pr-16 md:pl-8 max-w-[1700px] mx-auto w-full box-border relative bg-no-repeat bg-center bg-[size:600px_auto] md:bg-[size:1100px_auto] md:bg-left min-h-[110vh] md:min-h-[105vh] transition-all duration-300`}
-        style={{
-          backgroundImage: `url(${backgroundImg})`,
-        }}
-      >
-      
-        <div
-          className={`w-full ${isAssist ? 'max-w-[480px] sm:max-w-xl' : 'max-w-[400px] sm:max-w-md'} flex flex-col items-center justify-start ${containerGap} relative z-10
-            ${isContrast ? 'bg-black/90 text-white border-2 border-blue-400 shadow-[0_0_25px_rgba(,204,21,0.4)]' : 'bg-white/40 sm:bg-white/85 text-[#03045E] border border-[#03045E]/15'} backdrop-blur-[1px] sm:backdrop-blur-md rounded-xl sm:rounded-2xl shadow-xl
-            ${containerPadding}
-            ${isAssist ? 'min-h-[auto] sm:min-h-[660px]' : 'min-h-[auto] sm:min-h-[600px]'} md:mt-4 mr-0 md:mr-2 lg:mr-6`}
-        >
-          
+<div
+  className={`flex-grow pt-20 pb-12 flex flex-col items-center md:items-end justify-center p-3 sm:p-6 md:p-10 w-full box-border relative bg-no-repeat bg-center bg-[size:600px_auto] md:bg-[size:1100px_auto] md:bg-left min-h-[110vh] md:min-h-[105vh] transition-all duration-300`}
+  style={{
+    backgroundImage: `url(${backgroundImg})`,
+  }}
+>
+<div
+  className={`w-full ${isAssist ? 'max-w-[480px] sm:max-w-xl' : 'max-w-[400px] sm:max-w-md'} flex flex-col items-center justify-start ${containerGap} relative z-10
+    ${isContrast ? 'bg-black/90 text-white border-2 border-blue-400 shadow-[0_0_25px_rgba(,204,21,0.4)]' : 'bg-white/40 sm:bg-white/85 text-[#03045E] border border-[#03045E]/15'} backdrop-blur-[1px] sm:backdrop-blur-md rounded-xl sm:rounded-2xl shadow-xl
+    ${containerPadding}
+    ${isAssist ? 'min-h-[auto] sm:min-h-[660px]' : 'min-h-[auto] sm:min-h-[600px]'} md:mt-15 md:mr-2 lg:mr-6`}
+>  
           <div className="text-center w-full -mt-2 sm:-mt-3">
             <h1
               tabIndex="0"
@@ -499,7 +475,7 @@ export default function Login() {
       <footer
         className="py-6 sm:py-12 px-4 sm:px-6 mt-auto bg-[#03045E] text-white border-t-2 border-[#2C7FFF]/40 shadow-inner"
       >
-        <div className="max-w-[1700px] mx-auto grid grid-cols-3 md:grid-cols-4 gap-4 sm:gap-8 pb-6 sm:pb-10 border-b border-white/15">
+      <div className="w-full grid grid-cols-3 md:grid-cols-4 gap-4 sm:gap-8 pb-6 sm:pb-10 border-b border-white/15">
           
           <div className="col-span-3 md:col-span-1 space-y-2 sm:space-y-3">
             <img
@@ -519,12 +495,12 @@ export default function Login() {
             >
               Building an inclusive workforce and equal employment opportunities for everyone.
             </p>
-            <div 
-              tabIndex="0"
-              aria-label="Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines"
-              title="Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines"
-              className="pt-1 flex items-center space-x-3 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-white/70"
-            >
+               <div 
+  tabIndex="0"
+  aria-label="Copyright information and slogan"
+  title="Copyright information and slogan"
+  className="w-full pt-3 sm:pt-6 flex flex-col items-start justify-center gap-2 sm:gap-4 text-[9px] sm:text-xs font-bold text-white/75 text-left"
+>
               <span> Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</span>
               <span></span>
               <span></span>

@@ -30,23 +30,21 @@ const safeParse = (data) => {
   }
   return [];
 };
-
 const getDistanceBadgeStyles = (km, isDarkScreen) => {
   const distance = Number(km);
-  if (isNaN(distance)) return { backgroundColor: 'rgba(44,127,255,0.15)', color: '#03045E', borderColor: 'rgba(44,127,255,0.4)' };
+  if (isNaN(distance)) return `bg-[#2C7FFF]/15 ${isDarkScreen ? 'text-white' : 'text-[#03045E]'} border-[#03045E]/40`;
   
   if (distance <= 5) {
     if (isDarkScreen) {
-      return { backgroundColor: '#ffffff', color: '#10B981', borderColor: '#10B981', filter: 'none' };
+      return 'bg-white text-[#10B981] border-[#10B981]';
     }
-    return { backgroundColor: '#ffffff', color: '#10B981', borderColor: '#10B981', filter: 'none' };
+    return 'bg-white text-[#10B981] border-[#10B981]';
   } else if (distance <= 15) {
-    return { backgroundColor: 'rgba(44,127,255,0.15)', color: '#03045E', borderColor: 'rgba(44,127,255,0.5)' };
+    return `bg-[#2C7FFF]/15 ${isDarkScreen ? 'text-white' : 'text-[#03045E]'} border-[#03045E]/40`;
   } else {
-    return { backgroundColor: 'rgba(245,158,11,0.15)', color: '#92400E', borderColor: 'rgba(245,158,11,0.5)' };
+    return `bg-[#2C7FFF]/15 ${isDarkScreen ? 'text-white' : 'text-[#03045E]'} border-[#03045E]/40`;
   }
 };
-
 const getMatchColor = (percentage) => {
   if (percentage >= 80) return 'bg-[#2C7FFF]/15 text-[#03045E] border-[#2C7FFF]';
   if (percentage >= 50) return 'bg-[#2C7FFF]/10 text-[#03045E] border-[#03045E]/40';
@@ -74,8 +72,34 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
   const [selectedAccs, setSelectedAccs] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
   const [distanceOpen, setDistanceOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const jobsPerPage = 12;
+  const [expandedJobs, setExpandedJobs] = useState([]);
+  const [locallyAppliedJobs, setLocallyAppliedJobs] = useState(() => {
+    try {
+      const saved = localStorage.getItem('applicantLocallyAppliedJobs');
+      const parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('applicantLocallyAppliedJobs', JSON.stringify(locallyAppliedJobs));
+    } catch {}
+  }, [locallyAppliedJobs]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, maxDistance, selectedSkills, selectedAccs]);
+
+  const checkHasApplied = (jobId) => {
+    return applications.some(app => String(app.job_id) === String(jobId)) || locallyAppliedJobs.some(id => String(id) === String(jobId));
+  };
 
   useEffect(() => {
     if (initialSelectedJob) {
@@ -149,6 +173,7 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
 
   const toggleSkill = (skill) => setSelectedSkills(prev => prev.includes(skill) ? prev.filter(s => s !== skill) : [...prev, skill]);
   const toggleAcc = (acc) => setSelectedAccs(prev => prev.includes(acc) ? prev.filter(a => a !== acc) : [...prev, acc]);
+  const toggleExpand = (jobId) => setExpandedJobs(prev => prev.includes(jobId) ? prev.filter(id => id !== jobId) : [...prev, jobId]);
 
   const filteredJobs = useMemo(() => {
     if (!jobs) return [];
@@ -171,6 +196,11 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
       return true;
     });
   }, [jobs, searchQuery, maxDistance, selectedSkills, selectedAccs]);
+
+  const indexOfLastJob = currentPage * jobsPerPage;
+  const indexOfFirstJob = indexOfLastJob - jobsPerPage;
+  const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
+  const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
 
   const closeSweetAlert = () => {
     setSweetAlert({ ...sweetAlert, isOpen: false });
@@ -204,6 +234,7 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
       const data = await res.json();
       if (res.ok) {
         closeModal();
+        setLocallyAppliedJobs(prev => [...prev, selectedJob.id]);
         setSweetAlert({
           isOpen: true,
           type: 'success',
@@ -239,7 +270,7 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
   };
 
   const openApplyModal = (job) => {
-    const hasApplied = applications.some(app => app.job_id === job.id);
+    const hasApplied = checkHasApplied(job.id);
     if (hasApplied) {
       setSelectedJob(null);
       setSweetAlert({
@@ -263,6 +294,20 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
     setModalView('details');
     setResumeFile(null);
     setCoverLetter('');
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(prev => prev + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prev => prev - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const applicantSkills = profile?.skills ? (typeof profile.skills === 'string' ? safeParse(profile.skills) : profile.skills).map(s => s.toLowerCase()) : [];
@@ -297,7 +342,7 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 sm:gap-3 flex-wrap w-full sm:w-auto shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap w-full sm:w-auto shrink-0 relative">
           {filteredJobs.length > 0 && (
             <div
               tabIndex="0"
@@ -333,179 +378,178 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
               </>
             )}
           </button>
-        </div>
-      </section>
+          {showFilters && (
+            <section
+              id="explore-jobs-filters"
+              role="region"
+              aria-label="Job filters panel"
+              className="absolute top-full right-0 mt-3 z-50 w-[95vw] sm:w-[600px] max-w-[calc(100vw-2rem)] max-h-[75vh] overflow-y-auto p-4 sm:p-8 rounded-2xl sm:rounded-3xl bg-white shadow-[0_20px_50px_rgba(3,4,94,0.25)] border-2 border-[#03045E]/20 animate-fadeIn flex flex-col gap-4 sm:gap-6 text-left"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                <div className="flex flex-col gap-1 sm:gap-1.5">
+                  <label htmlFor="job-search" className={`text-[10px] sm:text-xs font-extrabold uppercase tracking-widest ${isDarkScreen ? 'text-white' : 'text-[#03045E]'} focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded`} tabIndex="0">Search by Title or Company</label>
+                  <input 
+                    id="job-search"
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="e.g. Data Entry, TechNova..."
+                    aria-label="Search jobs by title or company. Example: Data Entry, TechNova."
+                    title="Search jobs by title or company. Example: Data Entry, TechNova."
+                    className={`p-3 sm:p-3.5 border-2 border-[#03045E]/25 rounded-xl sm:rounded-2xl bg-white font-bold focus:border-[#2C7FFF] outline-none transition text-xs sm:text-sm text-[#03045E] placeholder:text-gray-400`}
+                  />
+                  {searchSuggestions.length > 0 && (
+                    <div role="list" aria-label="Search suggestions" className="grid grid-cols-2 gap-1.5 sm:gap-2 mt-1.5 sm:mt-2 animate-fadeIn">
+                      {searchSuggestions.map((suggestion, idx) => (
+                        <button
+                          key={idx}
+                          role="listitem"
+                          onClick={() => setSearchQuery(suggestion)}
+                          aria-label={`Use suggestion ${suggestion}`}
+                          className="px-2.5 py-1 sm:px-3 sm:py-1.5 bg-[#f4f4f4] text-[#03045E] text-[10px] sm:text-xs font-extrabold rounded-full border-2 border-[#03045E]/25 hover:border-[#2C7FFF] transition-colors flex items-center gap-1 cursor-pointer w-full"
+                        >
+                          <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                          <span className="truncate">{suggestion}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
-      {showFilters && (
-        <section
-          id="explore-jobs-filters"
-          role="region"
-          aria-label="Job filters panel"
-          className="p-4 sm:p-8 rounded-2xl sm:rounded-3xl bg-white shadow-md border-2 border-[#03045E]/20 animate-fadeIn flex flex-col gap-4 sm:gap-6"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-            <div className="flex flex-col gap-1 sm:gap-1.5">
-              <label htmlFor="job-search" className={`text-[10px] sm:text-xs font-extrabold uppercase tracking-widest ${isDarkScreen ? 'text-white' : 'text-[#03045E]'} focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded`} tabIndex="0">Search by Title or Company</label>
-              <input 
-                id="job-search"
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="e.g. Data Entry, TechNova..."
-                aria-label="Search jobs by title or company. Example: Data Entry, TechNova."
-                title="Search jobs by title or company. Example: Data Entry, TechNova."
-                className={`p-3 sm:p-3.5 border-2 border-[#03045E]/25 rounded-xl sm:rounded-2xl bg-white font-bold focus:border-[#2C7FFF] outline-none transition text-xs sm:text-sm text-[#03045E] placeholder:text-gray-400`}
-              />
-              {searchSuggestions.length > 0 && (
-                <div role="list" aria-label="Search suggestions" className="flex flex-wrap gap-1.5 sm:gap-2 mt-1.5 sm:mt-2 animate-fadeIn">
-                  {searchSuggestions.map((suggestion, idx) => (
+                <div className="flex flex-col gap-1 sm:gap-1.5 relative">
+                  <label htmlFor="distance-filter" className={`text-[10px] sm:text-xs font-extrabold uppercase tracking-widest ${isDarkScreen ? 'text-white' : 'text-[#03045E]'} focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded`} tabIndex="0">Maximum Distance</label>
+                  <div className="relative">
                     <button
-                      key={idx}
-                      role="listitem"
-                      onClick={() => setSearchQuery(suggestion)}
-                      aria-label={`Use suggestion ${suggestion}`}
-                      className="px-2.5 py-1 sm:px-3 sm:py-1.5 bg-[#f4f4f4] text-[#03045E] text-[10px] sm:text-xs font-extrabold rounded-full border-2 border-[#03045E]/25 hover:border-[#2C7FFF] transition-colors flex items-center gap-1 cursor-pointer"
+                      type="button"
+                      onClick={() => setDistanceOpen(!distanceOpen)}
+                      aria-haspopup="listbox"
+                      aria-expanded={distanceOpen}
+                      aria-label="Filter by maximum distance"
+                      className={`w-full flex items-center justify-between gap-2 p-3 sm:p-3.5 border-2 border-[#03045E]/25 rounded-xl sm:rounded-2xl bg-white font-bold focus:border-[#2C7FFF] outline-none transition text-xs sm:text-sm text-[#03045E] cursor-pointer`}
                     >
-                      <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                      {suggestion}
+                      <span>{maxDistance === 'Any' ? 'Within Profile Radius' : `Within ${maxDistance} km`}</span>
+                      <svg className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#03045E] transition-transform duration-200 ${distanceOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {distanceOpen && (
+                      <div role="listbox" aria-label="Maximum distance options" className="absolute z-50 mt-2 w-full rounded-xl border-2 border-[#2C7FFF] bg-white shadow-[0_15px_40px_rgba(3,4,94,0.15)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                        {[
+                          { value: 'Any', label: 'Within Profile Radius' },
+                          { value: '5', label: 'Within 5 km' },
+                          { value: '15', label: 'Within 15 km' },
+                          { value: '30', label: 'Within 30 km' }
+                        ].map((option) => {
+                          const isSelected = maxDistance === option.value;
+                          return (
+                            <button
+                              key={option.value}
+                              type="button"
+                              role="option"
+                              aria-selected={isSelected}
+                              onClick={() => {
+                                setMaxDistance(option.value);
+                                setDistanceOpen(false);
+                              }}
+                              className={`w-full flex items-center gap-2.5 p-3 text-left transition-colors cursor-pointer border-b border-[#03045E]/10 last:border-b-0 text-xs sm:text-sm font-bold ${
+                                isSelected ? 'bg-[#2C7FFF]/10 text-[#03045E]' : 'bg-white text-[#03045E] hover:bg-[#f4f4f4]'
+                              }`}
+                            >
+                              <span aria-hidden="true" className={`shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                                isSelected ? 'border-[#2C7FFF] bg-[#2C7FFF]' : 'border-[#03045E]/30 bg-white'
+                              }`}>
+                                {isSelected && (
+                                  <svg className="w-2.5 h-2.5" fill="none" stroke={isDarkMode ? '#000000' : '#ffffff'} strokeWidth="3" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                  </svg>
+                                )}
+                              </span>
+                              {option.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <hr aria-hidden="true" className="border-[#03045E]/15" />
+
+              <div role="group" aria-label="Filter by skills">
+                <span aria-hidden="true" className={`text-[10px] sm:text-xs font-extrabold text-[#03045E] uppercase tracking-widest mb-2 sm:mb-3 block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded`} tabIndex="0">Filter by Skills</span>
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                  {availableSkills.map(skill => (
+                    <button 
+                      key={skill} onClick={() => toggleSkill(skill)}
+                      aria-label={`Filter by skill ${skill}`}
+                      aria-pressed={selectedSkills.includes(skill)}
+                      className={`px-2.5 py-1 sm:px-3.5 sm:py-1.5 text-[10px] sm:text-xs font-extrabold rounded-lg border-2 transition-all cursor-pointer inline-flex items-center gap-1 ${
+                        selectedSkills.includes(skill)
+                          ? `bg-[#2C7FFF] ${isDarkScreen ? '!text-black' : '!text-white'} border-[#2C7FFF]`
+                          : 'bg-white text-[#03045E] border-[#03045E]/25 hover:border-[#2C7FFF]'
+                      }`}
+                    >
+                      {selectedSkills.includes(skill) && (
+                        <svg aria-hidden="true" className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                      )}
+                      {skill}
                     </button>
                   ))}
                 </div>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-1 sm:gap-1.5 relative">
-              <label htmlFor="distance-filter" className={`text-[10px] sm:text-xs font-extrabold uppercase tracking-widest ${isDarkScreen ? 'text-white' : 'text-[#03045E]'} focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded`} tabIndex="0">Maximum Distance</label>
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setDistanceOpen(!distanceOpen)}
-                  aria-haspopup="listbox"
-                  aria-expanded={distanceOpen}
-                  aria-label="Filter by maximum distance"
-                  className={`w-full flex items-center justify-between gap-2 p-3 sm:p-3.5 border-2 border-[#03045E]/25 rounded-xl sm:rounded-2xl bg-white font-bold focus:border-[#2C7FFF] outline-none transition text-xs sm:text-sm text-[#03045E] cursor-pointer`}
-                >
-                  <span>{maxDistance === 'Any' ? 'Within Profile Radius' : `Within ${maxDistance} km`}</span>
-                  <svg className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#03045E] transition-transform duration-200 ${distanceOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                {distanceOpen && (
-                  <div role="listbox" aria-label="Maximum distance options" className="absolute z-50 mt-2 w-full rounded-xl border-2 border-[#2C7FFF] bg-white shadow-[0_15px_40px_rgba(3,4,94,0.15)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
-                    {[
-                      { value: 'Any', label: 'Within Profile Radius' },
-                      { value: '5', label: 'Within 5 km' },
-                      { value: '15', label: 'Within 15 km' },
-                      { value: '30', label: 'Within 30 km' }
-                    ].map((option) => {
-                      const isSelected = maxDistance === option.value;
-                      return (
-                        <button
-                          key={option.value}
-                          type="button"
-                          role="option"
-                          aria-selected={isSelected}
-                          onClick={() => {
-                            setMaxDistance(option.value);
-                            setDistanceOpen(false);
-                          }}
-                          className={`w-full flex items-center gap-2.5 p-3 text-left transition-colors cursor-pointer border-b border-[#03045E]/10 last:border-b-0 text-xs sm:text-sm font-bold ${
-                            isSelected ? 'bg-[#2C7FFF]/10 text-[#03045E]' : 'bg-white text-[#03045E] hover:bg-[#f4f4f4]'
-                          }`}
-                        >
-                          <span aria-hidden="true" className={`shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                            isSelected ? 'border-[#2C7FFF] bg-[#2C7FFF]' : 'border-[#03045E]/30 bg-white'
-                          }`}>
-                            {isSelected && (
-                              <svg className="w-2.5 h-2.5" fill="none" stroke={isDarkMode ? '#000000' : '#ffffff'} strokeWidth="3" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                              </svg>
-                            )}
-                          </span>
-                          {option.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
               </div>
-            </div>
-          </div>
 
-          <hr aria-hidden="true" className="border-[#03045E]/15" />
+              <div role="group" aria-label="Filter by accommodations">
+                <span aria-hidden="true" className={`text-[10px] sm:text-xs font-extrabold text-[#03045E] uppercase tracking-widest mb-2 sm:mb-3 block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded`} tabIndex="0">Filter by Accommodations</span>
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                  {availableAccs.map(acc => (
+                    <button 
+                      key={acc} onClick={() => toggleAcc(acc)}
+                      aria-label={`Filter by accommodation ${acc}`}
+                      aria-pressed={selectedAccs.includes(acc)}
+                      className={`px-2.5 py-1 sm:px-3.5 sm:py-1.5 text-[10px] sm:text-xs font-extrabold rounded-lg border-2 transition-all cursor-pointer inline-flex items-center gap-1 ${
+                        selectedAccs.includes(acc)
+                          ? `bg-[#2C7FFF] ${isDarkScreen ? '!text-black' : '!text-white'} border-[#2C7FFF]`
+                          : 'bg-white text-[#03045E] border-[#03045E]/25 hover:border-[#2C7FFF]'
+                      }`}
+                    >
+                      {selectedAccs.includes(acc) && (
+                        <svg aria-hidden="true" className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                      )}
+                      {acc}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-          <div role="group" aria-label="Filter by skills">
-            <span aria-hidden="true" className={`text-[10px] sm:text-xs font-extrabold text-[#03045E] uppercase tracking-widest mb-2 sm:mb-3 block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded`} tabIndex="0">Filter by Skills</span>
-            <div className="flex flex-wrap gap-1.5 sm:gap-2">
-              {availableSkills.map(skill => (
-                <button 
-                  key={skill} onClick={() => toggleSkill(skill)}
-                  aria-label={`Filter by skill ${skill}`}
-                  aria-pressed={selectedSkills.includes(skill)}
-                  className={`px-2.5 py-1 sm:px-3.5 sm:py-1.5 text-[10px] sm:text-xs font-extrabold rounded-lg border-2 transition-all cursor-pointer inline-flex items-center gap-1 ${
-                    selectedSkills.includes(skill)
-                      ? `bg-[#2C7FFF] ${isDarkScreen ? '!text-black' : '!text-white'} border-[#2C7FFF]`
-                      : 'bg-white text-[#03045E] border-[#03045E]/25 hover:border-[#2C7FFF]'
-                  }`}
-                >
-                  {selectedSkills.includes(skill) && (
-                    <svg aria-hidden="true" className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                  )}
-                  {skill}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div role="group" aria-label="Filter by accommodations">
-            <span aria-hidden="true" className={`text-[10px] sm:text-xs font-extrabold text-[#03045E] uppercase tracking-widest mb-2 sm:mb-3 block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded`} tabIndex="0">Filter by Accommodations</span>
-            <div className="flex flex-wrap gap-1.5 sm:gap-2">
-              {availableAccs.map(acc => (
-                <button 
-                  key={acc} onClick={() => toggleAcc(acc)}
-                  aria-label={`Filter by accommodation ${acc}`}
-                  aria-pressed={selectedAccs.includes(acc)}
-                  className={`px-2.5 py-1 sm:px-3.5 sm:py-1.5 text-[10px] sm:text-xs font-extrabold rounded-lg border-2 transition-all cursor-pointer inline-flex items-center gap-1 ${
-                    selectedAccs.includes(acc)
-                      ? `bg-[#2C7FFF] ${isDarkScreen ? '!text-black' : '!text-white'} border-[#2C7FFF]`
-                      : 'bg-white text-[#03045E] border-[#03045E]/25 hover:border-[#2C7FFF]'
-                  }`}
-                >
-                  {selectedAccs.includes(acc) && (
-                    <svg aria-hidden="true" className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                  )}
-                  {acc}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {(searchQuery || maxDistance !== 'Any' || selectedSkills.length > 0 || selectedAccs.length > 0) && (
-            <div className="flex justify-end pt-1.5 sm:pt-2 border-t border-[#03045E]/15">
-              <button
-                onClick={() => { setSearchQuery(''); setMaxDistance('Any'); setSelectedSkills([]); setSelectedAccs([]); }}
-                aria-label="Clear All Filters"
-                className="text-[11px] sm:text-sm font-extrabold text-[#2C7FFF] hover:text-[#03045E] hover:underline cursor-pointer transition"
-              >
-                Clear All Filters
-              </button>
-            </div>
+              {(searchQuery || maxDistance !== 'Any' || selectedSkills.length > 0 || selectedAccs.length > 0) && (
+                <div className="flex justify-end pt-1.5 sm:pt-2 border-t border-[#03045E]/15">
+                  <button
+                    onClick={() => { setSearchQuery(''); setMaxDistance('Any'); setSelectedSkills([]); setSelectedAccs([]); }}
+                    aria-label="Clear All Filters"
+                    className={`text-[11px] sm:text-sm font-extrabold hover:underline cursor-pointer transition ${isDarkScreen ? '!text-black hover:!text-black' : 'text-[#2C7FFF] hover:text-[#03045E]'}`}
+                  >
+                    Clear All Filters
+                  </button>
+                </div>
+              )}
+            </section>
           )}
-        </section>
-      )}
+        </div>
+      </section>
 
       <section role="region" aria-label="Job listings" className="flex flex-col gap-4 sm:gap-8">
         {filteredJobs.length > 0 ? (
-          <div role="list" className="flex flex-col gap-4 sm:gap-8 w-full">
-            {filteredJobs.map(job => {
-              const hasApplied = applications.some(app => app.job_id === job.id);
-
+          <div className="flex flex-col gap-6 w-full">
+                   <div role="list" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 w-full">
+                               {currentJobs.map(job => {
+              const hasApplied = checkHasApplied(job.id);
               return (
-                <div
+                              <div
                   key={job.id}
                   role="listitem"
                   tabIndex={0}
-                  className={`p-4 sm:p-8 rounded-xl sm:rounded-2xl bg-white shadow-md border-2 border-[#03045E]/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 sm:gap-6 ${hasApplied ? 'opacity-85 bg-[#f4f4f4]' : ''}`}
+                  className={`p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-white shadow-md border-2 border-[#03045E]/20 flex flex-col justify-between gap-4 ${hasApplied ? 'opacity-85 bg-[#f4f4f4]' : ''}`}
                 >
                   <span className="sr-only">
                     Job posting: {job.job_title} at {job.company_name}.
@@ -527,9 +571,8 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                         </span>
                       )}
                       {job.distance_km && (
-                        <span
-                          style={getDistanceBadgeStyles(job.distance_km, isDarkScreen)}
-                          className="px-2.5 py-1 sm:px-3.5 sm:py-1.5 border-2 text-[10px] sm:text-xs font-black rounded-full flex items-center gap-1 sm:gap-1.5 uppercase tracking-wide w-fit"
+                                                                      <span
+                          className={`px-2.5 py-1 sm:px-3.5 sm:py-1.5 border-2 text-[10px] sm:text-xs font-black rounded-full flex items-center gap-1 sm:gap-1.5 uppercase tracking-wide w-fit ${getDistanceBadgeStyles(job.distance_km, isDarkScreen)}`}
                         >
                           <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
@@ -538,39 +581,48 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                           {job.distance_km} km away
                         </span>
                       )}
-                      {hasApplied && (
-                        <span className="px-2.5 py-1 sm:px-3.5 sm:py-1.5 bg-[#f4f4f4] text-[#03045E] border-2 border-[#03045E]/30 text-[10px] sm:text-xs font-black rounded-full uppercase tracking-wide w-fit inline-flex items-center gap-1">
-                          <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                          Applied
-                        </span>
-                      )}
                     </div>
                     <h2 className="text-base sm:text-2xl font-black text-[#03045E] leading-tight break-words w-full">{job.job_title}</h2>
                     <p className="text-xs sm:text-base font-black text-[#2C7FFF] mt-0.5 sm:mt-1 mb-2 sm:mb-3 break-words">{job.company_name}</p>
-                    <p className="text-[#03045E] text-xs sm:text-sm font-semibold line-clamp-2 leading-relaxed">{job.job_description}</p>
+                    <div>
+                      <p 
+                        onClick={() => toggleExpand(job.id)}
+                        className={`text-[#03045E] text-xs sm:text-sm font-semibold leading-relaxed cursor-pointer ${expandedJobs.includes(job.id) ? '' : 'line-clamp-2'}`}
+                      >
+                        {job.job_description}
+                      </p>
+                      {job.job_description && job.job_description.length > 80 && (
+                        <button 
+                          onClick={() => toggleExpand(job.id)}
+                          className="text-[10px] sm:text-xs font-bold text-[#2C7FFF] hover:underline mt-1 cursor-pointer"
+                        >
+                          {expandedJobs.includes(job.id) ? 'Read less' : 'Read more'}
+                        </button>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="shrink-0 w-full md:w-auto flex flex-row gap-2 sm:gap-3">
+                                   <div className="shrink-0 w-full flex flex-row gap-2 mt-auto pt-2">
                     <button 
                       onClick={() => openModal(job)}
                       aria-label={`View details of ${job.job_title} at ${job.company_name}`}
-                      className="flex-1 md:flex-none px-3 py-2.5 sm:px-6 sm:py-3.5 bg-white border-2 border-[#03045E] text-[#03045E] font-black text-xs sm:text-sm rounded-lg sm:rounded-xl transition-all duration-200 whitespace-nowrap cursor-pointer"
+                                           className="flex-1 px-2 sm:px-4 py-2.5 bg-white border-2 border-[#03045E] text-[#03045E] font-black text-xs rounded-lg transition-all duration-200 whitespace-nowrap cursor-pointer"
                     >
                       View Details
                     </button>
-                    <button 
+                                     <button 
                       onClick={() => openApplyModal(job)}
                       disabled={hasApplied}
                       aria-label={hasApplied ? `Already applied to ${job.job_title} at ${job.company_name}` : `Apply now to ${job.job_title} at ${job.company_name}`}
                       style={!hasApplied ? { color: '#ffffff' } : undefined}
-                      className={`flex-1 md:flex-none px-3 py-2.5 sm:px-6 sm:py-3.5 font-black text-xs sm:text-sm rounded-lg sm:rounded-xl transition-all duration-200 whitespace-nowrap cursor-pointer border-2 ${
+                      className={`flex-1 px-2 sm:px-4 py-2.5 font-black text-xs rounded-lg transition-all duration-200 whitespace-nowrap border-2 ${
                         hasApplied 
-                          ? 'bg-[#f4f4f4] text-[#03045E]/50 border-[#03045E]/20 cursor-not-allowed' 
-                          : `${isDarkScreen ? 'bg-black border-white' : 'bg-[#2C7FFF] border-[#2C7FFF]'}`
+                          ? 'bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed opacity-70' 
+                          : `${isDarkScreen ? 'bg-black border-white cursor-pointer' : 'bg-[#2C7FFF] border-[#2C7FFF] cursor-pointer'}`
                       }`}
                     >
                       {hasApplied ? (
-                        <span className="inline-flex items-center gap-1 sm:gap-1.5">
+                        <span className="inline-flex items-center justify-center gap-1 sm:gap-1.5">
                           <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                           Applied
                         </span>
@@ -581,10 +633,33 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                   </div>
                 </div>
               );
-            })}
+                     })}
+         
           </div>
-        ) : (
-          <div role="status" aria-label="No jobs match your filters. Try adjusting your search criteria." className="p-6 sm:p-12 rounded-2xl sm:rounded-3xl border-2 border-dashed border-[#03045E]/30 bg-white flex flex-col items-center justify-center text-center min-h-[220px] sm:min-h-[280px]">
+          {totalPages > 1 && (
+            <div className={`flex justify-between items-center gap-3 w-full pt-3 border-t-2 ${isDarkScreen ? 'border-white/15' : 'border-[#03045E]/10'}`}>
+              <button
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+                className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all cursor-pointer border-2 disabled:opacity-50 disabled:cursor-not-allowed ${isDarkScreen ? 'bg-black text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/30'}`}
+              >
+                Previous
+              </button>
+              <span className={`text-[10px] sm:text-xs font-black ${isDarkScreen ? 'text-white/70' : 'text-[#03045E]/70'}`}>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all cursor-pointer border-2 disabled:opacity-50 disabled:cursor-not-allowed ${isDarkScreen ? 'bg-black text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/30'}`}
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </div>
+              ) : (
+          <div role="status" aria-label="No jobs match your filters. Try adjusting your search criteria." className="col-span-full p-6 sm:p-12 rounded-2xl sm:rounded-3xl border-2 border-dashed border-[#03045E]/30 bg-white flex flex-col items-center justify-center text-center min-h-[220px] sm:min-h-[280px]">
             <div aria-hidden="true" className="w-12 h-12 sm:w-16 sm:h-16 bg-[#2C7FFF]/15 rounded-full flex items-center justify-center mb-4 sm:mb-5 border-2 border-[#2C7FFF]/30 text-[#2C7FFF]">
               <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -597,7 +672,7 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
             <button
               onClick={() => { setSearchQuery(''); setMaxDistance('Any'); setSelectedSkills([]); setSelectedAccs([]); }}
               aria-label="Clear all filters"
-              className="px-4 py-2 sm:px-5 sm:py-2.5 bg-[#2C7FFF] text-white font-black text-xs sm:text-sm rounded-xl sm:rounded-2xl transition border-2 border-[#2C7FFF] cursor-pointer"
+              className={`px-4 py-2 sm:px-5 sm:py-2.5 bg-[#2C7FFF] font-black text-xs sm:text-sm rounded-xl sm:rounded-2xl transition border-2 border-[#2C7FFF] cursor-pointer ${isDarkScreen ? '!text-black border-black' : '!text-white'}`}
             >
               Clear all filters
             </button>
@@ -659,12 +734,11 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                               {selectedJob.match_percentage}% Overall Match
                             </span>
                           )}
-                          {selectedJob.distance_km && (
+                                                  {selectedJob.distance_km && (
                             <span
                               tabIndex="0"
                               aria-label={`Distance ${selectedJob.distance_km} kilometers away`}
-                              style={getDistanceBadgeStyles(selectedJob.distance_km, isDarkScreen)}
-                              className="inline-flex px-2.5 py-1 sm:px-3.5 sm:py-1.5 border-2 text-[10px] sm:text-xs font-black uppercase tracking-wide rounded-full items-center gap-1 sm:gap-1.5 w-fit focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2"
+                              className={`inline-flex px-2.5 py-1 sm:px-3.5 sm:py-1.5 border-2 text-[10px] sm:text-xs font-black uppercase tracking-wide rounded-full items-center gap-1 sm:gap-1.5 w-fit focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 ${getDistanceBadgeStyles(selectedJob.distance_km, isDarkScreen)}`}
                             >
                               <svg aria-hidden="true" className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
@@ -809,19 +883,19 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                       </div>
                     </div>
 
-                    <div className="mt-2 pt-4 sm:pt-6 border-t-2 border-[#03045E]/15">
+                                  <div className="mt-2 pt-4 sm:pt-6 border-t-2 border-[#03045E]/15">
                       <button 
                         onClick={() => openApplyModal(selectedJob)}
-                        disabled={applications.some(app => app.job_id === selectedJob.id)}
-                        aria-label={applications.some(app => app.job_id === selectedJob.id) ? 'Already applied' : 'Apply now'}
-                        style={!applications.some(app => app.job_id === selectedJob.id) ? { color: '#ffffff' } : undefined}
-                        className={`py-3 sm:py-4 px-4 sm:px-6 font-black text-xs sm:text-sm rounded-xl sm:rounded-2xl transition w-full cursor-pointer border-2 ${
-                          applications.some(app => app.job_id === selectedJob.id) 
-                            ? 'bg-[#f4f4f4] text-[#03045E]/50 border-[#03045E]/20 cursor-not-allowed' 
-                            : `${isDarkScreen ? 'bg-black border-white' : 'bg-[#2C7FFF] border-[#2C7FFF]'}`
+                        disabled={checkHasApplied(selectedJob.id)}
+                        aria-label={checkHasApplied(selectedJob.id) ? 'Already applied' : 'Apply now'}
+                        style={!checkHasApplied(selectedJob.id) ? { color: '#ffffff' } : undefined}
+                        className={`py-3 sm:py-4 px-4 sm:px-6 font-black text-xs sm:text-sm rounded-xl sm:rounded-2xl transition w-full border-2 ${
+                          checkHasApplied(selectedJob.id)
+                            ? 'bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed opacity-70' 
+                            : `${isDarkScreen ? 'bg-black border-white cursor-pointer' : 'bg-[#2C7FFF] border-[#2C7FFF] cursor-pointer'}`
                         }`}
                       >
-                        {applications.some(app => app.job_id === selectedJob.id) ? (
+                        {checkHasApplied(selectedJob.id) ? (
                           <span className="inline-flex items-center justify-center gap-1 sm:gap-1.5">
                             <svg aria-hidden="true" className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                             Already Applied
@@ -881,52 +955,58 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
 
           </div>
         </div>
-      )}
+      )}  
 
-      {sweetAlert.isOpen && (
+          {sweetAlert.isOpen && (
         <div
-          role="alertdialog"
+                    className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
+          style={{ backgroundColor: (isDarkScreen) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
+          role="dialog"
           aria-modal="true"
           aria-labelledby="sweet-alert-title"
           aria-describedby="sweet-alert-text"
-          className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
-          style={{ backgroundColor: (isDarkScreen) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
+          tabIndex="-1"
         >
-          <div className="relative w-full max-w-md rounded-xl sm:rounded-2xl shadow-[0_25px_60px_rgba(3,4,94,0.25)] overflow-hidden animate-in zoom-in-95 duration-300 bg-[var(--color-card,#ffffff)] border-2 border-[#2C7FFF]">
-            <div aria-hidden="true" className="h-2 w-full bg-[#2C7FFF]" />
+          <div 
+            className={`relative w-full max-w-md rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 focus:outline-none ${(isDarkScreen) ? 'bg-black border-2 border-white' : 'bg-white border-2 border-[#2C7FFF]'}`}
+          >
+            <div className="h-1.5 sm:h-2 w-full bg-[#2C7FFF]" />
 
-            <div className="relative px-6 pt-8 pb-6 flex flex-col items-center text-center">
-              <div aria-hidden="true" className="relative mb-5">
-                <div className="w-20 h-20 rounded-full flex items-center justify-center bg-transparent border-4 border-[#2C7FFF]">
+            <div className="relative px-4 pt-6 pb-5 sm:px-8 sm:pt-10 sm:pb-8 flex flex-col items-center text-center">
+              <div className="relative mb-3 sm:mb-5">
+                <div className={`w-14 h-14 sm:w-24 sm:h-24 rounded-full flex items-center justify-center ${(isDarkScreen) ? 'bg-transparent border-4 border-white' : 'bg-transparent border-4 border-[#2C7FFF]'}`}>
                   {sweetAlert.type === 'success' ? (
-                    <svg className="w-10 h-10 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <svg className={`w-7 h-7 sm:w-12 sm:h-12 ${(isDarkScreen) ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   ) : (
-                    <svg className="w-10 h-10 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <svg className={`w-7 h-7 sm:w-12 sm:h-12 ${(isDarkScreen) ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                   )}
                 </div>
-                <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold bg-[#03045E] text-white">{sweetAlert.type === 'success' ? '✓' : '!'}</div>
+                <div className={`absolute -top-1 -right-1 w-4 h-4 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[9px] sm:text-xs font-bold ${(isDarkScreen) ? 'bg-white text-black' : 'bg-[#03045E] text-white'}`}>
+                  {sweetAlert.type === 'success' ? '✓' : '!'}
+                </div>
               </div>
 
-              <span aria-hidden="true" className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 border-2 text-[#2C7FFF] bg-transparent border-[#2C7FFF]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
+              <span className={`inline-flex items-center gap-1 sm:gap-1.5 px-2.5 py-0.5 sm:px-4 sm:py-1.5 rounded-full text-[8px] sm:text-[10px] font-black uppercase tracking-widest mb-2.5 sm:mb-4 border-2 ${(isDarkScreen) ? 'text-white bg-transparent border-white' : 'text-[#2C7FFF] bg-transparent border-[#2C7FFF]'}`}>
+                <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-[#10B981]"></span>
                 {sweetAlert.type === 'success' ? 'Success' : 'Notice'}
               </span>
 
-              <h2 id="sweet-alert-title" className="text-xl font-black tracking-tight mb-2 text-[#03045E]">
+              <h2 id="sweet-alert-title" className={`text-lg sm:text-3xl font-black tracking-tight mb-1 sm:mb-2 ${(isDarkScreen) ? 'text-white' : 'text-[#03045E]'}`}>
                 {sweetAlert.title}
               </h2>
-              <p id="sweet-alert-text" className="text-xs font-bold leading-relaxed mb-6 max-w-xs text-[#03045E]/80">
+              <p id="sweet-alert-text" className={`text-[11px] sm:text-sm font-bold leading-relaxed mb-5 sm:mb-8 max-w-xs ${(isDarkScreen) ? 'text-white/80' : 'text-[#03045E]/80'}`}>
                 {sweetAlert.text}
               </p>
 
               <button
                 onClick={closeSweetAlert}
                 aria-label="Got It. Close alert."
-                className="w-full py-3 rounded-lg sm:rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer text-[#03045E] bg-transparent border-2 border-[#03045E]"
+                className={`w-full py-2.5 sm:py-4 rounded-lg sm:rounded-xl font-black text-[11px] sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 focus:outline-none`}
+                style={{ color: (isDarkScreen) ? '#ffffff' : '#03045E', borderColor: (isDarkScreen) ? '#ffffff' : '#03045E' }}
               >
                 Got It
               </button>

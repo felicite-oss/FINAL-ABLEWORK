@@ -17,21 +17,36 @@ export default function RegisterSelect() {
   const useLightLogo = (paletteKey === 'highContrast' || paletteKey === 'darkComfort') && !isDarkActive;
   const headerLogo = isAccessibilityMode ? darkLogo : (isDarkActive ? darkLogo : lightLogo);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const handleResize = () => {
+      window.scrollTo(0, 0);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+    const isAPlusPlus = mode === 'A++' || mode === 'Assist' || mode === 'a++' || mode === 'assist';
+  const isAPlus = mode === 'A+' || mode === 'a+';
+  
+  const navSize = isAPlusPlus ? 'text-xl' : isAPlus ? 'text-lg' : 'text-[15px]';
+  const mobileNavSize = isAPlusPlus ? 'text-base' : isAPlus ? 'text-sm' : 'text-[13px]';
+
   const titleSize = 'text-xl sm:text-2xl md:text-3xl lg:text-4xl';
   const subtitleSize = 'text-xs sm:text-base md:text-lg';
   const cardTitleSize = 'text-base sm:text-xl md:text-2xl';
   const cardDescSize = 'text-[11px] sm:text-sm md:text-base';
   const containerPadding = 'pt-5 px-4 pb-3 sm:pt-6 sm:px-6 sm:pb-4 md:pt-8 md:px-8 md:pb-6 lg:pt-10 lg:px-10 lg:pb-8';
   const containerGap = 'gap-3 sm:gap-5';
-  const containerMaxWidth = 'max-w-[94%] sm:max-w-md md:max-w-xl lg:max-w-2xl';
+const containerMaxWidth = 'max-w-[94%] sm:max-w-md md:max-w-xl lg:max-w-2xl';
   const containerMinHeight = 'min-h-[auto] sm:min-h-[400px] md:min-h-[460px]';
 
   return (
     <main role="main" aria-label="RegisterSelect Screen" className="flex flex-col bg-[#f4f4f4] min-h-screen overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
 
       <header role="banner" className="w-full bg-[#f4f4f4] border-b border-[#03045E]/10 fixed top-0 left-0 z-50">
-        <div className="w-full h-14 sm:h-16 pl-3 pr-3 sm:pl-4 sm:pr-4 md:pr-8 flex items-center justify-between max-w-[1700px] mx-auto box-border">
-          <div className="flex items-center gap-8 max-w-[1700px] mx-auto w-full box-border">
+      <div className="w-full h-14 sm:h-16 pl-3 pr-3 sm:pl-4 sm:pr-4 md:pr-8 flex items-center justify-between box-border">
+         <div className="flex items-center gap-8 w-full box-border">
             <div className="flex items-center flex-shrink-0 py-1">
               <img
                 src={headerLogo}
@@ -43,7 +58,7 @@ export default function RegisterSelect() {
                 className="h-9 sm:h-12 md:h-14 w-auto object-contain max-h-full"
               />
             </div>
-            <nav aria-label="Main navigation" className={`hidden md:flex items-center gap-6 text-[15px] font-medium ${isAccessibilityMode ? '!text-white' : 'text-[#03045E]'}`}>
+     <nav aria-label="Main navigation" className={`hidden md:flex items-center gap-6 ${navSize} font-medium ${isAccessibilityMode ? '!text-white' : 'text-[#03045E]'}`}>
               <NavLink to="/" title="Home" className={({ isActive }) => `transition-colors duration-200 hover:scale-105 transform ${isAccessibilityMode ? '!text-white' : ''} ${isActive ? (isAccessibilityMode ? '!text-white font-semibold border-b-2 border-white pb-0.5' : 'text-[#2C7FFF] font-semibold border-b-2 border-[#2C7FFF] pb-0.5') : ''}`}>Home</NavLink>
               <NavLink to="/about" title="About Us" className={({ isActive }) => `transition-colors duration-200 hover:scale-105 transform ${isAccessibilityMode ? '!text-white' : ''} ${isActive ? (isAccessibilityMode ? '!text-white font-semibold border-b-2 border-white pb-0.5' : 'text-[#2C7FFF] font-semibold border-b-2 border-[#2C7FFF] pb-0.5') : ''}`}>About Us</NavLink>
               <NavLink to="/policy" title="Policy" className={({ isActive }) => `transition-colors duration-200 hover:scale-105 transform ${isAccessibilityMode ? '!text-white' : ''} ${isActive ? (isAccessibilityMode ? '!text-white font-semibold border-b-2 border-white pb-0.5' : 'text-[#2C7FFF] font-semibold border-b-2 border-[#2C7FFF] pb-0.5') : ''}`}>Policy</NavLink>
@@ -73,7 +88,7 @@ export default function RegisterSelect() {
                       </svg>
                     </div>
                     <div aria-hidden="true" className="flex-1 min-w-0">
-                      <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Home</span>
+                   <span aria-hidden="true" className={`${mobileNavSize} tracking-wide font-black block leading-tight text-[#03045E] break-words`}>Home</span>
                     </div>
                     <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -92,7 +107,7 @@ export default function RegisterSelect() {
                       </svg>
                     </div>
                     <div aria-hidden="true" className="flex-1 min-w-0">
-                      <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">About Us</span>
+                    <span aria-hidden="true" className={`${mobileNavSize} tracking-wide font-black block leading-tight text-[#03045E] break-words`}>About Us</span>
                     </div>
                     <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -145,13 +160,13 @@ export default function RegisterSelect() {
         </div>
       </header>
 
-      <div
-        className={`flex-grow pt-16 pb-12 flex flex-col items-center md:items-end justify-center px-3 sm:pl-4 sm:pr-4 md:pr-12 lg:pr-16 md:pl-8 max-w-[1700px] mx-auto w-full box-border relative bg-no-repeat bg-center bg-[size:600px_auto] md:bg-[size:1100px_auto] md:bg-left min-h-[110vh] md:min-h-[105vh] transition-all duration-300`}
-        style={{
-          backgroundImage: `url(${backgroundImg})`,
-        }}
-      >
-        <div className={`w-full ${containerMaxWidth} ${containerPadding} ${containerMinHeight} flex flex-col items-center justify-center ${containerGap} relative z-10 ${isDarkActive ? 'bg-black text-white border-2 border-white' : `${ui.mainCardBg}`} backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-xl md:mt-4 mr-0 md:mr-2 lg:mr-6`}>
+  <div
+  className={`flex-grow pt-20 pb-12 flex flex-col items-center md:items-end justify-center p-3 sm:p-6 md:p-10 w-full box-border relative bg-no-repeat bg-center bg-[size:600px_auto] md:bg-[size:1100px_auto] md:bg-left min-h-[110vh] md:min-h-[105vh] transition-all duration-300`}
+  style={{
+    backgroundImage: `url(${backgroundImg})`,
+  }}
+>
+       <div className={`w-full ${containerMaxWidth} ${containerPadding} ${containerMinHeight} flex flex-col items-center justify-start ${containerGap} relative z-10 ${isDarkActive ? 'bg-black text-white border-2 border-white' : `${ui.mainCardBg}`} backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-xl md:mt-15 md:mr-2 lg:mr-6`}>
           <div className="text-center w-full max-w-lg mb-2 sm:mb-4">
             <span aria-hidden="true" title="Welcome to AbleWork" tabIndex="0" className={`inline-block py-1 px-2.5 sm:px-3 rounded-full ${isDarkActive ? 'bg-white text-black' : `${ui.badgeBg}`} font-bold text-[10px] sm:text-xs uppercase tracking-widest mb-1.5`}>Welcome to AbleWork</span>
             <h1 aria-label="Choose Your Path" title="Choose Your Path" tabIndex="0" className={`${titleSize} font-black tracking-tight ${isDarkActive ? 'text-white' : `${ui.mainCardText}`} mb-1.5`}>Choose Your Path</h1>
@@ -180,7 +195,7 @@ export default function RegisterSelect() {
 
       <footer role="contentinfo" className="w-full relative z-20 overflow-hidden mt-auto bg-[#03045E] text-white border-t-2 border-[#2C7FFF]" style={{ filter: 'none', WebkitFilter: 'none', forcedColorAdjust: 'none' }}>
         <div aria-hidden="true" className="h-1 w-full bg-[#2C7FFF]" />
-        <div className="w-full h-auto pl-4 pr-4 md:pr-8 py-6 sm:py-12 max-w-[1700px] mx-auto box-border">
+       <div className="w-full h-auto px-4 md:px-10 py-6 sm:py-12 box-border">
           <div className="grid grid-cols-2 md:grid-cols-12 gap-4 sm:gap-8 items-start justify-between">
             <div className="col-span-2 md:col-span-5 flex flex-col items-center md:items-start text-center md:text-left space-y-2 sm:space-y-4">
               <div className="flex items-center gap-3">
@@ -217,7 +232,7 @@ export default function RegisterSelect() {
                 <h4 title="Connect" tabIndex="0" className="font-bold mb-2 sm:mb-4 text-white text-xs sm:text-base">Connect</h4>
                 <ul className="space-y-1 sm:space-y-3 text-[10px] sm:text-sm font-semibold text-white/80">
                   <li title="ableworksys5i@gmail.com" tabIndex="0" className="flex items-start gap-2"><svg aria-hidden="true" className="w-3.5 h-3.5 sm:w-5 sm:h-5 shrink-0 mt-0.5 text-[#7FB0FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg><span>ableworksys5i@gmail.com</span></li>
-                  <li title="Burgos Street, Barangay Villamonte, Bacolod City" tabIndex="0" className="flex items-start gap-2"><svg aria-hidden="true" className="w-3.5 h-3.5 sm:w-5 sm:h-5 shrink-0 mt-0.5 text-[#7FB0FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg><span>Burgos Street, Barangay Villamonte, Bacolod City</span></li>
+                 <li title="Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines" tabIndex="0" className="flex items-start gap-2"><svg aria-hidden="true" className="w-3.5 h-3.5 sm:w-5 sm:h-5 shrink-0 mt-0.5 text-[#7FB0FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg><span className="text-left">Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</span></li>
                   <li title="+63 900 000 0000" tabIndex="0" className="flex items-start gap-2"><svg aria-hidden="true" className="w-3.5 h-3.5 sm:w-5 sm:h-5 shrink-0 mt-0.5 text-[#7FB0FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg><span>+63 900 000 0000</span></li>
                 </ul>
               </div>
@@ -225,7 +240,7 @@ export default function RegisterSelect() {
           </div>
         </div>
         <div className="w-full py-2.5 sm:py-4 px-4 text-center text-[9px] sm:text-sm font-medium tracking-wide bg-[#03045E] text-white/70 border-t border-white/10">
-          <div title="Designed with accessibility and inclusivity at heart." tabIndex="0" className="max-w-[1700px] mx-auto flex items-center justify-center gap-4">
+<div title="Designed with accessibility and inclusivity at heart." tabIndex="0" className="w-full flex items-center justify-center gap-4">
             <p>Designed with accessibility and inclusivity at heart.</p>
           </div>
         </div>

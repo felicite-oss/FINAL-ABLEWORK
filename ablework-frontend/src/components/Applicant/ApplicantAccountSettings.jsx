@@ -341,14 +341,14 @@ export default function ApplicantAccountSettings({ profile }) {
   );
 
   return (
-    <div className="animate-fadeIn w-full space-y-6 sm:space-y-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] pb-10">
+    <div className="animate-fadeIn w-full space-y-4 sm:space-y-5 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] pb-6">
       
       <div
         role="region"
         aria-label="Account Settings header. Manage your security credentials and verification documents."
-        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4"
+        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2"
       >
-        <div className="flex flex-col items-start gap-2 w-fit text-left">
+        <div className="flex flex-col items-start gap-1 w-fit text-left">
           <h2
             role="heading"
             aria-level="1"
@@ -362,14 +362,14 @@ export default function ApplicantAccountSettings({ profile }) {
             role="text"
             aria-label="Manage your security credentials and verification documents."
             tabIndex="0"
-            className="text-[#03045E] mt-1.5 sm:mt-2 text-xs sm:text-sm md:text-base font-bold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
+            className="text-[#03045E] mt-1 text-xs sm:text-sm md:text-base font-bold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
           >
             Manage your security credentials and verification documents.
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 sm:gap-8">
+      <div className="flex flex-col gap-3 sm:gap-4">
         
         <div className={`bg-white rounded-xl sm:rounded-2xl border shadow-md overflow-hidden transition-all duration-300 ${openSection === 'verification' ? 'border-[#2C7FFF]/40' : 'border-[#03045E]/20 hover:border-[#2C7FFF]/30'}`}>
           <button
@@ -377,21 +377,21 @@ export default function ApplicantAccountSettings({ profile }) {
             onClick={() => toggleSection('verification')}
             aria-expanded={openSection === 'verification'}
             aria-controls="account-settings-verification-panel"
-            className="w-full p-4 sm:p-8 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer"
+            className="w-full p-4 sm:p-5 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer"
           >
             <span className="sr-only">
               Verification Status. Check your standing and manage your uploaded PWD ID.
             </span>
-            <div className="flex flex-col items-start gap-2 w-fit text-left">
+            <div className="flex flex-col items-start gap-1 w-fit text-left">
               <h2 
                 tabIndex="0"
-                className="text-base sm:text-xl font-extrabold text-[#03045E] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
+                className="text-base sm:text-lg font-extrabold text-[#03045E] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
               >
                 Verification Status
               </h2>
               <p 
                 tabIndex="0"
-                className="text-[11px] sm:text-sm text-[#03045e]/90 mt-0.5 sm:mt-1 font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
+                className="text-[11px] sm:text-sm text-[#03045e]/90 mt-0.5 font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
               >
                 Check your standing and manage your uploaded PWD ID.
               </p>
@@ -404,93 +404,70 @@ export default function ApplicantAccountSettings({ profile }) {
               id="account-settings-verification-panel"
               role="region"
               aria-label="Verification Status details"
-              className="px-4 pb-4 sm:px-8 sm:pb-8 border-t border-[#03045E]/10 pt-4 sm:pt-6 animate-fadeIn"
+              className="px-3 pb-3 sm:px-5 sm:pb-5 border-t border-[#03045E]/10 pt-3 sm:pt-4 animate-fadeIn"
             >
-              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start">
-                <div className="flex-1">
-                  <p tabIndex="0" className="text-[10px] sm:text-xs font-extrabold text-[#2c7fff]/60 uppercase tracking-widest mb-2 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2">Current Standing</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="p-3.5 rounded-lg border border-[#03045E]/10 bg-[#f4f4f4]">
+                  <div className="flex items-center gap-2 mb-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-[#2C7FFF]/15 flex items-center justify-center shrink-0">
+                      <svg className="w-4 h-4 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-[#03045E]/60">Current Standing</p>
+                  </div>
                   {profile?.verification_status === 'Approved' && (
-                    <span
-                      role="status"
-                      aria-label="Verification status: Approved"
-                      tabIndex="0"
-                      className="inline-flex items-center gap-1.5 px-3 py-1 sm:px-4 sm:py-1.5 bg-[#f4f4f4] text-[#03045E] font-extrabold text-xs sm:text-sm rounded-lg border border-[#03045E]/20 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2"
-                    >
-                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                    <span role="status" aria-label="Verification status: Approved" tabIndex="0" className="inline-flex items-center gap-1.5 px-3 py-1 bg-white text-[#03045E] font-extrabold text-xs rounded-lg border border-[#03045E]/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2">
+                      <svg className="w-3.5 h-3.5 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                       Approved
                     </span>
                   )}
                   {profile?.verification_status === 'Pending' && (
-                    <span
-                      role="status"
-                      aria-label="Verification status: Pending Review"
-                      tabIndex="0"
-                      className="inline-flex items-center gap-1.5 px-3 py-1 sm:px-4 sm:py-1.5 bg-[#2C7FFF]/10 text-[#2C7FFF] font-extrabold text-xs sm:text-sm rounded-lg border border-[#2C7FFF]/30 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2"
-                    >
-                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span role="status" aria-label="Verification status: Pending Review" tabIndex="0" className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#2C7FFF]/10 text-[#2C7FFF] font-extrabold text-xs rounded-lg border border-[#2C7FFF]/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                       Pending Review
                     </span>
                   )}
                   {isRejected && (
-                    <span
-                      role="status"
-                      aria-label="Verification status: Action Required"
-                      tabIndex="0"
-                      className="inline-flex items-center gap-1.5 px-3 py-1 sm:px-4 sm:py-1.5 bg-[#f4f4f4] text-[#03045E] font-extrabold text-xs sm:text-sm rounded-lg border border-[#03045E]/25 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2"
-                    >
-                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    <span role="status" aria-label="Verification status: Action Required" tabIndex="0" className="inline-flex items-center gap-1.5 px-3 py-1 bg-white text-[#03045E] font-extrabold text-xs rounded-lg border border-[#03045E]/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                       Action Required
                     </span>
                   )}
-                  
-                  <div className="mt-3 sm:mt-4">
-                    <a
-                      href={`http://localhost:5001/${profile?.pwd_document_path?.replace(/\\/g, '/')}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="View Document on File, opens in new tab"
-                      tabIndex="0"
-                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-extrabold text-[#2C7FFF] hover:underline rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2"
-                    >
-                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                      View Document on File
-                    </a>
+                  <p className="text-[10px] font-semibold text-[#03045E]/50 mt-2.5 leading-relaxed">
+                    {profile?.verification_status === 'Approved' && 'Your account is fully verified.'}
+                    {profile?.verification_status === 'Pending' && 'Awaiting admin review of your submission.'}
+                    {isRejected && 'Please re-upload a valid document.'}
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-lg border border-[#03045E]/10 bg-[#f4f4f4]">
+                  <div className="flex items-center gap-2 mb-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-[#2C7FFF]/15 flex items-center justify-center shrink-0">
+                      <svg className="w-4 h-4 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    </div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-[#03045E]/60">Uploaded Document</p>
                   </div>
+                  <a href={`http://localhost:5001/${profile?.pwd_document_path?.replace(/\\/g, '/')}`} target="_blank" rel="noopener noreferrer" aria-label="View Document on File, opens in new tab" tabIndex="0" className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#2C7FFF] hover:underline rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2">
+                    View Document on File
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                  </a>
+                  <p className="text-[10px] font-semibold text-[#03045E]/50 mt-2.5 leading-relaxed">Your submitted PWD ID on file.</p>
                 </div>
 
                 {isRejected && (
-                  <div className="flex-1 bg-[#f4f4f4] p-4 sm:p-5 rounded-lg sm:rounded-xl border border-[#03045E]/15 w-full">
-                    <h3 className="text-xs sm:text-sm font-extrabold text-[#03045E] mb-1.5 sm:mb-2">Re-verify Account</h3>
-                    <p className="text-[10px] sm:text-xs text-[#03045E]/70 mb-3 sm:mb-4 font-semibold">
+                  <div className="sm:col-span-2 p-3.5 rounded-lg border border-[#03045E]/15 bg-[#f4f4f4]">
+                    <h3 className="text-xs font-extrabold text-[#03045E] mb-1">Re-verify Account</h3>
+                    <p className="text-[10px] text-[#03045E]/70 mb-3 font-semibold">
                       {canResubmit ? "Your cooldown has expired. Please upload a clear, valid PWD ID image (Max 5MB)." : `Security lock active. You can upload a new document in ${daysLeft} days.`}
                     </p>
-                    
                     {verStatus.msg && (
-                      <div
-                        role={verStatus.type === 'error' ? 'alert' : 'status'}
-                        aria-live="assertive"
-                        className={`p-2.5 sm:p-3 text-[10px] sm:text-xs font-bold rounded-md sm:rounded-lg mb-3 sm:mb-4 border ${verStatus.type === 'error' ? 'bg-white text-[#03045E] border-[#03045E]/20' : 'bg-[#2C7FFF]/10 text-[#2C7FFF] border-[#2C7FFF]/30'}`}
-                      >
+                      <div role={verStatus.type === 'error' ? 'alert' : 'status'} aria-live="assertive" className={`p-2 text-[10px] font-bold rounded-md mb-3 border ${verStatus.type === 'error' ? 'bg-white text-[#03045E] border-[#03045E]/20' : 'bg-[#2C7FFF]/10 text-[#2C7FFF] border-[#2C7FFF]/30'}`}>
                         {verStatus.msg}
                       </div>
                     )}
-
-                    <form onSubmit={handleResubmitVerification} className="flex flex-col gap-2 sm:gap-3">
-                      <input 
-                        type="file" 
-                        accept="image/jpeg,image/jpg,image/png" 
-                        disabled={!canResubmit || isResubmitting} 
-                        onChange={(e) => setVerificationDoc(e.target.files[0])} 
-                        aria-label="Upload a new PWD ID picture file. Only JPG, JPEG, and PNG formats are allowed. Maximum size 5 megabytes."
-                        className="text-[10px] sm:text-xs text-[#03045E] file:mr-2 sm:file:mr-4 file:py-1.5 sm:file:py-2 file:px-3 sm:file:px-4 file:rounded-md sm:file:rounded-lg file:border-0 file:text-[10px] sm:file:text-xs file:font-bold file:bg-[#03045E] file:text-white hover:file:bg-[#2C7FFF] disabled:opacity-50 cursor-pointer" 
-                      />
+                    <form onSubmit={handleResubmitVerification} className="flex flex-col gap-2">
+                      <input type="file" accept="image/jpeg,image/jpg,image/png" disabled={!canResubmit || isResubmitting} onChange={(e) => setVerificationDoc(e.target.files[0])} aria-label="Upload a new PWD ID picture file. Only JPG, JPEG, and PNG formats are allowed. Maximum size 5 megabytes." className="text-[10px] text-[#03045E] file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-[#03045E] file:text-white hover:file:bg-[#2C7FFF] disabled:opacity-50 cursor-pointer" />
                       {canResubmit && (
-                        <button
-                          type="submit"
-                          disabled={isResubmitting || !verificationDoc}
-                          aria-label={isResubmitting ? 'Uploading new document, please wait' : 'Submit New Document'}
-                          className="mt-1 sm:mt-2 py-2 sm:py-2.5 bg-[#03045E] hover:bg-[#2C7FFF] text-white font-extrabold text-xs sm:text-sm rounded-md sm:rounded-lg transition disabled:opacity-50 shadow-sm cursor-pointer"
-                        >
+                        <button type="submit" disabled={isResubmitting || !verificationDoc} aria-label={isResubmitting ? 'Uploading new document, please wait' : 'Submit New Document'} className="py-2 bg-[#03045E] hover:bg-[#2C7FFF] text-white font-extrabold text-xs rounded-md transition disabled:opacity-50 shadow-sm cursor-pointer">
                           {isResubmitting ? 'Uploading...' : 'Submit New Document'}
                         </button>
                       )}
@@ -508,21 +485,21 @@ export default function ApplicantAccountSettings({ profile }) {
             onClick={() => toggleSection('email')}
             aria-expanded={openSection === 'email'}
             aria-controls="account-settings-email-panel"
-            className="w-full p-4 sm:p-8 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer"
+            className="w-full p-4 sm:p-5 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer"
           >
             <span className="sr-only">
               Email Address. Update your login email with OTP verification.
             </span>
-            <div className="flex flex-col items-start gap-2 w-fit text-left">
+            <div className="flex flex-col items-start gap-1 w-fit text-left">
               <h2 
                 tabIndex="0"
-                className="text-base sm:text-xl font-extrabold text-[#03045E] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
+                className="text-base sm:text-lg font-extrabold text-[#03045E] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
               >
                 Email Address
               </h2>
               <p 
                 tabIndex="0"
-                className="text-[11px] sm:text-sm text-[#03045E]/90 mt-0.5 sm:mt-1 font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
+                className="text-[11px] sm:text-sm text-[#03045E]/90 mt-0.5 font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
               >
                 Update your login email with OTP verification.
               </p>
@@ -535,88 +512,57 @@ export default function ApplicantAccountSettings({ profile }) {
               id="account-settings-email-panel"
               role="region"
               aria-label="Email Address details"
-              className="px-4 pb-4 sm:px-8 sm:pb-8 border-t border-[#03045E]/10 pt-4 sm:pt-6 animate-fadeIn"
+              className="px-3 pb-3 sm:px-5 sm:pb-5 border-t border-[#03045E]/10 pt-3 sm:pt-4 animate-fadeIn"
             >
-              
+              <div className="p-3 mb-3 rounded-lg border border-[#03045E]/10 bg-[#f4f4f4] flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-[#2C7FFF]/15 flex items-center justify-center shrink-0">
+                  <svg className="w-3.5 h-3.5 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-[#03045E]/50">Current Email</p>
+                  <p className="text-xs font-extrabold text-[#03045E] truncate">{profile?.email}</p>
+                </div>
+              </div>
+
               {emailStatus.msg && (
-                <div
-                  role={emailStatus.type === 'error' ? 'alert' : 'status'}
-                  aria-live="assertive"
-                  className={`p-3 sm:p-4 mb-4 sm:mb-6 rounded-md sm:rounded-lg text-xs sm:text-sm font-bold border-2 ${emailStatus.type === 'error' ? errorMsg : successMsg}`}
-                >
+                <div role={emailStatus.type === 'error' ? 'alert' : 'status'} aria-live="assertive" className={`p-2.5 mb-3 rounded-md text-xs font-bold border-2 ${emailStatus.type === 'error' ? errorMsg : successMsg}`}>
                   {emailStatus.msg}
                 </div>
               )}
 
               {emailStep === 1 ? (
-                <form onSubmit={handleRequestEmailUpdate} aria-label="Request email update form" className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-end">
+                <form onSubmit={handleRequestEmailUpdate} aria-label="Request email update form" className="flex flex-col sm:flex-row gap-3 items-end">
                   <div className="flex-1 w-full">
-                    <label htmlFor="account-settings-new-email" className="sr-only">Enter new email address</label>
-                    <input
-                      id="account-settings-new-email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      placeholder="Enter new email address"
-                      aria-label="Enter new email address"
-                      className="w-full p-3 sm:p-3.5 border border-[#03045E]/20 rounded-md sm:rounded-lg bg-[#f4f4f4] focus:border-[#2C7FFF] focus:bg-white outline-none transition font-medium text-xs sm:text-sm text-[#03045E]"
-                    />
+                    <label htmlFor="account-settings-new-email" className="text-[10px] font-black uppercase tracking-widest text-[#03045E]/60 mb-1 block">New Email Address</label>
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#03045E]/30" aria-hidden="true">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                      </div>
+                      <input id="account-settings-new-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="you@example.com" aria-label="Enter new email address" className="w-full pl-10 pr-3 py-2.5 border border-[#03045E]/20 rounded-lg bg-white focus:border-[#2C7FFF] outline-none transition font-semibold text-xs text-[#03045E]" />
+                    </div>
                   </div>
-                  <button
-                    type="submit"
-                    disabled={email === profile?.email}
-                    aria-label="Send verification code to new email"
-                    className="w-full sm:w-auto px-4 sm:px-6 py-3 sm:py-3.5 bg-[#f4f4f4] border border-[#03045E]/20 text-[#03045E] font-extrabold text-xs sm:text-sm rounded-md sm:rounded-lg shadow-sm transition disabled:opacity-50 cursor-pointer"
-                  >
+                  <button type="submit" disabled={email === profile?.email} aria-label="Send verification code to new email" className="w-full sm:w-auto px-5 py-2.5 bg-[#03045E] hover:bg-[#2C7FFF] text-white font-black text-xs rounded-lg transition disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5">
                     Send Code
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                   </button>
                 </form>
               ) : (
-                <form onSubmit={handleVerifyAndUpdateEmail} aria-label="Verify and update email form" className="flex flex-col gap-3 sm:gap-4">
-                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-end">
+                <form onSubmit={handleVerifyAndUpdateEmail} aria-label="Verify and update email form" className="flex flex-col gap-3">
+                  <div className="flex flex-col sm:flex-row gap-3 items-end">
                     <div className="flex-1 w-full">
-                      <label htmlFor="account-settings-new-email-disabled" tabIndex="0" className="text-[10px] sm:text-xs font-extrabold text-[#03045E]/60 uppercase tracking-widest mb-1 sm:mb-1.5 block rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit">New Email</label>
-                      <input
-                        id="account-settings-new-email-disabled"
-                        type="email"
-                        value={email}
-                        disabled
-                        aria-label={`New email address: ${email}. This field is locked.`}
-                        className="w-full p-3 sm:p-3.5 bg-[#f4f4f4] border border-[#03045E]/15 rounded-md sm:rounded-lg text-[#03045E]/50 outline-none cursor-not-allowed font-medium text-xs sm:text-sm"
-                      />
+                      <label htmlFor="account-settings-new-email-disabled" tabIndex="0" className="text-[10px] font-black uppercase tracking-widest text-[#03045E]/60 mb-1 block rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit">New Email</label>
+                      <input id="account-settings-new-email-disabled" type="email" value={email} disabled aria-label={`New email address: ${email}. This field is locked.`} className="w-full px-3 py-2.5 bg-[#f4f4f4] border border-[#03045E]/15 rounded-lg text-[#03045E]/50 outline-none cursor-not-allowed font-semibold text-xs" />
                     </div>
                     <div className="flex-1 w-full">
-                      <label htmlFor="account-settings-email-otp" tabIndex="0" className="text-[10px] sm:text-xs font-extrabold text-[#03045E]/60 uppercase tracking-widest mb-1 sm:mb-1.5 block rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit">Verification Code</label>
-                      <input
-                        id="account-settings-email-otp"
-                        type="text"
-                        value={emailOtp}
-                        onChange={(e) => setEmailOtp(e.target.value)}
-                        required
-                        placeholder="6-digit code"
-                        maxLength="6"
-                        aria-label="Enter the 6-digit verification code sent to your new email address"
-                        className="w-full p-3 sm:p-3.5 border border-[#03045E]/20 rounded-md sm:rounded-lg bg-[#f4f4f4] focus:border-[#2C7FFF] focus:bg-white outline-none transition tracking-widest font-mono text-xs sm:text-sm text-[#03045E]"
-                      />
+                      <label htmlFor="account-settings-email-otp" tabIndex="0" className="text-[10px] font-black uppercase tracking-widest text-[#03045E]/60 mb-1 block rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit">Verification Code</label>
+                      <input id="account-settings-email-otp" type="text" value={emailOtp} onChange={(e) => setEmailOtp(e.target.value)} required placeholder="000000" maxLength="6" aria-label="Enter the 6-digit verification code sent to your new email address" className="w-full px-3 py-2.5 border border-[#03045E]/20 rounded-lg bg-white focus:border-[#2C7FFF] outline-none transition tracking-[0.3em] text-center font-mono font-bold text-sm text-[#03045E]" />
                     </div>
                   </div>
-                  <div className="flex gap-2 sm:gap-3 mt-3 sm:mt-4">
-                    <button
-                      type="button"
-                      aria-label="Cancel email change"
-                      onClick={() => { setEmailStep(1); setEmailStatus({type:'', msg:''}); }}
-                      className="px-4 sm:px-6 py-3 sm:py-3.5 bg-[#f4f4f4] border border-[#03045E]/15 text-[#03045E] font-extrabold text-xs sm:text-sm rounded-md sm:rounded-lg hover:bg-white transition cursor-pointer"
-                    >
+                  <div className="flex gap-2">
+                    <button type="button" aria-label="Cancel email change" onClick={() => { setEmailStep(1); setEmailStatus({type:'', msg:''}); }} className="px-4 py-2.5 bg-[#f4f4f4] border border-[#03045E]/15 text-[#03045E] font-black text-xs rounded-lg hover:bg-white transition cursor-pointer">
                       Cancel
                     </button>
-                    <button
-                      type="submit"
-                      disabled={isUpdatingEmail || emailOtp.length < 6}
-                      aria-label={isUpdatingEmail ? 'Verifying code, please wait' : 'Verify and update email'}
-                    style={{ color: isDarkMode ? '#000000' : '#03045E' }}
-                      className="px-4 sm:px-6 py-3 sm:py-3.5 bg-[#03045E] font-extrabold text-xs sm:text-sm rounded-md sm:rounded-lg shadow-md hover:bg-[#2C7FFF] transition disabled:opacity-50 cursor-pointer w-full sm:w-auto"
-                    >
+                    <button type="submit" disabled={isUpdatingEmail || emailOtp.length < 6} aria-label={isUpdatingEmail ? 'Verifying code, please wait' : 'Verify and update email'} style={{ color: isDarkMode ? '#000000' : '#ffffff' }} className="flex-1 px-4 py-2.5 bg-[#03045E] font-black text-xs rounded-lg shadow-md hover:bg-[#2C7FFF] transition disabled:opacity-50 cursor-pointer">
                       {isUpdatingEmail ? 'Verifying...' : 'Verify & Update Email'}
                     </button>
                   </div>
@@ -632,21 +578,21 @@ export default function ApplicantAccountSettings({ profile }) {
             onClick={() => toggleSection('password')}
             aria-expanded={openSection === 'password'}
             aria-controls="account-settings-password-panel"
-            className="w-full p-4 sm:p-8 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer"
+            className="w-full p-4 sm:p-5 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer"
           >
             <span className="sr-only">
               Change Password. Update your account password securely.
             </span>
-            <div className="flex flex-col items-start gap-2 w-fit text-left">
+            <div className="flex flex-col items-start gap-1 w-fit text-left">
               <h2 
                 tabIndex="0"
-                className="text-base sm:text-xl font-extrabold text-[#03045E] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
+                className="text-base sm:text-lg font-extrabold text-[#03045E] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
               >
                 Change Password
               </h2>
               <p 
                 tabIndex="0"
-                className="text-[11px] sm:text-sm text-[#03045E]/90 mt-0.5 sm:mt-1 font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
+                className="text-[11px] sm:text-sm text-[#03045E]/90 mt-0.5 font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
               >
                 Update your account password securely.
               </p>
@@ -659,117 +605,78 @@ export default function ApplicantAccountSettings({ profile }) {
               id="account-settings-password-panel"
               role="region"
               aria-label="Change Password details"
-              className="px-4 pb-4 sm:px-8 sm:pb-8 border-t border-[#03045E]/10 pt-4 sm:pt-6 animate-fadeIn"
+              className="px-3 pb-3 sm:px-5 sm:pb-5 border-t border-[#03045E]/10 pt-3 sm:pt-4 animate-fadeIn"
             >
-              
               {passwordStatus.msg && (
-                <div
-                  role={passwordStatus.type === 'error' ? 'alert' : 'status'}
-                  aria-live="assertive"
-                  className={`p-3 sm:p-4 mb-4 sm:mb-6 rounded-md sm:rounded-lg text-xs sm:text-sm font-bold border-2 ${passwordStatus.type === 'error' ? errorMsg : successMsg}`}
-                >
+                <div role={passwordStatus.type === 'error' ? 'alert' : 'status'} aria-live="assertive" className={`p-2.5 mb-3 rounded-md text-xs font-bold border-2 ${passwordStatus.type === 'error' ? errorMsg : successMsg}`}>
                   {passwordStatus.msg}
                 </div>
               )}
 
               {passwordStep === 1 ? (
-                <form onSubmit={handleRequestPasswordUpdate} aria-label="Request password change form" className="flex flex-col gap-4 sm:gap-5">
-                  <div className="flex flex-col gap-1 sm:gap-1.5 w-full sm:max-w-md">
-                    <label htmlFor="account-settings-current-password" tabIndex="0" className="text-[10px] sm:text-xs font-extrabold text-[#2C7FFF]/60 uppercase tracking-widest rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit">Current Password</label>
+                <form onSubmit={handleRequestPasswordUpdate} aria-label="Request password change form" className="flex flex-col gap-3">
+                  <div className="p-3 rounded-lg border border-[#03045E]/10 bg-[#f4f4f4]">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-6 h-6 rounded-md bg-[#2C7FFF]/15 flex items-center justify-center shrink-0">
+                        <svg className="w-3.5 h-3.5 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                      </div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-[#03045E]/60">Verify Current Password</p>
+                    </div>
                     <div className="relative">
-                      <input 
-                        id="account-settings-current-password"
-                        type={showCurrentPassword ? "text" : "password"} 
-                        value={currentPassword} 
-                        onChange={(e) => setCurrentPassword(e.target.value)} 
-                        required 
-                        disabled={isRequestingPassword}
-                        aria-label="Enter your current password"
-                        className="w-full p-3 pr-10 sm:p-3.5 sm:pr-12 border border-[#03045E]/20 rounded-md sm:rounded-lg bg-[#f4f4f4] focus:border-[#2C7FFF] focus:bg-white outline-none transition font-medium text-xs sm:text-sm text-[#03045E] disabled:opacity-60" 
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                        aria-label={showCurrentPassword ? 'Hide current password' : 'Show current password'}
-                        className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-[#03045E]/50 hover:text-[#2C7FFF] transition cursor-pointer"
-                      >
+                      <input id="account-settings-current-password" type={showCurrentPassword ? "text" : "password"} value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required disabled={isRequestingPassword} placeholder="Enter your current password" aria-label="Enter your current password" className="w-full px-3 py-2.5 pr-10 border border-[#03045E]/20 rounded-lg bg-white focus:border-[#2C7FFF] outline-none transition font-semibold text-xs text-[#03045E] disabled:opacity-60" />
+                      <button type="button" onClick={() => setShowCurrentPassword(!showCurrentPassword)} aria-label={showCurrentPassword ? 'Hide current password' : 'Show current password'} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#03045E]/50 hover:text-[#2C7FFF] transition cursor-pointer">
                         {showCurrentPassword ? (
-                          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                         ) : (
-                          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
                         )}
                       </button>
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 w-full">
-                    <div className="flex flex-col gap-1 sm:gap-1.5 flex-1">
-                      <label htmlFor="account-settings-new-password" tabIndex="0" className="text-[10px] sm:text-xs font-extrabold text-[#2C7FFF]/60 uppercase tracking-widest rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit">New Password</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="p-3 rounded-lg border border-[#03045E]/10 bg-[#f4f4f4]">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-6 h-6 rounded-md bg-[#2C7FFF]/15 flex items-center justify-center shrink-0">
+                          <svg className="w-3.5 h-3.5 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
+                        </div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-[#03045E]/60">New Password</p>
+                      </div>
                       <div className="relative">
-                        <input 
-                          id="account-settings-new-password"
-                          type={showNewPassword ? "text" : "password"} 
-                          value={newPassword} 
-                          onChange={(e) => setNewPassword(e.target.value)} 
-                          required 
-                          disabled={isRequestingPassword}
-                          aria-label="Enter your new password"
-                          className="w-full p-3 pr-10 sm:p-3.5 sm:pr-12 border border-[#03045E]/20 rounded-md sm:rounded-lg bg-[#f4f4f4] focus:border-[#2C7FFF] focus:bg-white outline-none transition font-medium text-xs sm:text-sm text-[#03045E] disabled:opacity-60" 
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowNewPassword(!showNewPassword)}
-                          aria-label={showNewPassword ? 'Hide new password' : 'Show new password'}
-                          className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-[#03045E]/50 hover:text-[#2C7FFF] transition cursor-pointer"
-                        >
+                        <input id="account-settings-new-password" type={showNewPassword ? "text" : "password"} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required disabled={isRequestingPassword} placeholder="Min. 6 characters" aria-label="Enter your new password" className="w-full px-3 py-2.5 pr-10 border border-[#03045E]/20 rounded-lg bg-white focus:border-[#2C7FFF] outline-none transition font-semibold text-xs text-[#03045E] disabled:opacity-60" />
+                        <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} aria-label={showNewPassword ? 'Hide new password' : 'Show new password'} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#03045E]/50 hover:text-[#2C7FFF] transition cursor-pointer">
                           {showNewPassword ? (
-                            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                           ) : (
-                            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
                           )}
                         </button>
                       </div>
                     </div>
-                    
-                    <div className="flex flex-col gap-1 sm:gap-1.5 flex-1">
-                      <label htmlFor="account-settings-confirm-password" tabIndex="0" className="text-[10px] sm:text-xs font-extrabold text-[#2C7FFF]/60 uppercase tracking-widest rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit">Confirm New Password</label>
+                    <div className="p-3 rounded-lg border border-[#03045E]/10 bg-[#f4f4f4]">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-6 h-6 rounded-md bg-[#2C7FFF]/15 flex items-center justify-center shrink-0">
+                          <svg className="w-3.5 h-3.5 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                        </div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-[#03045E]/60">Confirm Password</p>
+                      </div>
                       <div className="relative">
-                        <input 
-                          id="account-settings-confirm-password"
-                          type={showConfirmPassword ? "text" : "password"} 
-                          value={confirmPassword} 
-                          onChange={(e) => setConfirmPassword(e.target.value)} 
-                          required 
-                          disabled={isRequestingPassword}
-                          aria-label="Confirm your new password"
-                          className="w-full p-3 pr-10 sm:p-3.5 sm:pr-12 border border-[#03045E]/20 rounded-md sm:rounded-lg bg-[#f4f4f4] focus:border-[#2C7FFF] focus:bg-white outline-none transition font-medium text-xs sm:text-sm text-[#03045E] disabled:opacity-60" 
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
-                          className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-[#03045E]/50 hover:text-[#2C7FFF] transition cursor-pointer"
-                        >
+                        <input id="account-settings-confirm-password" type={showConfirmPassword ? "text" : "password"} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required disabled={isRequestingPassword} placeholder="Re-enter new password" aria-label="Confirm your new password" className="w-full px-3 py-2.5 pr-10 border border-[#03045E]/20 rounded-lg bg-white focus:border-[#2C7FFF] outline-none transition font-semibold text-xs text-[#03045E] disabled:opacity-60" />
+                        <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#03045E]/50 hover:text-[#2C7FFF] transition cursor-pointer">
                           {showConfirmPassword ? (
-                            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                           ) : (
-                            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
                           )}
                         </button>
                       </div>
                     </div>
                   </div>
 
-                  <button
-                    type="submit"
-                    disabled={isRequestingPassword}
-                    aria-label={isRequestingPassword ? 'Sending verification code, please wait' : 'Request Password Change'}
-                    style={{ color: isDarkMode ? '#000000' : '#ffffff' }}
-                    className="mt-2 w-full sm:max-w-md px-4 sm:px-6 py-3 sm:py-3.5 bg-[#03045E] font-extrabold text-xs sm:text-sm rounded-md sm:rounded-lg shadow-md hover:bg-[#2C7FFF] transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
+                  <button type="submit" disabled={isRequestingPassword} aria-label={isRequestingPassword ? 'Sending verification code, please wait' : 'Request Password Change'} style={{ color: isDarkMode ? '#000000' : '#ffffff' }} className="w-full px-4 py-2.5 bg-[#03045E] font-black text-xs rounded-lg shadow-md hover:bg-[#2C7FFF] transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                     {isRequestingPassword ? (
                       <>
-                        <svg className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" style={{ color: isDarkMode ? '#000000' : '#ffffff' }} fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                        <svg className="w-4 h-4 animate-spin" style={{ color: isDarkMode ? '#000000' : '#ffffff' }} fill="none" viewBox="0 0 24 24" aria-hidden="true">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                         </svg>
@@ -781,39 +688,21 @@ export default function ApplicantAccountSettings({ profile }) {
                   </button>
                 </form>
               ) : (
-                <form onSubmit={handleVerifyAndUpdatePassword} aria-label="Verify and update password form" className="flex flex-col gap-3 sm:gap-4">
-                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-end">
-                    <div className="flex-1 w-full">
-                      <label htmlFor="account-settings-password-otp" tabIndex="0" className="text-[10px] sm:text-xs font-extrabold text-[#03045E]/60 uppercase tracking-widest mb-1 sm:mb-1.5 block rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit">Verification Code</label>
-                      <input
-                        id="account-settings-password-otp"
-                        type="text"
-                        value={passwordOtp}
-                        onChange={(e) => setPasswordOtp(e.target.value)}
-                        required
-                        placeholder="6-digit code sent to email"
-                        maxLength="6"
-                        aria-label="Enter the 6-digit verification code sent to your email"
-                        className="w-full p-3 sm:p-3.5 border border-[#03045E]/20 rounded-md sm:rounded-lg bg-[#f4f4f4] focus:border-[#2C7FFF] focus:bg-white outline-none transition tracking-widest font-mono text-xs sm:text-sm text-[#03045E]"
-                      />
+                <form onSubmit={handleVerifyAndUpdatePassword} aria-label="Verify and update password form" className="flex flex-col gap-3">
+                  <div className="p-3 rounded-lg border border-[#03045E]/10 bg-[#f4f4f4]">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-6 h-6 rounded-md bg-[#2C7FFF]/15 flex items-center justify-center shrink-0">
+                        <svg className="w-3.5 h-3.5 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                      </div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-[#03045E]/60">Email Verification Code</p>
                     </div>
+                    <input id="account-settings-password-otp" type="text" value={passwordOtp} onChange={(e) => setPasswordOtp(e.target.value)} required placeholder="000000" maxLength="6" aria-label="Enter the 6-digit verification code sent to your email" className="w-full px-3 py-2.5 border border-[#03045E]/20 rounded-lg bg-white focus:border-[#2C7FFF] outline-none transition tracking-[0.3em] text-center font-mono font-bold text-sm text-[#03045E]" />
                   </div>
-                  <div className="flex gap-2 sm:gap-3 mt-3 sm:mt-4">
-                    <button
-                      type="button"
-                      aria-label="Cancel password change"
-                      onClick={() => { setPasswordStep(1); setPasswordStatus({type:'', msg:''}); }}
-                      className="px-4 sm:px-6 py-3 sm:py-3.5 bg-[#f4f4f4] border border-[#03045E]/15 text-[#03045E] font-extrabold text-xs sm:text-sm rounded-md sm:rounded-lg hover:bg-white transition cursor-pointer"
-                    >
+                  <div className="flex gap-2">
+                    <button type="button" aria-label="Cancel password change" onClick={() => { setPasswordStep(1); setPasswordStatus({type:'', msg:''}); }} className="px-4 py-2.5 bg-[#f4f4f4] border border-[#03045E]/15 text-[#03045E] font-black text-xs rounded-lg hover:bg-white transition cursor-pointer">
                       Cancel
                     </button>
-                    <button
-                      type="submit"
-                      disabled={isUpdatingPassword || passwordOtp.length < 6}
-                      aria-label={isUpdatingPassword ? 'Verifying code, please wait' : 'Verify and update password'}
-                      style={{ color: isDarkMode ? '#000000' : '#ffffff' }}
-                      className="px-4 sm:px-6 py-3 sm:py-3.5 bg-[#03045E] font-extrabold text-xs sm:text-sm rounded-md sm:rounded-lg shadow-md hover:bg-[#2C7FFF] transition disabled:opacity-50 cursor-pointer w-full sm:w-auto"
-                    >
+                    <button type="submit" disabled={isUpdatingPassword || passwordOtp.length < 6} aria-label={isUpdatingPassword ? 'Verifying code, please wait' : 'Verify and update password'} style={{ color: isDarkMode ? '#000000' : '#ffffff' }} className="flex-1 px-4 py-2.5 bg-[#03045E] font-black text-xs rounded-lg shadow-md hover:bg-[#2C7FFF] transition disabled:opacity-50 cursor-pointer">
                       {isUpdatingPassword ? 'Verifying...' : 'Verify & Update Password'}
                     </button>
                   </div>
@@ -829,21 +718,21 @@ export default function ApplicantAccountSettings({ profile }) {
             onClick={() => toggleSection('danger')}
             aria-expanded={openSection === 'danger'}
             aria-controls="account-settings-danger-panel"
-            className="w-full p-4 sm:p-8 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer"
+            className="w-full p-4 sm:p-5 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer"
           >
             <span className="sr-only">
               Danger Zone. Deactivate or permanently delete your account.
             </span>
-            <div className="flex flex-col items-start gap-2 w-fit text-left">
+            <div className="flex flex-col items-start gap-1 w-fit text-left">
               <h2 
                 tabIndex="0"
-                className="text-base sm:text-xl font-extrabold text-[#ff0000] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
+                className="text-base sm:text-lg font-extrabold text-[#ff0000] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
               >
                 Danger Zone
               </h2>
               <p 
                 tabIndex="0"
-                className="text-[11px] sm:text-sm text-[#ff0000]/90 mt-0.5 sm:mt-1 font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
+                className="text-[11px] sm:text-sm text-[#ff0000]/90 mt-0.5 font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
               >
                 Deactivate or permanently delete your account.
               </p>
@@ -856,47 +745,38 @@ export default function ApplicantAccountSettings({ profile }) {
               id="account-settings-danger-panel"
               role="region"
               aria-label="Danger Zone details"
-              className="px-4 pb-4 sm:px-8 sm:pb-8 border-t border-[#03045E]/10 pt-4 sm:pt-6 animate-fadeIn"
+              className="px-3 pb-3 sm:px-5 sm:pb-5 border-t border-[#03045E]/10 pt-3 sm:pt-4 animate-fadeIn"
             >
-              
-              <div className="flex flex-col md:flex-row gap-4 sm:gap-6 justify-between items-start md:items-center p-4 sm:p-5 rounded-lg sm:rounded-xl bg-[#f4f4f4] border border-[#03045E]/15">
-                <div>
-                  <h3 tabIndex="0" className="text-xs sm:text-sm font-extrabold rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit" style={{ color: '#ff0000' }}>
-                    {isDeactivated ? 'Account is Currently Deactivated' : 'Deactivate Account'}
-                  </h3>
-                  <p tabIndex="0" className="text-[10px] sm:text-xs mt-1 font-semibold rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2" style={{ color: '#ff0000' }}>
-                    {isDeactivated 
-                      ? 'Your profile is hidden from employers. Reactivate to resume your job search.' 
-                      : 'Temporarily hide your profile and applications. You can reactivate later.'}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="p-3.5 rounded-lg border border-[#ff0000]/30 bg-[#f4f4f4]">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-7 h-7 rounded-lg bg-[#ff0000]/10 flex items-center justify-center shrink-0">
+                      <svg className="w-4 h-4 text-[#ff0000]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+                    </div>
+                    <h3 tabIndex="0" className="text-xs font-black uppercase tracking-wider text-[#ff0000] rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit">
+                      {isDeactivated ? 'Account Deactivated' : 'Deactivate Account'}
+                    </h3>
+                  </div>
+                  <p tabIndex="0" className="text-[11px] font-semibold text-[#03045E]/70 mb-3 leading-relaxed rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2">
+                    {isDeactivated ? 'Your profile is hidden from employers.' : 'Temporarily hide your profile and applications.'}
                   </p>
+                  <button type="button" onClick={handleToggleDeactivation} aria-label={isDeactivated ? 'Reactivate Account' : 'Deactivate Account'} className="w-full px-4 py-2 bg-white text-[#ff0000] border-2 border-[#ff0000] font-black text-xs rounded-lg hover:bg-[#ff0000]/5 transition cursor-pointer">
+                    {isDeactivated ? 'Reactivate Account' : 'Deactivate Account'}
+                  </button>
                 </div>
-                <button 
-                  type="button"
-                  onClick={handleToggleDeactivation}
-                  aria-label={isDeactivated ? 'Reactivate Account' : 'Deactivate Account'}
-                  className="px-4 sm:px-6 py-2 sm:py-2.5 font-extrabold text-xs sm:text-sm rounded-md sm:rounded-lg whitespace-nowrap cursor-pointer bg-transparent border-2"
-                  style={{ color: '#ff0000', borderColor: '#ff0000' }}
-                >
-                  {isDeactivated ? 'Reactivate Account' : 'Deactivate Account'}
-                </button>
-              </div>
 
-              <div className="h-px bg-[#03045E]/10 my-4 sm:my-6"></div>
-
-              <div className="flex flex-col md:flex-row gap-4 sm:gap-6 justify-between items-start md:items-center">
-                <div>
-                  <h3 tabIndex="0" className="text-xs sm:text-sm font-extrabold rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit" style={{ color: '#ff0000' }}>Delete Account</h3>
-                  <p tabIndex="0" className="text-[10px] sm:text-xs mt-1 font-semibold rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2" style={{ color: '#ff0000' }}>Permanently erase your data. This action cannot be undone.</p>
+                <div className="p-3.5 rounded-lg border border-[#ff0000]/30 bg-[#f4f4f4]">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-7 h-7 rounded-lg bg-[#ff0000]/10 flex items-center justify-center shrink-0">
+                      <svg className="w-4 h-4 text-[#ff0000]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </div>
+                    <h3 tabIndex="0" className="text-xs font-black uppercase tracking-wider text-[#ff0000] rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit">Delete Account</h3>
+                  </div>
+                  <p tabIndex="0" className="text-[11px] font-semibold text-[#03045E]/70 mb-3 leading-relaxed rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2">Permanently erase your data. This cannot be undone.</p>
+                  <button type="button" onClick={() => setShowDeleteModal(true)} aria-label="Delete Account" className="w-full px-4 py-2 bg-[#ff0000] text-white font-black text-xs rounded-lg hover:bg-[#cc0000] transition cursor-pointer shadow-sm">
+                    Delete Account
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setShowDeleteModal(true)}
-                  aria-label="Delete Account"
-                  className="px-4 sm:px-6 py-2 sm:py-2.5 font-extrabold text-xs sm:text-sm rounded-md sm:rounded-lg shadow-sm transition whitespace-nowrap cursor-pointer bg-transparent border-2"
-                  style={{ color: '#ff0000', borderColor: '#ff0000' }}
-                >
-                  Delete Account
-                </button>
               </div>
             </div>
           )}

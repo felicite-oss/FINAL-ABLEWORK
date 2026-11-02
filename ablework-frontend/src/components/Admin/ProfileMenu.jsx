@@ -50,7 +50,7 @@ export default function ProfileMenu({ adminUser, isLoggingOut, onLogoutClick, is
               : 'bg-[var(--color-card,#ffffff)] border-[var(--color-border,rgba(3,4,94,0.15))]'
           }`}>
 
-            <div className={`relative p-4 sm:p-5 ${isDark ? 'bg-black border-b-2 border-white' : 'bg-[#2C7FFF]'}`}>
+            <div className={`relative p-4 sm:p-5 ${isDark ? 'bg-black border-b-2 border-white' : 'bg-[#03045e]'}`}>
               <div className="relative flex items-center gap-3">
                 <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl overflow-hidden border-2 shrink-0 ${
                   isDark ? 'border-white bg-black' : 'border-white bg-white'

@@ -60,7 +60,7 @@ function MapInvalidator({ trigger }) {
   return null;
 }
 
-export default function ApplicantOverview({ profile, matchesCount, matches = [], jobs = [], applications = [], setActiveTab, setJobFromMap }) {
+export default function ApplicantOverview({ profile, matchesCount, matches = [], jobs = [], applications = [], setActiveTab }) {
   const { mode } = useContext(AccessibilityContext);
   const isDarkMode = mode && typeof mode === 'string' && (mode.toLowerCase().includes('dark') || mode.toLowerCase().includes('comfort'));
   const isContrast = mode && typeof mode === 'string' && mode.toLowerCase().includes('contrast');
@@ -478,10 +478,7 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
                           </div>
 
                           <button
-                            onClick={() => {
-                              setJobFromMap(job); // 1. Save the clicked job
-                              setActiveTab('explore-jobs'); // 2. Switch the tab
-                            }}
+                            onClick={() => setActiveTab('explore-jobs')}
                             aria-label={`View job details for ${job.job_title} at ${job.company_name}`}
                             className="w-full py-2.5 text-white text-xs font-black rounded-lg cursor-pointer flex items-center justify-center gap-2 shadow-md"
                             style={{ backgroundColor: isMatch ? '#10B981' : '#2C7FFF' }}
@@ -652,5 +649,5 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
 
       </section>
     </main>
-  );
+  );    
 }

@@ -16,10 +16,16 @@ export default function EmployerApplications({ profile, refreshStats }) {
   
   const [activeTab, setActiveTab] = useState('All');
 
-  const [nextSteps, setNextSteps] = useState({ isOpen: false, status: '' });
+    const [nextSteps, setNextSteps] = useState({ isOpen: false, status: '' });
   const [messageText, setMessageText] = useState('');
   const [showStatusAlert, setShowStatusAlert] = useState(false);
   const [statusAlert, setStatusAlert] = useState({ title: '', subtitle: '', tone: 'default' });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab]);
 
   const fetchApplications = async () => {
     try {
@@ -138,8 +144,12 @@ export default function EmployerApplications({ profile, refreshStats }) {
     return app.application_status === activeTab;
   });
 
-  const tabs = ['All', 'Pending', 'Under Review', 'Shortlisted', 'Hired', 'Rejected'];
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentApps = filteredApplications.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredApplications.length / itemsPerPage);
 
+  const tabs = ['All', 'Pending', 'Under Review', 'Shortlisted', 'Hired', 'Rejected'];
   const pageText = isDark ? 'text-white' : 'text-[#03045E]';
   const panelBg = isDark ? 'bg-black border-white' : 'bg-white border-gray-200';
   const cardBg = isDark ? 'bg-black border-white' : 'bg-white border-gray-200';
@@ -238,55 +248,98 @@ export default function EmployerApplications({ profile, refreshStats }) {
         })}
       </div>
       
-      <div className="flex flex-col gap-3 sm:gap-4">
-        {filteredApplications.length > 0 ? (
-          filteredApplications.map(app => (
-            <div key={app.application_id} className={`p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 ${cardBg}`}>
-              
-              <div className="flex-1">
-                <div className="flex items-center gap-2 sm:gap-3 mb-1 flex-wrap">
-                  <h3 className={`text-base sm:text-xl font-bold ${pageText}`}>{app.firstname} {app.lastname}</h3>
-                  <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[9px] sm:text-[11px] font-bold uppercase tracking-wider border-2 ${getStatusColor(app.application_status)}`}>
+          {filteredApplications.length > 0 ? (
+        <div role="list" className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6 items-start">
+          {currentApps.map(app => (
+            <div 
+              key={app.application_id} 
+              role="listitem"
+              tabIndex={0}
+              className={`min-h-[180px] sm:min-h-[220px] p-3.5 sm:p-8 rounded-lg sm:rounded-xl border-2 transition-all duration-200 flex flex-col justify-between gap-2.5 sm:gap-5 ${cardBg}`}
+            >
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 sm:gap-4 w-full min-w-0">
+                <div className="flex-1 min-w-0 w-full">
+                  <h3 className={`text-sm sm:text-2xl font-extrabold leading-tight break-words w-full ${pageText}`}>
+                    {app.firstname} {app.lastname}
+                  </h3>
+                  <p className={`text-[10px] sm:text-sm font-extrabold mt-0.5 sm:mt-1.5 mb-1 sm:mb-2 break-words ${muted}`}>
+                    Applied for: <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>{app.job_title}</span>
+                  </p>
+                  <p className={`text-[9px] sm:text-xs font-semibold ${subtle}`}>
+                    Applied on {new Date(app.applied_at).toLocaleDateString()}
+                  </p>
+                </div>
+
+                <div className="flex flex-row md:flex-col items-center md:items-end gap-2 sm:gap-2 min-w-0 w-full md:w-auto shrink-0 mt-2 md:mt-0">
+                  <span className={`px-2.5 py-1 sm:px-4 sm:py-2 text-[10px] sm:text-sm font-extrabold rounded-lg border whitespace-nowrap ${getStatusColor(app.application_status)}`}>
                     {app.application_status}
                   </span>
+                  <button 
+                    onClick={() => {
+                      setSelectedApp(app);
+                      setNextSteps({ isOpen: false, status: '' });
+                      setMessageText('');
+
+                      if(app.application_status === 'Pending') {
+                          updateStatus(app.application_id, 'Under Review', null, false);
+                      }
+                    }} 
+                    className={`w-full md:w-auto px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold rounded-md sm:rounded-lg cursor-pointer border-2 ${
+                      isDark
+                        ? 'bg-black text-white border-white'
+                        : 'bg-white text-[#03045E] border-gray-200'
+                    }`}
+                  >
+                    View Details
+                  </button>
                 </div>
-                <p className={`text-xs sm:text-sm font-semibold ${muted}`}>Applied for: <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>{app.job_title}</span></p>
-                <p className={`text-[10px] sm:text-xs font-medium mt-1 ${subtle}`}>Date: {new Date(app.applied_at).toLocaleDateString()}</p>
               </div>
-
-              <div className="w-full md:w-auto">
-                <button 
-                  onClick={() => {
-                    setSelectedApp(app);
-                    setNextSteps({ isOpen: false, status: '' });
-                    setMessageText('');
-
-                    if(app.application_status === 'Pending') {
-                        updateStatus(app.application_id, 'Under Review', null, false);
-                    }
-                  }} 
-                  className={`w-full md:w-auto px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-md sm:rounded-lg cursor-pointer border-2 ${
-                    isDark
-                      ? 'bg-black text-white border-white'
-                      : 'bg-white text-[#03045E] border-gray-200'
-                  }`}
-                >
-                  View Details
-                </button>
-              </div>
-
             </div>
-          ))
-        ) : (
-          <div className={`p-6 sm:p-10 text-center font-bold border-2 border-dashed rounded-xl sm:rounded-2xl text-sm sm:text-base ${
-            isDark 
-              ? 'text-white/70 border-white bg-black' 
-              : 'text-[#03045E]/70 border-gray-200 bg-white'
-          }`}>
-            No {activeTab !== 'All' ? activeTab.toLowerCase() : ''} applications found.
+          ))}
+        </div>
+      ) : (
+        <div className={`p-5 sm:p-12 rounded-lg sm:rounded-xl border-2 border-dashed flex flex-col items-center justify-center text-center min-h-[200px] sm:min-h-[280px] ${
+          isDark 
+            ? 'text-white/70 border-white bg-black' 
+            : 'text-[#03045E]/70 border-gray-200 bg-white'
+        }`}>
+          <div className={`w-10 h-10 sm:w-16 sm:h-16 rounded-full flex items-center justify-center shadow-sm mb-3 sm:mb-5 border ${isDark ? 'bg-black border-white/20' : 'bg-white border-[#03045E]/20'}`}>
+            <svg className={`w-5 h-5 sm:w-8 sm:h-8 ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
           </div>
-        )}
-      </div>
+          <h3 className={`text-base sm:text-xl font-extrabold mb-1.5 sm:mb-2 ${pageText}`}>
+            No {activeTab !== 'All' ? activeTab.toLowerCase() : ''} applications found
+          </h3>
+          <p className={`text-[11px] sm:text-sm font-semibold max-w-md leading-relaxed px-2 ${muted}`}>
+            {activeTab === 'All' 
+              ? "You haven't received any job applications yet. Once candidates apply, they will appear here." 
+              : `You don't have any applications currently in the "${activeTab}" state.`}
+          </p>
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className={`flex justify-between items-center gap-3 w-full pt-4 mt-2 border-t-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/10'}`}>
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all cursor-pointer border-2 disabled:opacity-50 disabled:cursor-not-allowed ${isDark ? 'bg-black text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/30'}`}
+          >
+            Previous
+          </button>
+          <span className={`text-[10px] sm:text-xs font-black ${isDark ? 'text-white/70' : 'text-[#03045E]/70'}`}>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all cursor-pointer border-2 disabled:opacity-50 disabled:cursor-not-allowed ${isDark ? 'bg-black text-white border-white/30' : 'bg-white text-[#03045E] border-[#03045E]/30'}`}
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       {selectedApp && (
         <div
