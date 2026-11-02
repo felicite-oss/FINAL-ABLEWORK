@@ -764,14 +764,14 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                             <Marker position={[Number(selectedJob.latitude), Number(selectedJob.longitude)]}>
                               <Popup>
                                 <div className="flex flex-col items-center justify-center gap-2 p-1 min-w-[140px]">
-                                  <span className="font-extrabold text-[#03045E] text-xs text-center leading-tight">
+                                  <span className={`font-extrabold ${isDarkScreen ? '!text-black' : 'text-[#03045E]'} text-xs text-center leading-tight`}>
                                     {selectedJob.company_name}
                                   </span>
-                                  <a
+                                                                    <a
                                     href={`https://www.google.com/maps?q=${selectedJob.latitude},${selectedJob.longitude}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="bg-[#2C7FFF] text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-[#03045E] transition-colors flex items-center justify-center gap-1.5 no-underline shadow-sm w-full"
+                                    className={`bg-[#2C7FFF] ${isDarkScreen ? '!text-black' : 'text-white'} px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-[#03045E] transition-colors flex items-center justify-center gap-1.5 no-underline shadow-sm w-full`}
                                   >
                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
