@@ -780,7 +780,7 @@ export function Home() {
                             title={`View job details for ${job.job_title} at ${job.company_name}`}
                             className="w-full py-2.5 text-white text-xs font-black rounded-xl cursor-pointer flex items-center justify-center gap-2 shadow-md bg-[#2C7FFF]"
                           >
-                            View Job Details
+                            Register to View Job Details
                             <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                             </svg>
