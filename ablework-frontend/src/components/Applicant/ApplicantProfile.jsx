@@ -120,9 +120,10 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
   }, []);
 
   const modalRef = useRef(null);
-  useEffect(() => {
+   useEffect(() => {
     if (isModalOpen && modalRef.current) {
-      modalRef.current.focus();
+      const titleElement = modalRef.current.querySelector('#avatar-modal-title');
+      if (titleElement) titleElement.focus();
     }
   }, [isModalOpen]);
 
@@ -551,21 +552,19 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
         </div>
       </div>
 
-      {isModalOpen && (
+          {isModalOpen && (
         <div
           role="dialog"
           aria-modal="true"
           aria-labelledby="avatar-modal-title"
           aria-describedby="avatar-modal-desc"
-          aria-live="assertive"
           tabIndex="-1"
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div 
+                  <div 
             ref={modalRef}
             onKeyDown={handleModalKeyDown}
-            tabIndex={-1}
             className="relative w-full max-w-md rounded-xl sm:rounded-2xl shadow-[0_25px_60px_rgba(3,4,94,0.25)] overflow-hidden animate-in zoom-in-95 duration-300 bg-white focus:outline-none"
           >
             <div aria-hidden="true" className="absolute -top-20 -right-20 w-56 h-56 rounded-full bg-[#2C7FFF]/10"></div>
@@ -582,14 +581,13 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
                 </div>
               </div>
 
-              <span tabIndex="0" className="inline-flex items-center gap-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.18em] text-[#2C7FFF] bg-[#2C7FFF]/10 px-2.5 sm:px-3 py-1 rounded-full mb-2 sm:mb-3 rounded focus:outline-none focus:ring-2 focus:ring-[#2C7FFF]">
+                         <span tabIndex="0" aria-label="Profile Picture" title="Profile Picture" className="inline-flex items-center gap-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.18em] text-[#2C7FFF] bg-[#2C7FFF]/10 px-2.5 sm:px-3 py-1 rounded-full mb-2 sm:mb-3 rounded focus:outline-none focus:ring-2 focus:ring-[#2C7FFF]">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2C7FFF] animate-pulse"></span>
                 Profile Picture
               </span>
 
-              <h3 id="avatar-modal-title" tabIndex="0" className="text-xl sm:text-2xl font-black text-[#03045E] tracking-tight mb-1 sm:mb-2 rounded focus:outline-none focus:ring-2 focus:ring-[#2C7FFF] focus:px-1">Update Your Avatar</h3>
-              <p id="avatar-modal-desc" tabIndex="0" className="text-[11px] sm:text-xs font-semibold text-[#03045E]/70 mb-4 sm:mb-6 max-w-xs rounded focus:outline-none focus:ring-2 focus:ring-[#2C7FFF] focus:px-1">Choose a new image to refresh your profile and header photo.</p>
-
+              <h3 id="avatar-modal-title" tabIndex="0" aria-label="Update Your Avatar" title="Update Your Avatar" className="text-xl sm:text-2xl font-black text-[#03045E] tracking-tight mb-1 sm:mb-2 rounded focus:outline-none focus:ring-2 focus:ring-[#2C7FFF] focus:px-1">Update Your Avatar</h3>
+              <p id="avatar-modal-desc" tabIndex="0" aria-label="Choose a new image to refresh your profile and header photo." title="Choose a new image to refresh your profile and header photo." className="text-[11px] sm:text-xs font-semibold text-[#03045E]/70 mb-4 sm:mb-6 max-w-xs rounded focus:outline-none focus:ring-2 focus:ring-[#2C7FFF] focus:px-1">Choose a new image to refresh your profile and header photo.</p>
               <div aria-hidden="true" className="relative mb-5 sm:mb-6">
                 <div className="absolute inset-0 rounded-full bg-[#2C7FFF]/15 blur-xl"></div>
                 <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-white shadow-xl ring-4 ring-[#2C7FFF]/30 bg-gray-100 flex items-center justify-center">

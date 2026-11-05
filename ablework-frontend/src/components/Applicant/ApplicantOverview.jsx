@@ -60,7 +60,7 @@ function MapInvalidator({ trigger }) {
   return null;
 }
 
-export default function ApplicantOverview({ profile, matchesCount, matches = [], jobs = [], applications = [], setActiveTab }) {
+export default function ApplicantOverview({ profile, matchesCount, matches = [], jobs = [], applications = [], setActiveTab, setJobFromMap }) {
   const { mode } = useContext(AccessibilityContext);
   const isDarkMode = mode && typeof mode === 'string' && (mode.toLowerCase().includes('dark') || mode.toLowerCase().includes('comfort'));
   const isContrast = mode && typeof mode === 'string' && mode.toLowerCase().includes('contrast');
@@ -413,9 +413,8 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
               )}
               
               <Marker position={[userLat, userLng]}>
-                <Popup>
-                  <div className="p-0 min-w-[220px] rounded-xl overflow-hidden bg-white shadow-xl">
-                    <div aria-hidden="true" className="h-1.5 w-full bg-[#03045E]"></div>
+                <Popup eventHandlers={{ add: (e) => { if (e.target._container) e.target._container.setAttribute('tabindex', '-1'); setTimeout(() => { const el = e.target._contentNode?.firstElementChild; if (el) el.focus(); }, 100); if (e.target._closeButton) e.target._closeButton.setAttribute('aria-label', 'Close'); } }}>
+                  <div className="p-0 min-w-[220px] rounded-xl overflow-hidden bg-white shadow-xl outline-none" tabIndex={0}>
                     <div className="px-4 pt-3.5 pb-3">
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-sm bg-[#03045E]">
@@ -447,9 +446,9 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
                     key={job.id} 
                     position={[Number(job.latitude), Number(job.longitude)]}
                     icon={isMatch ? MatchJobIcon : OtherJobIcon}
-                  >
-                    <Popup>
-                      <div className="p-0 min-w-[240px] rounded-xl overflow-hidden bg-white shadow-xl">
+                               >
+                    <Popup eventHandlers={{ add: (e) => { if (e.target._container) e.target._container.setAttribute('tabindex', '-1'); setTimeout(() => { const el = e.target._contentNode?.firstElementChild; if (el) el.focus(); }, 100); if (e.target._closeButton) e.target._closeButton.setAttribute('aria-label', 'Close'); } }}>
+                      <div className="p-0 min-w-[240px] rounded-xl overflow-hidden bg-white shadow-xl outline-none" tabIndex={0}>
                         <div aria-hidden="true" className="h-1.5 w-full" style={{ backgroundColor: isMatch ? '#10B981' : '#2C7FFF' }}></div>
 
                         <div className="px-4 pt-3.5 pb-3">
@@ -478,7 +477,10 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
                           </div>
 
                           <button
-                            onClick={() => setActiveTab('explore-jobs')}
+                            onClick={() => {
+                              setJobFromMap(job); // 1. Save the clicked job
+                              setActiveTab('explore-jobs'); // 2. Switch the tab
+                            }}
                             aria-label={`View job details for ${job.job_title} at ${job.company_name}`}
                             className="w-full py-2.5 text-white text-xs font-black rounded-lg cursor-pointer flex items-center justify-center gap-2 shadow-md"
                             style={{ backgroundColor: isMatch ? '#10B981' : '#2C7FFF' }}
@@ -611,34 +613,40 @@ export default function ApplicantOverview({ profile, matchesCount, matches = [],
           
           {/* Smart Engine Card - Adjusted Padding & Fonts */}
           <section aria-label="Smart Engine section" className="p-5 sm:p-8 rounded-2xl sm:rounded-3xl bg-white shadow-md border border-[#03045E]/20 flex flex-col justify-center">
-            <button 
-              type="button"
+                                   <div 
+              tabIndex="0"
+              role="text"
               onClick={() => setActiveTab('explore-jobs')}
-              aria-label="View your job matches"
-              className="flex flex-col items-start gap-2 w-fit group text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 mb-3 sm:mb-4"
+              aria-label="Smart Engine"
+              title="Smart Engine"
+              className="flex flex-col items-start gap-2 w-fit group text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 mb-3 sm:mb-4 cursor-pointer"
             >
               <span aria-hidden="true" className="inline-block px-2.5 sm:px-3 py-1 bg-[#f4f4f4] border border-[#03045E]/20 rounded-full text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-[#2C7FFF] w-fit">Smart Engine</span>
-            </button>
-            <button 
-              type="button"
+            </div>
+                  <div 
+              tabIndex="0"
+              role="text"
               onClick={() => setActiveTab('explore-jobs')}
-              aria-label="View your job matches"
-              className="flex flex-col items-start gap-2 w-fit group text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 mb-1.5 sm:mb-2"
+              aria-label="Find Your Perfect Fit"
+              title="Find Your Perfect Fit"
+              className="flex flex-col items-start gap-2 w-fit group text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 mb-1.5 sm:mb-2 cursor-pointer"
             >
               <h3 className="text-xl sm:text-2xl font-black text-[#03045E] transition-all group-hover:text-[#03045e] leading-tight">
                 Find Your Perfect Fit
               </h3>
-            </button>
-            <button 
-              type="button"
+            </div>
+            <div 
+              tabIndex="0"
+              role="text"
               onClick={() => setActiveTab('explore-jobs')}
-              aria-label="View your job matches"
-              className="flex flex-col items-start gap-2 w-fit group text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 mb-4 sm:mb-6"
+              aria-label="We've analyzed your skills and travel radius to pinpoint jobs tailored exactly for you."
+              title="We've analyzed your skills and travel radius to pinpoint jobs tailored exactly for you."
+              className="flex flex-col items-start gap-2 w-fit group text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 mb-4 sm:mb-6 cursor-pointer"
             >
               <p className="text-xs sm:text-sm font-semibold text-[#03045E] transition-all group-hover:text-[#03045e] max-w-[95%] sm:max-w-[90%] leading-relaxed">
                 We've analyzed your skills and travel radius to pinpoint jobs tailored exactly for you.
               </p>
-            </button>
+            </div>
             <button onClick={() => setActiveTab('explore-jobs')} aria-label="View your job matches" className={`flex items-center justify-center gap-2 w-full px-4 sm:px-6 py-3 sm:py-3.5 bg-white border-2 border-[#2C7FFF] font-extrabold text-xs sm:text-sm rounded-lg shadow-sm cursor-pointer text-[#03045E]`}>
               View Your Matches
               <svg aria-hidden="true" className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>

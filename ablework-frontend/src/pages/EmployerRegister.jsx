@@ -506,7 +506,7 @@ const handleAddressType = (e) => {
                       onChange={(e) => setPassword(e.target.value)} 
                       placeholder="Enter your Password" 
                       required 
-                      className={`w-full p-3 pr-12 border rounded-lg bg-white text-[#03045E] focus:outline-none transition ${password.length > 0 && !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password) ? 'border-red-500 focus:border-red-500' : 'border-[#03045E]/20 focus:border-[#2C7FFF]'}`} 
+                      className={`w-full p-3 pr-12 border rounded-lg bg-white text-[#03045E] focus:outline-none transition ${password.length > 0 && !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password) ? '!border-red-500 focus:!border-red-500' : 'border-[#03045E]/20 focus:border-[#2C7FFF]'}`} 
                       aria-label="Password. Please create a secure password with at least 8 characters."
                     />
                     <button
@@ -528,7 +528,7 @@ const handleAddressType = (e) => {
                     </button>
                   </div>
                   {password.length > 0 && !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password) && (
-                    <p className="text-xs text-red-500 font-semibold mt-1" aria-live="polite">
+                    <p tabIndex="0" role="alert" title="Must be 8+ chars and include an uppercase letter, lowercase letter, number, and special character." aria-label="Must be 8+ chars and include an uppercase letter, lowercase letter, number, and special character." className={`text-xs font-semibold mt-1 ${isDarkMode || isAccessibilityMode ? '!text-red-500' : 'text-red-500'}`} aria-live="polite">
                       Must be 8+ chars and include an uppercase letter, lowercase letter, number, and special character.
                     </p>
                   )}
@@ -544,7 +544,7 @@ const handleAddressType = (e) => {
                       onChange={(e) => setConfirmPassword(e.target.value)} 
                       placeholder="Confirm your Password" 
                       required 
-                      className={`w-full p-3 pr-12 border rounded-lg bg-white text-[#03045E] focus:outline-none transition ${confirmPassword.length > 0 && password !== confirmPassword ? 'border-red-500 focus:border-red-500' : 'border-[#03045E]/20 focus:border-[#2C7FFF]'}`} 
+                                         className={`w-full p-3 pr-12 border rounded-lg bg-white text-[#03045E] focus:outline-none transition ${confirmPassword.length > 0 && password !== confirmPassword ? '!border-red-500 focus:!border-red-500' : 'border-[#03045E]/20 focus:border-[#2C7FFF]'}`} 
                       aria-label="Confirm Password. Please re-enter your password to confirm it matches."
                     />
                     <button
@@ -565,8 +565,8 @@ const handleAddressType = (e) => {
                       )}
                     </button>
                   </div>
-                  {confirmPassword.length > 0 && password !== confirmPassword && (
-                    <p className="text-xs text-red-500 font-semibold mt-1" aria-live="polite">
+                                   {confirmPassword.length > 0 && password !== confirmPassword && (
+                    <p tabIndex="0" role="alert" title="Passwords do not match." aria-label="Passwords do not match." className={`text-xs font-semibold mt-1 ${isDarkMode || isAccessibilityMode ? '!text-red-500' : 'text-red-500'}`} aria-live="polite">
                       Passwords do not match.
                     </p>
                   )}
@@ -634,6 +634,9 @@ const handleAddressType = (e) => {
                           key={index}
                           role="option"
                           aria-selected="false"
+                          tabIndex="0"
+                          title={place.place_name}
+                          aria-label={place.place_name}
                           onClick={() => handleSelectSuggestion(place)}
                           className="p-3 cursor-pointer hover:bg-gray-100 text-[#03045E] text-sm border-b last:border-b-0"
                         >
@@ -851,7 +854,9 @@ const handleAddressType = (e) => {
                   className={`p-4 rounded-md font-bold text-center border-2 ${
                     statusMessage.type === 'success'
                       ? 'bg-green-100 text-green-800 border-green-400'
-                      : 'bg-white text-red-600 border-red-600'
+                      : isDarkMode || isAccessibilityMode
+                        ? 'bg-black !text-red-500 !border-red-500'
+                        : 'bg-white text-red-600 border-red-600'
                   }`}
                 >
                   {statusMessage.text}

@@ -38,6 +38,7 @@ export default function ApplicantDashboard() {
   const [authError, setAuthError] = useState('');
   const [isAuthVerifying, setIsAuthVerifying] = useState(false);
   const [showAuthPassword, setShowAuthPassword] = useState(false);
+  const [authTargetTab, setAuthTargetTab] = useState('settings');
   const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false); 
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -46,33 +47,45 @@ export default function ApplicantDashboard() {
   const notifRef = useRef(null); 
   const notifPanelRef = useRef(null);
   const profilePanelRef = useRef(null);
-  const logoutPanelRef = useRef(null);
+const logoutPanelRef = useRef(null);
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSettingsAuth = async (e) => {
+const handleSettingsAuth = async (e) => {
     e.preventDefault();
     setAuthError('');
     setIsAuthVerifying(true);
     try {
-      const res = await fetch(`http://localhost:5001/api/users/${profile.user_id}/verify-password`, {
+      // Fallback to profile.id if profile.user_id isn't set yet
+      const userId = profile?.user_id || profile?.id; 
+      
+      const res = await fetch(`http://localhost:5001/api/users/${userId}/verify-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: authPassword })
       });
-      const data = await res.json();
+
+      // Safely check if the response is JSON before parsing
+      const contentType = res.headers.get("content-type");
+      let data = {};
+      if (contentType && contentType.includes("application/json")) {
+        data = await res.json();
+      }
+
       if (res.ok) {
         setSettingsAuthOpen(false);
         setAuthPassword('');
-        handleTabChange('settings');
+        handleTabChange(authTargetTab);
       } else {
-        setAuthError(data.message || 'Incorrect password.');
+        // Show specific backend error or a fallback HTTP error message
+        setAuthError(data.message || `Error: ${res.status} ${res.statusText}`);
       }
     } catch (err) {
-      setAuthError('Server connection error.');
+      console.error("Security check failed:", err);
+      setAuthError('Server connection error. Please ensure the backend is running.');
     } finally {
       setIsAuthVerifying(false);
     }
@@ -124,15 +137,14 @@ export default function ApplicantDashboard() {
     }
   }, [profileDropdownOpen, settingsAuthOpen]);
 
-  useEffect(() => {
-    if (showLogoutConfirm && logoutPanelRef.current) {
-      const timer = setTimeout(() => {
-        logoutPanelRef.current.focus();
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [showLogoutConfirm]);
-
+ useEffect(() => {
+  if (showLogoutConfirm && logoutPanelRef.current) {
+    const timer = setTimeout(() => {
+      logoutPanelRef.current.focus();
+    }, 100);
+    return () => clearTimeout(timer);
+  }
+}, [showLogoutConfirm]);
   useEffect(() => {
     const handleStorageSync = () => {
       const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -281,16 +293,16 @@ export default function ApplicantDashboard() {
         </div>
       )}
 
-      {isLoggingOut && (
-        <div
-          className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
-          style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="logging-title"
-          aria-describedby="logging-desc"
-          tabIndex="-1"
-        >
+{isLoggingOut && (
+  <>
+    <div role="alert" aria-live="assertive" className="sr-only">
+      Logging Out... Please wait while we secure your account and end the session.
+    </div>
+    <div
+      className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
+      style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
+      aria-hidden="true"
+    >
           <div className={`relative w-full max-w-md rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${(isContrast || isDarkMode) ? 'bg-black border-2 border-white' : 'bg-white border-2 border-[#2C7FFF]'}`}>
             <div className="h-1.5 sm:h-2 w-full bg-[#2C7FFF]" />
 
@@ -321,9 +333,10 @@ export default function ApplicantDashboard() {
                 <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#2C7FFF] animate-pulse [animation-delay:150ms]" />
                 <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#2C7FFF] animate-pulse [animation-delay:300ms]" />
               </div>
-            </div>
+                    </div>
           </div>
         </div>
+      </>
       )}
 
       {showLogoutConfirm && (
@@ -559,9 +572,9 @@ export default function ApplicantDashboard() {
                   {settingsAuthOpen ? (
                     <div className="p-5">
                       <h3 className={`text-lg font-black mb-2 text-center ${isContrast || isDarkMode ? 'text-white' : 'text-[#03045E]'}`}>Security Check</h3>
-                      <p className={`text-xs text-center font-bold mb-4 ${isContrast || isDarkMode ? 'text-white/70' : 'text-[#03045E]/70'}`}>Please enter your password to access Settings.</p>
+                      <p className={`text-xs text-center font-bold mb-4 ${isContrast || isDarkMode ? 'text-white/70' : 'text-[#03045E]/70'}`}>Please enter your password to access {authTargetTab === 'profile' ? 'Profile' : 'Settings'}.</p>
                    {authError && (
-  <div className={`mb-3 p-2 rounded-lg text-xs text-center font-bold bg-transparent border-2 ${isContrast || isDarkMode ? 'text-red-500 border-red-500' : 'text-red-600 border-red-600'}`}>
+  <div role="alert" aria-live="assertive" className={`mb-3 p-2 rounded-lg text-xs text-center font-bold bg-transparent border-2 ${isContrast || isDarkMode ? '!text-red-500 !border-red-500' : 'text-red-600 border-red-600'}`}>
     {authError}
   </div>
 )}
@@ -637,7 +650,14 @@ export default function ApplicantDashboard() {
                         <p tabIndex="0" aria-label="Account" className={`px-3 pt-1.5 pb-2 text-[10px] font-black uppercase tracking-[0.15em] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded w-fit ${isContrast ? 'text-white/50' : 'text-[#03045E]/50'}`}>Account</p>
                         <button
                           role="menuitem"
-                          onClick={() => { handleTabChange('profile'); setProfileDropdownOpen(false); }}
+                          onClick={() => { 
+                            setProfileDropdownOpen(false); 
+                            setSettingsAuthOpen(true); 
+                            setAuthTargetTab('profile');
+                            setAuthPassword('');
+                            setAuthError('');
+                            setShowAuthPassword(false);
+                          }}
                           aria-label="Edit Profile"
                           aria-current={activeTab === 'profile' ? 'page' : undefined}
                           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg sm:rounded-xl text-sm font-black transition-colors text-left cursor-pointer focus:outline-none ${
@@ -664,6 +684,7 @@ export default function ApplicantDashboard() {
                           onClick={() => { 
                             setProfileDropdownOpen(false); 
                             setSettingsAuthOpen(true); 
+                            setAuthTargetTab('settings');
                             setAuthPassword('');
                             setAuthError('');
                             setShowAuthPassword(false);
@@ -887,33 +908,46 @@ export default function ApplicantDashboard() {
         </div>
       </header>
 
-      <button
-        onClick={() => setShowDesktopSidebar((prev) => !prev)}
-        aria-label="Toggle sidebar"
-        aria-expanded={showDesktopSidebar}
-        aria-controls="sidebar-navigation"
-        title={showDesktopSidebar ? 'Hide navigation' : 'Show navigation'}
-        className={`hidden md:flex fixed top-[4.5rem] z-40 w-11 h-11 items-center justify-center rounded-lg border-2 shadow-md transition-all duration-300 cursor-pointer focus:outline-none ${
-          showDesktopSidebar ? 'left-4' : 'left-[1.125rem]'
-        } ${
-          isContrast || isDarkMode
-            ? 'bg-black text-white border-white'
-            : 'bg-white text-[#03045E] border-[#03045E]/15'
-        }`}
-      >
-        <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-          {showDesktopSidebar ? (
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          ) : (
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          )}
-        </svg>
-      </button>
+          {/* SEPARATED SIDEBAR TOGGLE BUTTONS */}
+      {showDesktopSidebar ? (
+        
+        /* --- CLOSE SIDEBAR BUTTON (Only exists when sidebar is OPEN) --- */
+        <button
+          onClick={() => setShowDesktopSidebar(false)}
+          aria-label="Close sidebar"
+          aria-expanded={true}
+          aria-controls="sidebar-navigation"
+          title="Hide navigation"
+          className="hidden md:flex fixed z-40 shadow-md transition-all duration-300 cursor-pointer focus:outline-none items-center justify-center top-20 left-72 w-7 h-16 rounded-r-lg border-y-2 border-r-2 border-l-0 bg-[#f4f4f4] text-[#03045E] border-[#03045E]/20 hover:bg-white"
+        >
+          <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
 
+      ) : (
+
+        /* --- OPEN SIDEBAR BUTTON (Only exists when sidebar is CLOSED) --- */
+        <button
+          onClick={() => setShowDesktopSidebar(true)}
+          aria-label="Open sidebar"
+          aria-expanded={false}
+          aria-controls="sidebar-navigation"
+          title="Show navigation"
+          className={`hidden md:flex fixed z-40 shadow-md transition-all duration-300 cursor-pointer focus:outline-none items-center justify-center top-[4.5rem] left-[1.125rem] w-11 h-11 rounded-lg border-2 ${
+            isContrast || isDarkMode ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-[#03045E]/15'
+          }`}
+        >
+          <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+      )}
       {/* MAIN CONTAINER - MATCHING ADMIN DASHBOARD STRUCTURE */}
           <div className={`flex flex-col md:flex-row flex-1 min-h-screen pt-10 transition-all duration-300 ${(isContrast || isDarkMode) ? 'bg-black' : ''}`}>
         
-        <aside id="sidebar-navigation" role="complementary" aria-label="Sidebar navigation" className={`hidden md:flex flex-col z-10 border-r-2 pt-16 pb-4 justify-between shadow-sm flex-shrink-0 fixed top-16 left-0 h-[calc(100vh-4rem)] overflow-y-auto overflow-x-hidden focus:outline-none transition-all duration-300 ease-in-out ${(isContrast || isDarkMode) ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/15'} ${showDesktopSidebar ? 'w-72 px-4' : 'w-20 px-2'}`}>
+<aside id="sidebar-navigation" role="complementary" aria-label="Sidebar navigation" className={`hidden md:flex flex-col z-10 border-r-2 pb-4 justify-between shadow-sm flex-shrink-0 fixed top-16 left-0 h-[calc(100vh-4rem)] overflow-y-auto overflow-x-hidden focus:outline-none transition-all duration-300 ease-in-out ${(isContrast || isDarkMode) ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/15'} ${showDesktopSidebar ? 'w-72 px-4 pt-10' : 'w-20 px-2 pt-16'}`}>
           <nav className="flex flex-col space-y-3 w-full" aria-label="Sidebar navigation links">
             {[
               { id: 'overview', label: 'Overview', desc: 'Your snapshot', icon: (

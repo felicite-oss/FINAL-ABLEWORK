@@ -776,27 +776,47 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <button
-        onClick={() => setShowDesktopSidebar((prev) => !prev)}
-        aria-label="Toggle sidebar"
-        aria-expanded={showDesktopSidebar}
-        title={showDesktopSidebar ? 'Hide navigation' : 'Show navigation'}
-        className={`hidden md:flex fixed top-[4.5rem] left-4 z-[60] w-11 h-11 items-center justify-center rounded-xl border-2 shadow-lg transition-all duration-200 cursor-pointer ${isDark ? 'bg-white text-black border-white hover:bg-white/90' : 'bg-[#f4f4f4] text-[#03045E] border-[#03045E]/20'}`}
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-          {showDesktopSidebar ? (
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          ) : (
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          )}
-        </svg>
-      </button>
+         {/* SEPARATED SIDEBAR TOGGLE BUTTONS */}
+      {showDesktopSidebar ? (
+        
+        /* --- CLOSE SIDEBAR BUTTON (Only exists when sidebar is OPEN) --- */
+        <button
+          onClick={() => setShowDesktopSidebar(false)}
+          aria-label="Close sidebar"
+          aria-expanded={true}
+          aria-controls="sidebar-navigation"
+          title="Hide navigation"
+          className="hidden md:flex fixed z-[60] shadow-md transition-all duration-300 cursor-pointer focus:outline-none items-center justify-center top-20 left-72 w-7 h-16 rounded-r-lg border-y-2 border-r-2 border-l-0 bg-[#f4f4f4] text-[#03045E] border-[#03045E]/20 hover:bg-white"
+        >
+          <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
 
+      ) : (
+
+        /* --- OPEN SIDEBAR BUTTON (Only exists when sidebar is CLOSED) --- */
+        <button
+          onClick={() => setShowDesktopSidebar(true)}
+          aria-label="Open sidebar"
+          aria-expanded={false}
+          aria-controls="sidebar-navigation"
+          title="Show navigation"
+          className={`hidden md:flex fixed z-[60] shadow-md transition-all duration-300 cursor-pointer focus:outline-none items-center justify-center top-[4.5rem] left-[1.125rem] w-11 h-11 rounded-lg border-2 ${
+            isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-[#03045E]/15'
+          }`}
+        >
+          <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+      )}
       <div className={`flex flex-col md:flex-row flex-1 min-h-screen pt-20 transition-all duration-300 ${isDark ? 'bg-black' : ''}`}>
         
         <aside id="sidebar-navigation" role="complementary" aria-label="Sidebar navigation" className={`hidden md:flex flex-col z-10 border-r-2 shadow-sm flex-shrink-0 fixed top-16 left-0 h-[calc(100vh-4rem)] focus:outline-none transition-all duration-300 ease-in-out ${isDark ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/15'} ${showDesktopSidebar ? 'w-72 px-4' : 'w-20 px-2'}`}>
           <div className="w-full flex flex-col h-full min-w-0">
-            <nav className="flex-1 flex flex-col space-y-3 w-full pt-16 pb-4 overflow-y-auto overflow-x-hidden" aria-label="Sidebar navigation links">
+        <nav className={`flex-1 flex flex-col space-y-3 w-full pb-4 overflow-y-auto overflow-x-hidden ${showDesktopSidebar ? 'pt-10' : 'pt-16'}`} aria-label="Sidebar navigation links">
               {[
                 { id: 'Overview', label: 'Overview', desc: 'Dashboard summary' },
                 { id: 'Employers', label: 'Employers', desc: 'Manage companies' },

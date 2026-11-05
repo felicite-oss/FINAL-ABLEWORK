@@ -26,7 +26,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [publishedJobTitle, setPublishedJobTitle] = useState('');
 
-  // NEW: Check if the user is fully verified
+  // Check if the user is fully verified
   const isVerified = profile?.verification_status === 'Approved';
 
   useEffect(() => {
@@ -220,28 +220,35 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
   const muted = isDark ? 'text-white/70' : 'text-[#03045E]/70';
   const cardBg = isDark ? 'bg-black border-white' : 'bg-white border-gray-200';
   const softBg = isDark ? 'bg-black border-white' : 'bg-white border-gray-200';
+  
+  // Radius adjusted: inputs now use rounded-lg / rounded-md
   const inputCls = isContrast
-    ? 'w-full p-2.5 sm:p-4 border-2 border-white rounded-xl bg-black text-white font-semibold placeholder:text-gray-400 focus:outline-none focus:border-white transition-all text-sm sm:text-base'
+    ? 'w-full p-2.5 sm:p-4 border-2 border-white rounded-lg bg-black text-white font-semibold placeholder:text-gray-400 focus:outline-none focus:border-white transition-all text-sm sm:text-base'
     : isDarkMode
-      ? 'w-full p-2.5 sm:p-4 border-2 border-white rounded-xl bg-black text-white font-semibold placeholder:text-gray-400 focus:outline-none focus:border-white transition-all text-sm sm:text-base'
-      : 'w-full p-2.5 sm:p-4 border-2 border-gray-200 rounded-xl bg-white text-[#03045E] font-semibold placeholder:text-gray-400 focus:outline-none focus:border-gray-200 transition-all text-sm sm:text-base';
+      ? 'w-full p-2.5 sm:p-4 border-2 border-white rounded-lg bg-black text-white font-semibold placeholder:text-gray-400 focus:outline-none focus:border-white transition-all text-sm sm:text-base'
+      : 'w-full p-2.5 sm:p-4 border-2 border-gray-200 rounded-lg bg-white text-[#03045E] font-semibold placeholder:text-gray-400 focus:outline-none focus:border-gray-200 transition-all text-sm sm:text-base';
+      
   const inputSmCls = isContrast
-    ? 'w-full p-2 sm:p-3 border-2 border-white rounded-lg bg-black text-white font-semibold placeholder:text-gray-400 focus:outline-none focus:border-white transition-all text-xs sm:text-sm'
+    ? 'w-full p-2 sm:p-3 border-2 border-white rounded-md bg-black text-white font-semibold placeholder:text-gray-400 focus:outline-none focus:border-white transition-all text-xs sm:text-sm'
     : isDarkMode
-      ? 'w-full p-2 sm:p-3 border-2 border-white rounded-lg bg-black text-white font-semibold placeholder:text-gray-400 focus:outline-none focus:border-white transition-all text-xs sm:text-sm'
-      : 'w-full p-2 sm:p-3 border-2 border-gray-200 rounded-lg bg-white text-[#03045E] font-semibold placeholder:text-gray-400 focus:outline-none focus:border-gray-200 transition-all text-xs sm:text-sm';
+      ? 'w-full p-2 sm:p-3 border-2 border-white rounded-md bg-black text-white font-semibold placeholder:text-gray-400 focus:outline-none focus:border-white transition-all text-xs sm:text-sm'
+      : 'w-full p-2 sm:p-3 border-2 border-gray-200 rounded-md bg-white text-[#03045E] font-semibold placeholder:text-gray-400 focus:outline-none focus:border-gray-200 transition-all text-xs sm:text-sm';
+      
   const chipContainer = isDark
     ? 'flex flex-wrap gap-1.5 sm:gap-2 mt-2 p-2 sm:p-3 bg-black rounded-lg border-2 border-white'
     : 'flex flex-wrap gap-1.5 sm:gap-2 mt-2 p-2 sm:p-3 bg-white rounded-lg border-2 border-gray-200';
+    
   const suggestionBtn = isDark
     ? 'px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-bold rounded-full border-2 bg-black text-white border-white'
     : 'px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-bold rounded-full border-2 bg-white text-[#03045E] border-gray-200';
+    
   const divider = isDark ? 'border-white' : 'border-gray-200';
 
   return (
     <div className="animate-fadeIn max-w-9xl mx-auto pb-6 sm:pb-10 px-1 sm:px-0">
       
-      <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 backdrop-blur-md p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border-2 ${cardBg}`}>
+      {/* Header Container (Outer) */}
+      <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 backdrop-blur-md p-4 sm:p-6 rounded-2xl shadow-[0_10px_30px_rgba(3,4,94,0.06)] border-2 ${cardBg}`}>
         <div>
           <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-1.5 flex-wrap">
             <span className={`text-[10px] sm:text-xs font-extrabold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full uppercase tracking-wider border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#2C7FFF] border-gray-200'}`}>Job Management</span>
@@ -257,7 +264,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
       </div>
 
       {statusMessage.text && (
-        <div className={`p-3 sm:p-4 mb-4 sm:mb-6 rounded-lg sm:rounded-xl font-bold text-center border-2 text-sm sm:text-base ${
+        <div className={`p-3 sm:p-4 mb-4 sm:mb-6 rounded-xl font-bold text-center border-2 text-sm sm:text-base ${
           statusMessage.type === 'success'
             ? (isDark ? 'bg-black text-white border-white' : 'bg-white text-[#2C7FFF] border-gray-200')
             : (isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-gray-200')
@@ -268,11 +275,12 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
 
       {/* VERIFICATION REQUIRED LOCK SCREEN */}
       {!isVerified ? (
-        <div className={`relative p-8 md:p-16 rounded-2xl sm:rounded-3xl border-2 flex flex-col items-center text-center overflow-hidden shadow-sm ${cardBg}`}>
+        <div className={`relative p-8 md:p-16 rounded-2xl border-2 flex flex-col items-center text-center overflow-hidden shadow-sm ${cardBg}`}>
           <div className={`absolute -top-12 -right-12 w-40 h-40 rounded-full opacity-50 pointer-events-none ${isDark ? 'bg-white/10' : 'bg-[#2C7FFF]/10'}`}></div>
           <div className={`absolute -bottom-10 -left-10 w-32 h-32 rounded-full opacity-50 pointer-events-none ${isDark ? 'bg-white/10' : 'bg-[#2C7FFF]/10'}`}></div>
           
-          <div className={`relative w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center mb-6 shadow-sm border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}>
+          {/* Inner Icon Box */}
+          <div className={`relative w-20 h-20 md:w-24 md:h-24 rounded-xl flex items-center justify-center mb-6 shadow-sm border-2 ${isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]'}`}>
             <svg className="w-10 h-10 md:w-12 md:h-12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
@@ -292,7 +300,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
 
           <button 
             onClick={() => setActiveTab('settings')}
-            className={`px-6 py-3 font-black text-sm uppercase tracking-wider rounded-xl border-2 transition-all cursor-pointer ${
+            className={`px-6 py-3 font-black text-sm uppercase tracking-wider rounded-lg border-2 transition-all cursor-pointer ${
               isHighContrastOrDarkComfort
                 ? 'bg-[#2C7FFF] !text-white border-[#2C7FFF] hover:bg-white hover:text-[#2C7FFF]'
                 : (isDark
@@ -304,7 +312,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
           </button>
         </div>
       ) : (
-      <form onSubmit={handleSubmit} className={`p-4 sm:p-8 rounded-xl sm:rounded-2xl shadow-sm border-2 flex flex-col gap-6 sm:gap-8 ${cardBg}`}>
+      <form onSubmit={handleSubmit} className={`p-4 sm:p-8 rounded-2xl shadow-sm border-2 flex flex-col gap-6 sm:gap-8 ${cardBg}`}>
         
         <div className="flex flex-col gap-3 sm:gap-4">
           <div className="flex flex-col gap-1.5 sm:gap-2">
@@ -343,7 +351,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
             <input
               type="text" value={salaryRange} onChange={(e) => setSalaryRange(e.target.value)}
               placeholder="e.g. ₱20,000 - ₱30,000 / month"
-              className={`w-full p-2 sm:p-3 border-2 rounded-lg font-semibold focus:outline-none transition-all text-xs sm:text-sm ${
+              className={`w-full p-2 sm:p-3 border-2 rounded-md font-semibold focus:outline-none transition-all text-xs sm:text-sm ${
                 salaryError
                   ? (isDark ? 'border-white text-white bg-black' : 'border-red-500 text-red-500 bg-white')
                   : isContrast
@@ -456,7 +464,8 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
 
         <hr className={divider} />
 
-        <div className={`flex flex-col gap-3 sm:gap-4 p-3 sm:p-5 rounded-lg sm:rounded-xl border-2 ${softBg}`}>
+        {/* Disability Section Container (Medium Outer) */}
+        <div className={`flex flex-col gap-3 sm:gap-4 p-3 sm:p-5 rounded-xl border-2 ${softBg}`}>
           <div>
             <label className={`text-xs sm:text-sm font-extrabold flex items-center gap-1.5 sm:gap-2 uppercase tracking-wider ${pageText}`}>
               <svg className={`w-4 h-4 sm:w-5 sm:h-5 ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -473,7 +482,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
                   type="button"
                   key={disability}
                   onClick={() => toggleSelection(disability, selectedDisabilities, setSelectedDisabilities)}
-                  className={`px-2 sm:px-4 py-1 sm:py-2 rounded-md sm:rounded-lg text-[10px] sm:text-sm font-bold border-2 transition-colors ${
+                  className={`px-2 sm:px-4 py-1 sm:py-2 rounded-lg text-[10px] sm:text-sm font-bold border-2 transition-colors ${
                     isSelected
                       ? (isDark ? 'bg-white text-black border-white' : (isHighContrastOrDarkComfort ? 'bg-[#2C7FFF] !text-white border-[#2C7FFF]' : 'bg-[#2C7FFF] text-white border-[#2C7FFF]'))
                       : (isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-gray-200')
@@ -489,7 +498,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
         <button
           type="submit"
           disabled={isLoading}
-          className={`w-full py-3 sm:py-4 text-sm sm:text-base font-extrabold rounded-lg sm:rounded-xl shadow-md transition-all disabled:opacity-50 mt-2 flex justify-center items-center gap-1.5 sm:gap-2 cursor-pointer border-2 ${
+          className={`w-full py-3 sm:py-4 text-sm sm:text-base font-extrabold rounded-xl shadow-md transition-all disabled:opacity-50 mt-2 flex justify-center items-center gap-1.5 sm:gap-2 cursor-pointer border-2 ${
             isHighContrastOrDarkComfort
               ? 'bg-[#2C7FFF] !text-white border-[#2C7FFF] hover:bg-white hover:text-[#2C7FFF]'
               : (isDark
@@ -505,10 +514,10 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
 
       {showSuccessAlert && (
         <div
-          className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
+          className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
           style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
         >
-          <div className={`relative w-full max-w-sm rounded-xl sm:rounded-2xl border-2 overflow-hidden ${isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#2C7FFF]'}`}>
+          <div className={`relative w-full max-w-sm rounded-2xl border-2 overflow-hidden ${isDark ? 'bg-black border-white' : 'bg-[#F4F4F4] border-[#2C7FFF]'}`}>
             <div className={`h-2 w-full ${isDark ? 'bg-white' : 'bg-[#2C7FFF]'}`} />
 
             <div className="px-6 sm:px-8 pt-8 sm:pt-10 pb-6 sm:pb-8 flex flex-col items-center text-center">
@@ -539,7 +548,8 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
                 <span className={`font-black ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`}>"{publishedJobTitle}"</span> has been published successfully and is now visible to matching candidates.
               </p>
 
-              <div className={`w-full rounded-lg sm:rounded-xl p-3 sm:p-4 border-2 mb-4 sm:mb-6 ${isDark ? 'bg-black border-white' : 'bg-white border-[#2C7FFF]'}`}>
+              {/* Inner Status Box */}
+              <div className={`w-full rounded-xl p-3 sm:p-4 border-2 mb-4 sm:mb-6 ${isDark ? 'bg-black border-white' : 'bg-white border-[#2C7FFF]'}`}>
                 <div className="flex items-center justify-between">
                   <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-wider ${isDark ? 'text-white/60' : 'text-[#03045E]/60'}`}>Status</span>
                   <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-wider ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`}>Active</span>

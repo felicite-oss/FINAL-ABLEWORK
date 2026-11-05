@@ -32,6 +32,7 @@ export default function EmployerDashboard() {
   const [authError, setAuthError] = useState('');
   const [isAuthVerifying, setIsAuthVerifying] = useState(false);
   const [showAuthPassword, setShowAuthPassword] = useState(false);
+  const [authTargetTab, setAuthTargetTab] = useState('settings');
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showDesktopSidebar, setShowDesktopSidebar] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -62,7 +63,7 @@ export default function EmployerDashboard() {
       if (res.ok) {
         setSettingsAuthOpen(false);
         setAuthPassword('');
-        handleTabChange('settings');
+        handleTabChange(authTargetTab);
       } else {
         setAuthError(data.message || 'Incorrect password.');
       }
@@ -477,9 +478,9 @@ export default function EmployerDashboard() {
                 {settingsAuthOpen ? (
                   <div className="p-5">
                     <h3 className={`text-lg font-black mb-2 text-center ${isContrast || isDarkMode ? 'text-white' : 'text-[#03045E]'}`}>Security Check</h3>
-                    <p className={`text-xs text-center font-bold mb-4 ${isContrast || isDarkMode ? 'text-white/70' : 'text-[#03045E]/70'}`}>Please enter your password to access Settings.</p>
-                    {authError && (
-                      <div className={`mb-3 p-2 rounded-lg text-xs text-center font-bold bg-transparent border-2 ${isContrast || isDarkMode ? 'text-red-500 border-red-500' : 'text-red-600 border-red-600'}`}>
+                    <p className={`text-xs text-center font-bold mb-4 ${isContrast || isDarkMode ? 'text-white/70' : 'text-[#03045E]/70'}`}>Please enter your password to access {authTargetTab === 'profile' ? 'Profile' : 'Settings'}.</p>
+                                      {authError && (
+                      <div role="alert" aria-live="assertive" className={`mb-3 p-2 rounded-lg text-xs text-center font-bold bg-transparent border-2 ${isContrast || isDarkMode ? '!text-red-500 !border-red-500' : 'text-red-600 border-red-600'}`}>
                         {authError}
                       </div>
                     )}
@@ -555,7 +556,14 @@ export default function EmployerDashboard() {
                   <p aria-hidden="true" className={`px-3 pt-1.5 pb-2 text-[10px] font-black uppercase tracking-[0.15em] ${isContrast ? 'text-white/50' : 'text-[#03045E]/50'}`}>Account</p>
                   <button
                     role="menuitem"
-                    onClick={() => { handleTabChange('profile'); setShowProfileDropdown(false); }}
+                    onClick={() => { 
+                      setShowProfileDropdown(false); 
+                      setSettingsAuthOpen(true); 
+                      setAuthTargetTab('profile');
+                      setAuthPassword('');
+                      setAuthError('');
+                      setShowAuthPassword(false);
+                    }}
                     aria-label="Edit Profile"
                     aria-current={activeTab === 'profile' ? 'page' : undefined}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg sm:rounded-xl text-sm font-black transition-colors text-left cursor-pointer focus:outline-none ${
@@ -582,6 +590,7 @@ export default function EmployerDashboard() {
                     onClick={() => { 
                       setShowProfileDropdown(false); 
                       setSettingsAuthOpen(true); 
+                      setAuthTargetTab('settings');
                       setAuthPassword('');
                       setAuthError('');
                       setShowAuthPassword(false);
@@ -794,32 +803,48 @@ export default function EmployerDashboard() {
       </div>
       </header>
 
-      <button
-        onClick={() => setShowDesktopSidebar((prev) => !prev)}
-        aria-label="Toggle sidebar"
-        aria-expanded={showDesktopSidebar}
-        aria-controls="sidebar-navigation"
-        title={showDesktopSidebar ? 'Hide navigation' : 'Show navigation'}
-        className={`hidden md:flex fixed top-[4.5rem] left-4 z-40 w-11 h-11 items-center justify-center rounded-lg border-2 shadow-md transition-all duration-200 cursor-pointer ${
-          dark
-            ? 'bg-black text-white border-white'
-            : 'bg-white text-[#03045E] border-[#03045E]/15'
-        }`}
-      >
-        <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-          {showDesktopSidebar ? (
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          ) : (
+          {/* SEPARATED SIDEBAR TOGGLE BUTTONS */}
+      {showDesktopSidebar ? (
+        
+        /* --- CLOSE SIDEBAR BUTTON (Only exists when sidebar is OPEN) --- */
+        <button
+          onClick={() => setShowDesktopSidebar(false)}
+          aria-label="Close sidebar"
+          aria-expanded={true}
+          aria-controls="sidebar-navigation"
+          title="Hide navigation"
+          className="hidden md:flex fixed z-40 shadow-md transition-all duration-300 cursor-pointer focus:outline-none items-center justify-center top-20 left-72 w-7 h-16 rounded-r-lg border-y-2 border-r-2 border-l-0 bg-[#f4f4f4] text-[#03045E] border-[#03045E]/20 hover:bg-white"
+        >
+          <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+
+      ) : (
+
+        /* --- OPEN SIDEBAR BUTTON (Only exists when sidebar is CLOSED) --- */
+        <button
+          onClick={() => setShowDesktopSidebar(true)}
+          aria-label="Open sidebar"
+          aria-expanded={false}
+          aria-controls="sidebar-navigation"
+          title="Show navigation"
+          className={`hidden md:flex fixed z-40 shadow-md transition-all duration-300 cursor-pointer focus:outline-none items-center justify-center top-[4.5rem] left-[1.125rem] w-11 h-11 rounded-lg border-2 ${
+            dark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-[#03045E]/15'
+          }`}
+        >
+          <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          )}
-        </svg>
-      </button>
+          </svg>
+        </button>
+
+      )}
 
     
       <div className={`flex flex-col md:flex-row flex-1 min-h-screen pt-20 transition-all duration-300 ${dark ? 'bg-black' : ''}`}>
         
 
-             <aside id="sidebar-navigation" role="complementary" aria-label="Sidebar navigation" className={`hidden md:flex flex-col z-10 border-r-2 pt-16 pb-4 justify-between shadow-sm flex-shrink-0 fixed top-16 left-0 h-[calc(100vh-4rem)] overflow-y-auto overflow-x-hidden focus:outline-none transition-all duration-300 ease-in-out ${dark ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/15'} ${showDesktopSidebar ? 'w-72 px-4' : 'w-20 px-2'}`}>
+<aside id="sidebar-navigation" role="complementary" aria-label="Sidebar navigation" className={`hidden md:flex flex-col z-10 border-r-2 pb-4 justify-between shadow-sm flex-shrink-0 fixed top-16 left-0 h-[calc(100vh-4rem)] overflow-y-auto overflow-x-hidden focus:outline-none transition-all duration-300 ease-in-out ${dark ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/15'} ${showDesktopSidebar ? 'w-72 px-4 pt-10' : 'w-20 px-2 pt-16'}`}>
           <nav className="flex flex-col space-y-3 w-full" aria-label="Sidebar navigation links">
 
                     {[

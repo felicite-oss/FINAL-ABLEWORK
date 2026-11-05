@@ -1721,6 +1721,41 @@ app.post('/api/auth/reset-password', async (req, res) => {
     }
 });
 
+// ---------------------------------------------------------
+// ROUTE: VERIFY USER PASSWORD (Security Check)
+// ---------------------------------------------------------
+app.post('/api/users/:id/verify-password', async (req, res) => {
+    const userId = req.params.id;
+    const { password } = req.body;
+
+    if (!password) {
+        return res.status(400).json({ message: "Password is required." });
+    }
+
+    try {
+        // Fetch the user's hashed password from the database
+        const [users] = await db.execute('SELECT password_hash FROM users WHERE id = ?', [userId]);
+        
+        if (users.length === 0) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        // Compare the submitted password with the stored hash
+        const isMatch = await bcrypt.compare(password, users[0].password_hash);
+        
+        if (!isMatch) {
+            return res.status(401).json({ message: "Incorrect password." });
+        }
+
+        // If it matches, send a success response
+        res.status(200).json({ message: "Password verified successfully." });
+        
+    } catch (error) {
+        console.error("Password Verification Error:", error.message);
+        res.status(500).json({ message: "Server error verifying password." });
+    }
+});
+
 
 const PORT = process.env.PORT || 5001;
 

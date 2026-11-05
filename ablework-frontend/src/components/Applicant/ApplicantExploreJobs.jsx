@@ -7,7 +7,6 @@ import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-
 let DefaultIcon = L.icon({
     iconUrl: icon,
     shadowUrl: iconShadow,
@@ -30,28 +29,26 @@ const safeParse = (data) => {
   }
   return [];
 };
+
 const getDistanceBadgeStyles = (km, isDarkScreen) => {
   const distance = Number(km);
   if (isNaN(distance)) return `bg-[#2C7FFF]/15 ${isDarkScreen ? 'text-white' : 'text-[#03045E]'} border-[#03045E]/40`;
   
   if (distance <= 5) {
-    if (isDarkScreen) {
-      return 'bg-white text-[#10B981] border-[#10B981]';
-    }
     return 'bg-white text-[#10B981] border-[#10B981]';
-  } else if (distance <= 15) {
-    return `bg-[#2C7FFF]/15 ${isDarkScreen ? 'text-white' : 'text-[#03045E]'} border-[#03045E]/40`;
   } else {
     return `bg-[#2C7FFF]/15 ${isDarkScreen ? 'text-white' : 'text-[#03045E]'} border-[#03045E]/40`;
   }
 };
+
 const getMatchColor = (percentage) => {
   if (percentage >= 80) return 'bg-[#2C7FFF]/15 text-[#03045E] border-[#2C7FFF]';
   if (percentage >= 50) return 'bg-[#2C7FFF]/10 text-[#03045E] border-[#03045E]/40';
   return 'bg-[#f4f4f4] text-[#03045E] border-[#03045E]/20';
 };
 
-export default function ApplicantExploreJobs({ profile, jobs, applications = [], refreshData, initialSelectedJob, clearJobFromMap }) {
+// ADD highlightId TO PROPS
+export default function ApplicantExploreJobs({ profile, jobs, applications = [], refreshData, initialSelectedJob, clearJobFromMap, highlightId }) {
   const {
     isContrast,
     isDarkMode,
@@ -75,6 +72,7 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
   const [currentPage, setCurrentPage] = useState(1);
   const jobsPerPage = 12;
   const [expandedJobs, setExpandedJobs] = useState([]);
+  const [activeTab, setActiveTab] = useState('available'); 
   const [locallyAppliedJobs, setLocallyAppliedJobs] = useState(() => {
     try {
       const saved = localStorage.getItem('applicantLocallyAppliedJobs');
@@ -95,7 +93,7 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, maxDistance, selectedSkills, selectedAccs]);
+  }, [searchQuery, maxDistance, selectedSkills, selectedAccs, activeTab]);
 
   const checkHasApplied = (jobId) => {
     return applications.some(app => String(app.job_id) === String(jobId)) || locallyAppliedJobs.some(id => String(id) === String(jobId));
@@ -175,6 +173,11 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
   const toggleAcc = (acc) => setSelectedAccs(prev => prev.includes(acc) ? prev.filter(a => a !== acc) : [...prev, acc]);
   const toggleExpand = (jobId) => setExpandedJobs(prev => prev.includes(jobId) ? prev.filter(id => id !== jobId) : [...prev, jobId]);
 
+  const appliedCount = useMemo(() => {
+    if (!jobs) return 0;
+    return jobs.filter(job => checkHasApplied(job.id)).length;
+  }, [jobs, applications, locallyAppliedJobs]);
+
   const filteredJobs = useMemo(() => {
     if (!jobs) return [];
     return jobs.filter(job => {
@@ -193,9 +196,15 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
         const jobAccs = safeParse(job.provided_accommodations);
         if (!selectedAccs.some(a => jobAccs.includes(a))) return false;
       }
-      return true;
+
+      const isApplied = checkHasApplied(job.id);
+      if (activeTab === 'applied') {
+        return isApplied;
+      } else {
+        return !isApplied;
+      }
     });
-  }, [jobs, searchQuery, maxDistance, selectedSkills, selectedAccs]);
+  }, [jobs, searchQuery, maxDistance, selectedSkills, selectedAccs, applications, locallyAppliedJobs, activeTab]);
 
   const indexOfLastJob = currentPage * jobsPerPage;
   const indexOfFirstJob = indexOfLastJob - jobsPerPage;
@@ -342,42 +351,74 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 sm:gap-3 flex-wrap w-full sm:w-auto shrink-0 relative">
-          {filteredJobs.length > 0 && (
-            <div
-              tabIndex="0"
-              aria-label={`${filteredJobs.length} matches found.`}
-              className="flex items-center gap-1.5 px-2.5 py-1 sm:px-4 sm:py-2 rounded-full bg-[#f4f4f4] border-2 border-[#03045E]/30 shrink-0 cursor-pointer hover:border-[#2C7FFF] transition-all group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2"
-            >
-              <span aria-hidden="true" className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#10B981]" />
-              <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-widest text-[#03045E] group-hover:text-[#2C7FFF] transition-all">
-                {filteredJobs.length} match{filteredJobs.length !== 1 ? 'es' : ''}
-              </span>
-            </div>
-          )}
-          <button 
-            onClick={() => setShowFilters(!showFilters)}
-            aria-expanded={showFilters}
-            aria-controls="explore-jobs-filters"
-            aria-label={showFilters ? 'Close Filters' : 'Filter Matches'}
-            className={`px-3.5 py-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl font-extrabold text-[11px] sm:text-sm transition-all duration-200 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-sm border-2 shrink-0 ${
-              showFilters
-                ? 'bg-black text-white border-white'
-                : 'bg-white border-[#03045E] text-[#03045E]'
-            }`}
-          >
-            {showFilters ? (
-              <>
-                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                Close Filters
-              </>
-            ) : (
-              <>
-                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                Filter Matches
-              </>
+            <div className="flex flex-col items-start sm:items-end gap-2 sm:gap-3 w-full sm:w-auto shrink-0 relative">
+          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-start sm:justify-end flex-wrap">
+            {filteredJobs.length > 0 && (
+              <div
+                tabIndex="0"
+                aria-label={`${filteredJobs.length} matches found.`}
+                className="flex items-center gap-1.5 px-2.5 py-1 sm:px-4 sm:py-2 rounded-full bg-[#f4f4f4] border-2 border-[#03045E]/30 shrink-0 cursor-pointer hover:border-[#2C7FFF] transition-all group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2"
+              >
+                <span aria-hidden="true" className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#10B981]" />
+                <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-widest text-[#03045E] group-hover:text-[#2C7FFF] transition-all">
+                  {filteredJobs.length} match{filteredJobs.length !== 1 ? 'es' : ''}
+                </span>
+              </div>
             )}
-          </button>
+            <button 
+              onClick={() => setShowFilters(!showFilters)}
+              aria-expanded={showFilters}
+              aria-controls="explore-jobs-filters"
+              aria-label={showFilters ? 'Close Filters' : 'Filter Matches'}
+              className={`px-3.5 py-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl font-extrabold text-[11px] sm:text-sm transition-all duration-200 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-sm border-2 shrink-0 ${
+                showFilters
+                  ? 'bg-black text-white border-white'
+                  : 'bg-white border-[#03045E] text-[#03045E]'
+              }`}
+            >
+              {showFilters ? (
+                <>
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                  Close Filters
+                </>
+              ) : (
+                <>
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                  Filter Matches
+                </>
+              )}
+            </button>
+          </div>
+          
+          <div className="flex gap-1 p-1 bg-[#f4f4f4] rounded-xl border-2 border-[#03045E]/15 w-full sm:w-fit">
+            <button
+                onClick={() => setActiveTab('available')}
+                className={`flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-extrabold text-[11px] sm:text-sm transition-all whitespace-nowrap flex items-center justify-center ${
+                    activeTab === 'available'
+                    ? 'bg-[#03045E] text-white shadow-md'
+                    : 'text-[#03045E]/70 hover:bg-white hover:text-[#03045E]'
+                }`}
+            >
+                Available Jobs
+            </button>
+            <button
+                onClick={() => setActiveTab('applied')}
+                className={`flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-extrabold text-[11px] sm:text-sm transition-all whitespace-nowrap flex items-center justify-center gap-1.5 ${
+                    activeTab === 'applied'
+                    ? 'bg-[#03045E] text-white shadow-md'
+                    : 'text-[#03045E]/70 hover:bg-white hover:text-[#03045E]'
+                }`}
+            >
+                Already Applied
+                {appliedCount > 0 && (
+                    <span className={`min-w-[20px] h-5 px-1 flex items-center justify-center rounded-full text-[10px] sm:text-xs font-black shrink-0 ${
+                        activeTab === 'applied' ? 'bg-white text-[#03045E]' : 'bg-[#03045E]/10 text-[#03045E]'
+                    }`}>
+                        {appliedCount}
+                    </span>
+                )}
+            </button>
+          </div>
           {showFilters && (
             <section
               id="explore-jobs-filters"
@@ -541,15 +582,27 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
       <section role="region" aria-label="Job listings" className="flex flex-col gap-4 sm:gap-8">
         {filteredJobs.length > 0 ? (
           <div className="flex flex-col gap-6 w-full">
-                   <div role="list" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 w-full">
+                                 <div role="list" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 w-full items-stretch">
                                {currentJobs.map(job => {
               const hasApplied = checkHasApplied(job.id);
+              
+              // HIGHLIGHT LOGIC HERE
+              const isHighlighted = String(highlightId) === String(job.id);
+
               return (
                               <div
                   key={job.id}
+                  id={`job-${job.id}`}
                   role="listitem"
                   tabIndex={0}
-                  className={`p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-white shadow-md border-2 border-[#03045E]/20 flex flex-col justify-between gap-4 ${hasApplied ? 'opacity-85 bg-[#f4f4f4]' : ''}`}
+                  // APPLY HIGHLIGHT CLASSES HERE
+                  className={`p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-white shadow-md border-2 border-[#03045E]/20 flex flex-col justify-between gap-4 h-full transition-all duration-500 ${
+                    hasApplied ? 'opacity-85 bg-[#f4f4f4]' : ''
+                  } ${
+                    isHighlighted 
+                      ? 'animate-bounce ring-4 ring-[#2C7FFF] shadow-[0_0_20px_rgba(44,127,255,0.5)] z-10 scale-[1.02]' 
+                      : ''
+                  }`}
                 >
                   <span className="sr-only">
                     Job posting: {job.job_title} at {job.company_name}.
@@ -558,7 +611,7 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                     {hasApplied ? ' You have applied to this job.' : ''}
                     {job.job_description ? ` Description: ${job.job_description}` : ''}
                   </span>
-                  <div aria-hidden="true" className="flex-1 w-full min-w-0">
+                  <div aria-hidden="true" className="flex-1 w-full min-w-0 flex flex-col">
                     <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4">
                       {job.match_percentage && (
                         <span className={`px-2.5 py-1 sm:px-3.5 sm:py-1.5 text-[10px] sm:text-xs font-black rounded-full border-2 flex items-center gap-1 sm:gap-1.5 uppercase tracking-wide w-fit ${getMatchColor(job.match_percentage)} ${isDarkScreen ? 'text-black' : ''}`}>
@@ -584,7 +637,7 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                     </div>
                     <h2 className="text-base sm:text-2xl font-black text-[#03045E] leading-tight break-words w-full">{job.job_title}</h2>
                     <p className="text-xs sm:text-base font-black text-[#2C7FFF] mt-0.5 sm:mt-1 mb-2 sm:mb-3 break-words">{job.company_name}</p>
-                    <div>
+                    <div className="flex-1 flex flex-col min-h-[80px] sm:min-h-[100px]">
                       <p 
                         onClick={() => toggleExpand(job.id)}
                         className={`text-[#03045E] text-xs sm:text-sm font-semibold leading-relaxed cursor-pointer ${expandedJobs.includes(job.id) ? '' : 'line-clamp-2'}`}
@@ -594,7 +647,7 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                       {job.job_description && job.job_description.length > 80 && (
                         <button 
                           onClick={() => toggleExpand(job.id)}
-                          className="text-[10px] sm:text-xs font-bold text-[#2C7FFF] hover:underline mt-1 cursor-pointer"
+                          className="text-[10px] sm:text-xs font-bold text-[#2C7FFF] hover:underline mt-1 cursor-pointer text-left w-fit"
                         >
                           {expandedJobs.includes(job.id) ? 'Read less' : 'Read more'}
                         </button>
@@ -606,7 +659,7 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                     <button 
                       onClick={() => openModal(job)}
                       aria-label={`View details of ${job.job_title} at ${job.company_name}`}
-                                           className="flex-1 px-2 sm:px-4 py-2.5 bg-white border-2 border-[#03045E] text-[#03045E] font-black text-xs rounded-lg transition-all duration-200 whitespace-nowrap cursor-pointer"
+                      className="flex-1 min-w-0 px-2 sm:px-4 py-2.5 bg-white border-2 border-[#03045E] text-[#03045E] font-black text-xs rounded-lg transition-all duration-200 text-center cursor-pointer"
                     >
                       View Details
                     </button>
@@ -615,7 +668,7 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                       disabled={hasApplied}
                       aria-label={hasApplied ? `Already applied to ${job.job_title} at ${job.company_name}` : `Apply now to ${job.job_title} at ${job.company_name}`}
                       style={!hasApplied ? { color: '#ffffff' } : undefined}
-                      className={`flex-1 px-2 sm:px-4 py-2.5 font-black text-xs rounded-lg transition-all duration-200 whitespace-nowrap border-2 ${
+                      className={`flex-1 min-w-0 px-2 sm:px-4 py-2.5 font-black text-xs rounded-lg transition-all duration-200 text-center border-2 ${
                         hasApplied 
                           ? 'bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed opacity-70' 
                           : `${isDarkScreen ? 'bg-black border-white cursor-pointer' : 'bg-[#2C7FFF] border-[#2C7FFF] cursor-pointer'}`
@@ -665,17 +718,32 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
             </div>
-            <h3 className="text-base sm:text-xl font-black text-[#03045E] mb-2">No jobs match your filters</h3>
+            <h3 className="text-base sm:text-xl font-black text-[#03045E] mb-2">
+              No {activeTab === 'applied' ? 'applied' : 'available'} jobs found
+            </h3>
             <p className="text-xs sm:text-sm font-bold text-[#03045E]/70 max-w-md mb-4 leading-relaxed">
-              Try adjusting your search criteria, or ensure your profile settings reflect your true availability.
+              {activeTab === 'applied' 
+                ? "You haven't applied to any jobs yet. Head over to the Available Jobs tab to find your next opportunity!" 
+                : "Try adjusting your search criteria, or ensure your profile settings reflect your true availability."}
             </p>
-            <button
-              onClick={() => { setSearchQuery(''); setMaxDistance('Any'); setSelectedSkills([]); setSelectedAccs([]); }}
-              aria-label="Clear all filters"
-              className={`px-4 py-2 sm:px-5 sm:py-2.5 bg-[#2C7FFF] font-black text-xs sm:text-sm rounded-xl sm:rounded-2xl transition border-2 border-[#2C7FFF] cursor-pointer ${isDarkScreen ? '!text-black border-black' : '!text-white'}`}
-            >
-              Clear all filters
-            </button>
+            {activeTab === 'available' && (
+              <button
+                onClick={() => { setSearchQuery(''); setMaxDistance('Any'); setSelectedSkills([]); setSelectedAccs([]); }}
+                aria-label="Clear all filters"
+                className={`px-4 py-2 sm:px-5 sm:py-2.5 bg-[#2C7FFF] font-black text-xs sm:text-sm rounded-xl sm:rounded-2xl transition border-2 border-[#2C7FFF] cursor-pointer ${isDarkScreen ? '!text-black border-black' : '!text-white'}`}
+              >
+                Clear all filters
+              </button>
+            )}
+            {activeTab === 'applied' && (
+              <button
+                onClick={() => setActiveTab('available')}
+                aria-label="Go to Available Jobs"
+                className={`px-4 py-2 sm:px-5 sm:py-2.5 bg-[#2C7FFF] font-black text-xs sm:text-sm rounded-xl sm:rounded-2xl transition border-2 border-[#2C7FFF] cursor-pointer ${isDarkScreen ? '!text-black border-black' : '!text-white'}`}
+              >
+                Browse Available Jobs
+              </button>
+            )}
           </div>
         )}
       </section>
@@ -927,17 +995,17 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                   <svg aria-hidden="true" className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
                   Back to Job Details
                 </button>
-                <h2 className="text-lg sm:text-3xl font-black text-[#03045E] mb-1 sm:mb-2">Submit Application</h2>
-                <p className="text-xs sm:text-base text-[#03045E] mb-6 sm:mb-8 font-bold">Applying for <span className="font-black text-[#2C7FFF]">{selectedJob.job_title}</span> at {selectedJob.company_name}</p>
+                <h2 tabIndex="0" role="heading" aria-level="2" aria-label="Submit Application" title="Submit Application" className="text-lg sm:text-3xl font-black text-[#03045E] mb-1 sm:mb-2 focus:outline-none">Submit Application</h2>
+                               <p tabIndex="0" role="text" aria-label={`Applying for ${selectedJob.job_title} at ${selectedJob.company_name}`} title={`Applying for ${selectedJob.job_title} at ${selectedJob.company_name}`} className="text-xs sm:text-base text-[#03045E] mb-6 sm:mb-8 font-bold focus:outline-none">Applying for <span className="font-black text-[#2C7FFF]">{selectedJob.job_title}</span> at {selectedJob.company_name}</p>
                 <form onSubmit={submitApplication} className="flex flex-col gap-4 sm:gap-6">
                   <div className="flex flex-col gap-1.5 sm:gap-2">
-                    <label htmlFor="resume-upload" className="text-xs sm:text-sm font-black text-[#03045E]">Upload Resume / CV <span className="text-red-500">*</span></label>
+                    <label htmlFor="resume-upload" tabIndex="0" aria-label="Upload Resume or CV, required" title="Upload Resume or CV, required" className="text-xs sm:text-sm font-black text-[#03045E] focus:outline-none">Upload Resume / CV <span className="text-red-500">*</span></label>
                     <div className="border-2 border-dashed border-gray-300 p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-white flex flex-col items-center justify-center text-center">
                       <svg aria-hidden="true" className="w-8 h-8 sm:w-10 sm:h-10 text-[#2C7FFF] mb-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
                       <input id="resume-upload" type="file" accept=".pdf,.doc,.docx" required onChange={(e) => setResumeFile(e.target.files[0])} aria-label="Upload Resume or CV" className={`text-[10px] sm:text-sm text-[#03045E] file:mr-2 sm:file:mr-4 file:py-1.5 sm:file:py-2.5 file:px-3 sm:file:px-5 file:rounded-lg file:text-[10px] sm:file:text-sm file:font-black cursor-pointer !file:bg-white !file:text-[#03045E] file:border-2 file:border-gray-300`} />
-                      <p className="text-[10px] sm:text-xs text-[#03045E]/70 mt-2 sm:mt-3 font-bold">Supported formats: PDF, DOCX (Max 5MB)</p>
+                      <p tabIndex="0" role="text" aria-label="Supported formats: PDF, DOCX (Max 5MB)" title="Supported formats: PDF, DOCX (Max 5MB)" className="text-[10px] sm:text-xs text-[#03045E]/70 mt-2 sm:mt-3 font-bold focus:outline-none">Supported formats: PDF, DOCX (Max 5MB)</p>
                     </div>
                   </div>
                   <div className="flex flex-col gap-1.5 sm:gap-2">

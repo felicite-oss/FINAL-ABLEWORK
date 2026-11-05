@@ -16,6 +16,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loginRole, setLoginRole] = useState('');
 
    useEffect(() => {
     setEmail('');
@@ -99,8 +100,12 @@ export default function Login() {
 
       const data = await response.json();
 
-      if (response.ok) {
+           if (response.ok) {
         localStorage.setItem('user', JSON.stringify(data.user));
+
+        if (data.user.role === 'admin') setLoginRole('Admin');
+        else if (data.user.role === 'employer') setLoginRole('Employer');
+        else setLoginRole('Applicant');
 
         setTimeout(() => {
           if (data.user.role === 'admin') {
@@ -128,52 +133,51 @@ export default function Login() {
       aria-label="Login Screen"
       className={`min-h-screen flex flex-col ${isContrast ? 'bg-black text-white' : 'bg-[#f4f4f4] text-[#03045E]'} overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]`}
     >
-      {isLoading && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Logging In"
-          aria-labelledby="logging-title"
-          aria-describedby="logging-desc"
-          aria-live="assertive"
-          tabIndex="-1"
-          className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
-          style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
-        >
-          <div className={`relative w-full max-w-md rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${(isContrast || isDarkMode || isAccessibilityMode) ? 'bg-black border-2 border-white' : 'bg-white border-2 border-[#2C7FFF]'}`}>
-            <div aria-hidden="true" className="h-1.5 sm:h-2 w-full bg-[#2C7FFF]" />
+                {isLoading && (
+        <>
+          <div role="alert" aria-live="assertive" className="sr-only">
+            {loginRole ? `You're logging in to the ${loginRole} dashboard` : "Logging In..."}
+          </div>
+          <div
+            aria-hidden="true"
+            className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
+            style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
+          >
+            <div className={`relative w-full max-w-md rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 ${(isContrast || isDarkMode || isAccessibilityMode) ? 'bg-black border-2 border-white' : 'bg-white border-2 border-[#2C7FFF]'}`}>
+              <div aria-hidden="true" className="h-1.5 sm:h-2 w-full bg-[#2C7FFF]" />
 
-            <div className="relative px-5 pt-8 pb-6 sm:px-8 sm:pt-10 sm:pb-8 flex flex-col items-center text-center">
-              <div aria-hidden="true" className="relative mb-4 sm:mb-5 flex items-center justify-center mx-auto">
-                <div className={`w-16 h-16 sm:w-24 sm:h-24 rounded-full flex items-center justify-center ${(isContrast || isDarkMode || isAccessibilityMode) ? 'bg-transparent border-4 border-white' : 'bg-transparent border-4 border-[#2C7FFF]'}`}>
-                  <svg className={`w-8 h-8 sm:w-12 sm:h-12 animate-spin [animation-direction:reverse] ${(isContrast || isDarkMode || isAccessibilityMode) ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M12 12H4a8 8 0 018-8v8z"></path>
-                  </svg>
+              <div className="relative px-5 pt-8 pb-6 sm:px-8 sm:pt-10 sm:pb-8 flex flex-col items-center text-center">
+                <div aria-hidden="true" className="relative mb-4 sm:mb-5 flex items-center justify-center mx-auto">
+                  <div className={`w-16 h-16 sm:w-24 sm:h-24 rounded-full flex items-center justify-center ${(isContrast || isDarkMode || isAccessibilityMode) ? 'bg-transparent border-4 border-white' : 'bg-transparent border-4 border-[#2C7FFF]'}`}>
+                    <svg className={`w-8 h-8 sm:w-12 sm:h-12 animate-spin [animation-direction:reverse] ${(isContrast || isDarkMode || isAccessibilityMode) ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M12 12H4a8 8 0 018-8v8z"></path>
+                    </svg>
+                  </div>
+                  <div className={`absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold ${(isContrast || isDarkMode || isAccessibilityMode) ? 'bg-white text-black' : 'bg-[#03045E] text-white'}`}>✓</div>
                 </div>
-                <div className={`absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold ${(isContrast || isDarkMode || isAccessibilityMode) ? 'bg-white text-black' : 'bg-[#03045E] text-white'}`}>✓</div>
-              </div>
 
-              <span aria-hidden="true" title="Notice" className={`inline-flex items-center gap-1 sm:gap-1.5 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-3 sm:mb-4 border-2 ${(isContrast || isDarkMode || isAccessibilityMode) ? 'text-white bg-transparent border-white' : 'text-[#2C7FFF] bg-transparent border-[#2C7FFF]'}`}>
-                <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-[#10B981]"></span>
-                Notice
-              </span>
+                <span aria-hidden="true" title="Notice" className={`inline-flex items-center gap-1 sm:gap-1.5 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-3 sm:mb-4 border-2 ${(isContrast || isDarkMode || isAccessibilityMode) ? 'text-white bg-transparent border-white' : 'text-[#2C7FFF] bg-transparent border-[#2C7FFF]'}`}>
+                  <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-[#10B981]"></span>
+                  Notice
+                </span>
 
-              <h2 id="logging-title" title="Logging In..." className={`text-xl sm:text-3xl font-black tracking-tight mb-1.5 sm:mb-2 ${(isContrast || isDarkMode || isAccessibilityMode) ? 'text-white' : 'text-[#03045E]'}`}>
-                Logging In...
-              </h2>
-              <p id="logging-desc" title="Please wait while we set up your session and redirect you." className={`text-xs sm:text-sm font-bold leading-relaxed mb-6 sm:mb-8 max-w-xs ${(isContrast || isDarkMode || isAccessibilityMode) ? 'text-white/80' : 'text-[#03045E]/80'}`}>
-                Please wait while we set up your session and redirect you.
-              </p>
+                <h2 id="logging-title" className={`text-xl sm:text-3xl font-black tracking-tight mb-1.5 sm:mb-2 ${(isContrast || isDarkMode || isAccessibilityMode) ? 'text-white' : 'text-[#03045E]'}`}>
+                  Logging In...
+                </h2>
+                <p id="logging-desc" className={`text-xs sm:text-sm font-bold leading-relaxed mb-6 sm:mb-8 max-w-xs ${(isContrast || isDarkMode || isAccessibilityMode) ? 'text-white/80' : 'text-[#03045E]/80'}`}>
+                  Please wait while we set up your session and redirect you.
+                </p>
 
-              <div aria-hidden="true" className="flex items-center gap-1 sm:gap-1.5">
-                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#2C7FFF] animate-pulse" />
-                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#2C7FFF] animate-pulse [animation-delay:150ms]" />
-                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#2C7FFF] animate-pulse [animation-delay:300ms]" />
+                <div aria-hidden="true" className="flex items-center gap-1 sm:gap-1.5">
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#2C7FFF] animate-pulse" />
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#2C7FFF] animate-pulse [animation-delay:150ms]" />
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#2C7FFF] animate-pulse [animation-delay:300ms]" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
    
         <header
@@ -334,11 +338,17 @@ export default function Login() {
             </p>
           </div>
 
-          {errorMessage && (
+                   {errorMessage && (
             <div
               role="alert"
               aria-live="assertive"
-              className={`w-full p-3 sm:p-3.5 text-xs sm:text-sm font-bold text-center ${isContrast ? 'text-blue-300 bg-zinc-900 border border-blue-400' : 'text-red-600 bg-white border-2 border-red-500'} rounded-xl shadow-inner`}
+              className={`w-full p-3 sm:p-3.5 text-xs sm:text-sm font-bold text-center ${
+                isContrast 
+                  ? 'text-blue-300 bg-zinc-900 border border-blue-400' 
+                  : (isDarkMode || isAccessibilityMode)
+                    ? '!text-red-600 bg-zinc-900 !border-red-500 border-2' 
+                    : 'text-red-500 bg-white border-2 border-red-500'
+              } rounded-xl shadow-inner`}
             >
               {errorMessage}
             </div>
@@ -496,12 +506,12 @@ export default function Login() {
               Building an inclusive workforce and equal employment opportunities for everyone.
             </p>
                <div 
-  tabIndex="0"
-  aria-label="Copyright information and slogan"
-  title="Copyright information and slogan"
   className="w-full pt-3 sm:pt-6 flex flex-col items-start justify-center gap-2 sm:gap-4 text-[9px] sm:text-xs font-bold text-white/75 text-left"
 >
-              <span> Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</span>
+              <label
+                tabIndex="0"
+                aria-label="Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines"
+              > Burgos Street, Barangay Villamonte, Bacolod City, 6100 Negros Occidental, Philippines</label>
               <span></span>
               <span></span>
             </div>
@@ -589,8 +599,6 @@ export default function Login() {
 
         <div 
           tabIndex="0"
-          aria-label="Copyright information and slogan"
-          title="Copyright information and slogan"
           className="max-w-[1700px] mx-auto pt-3 sm:pt-6 flex flex-col items-center justify-center gap-2 sm:gap-4 text-[9px] sm:text-xs font-bold text-white/75 text-center"
         >
           <p>© {new Date().getFullYear()} AgileWork Inc. All rights reserved.</p>
