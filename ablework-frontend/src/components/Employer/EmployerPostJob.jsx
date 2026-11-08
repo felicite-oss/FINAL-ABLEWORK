@@ -9,15 +9,16 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
   const isDarkMode = mode && typeof mode === 'string' && (mode.toLowerCase().includes('dark') || mode.toLowerCase().includes('comfort'));
   const isDark = isContrast || isDarkMode;
   const isHighContrastOrDarkComfort = paletteKey === 'highContrast' || paletteKey === 'darkComfort';
-
   const [jobTitle, setJobTitle] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [currentSkill, setCurrentSkill] = useState(''); 
   const [selectedAccommodations, setSelectedAccommodations] = useState([]);
   const [currentAccommodation, setCurrentAccommodation] = useState('');
+  const [currency, setCurrency] = useState('PHP');
   const [salaryRange, setSalaryRange] = useState('');
   const [salaryError, setSalaryError] = useState('');
+  const [maxApplications, setMaxApplications] = useState(50);
   const [selectedBenefits, setSelectedBenefits] = useState([]);
   const [currentBenefit, setCurrentBenefit] = useState('');
   const [selectedDisabilities, setSelectedDisabilities] = useState([]);
@@ -25,6 +26,9 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' }); 
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [publishedJobTitle, setPublishedJobTitle] = useState('');
+  const [expandedCategory, setExpandedCategory] = useState(null);
+
+
 
   // Check if the user is fully verified
   const isVerified = profile?.verification_status === 'Approved';
@@ -47,21 +51,65 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
     }
   }, [salaryRange]);
 
-  const availableDisabilities = [
-    'Deafness', 'Blindness', 'Low Vision', 'Hard of Hearing', 'Color Blindness', 
-    'Paralysis', 'Amputation', 'Cerebral Palsy', 'Limited Fine Motor Skills', 'Wheelchair User'
+const disabilityCategories = {
+    "Vision Impairments": ['Total Blindness','Partially Blind' ,'Low Vision', 'Color Blindness'],
+    "Hearing & Speech": ['Deafness', 'Hard of Hearing', 'Muteness', 'Speech Impairment'],
+    "Combinations": ['Deafblindness'],
+    "Amputation": [
+      'Upper Limb Amputation (Left)', 'Upper Limb Amputation (Right)', 'Upper Limb Amputation (Both)', 
+      'Lower Limb Amputation (Left)', 'Lower Limb Amputation (Right)', 'Lower Limb Amputation (Both)'
+    ],
+    "Polio": ['Polio (Upper Limbs)', 'Polio (Lower Limbs)', 'Polio (One Side)'],
+    "Motor & Neuromuscular": [
+      'Paraplegia (Lower Body)', 'Hemiplegia (One Side)', 'Quadriplegia (All Limbs)', 
+      'Cerebral Palsy', 'Limited Fine Motor Skills', 'Spinal Cord Injury', 
+      'Muscular Dystrophy', 'Spina Bifida', 'Dwarfism', 'Scoliosis', 'Multiple Sclerosis', 'Chronic Pain'
+    ]
+  };
+
+const skillSuggestions = [
+    'Data Entry', 'Customer Service', 'Virtual Assistance', 'Graphic Design', 'Social Media Management', 'Microsoft Office',
+    'Massage Therapy', 'Reflexology', 'Wellness Therapy', 'Braille Transcription', 'Sign Language Instruction', 'Translation',
+    'Audio Transcription', 'Voice-Over Artistry', 'Telemarketing', 'Web Development', 'Software Programming', 'UI/UX Design',
+    'QA Testing', 'IT Helpdesk', 'Database Administration', 'Copywriting', 'Video Editing', 'Audio Editing',
+    'Visual Arts / Illustration', 'Bookkeeping', 'Project Management', 'Scheduling', 'Inventory Management',
+    'Communication', 'Problem Solving', 'Time Management', 'Teamwork'
   ];
 
-  const skillSuggestions = [
-    'Customer Service', 'Data Entry', 'Communication', 'Time Management', 'Microsoft Office', 
-    'Teamwork', 'Virtual Assistance', 'Problem Solving', 'Writing', 'Graphic Design', 
-    'Project Management', 'Copywriting', 'Python', 'React', 'Node.js', 'UI/UX Design'
+const accommodationSuggestions = [
+    'Screen Reader', 'Wheelchair Access', 'Sign Language Interpreter', 'Flexible Hours', 'Quiet Workspace',
+    'Ergonomic Setup', 'Noise-Cancelling Headphones', 'Screen Magnifier', 'Braille Keyboard', 'Captioning Services',
+    'Remote Work', 'Frequent Breaks', 'Service Animal', 'Adjustable Desk', 'Voice-to-Text Software',
+    'Large Print Documents', 'Step-Free Access', 'Travel Assistant', 'Walking Assistant', 'Accessible Parking'
   ];
 
-  const accommodationSuggestions = [
-    'Wheelchair Access', 'Screen Reader', 'Sign Language Interpreter', 'Flexible Hours', 
-    'Quiet Workspace', 'Ergonomic Setup', 'Step-Free Access', 'Noise-Cancelling Headphones',
-    'Captioning Services', 'Remote Work'
+  const salaryOptionsPHP = [
+    'Undisclosed / Negotiable',
+    'Below ₱15,000 / month',
+    '₱15,000 - ₱25,000 / month (Entry Level)',
+    '₱25,000 - ₱40,000 / month (Specialist)',
+    '₱40,000 - ₱70,000 / month (Mid-Level)',
+    '₱70,000 - ₱100,000 / month (Managerial)',
+    '₱100,000+ / month (Executive)'
+  ];
+
+  const salaryOptionsUSD = [
+    'Undisclosed / Negotiable',
+    'Below $500 / month',
+    '$500 - $1,000 / month (Entry Level)',
+    '$1,000 - $2,000 / month (Specialist)',
+    '$2,000 - $4,000 / month (Mid-Level)',
+    '$4,000+ / month (Executive/Senior)'
+  ];
+
+  const doleMandatedBenefits = [
+    '13th Month Pay', 'SSS Contribution', 'PhilHealth', 'Pag-IBIG Fund',
+    'Service Incentive Leave (SIL)', 'Maternity / Paternity Leave', 'Night Shift Differential'
+  ];
+
+  const standardBenefits = [
+    'HMO / Health Insurance', 'Paid Vacation Leave', 'Paid Sick Leave',
+    'Performance Bonus', '14th Month Pay', 'Flexible Working Hours', 'Equipment Provided'
   ];
 
   const toggleSelection = (item, selectedArray, setSelectedArray) => {
@@ -151,13 +199,6 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
       return setStatusMessage({ type: 'error', text: 'Please add at least one required skill.' });
     }
 
-    if (salaryError) {
-      return setStatusMessage({ 
-        type: 'error', 
-        text: 'Please fix the salary range format before publishing.' 
-      });
-    }
-
     setIsLoading(true);
 
     const payload = {
@@ -170,6 +211,7 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
       accepted_disabilities: selectedDisabilities, 
       salary_range: salaryRange,
       benefits: selectedBenefits,
+      max_applications: maxApplications,
       latitude: profile.latitude,
       longitude: profile.longitude,
       status: 'Active'
@@ -340,47 +382,131 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
           </div>
         </div>
 
+
+          {/* NEW MAX APPLICATIONS FIELD */}
+          <div className="flex flex-col gap-1.5 sm:gap-2">
+            <label className={`text-xs sm:text-sm font-extrabold flex items-center gap-1.5 sm:gap-2 uppercase tracking-wider ${pageText}`}>
+              <svg className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+              Maximum Applications Allowed
+            </label>
+            <p className={`text-[10px] sm:text-xs font-semibold mb-1 ${muted}`}>
+              The job will automatically stop accepting resumes once this number is reached (Max: 50).
+            </p>
+            <input 
+              type="number" 
+              min="1" 
+              max="50"
+              value={maxApplications} 
+              onChange={(e) => {
+                let val = parseInt(e.target.value) || 1;
+                // Instantly forces the number back to 50 if they try to type 51 or higher
+                if (val > 50) val = 50; 
+                setMaxApplications(val);
+              }} 
+              required
+              className={inputSmCls}
+            />
+          </div>
+
         <hr className={divider} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+          
+
+{/* SALARY & CURRENCY DROPDOWN */}
           <div className="flex flex-col gap-2 sm:gap-3">
             <label className={`text-xs sm:text-sm font-extrabold uppercase tracking-wider ${pageText}`}>
               Salary Range
             </label>
-            <p className={`text-[10px] sm:text-xs font-semibold mb-1 ${muted}`}>Leave blank if undisclosed.</p>
-            <input
-              type="text" value={salaryRange} onChange={(e) => setSalaryRange(e.target.value)}
-              placeholder="e.g. ₱20,000 - ₱30,000 / month"
-              className={`w-full p-2 sm:p-3 border-2 rounded-md font-semibold focus:outline-none transition-all text-xs sm:text-sm ${
-                salaryError
-                  ? (isDark ? 'border-white text-white bg-black' : 'border-red-500 text-red-500 bg-white')
-                  : isContrast
-                    ? 'border-white bg-black text-white placeholder:text-gray-400 focus:border-white'
-                    : isDarkMode
-                      ? 'border-white bg-black text-white placeholder:text-gray-400 focus:border-white'
-                      : 'border-gray-200 bg-white text-[#03045E] placeholder:text-gray-400 focus:border-gray-200'
-              }`}
-            />
-            {salaryError && (
-              <p className={`text-[10px] sm:text-xs font-black ${isDark ? 'text-white' : 'text-red-500'}`}>{salaryError}</p>
-            )}
+            <p className={`text-[10px] sm:text-xs font-semibold mb-1 ${muted}`}>Select currency and applicable income bracket.</p>
+            
+            <div className="flex gap-2">
+              <select
+                value={currency}
+                onChange={(e) => {
+                  setCurrency(e.target.value);
+                  setSalaryRange(''); // Resets the bracket if they switch currencies
+                }}
+                className={`w-24 p-2 sm:p-3 border-2 rounded-md font-bold focus:outline-none transition-all text-xs sm:text-sm cursor-pointer appearance-none text-center ${
+                  isContrast || isDarkMode
+                    ? 'border-white bg-black text-white focus:border-white'
+                    : 'border-gray-200 bg-[#f4f4f4] text-[#03045E] focus:border-gray-200'
+                }`}
+              >
+                <option value="PHP">PHP ₱</option>
+                <option value="USD">USD $</option>
+              </select>
+
+              <select
+                value={salaryRange}
+                onChange={(e) => setSalaryRange(e.target.value)}
+                className={`flex-1 p-2 sm:p-3 border-2 rounded-md font-semibold focus:outline-none transition-all text-xs sm:text-sm cursor-pointer appearance-none ${
+                  isContrast || isDarkMode
+                    ? 'border-white bg-black text-white focus:border-white'
+                    : 'border-gray-200 bg-white text-[#03045E] focus:border-gray-200'
+                }`}
+              >
+                <option value="" disabled>Select a salary bracket...</option>
+                {(currency === 'PHP' ? salaryOptionsPHP : salaryOptionsUSD).map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
+          {/* DOLE & COMPANY BENEFITS DROPDOWN */}
           <div className="flex flex-col gap-2 sm:gap-3">
             <label className={`text-xs sm:text-sm font-extrabold uppercase tracking-wider ${pageText}`}>
-              Benefits
+              Benefits Package
             </label>
-            <p className={`text-[10px] sm:text-xs font-semibold mb-1 ${muted}`}>Type a benefit and press <strong>Enter</strong> to add it.</p>
-            <input
-              type="text" value={currentBenefit} onChange={(e) => setCurrentBenefit(e.target.value)} onKeyDown={handleBenefitKeyDown}
-              placeholder="e.g. HMO, 13th Month Pay..."
-              className={inputSmCls}
-            />
+            <p className={`text-[10px] sm:text-xs font-semibold mb-1 ${muted}`}>Select DOLE-mandated and company-initiated benefits.</p>
+            
+            <select
+              value=""
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val && !selectedBenefits.includes(val)) {
+                  setSelectedBenefits([...selectedBenefits, val]);
+                }
+              }}
+              className={`w-full p-2 sm:p-3 border-2 rounded-md font-semibold focus:outline-none transition-all text-xs sm:text-sm cursor-pointer appearance-none ${
+                isContrast || isDarkMode
+                  ? 'border-white bg-black text-white focus:border-white'
+                  : 'border-gray-200 bg-white text-[#03045E] focus:border-gray-200'
+              }`}
+            >
+              <option value="" disabled>+ Add a benefit...</option>
+              
+              <optgroup label="DOLE-Mandated (Labor Code)">
+                {doleMandatedBenefits
+                  .filter(b => !selectedBenefits.includes(b))
+                  .map(benefit => (
+                    <option key={benefit} value={benefit}>{benefit}</option>
+                  ))}
+              </optgroup>
+              
+              <optgroup label="Company Perks">
+                {standardBenefits
+                  .filter(b => !selectedBenefits.includes(b))
+                  .map(benefit => (
+                    <option key={benefit} value={benefit}>{benefit}</option>
+                  ))}
+              </optgroup>
+            </select>
+
+            {/* Selected Benefits Chips */}
             {selectedBenefits.length > 0 && (
               <div className={chipContainer}>
                 {selectedBenefits.map(benefit => (
                   <span key={benefit} className={`inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-md border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-gray-200'}`}>
-                    {benefit} <button type="button" onClick={() => removeBenefit(benefit)} className={`font-bold ml-0.5 transition ${isDark ? 'text-white hover:text-red-500' : 'text-[#03045E] hover:text-red-500'}`}>✕</button>
+                    {benefit} 
+                    <button 
+                      type="button" 
+                      onClick={() => setSelectedBenefits(selectedBenefits.filter(b => b !== benefit))} 
+                      className={`font-bold ml-0.5 transition ${isDark ? 'text-white hover:text-red-500' : 'text-[#03045E] hover:text-red-500'}`}
+                    >
+                      ✕
+                    </button>
                   </span>
                 ))}
               </div>
@@ -464,35 +590,75 @@ export default function EmployerPostJob({ profile, refreshData, setActiveTab }) 
 
         <hr className={divider} />
 
-        {/* Disability Section Container (Medium Outer) */}
+{/* Disability Section Container (Expandable UI) */}
         <div className={`flex flex-col gap-3 sm:gap-4 p-3 sm:p-5 rounded-xl border-2 ${softBg}`}>
           <div>
             <label className={`text-xs sm:text-sm font-extrabold flex items-center gap-1.5 sm:gap-2 uppercase tracking-wider ${pageText}`}>
               <svg className={`w-4 h-4 sm:w-5 sm:h-5 ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
               Accepted Disabilities <span className={isDark ? 'text-white' : 'text-red-500'}>*</span>
             </label>
-            <p className={`text-[10px] sm:text-xs font-semibold mt-1 ${muted}`}>Select the specific conditions this workplace is fully equipped and prepared to support.</p>
+            <p className={`text-[10px] sm:text-xs font-semibold mt-1 ${muted}`}>Select a category below to reveal and choose specific conditions this workplace is fully equipped to support.</p>
           </div>
+
+          {/* Show Currently Selected Disabilities so they don't get lost when categories switch */}
+          {selectedDisabilities.length > 0 && (
+            <div className={chipContainer}>
+              <span className={`w-full text-[10px] font-black uppercase tracking-wider ${muted}`}>Currently Selected:</span>
+              {selectedDisabilities.map(disability => (
+                <span key={disability} className={`inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-md border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-gray-200'}`}>
+                  {disability}
+                  <button type="button" onClick={() => toggleSelection(disability, selectedDisabilities, setSelectedDisabilities)} className={`font-bold ml-0.5 transition ${isDark ? 'text-white hover:text-red-500' : 'text-[#03045E] hover:text-red-500'}`}>✕</button>
+                </span>
+              ))}
+            </div>
+          )}
           
-          <div className="flex flex-wrap gap-1.5 sm:gap-3 mt-1 sm:mt-2">
-            {availableDisabilities.map((disability) => {
-              const isSelected = selectedDisabilities.includes(disability);
+          {/* Main Category Buttons */}
+          <div className="flex flex-wrap gap-2 mt-1">
+            {Object.keys(disabilityCategories).map(category => {
+              const isActive = expandedCategory === category;
               return (
                 <button
                   type="button"
-                  key={disability}
-                  onClick={() => toggleSelection(disability, selectedDisabilities, setSelectedDisabilities)}
-                  className={`px-2 sm:px-4 py-1 sm:py-2 rounded-lg text-[10px] sm:text-sm font-bold border-2 transition-colors ${
-                    isSelected
-                      ? (isDark ? 'bg-white text-black border-white' : (isHighContrastOrDarkComfort ? 'bg-[#2C7FFF] !text-white border-[#2C7FFF]' : 'bg-[#2C7FFF] text-white border-[#2C7FFF]'))
-                      : (isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-gray-200')
+                  key={category}
+                  onClick={() => setExpandedCategory(isActive ? null : category)}
+                  className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold border-2 transition-colors ${
+                    isActive
+                      ? (isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]')
+                      : (isDark ? 'bg-black text-white border-white/50 hover:border-white' : 'bg-white text-[#03045E] border-gray-200 hover:border-[#03045E]')
                   }`}
                 >
-                  {disability} {isSelected ? '✓' : '+'}
+                  {category} {isActive ? '▼' : '▶'}
                 </button>
               );
             })}
           </div>
+
+          {/* Expanded Specific Options Box */}
+          {expandedCategory && (
+            <div className={`p-3 sm:p-4 rounded-xl border-2 animate-fadeIn ${isDark ? 'border-white/30 bg-white/5' : 'border-[#03045E]/15 bg-[#f4f4f4]'}`}>
+              <p className={`text-[10px] font-black uppercase tracking-wider mb-2 sm:mb-3 ${pageText}`}>Specific Conditions under {expandedCategory}:</p>
+              <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                {disabilityCategories[expandedCategory].map(disability => {
+                  const isSelected = selectedDisabilities.includes(disability);
+                  return (
+                    <button
+                      type="button"
+                      key={disability}
+                      onClick={() => toggleSelection(disability, selectedDisabilities, setSelectedDisabilities)}
+                      className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-bold border-2 transition-colors ${
+                        isSelected
+                          ? (isDark ? 'bg-white text-black border-white' : 'bg-[#2C7FFF] text-white border-[#2C7FFF]')
+                          : (isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-[#03045E]/20 hover:border-[#2C7FFF]')
+                      }`}
+                    >
+                      {disability} {isSelected ? '✓' : '+'}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         <button

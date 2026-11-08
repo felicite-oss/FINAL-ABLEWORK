@@ -29,7 +29,6 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
   const isDarkMode = mode && typeof mode === 'string' && (mode.toLowerCase().includes('dark') || mode.toLowerCase().includes('comfort'));
   const isDark = isContrast || isDarkMode;
   const isHighContrastOrDarkComfort = paletteKey === 'highContrast' || paletteKey === 'darkComfort';
-
   const [editingJob, setEditingJob] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [listTab, setListTab] = useState('active');
@@ -38,11 +37,13 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
   const [currentBenefit, setCurrentBenefit] = useState('');
   const [showAlert, setShowAlert] = useState(false);
   const [alertConfig, setAlertConfig] = useState({ tone: 'default', pill: '', title: '', subtitle: '' });
-   const [showArchiveModal, setShowArchiveModal] = useState(false);
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
   const [archiveTarget, setArchiveTarget] = useState(null);
   const [archiveStage, setArchiveStage] = useState('confirm');
-    const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   const [expandedJobs, setExpandedJobs] = useState([]);
+  const [expandedCategory, setExpandedCategory] = useState(null);
+
   const jobsPerPage = 12;
   useEffect(() => {
     setCurrentPage(1);
@@ -81,25 +82,57 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
     ? 'inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-full shadow-sm bg-white text-black border-2 border-white'
     : 'inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-full shadow-sm bg-white text-[#03045E] border-2 border-gray-200';
 
-  const availableDisabilities = [
-    'Deafness', 'Blindness', 'Low Vision', 'Hard of Hearing', 'Color Blindness', 
-    'Paralysis', 'Amputation', 'Cerebral Palsy', 'Limited Fine Motor Skills', 'Wheelchair User'
-  ];
+  const disabilityCategories = {
+    "Vision Impairments": ['Total Blindness', 'Low Vision / Partially Blind', 'Color Blindness'],
+    "Hearing & Speech": ['Deafness', 'Hard of Hearing', 'Muteness', 'Speech Impairment'],
+    "Combinations": ['Deafblindness'],
+    "Amputation": [
+      'Upper Limb Amputation (Left)', 'Upper Limb Amputation (Right)', 'Upper Limb Amputation (Both)', 
+      'Lower Limb Amputation (Left)', 'Lower Limb Amputation (Right)', 'Lower Limb Amputation (Both)'
+    ],
+    "Polio": ['Polio (Upper Limbs)', 'Polio (Lower Limbs)', 'Polio (One Side)'],
+    "Motor & Neuromuscular": [
+      'Paraplegia (Lower Body)', 'Hemiplegia (One Side)', 'Quadriplegia (All Limbs)', 
+      'Cerebral Palsy', 'Limited Fine Motor Skills', 'Spinal Cord Injury', 
+      'Muscular Dystrophy', 'Spina Bifida', 'Dwarfism', 'Scoliosis', 'Multiple Sclerosis', 'Chronic Pain'
+    ]
+  };
 
   const skillSuggestions = [
-    'Customer Service', 'Data Entry', 'Communication', 'Time Management', 'Microsoft Office', 
-    'Teamwork', 'Virtual Assistance', 'Problem Solving', 'Writing', 'Graphic Design', 
-    'Project Management', 'Copywriting', 'Python', 'React', 'Node.js', 'UI/UX Design'
+    'Data Entry', 'Customer Service', 'Virtual Assistance', 'Graphic Design', 'Social Media Management', 'Microsoft Office',
+    'Massage Therapy', 'Reflexology', 'Wellness Therapy', 'Braille Transcription', 'Sign Language Instruction', 'Translation',
+    'Audio Transcription', 'Voice-Over Artistry', 'Telemarketing', 'Web Development', 'Software Programming', 'UI/UX Design',
+    'QA Testing', 'IT Helpdesk', 'Database Administration', 'Copywriting', 'Video Editing', 'Audio Editing',
+    'Visual Arts / Illustration', 'Bookkeeping', 'Project Management', 'Scheduling', 'Inventory Management',
+    'Communication', 'Problem Solving', 'Time Management', 'Teamwork'
   ];
 
   const accommodationSuggestions = [
-    'Wheelchair Access', 'Screen Reader', 'Sign Language Interpreter', 'Flexible Hours', 
-    'Quiet Workspace', 'Ergonomic Setup', 'Step-Free Access', 'Noise-Cancelling Headphones',
-    'Captioning Services', 'Remote Work'
+    'Screen Reader', 'Wheelchair Access', 'Sign Language Interpreter', 'Flexible Hours', 'Quiet Workspace',
+    'Ergonomic Setup', 'Noise-Cancelling Headphones', 'Screen Magnifier', 'Braille Keyboard', 'Captioning Services',
+    'Remote Work', 'Frequent Breaks', 'Service Animal', 'Adjustable Desk', 'Voice-to-Text Software',
+    'Large Print Documents', 'Step-Free Access', 'Travel Assistant', 'Walking Assistant', 'Accessible Parking'
   ];
 
-  const benefitSuggestions = [
-    'HMO', '13th Month Pay', 'Internet Allowance', 'Equipment Provided', 'Paid Time Off', 'Performance Bonus'
+  const salaryOptionsPHP = [
+    'Undisclosed / Negotiable', 'Below ₱15,000 / month', '₱15,000 - ₱25,000 / month (Entry Level)',
+    '₱25,000 - ₱40,000 / month (Specialist)', '₱40,000 - ₱70,000 / month (Mid-Level)',
+    '₱70,000 - ₱100,000 / month (Managerial)', '₱100,000+ / month (Executive)'
+  ];
+
+  const salaryOptionsUSD = [
+    'Undisclosed / Negotiable', 'Below $500 / month', '$500 - $1,000 / month (Entry Level)',
+    '$1,000 - $2,000 / month (Specialist)', '$2,000 - $4,000 / month (Mid-Level)', '$4,000+ / month (Executive/Senior)'
+  ];
+
+  const doleMandatedBenefits = [
+    '13th Month Pay', 'SSS Contribution', 'PhilHealth', 'Pag-IBIG Fund',
+    'Service Incentive Leave (SIL)', 'Maternity / Paternity Leave', 'Night Shift Differential'
+  ];
+
+  const standardBenefits = [
+    'HMO / Health Insurance', 'Paid Vacation Leave', 'Paid Sick Leave',
+    'Performance Bonus', '14th Month Pay', 'Flexible Working Hours', 'Equipment Provided'
   ];
 
   const activeSkillQuery = currentSkill.trim().toLowerCase();
@@ -501,70 +534,122 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                 )}
               </div>
 
-              {/* Disability Section (Medium Inner) */}
+            {/* Disability Section (Categorized) */}
               <div className={`flex flex-col gap-2 p-3 sm:p-5 rounded-xl border-2 ${disabBoxBg}`}>
                 <div>
                   <label className="text-xs sm:text-sm font-extrabold flex items-center gap-1.5 sm:gap-2 uppercase tracking-wider text-[#03045E]">
                     Accepted Disabilities <span style={{ color: 'var(--color-primary, #2C7FFF)' }}>*</span>
                   </label>
+                  <p className={`text-[10px] sm:text-xs font-semibold mt-1 ${subtle}`}>Select categories below to reveal specific conditions.</p>
                 </div>
-                <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-1">
-                  {availableDisabilities.map((disability) => {
-                    const isSelected = editingJob.parsedDisabilities.includes(disability);
+                
+                {editingJob.parsedDisabilities.length > 0 && (
+                  <div className={chipBoxContainer}>
+                    <span className={`w-full text-[10px] font-black uppercase tracking-wider ${subtle}`}>Currently Selected:</span>
+                    {editingJob.parsedDisabilities.map(disability => (
+                      <span key={disability} className={chipPill}>
+                        {disability}
+                        <button type="button" onClick={() => toggleDisability(disability)} className="font-bold ml-0.5 hover:text-red-500 transition-colors">✕</button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {Object.keys(disabilityCategories).map(category => {
+                    const isActive = expandedCategory === category;
                     return (
                       <button
                         type="button"
-                        key={disability}
-                        onClick={() => toggleDisability(disability)}
-                        className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-bold border-2 transition-colors cursor-pointer shadow-sm`}
-                        style={isDark ? {
-                          color: isSelected ? '#000000' : '#ffffff',
-                          backgroundColor: isSelected ? '#ffffff' : '#000000',
-                          borderColor: '#ffffff'
-                        } : isHighContrastOrDarkComfort ? {
-                          color: isSelected ? '#ffffff' : '#ffffff',
-                          backgroundColor: isSelected ? '#2C7FFF' : '#000000',
-                          borderColor: isSelected ? '#2C7FFF' : '#ffffff'
-                        } : {
-                          color: isSelected ? '#ffffff' : 'var(--color-primary, #2C7FFF)',
-                          backgroundColor: isSelected ? 'var(--color-primary, #2C7FFF)' : '#ffffff',
-                          borderColor: isSelected ? 'var(--color-primary, #2C7FFF)' : 'var(--color-primary, #2C7FFF)'
-                        }}
+                        key={category}
+                        onClick={() => setExpandedCategory(isActive ? null : category)}
+                        className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-bold border-2 transition-colors ${
+                          isActive
+                            ? (isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]')
+                            : (isDark ? 'bg-black text-white border-white/50 hover:border-white' : 'bg-white text-[#03045E] border-gray-200 hover:border-[#03045E]')
+                        }`}
                       >
-                        {disability} {isSelected ? '✓' : '+'}
+                        {category} {isActive ? '▼' : '▶'}
                       </button>
                     );
                   })}
                 </div>
+
+                {expandedCategory && (
+                  <div className={`p-3 rounded-xl border-2 animate-fadeIn mt-2 ${isDark ? 'border-white/30 bg-white/5' : 'border-[#03045E]/15 bg-[#f4f4f4]'}`}>
+                    <p className={`text-[10px] font-black uppercase tracking-wider mb-2 ${pageText}`}>Specific Conditions under {expandedCategory}:</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {disabilityCategories[expandedCategory].map(disability => {
+                        const isSelected = editingJob.parsedDisabilities.includes(disability);
+                        return (
+                          <button
+                            type="button"
+                            key={disability}
+                            onClick={() => toggleDisability(disability)}
+                            className={`px-2 py-1 rounded border-2 text-[10px] font-bold transition-colors ${
+                              isSelected
+                                ? (isDark ? 'bg-white text-black border-white' : 'bg-[#2C7FFF] text-white border-[#2C7FFF]')
+                                : (isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-[#03045E]/20 hover:border-[#2C7FFF]')
+                            }`}
+                          >
+                            {disability} {isSelected ? '✓' : '+'}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <hr className={`my-1 border-t-2 ${divider}`} />
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs sm:text-sm font-bold text-[#03045E]">Salary Range</label>
-                <input type="text" value={editingJob.salary_range} onChange={e => setEditingJob({...editingJob, salary_range: e.target.value})} className={`p-2.5 sm:p-3 border-2 rounded-xl outline-none font-semibold transition-all text-sm sm:text-base ${inputBg}`} placeholder="e.g. ₱20,000 - ₱30,000 / month" />
+                <div className="flex gap-2">
+                  <select
+                    className={`w-20 p-2.5 sm:p-3 border-2 rounded-xl font-bold transition-all text-xs sm:text-sm appearance-none text-center outline-none ${inputBg}`}
+                    onChange={(e) => setEditingJob({...editingJob, salary_range: ''})} 
+                  >
+                    <option value="PHP">PHP ₱</option>
+                    <option value="USD">USD $</option>
+                  </select>
+                  <select
+                    value={editingJob.salary_range}
+                    onChange={(e) => setEditingJob({...editingJob, salary_range: e.target.value})}
+                    className={`flex-1 p-2.5 sm:p-3 border-2 rounded-xl outline-none font-semibold transition-all text-xs sm:text-sm appearance-none ${inputBg}`}
+                  >
+                    <option value="" disabled>Select a salary bracket...</option>
+                    {[...salaryOptionsPHP, ...salaryOptionsUSD].map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
               
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs sm:text-sm font-bold text-[#03045E]">Benefits</label>
-                <p className={`text-[10px] sm:text-xs font-semibold mb-1 ${subtle}`}>Type and press <strong>Enter</strong> to add.</p>
-                <input 
-                  type="text" value={currentBenefit} 
-                  onChange={e => setCurrentBenefit(e.target.value)} 
-                  onKeyDown={e => handleAddChip(e, 'parsedBenefits', currentBenefit, setCurrentBenefit)} 
-                  className={`p-2.5 sm:p-3 border-2 rounded-xl outline-none font-semibold transition-all text-sm sm:text-base ${inputBg}`} 
-                  placeholder="e.g. HMO, 13th Month Pay..." 
-                />
-
-                {filteredBenefits.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-1">
-                    {filteredBenefits.map(suggestion => (
-                      <button key={suggestion} type="button" onClick={() => addSuggestion('parsedBenefits', suggestion, setCurrentBenefit)} className={suggestionBtn}>
-                        + {suggestion}
-                      </button>
+                <select
+                  value=""
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val && !editingJob.parsedBenefits.includes(val)) {
+                      setEditingJob({ ...editingJob, parsedBenefits: [...editingJob.parsedBenefits, val] });
+                    }
+                  }}
+                  className={`w-full p-2.5 sm:p-3 border-2 rounded-xl font-semibold outline-none transition-all text-xs sm:text-sm appearance-none ${inputBg}`}
+                >
+                  <option value="" disabled>+ Add a benefit...</option>
+                  <optgroup label="DOLE-Mandated (Labor Code)">
+                    {doleMandatedBenefits.filter(b => !editingJob.parsedBenefits.includes(b)).map(benefit => (
+                      <option key={benefit} value={benefit}>{benefit}</option>
                     ))}
-                  </div>
-                )}
+                  </optgroup>
+                  <optgroup label="Company Perks">
+                    {standardBenefits.filter(b => !editingJob.parsedBenefits.includes(b)).map(benefit => (
+                      <option key={benefit} value={benefit}>{benefit}</option>
+                    ))}
+                  </optgroup>
+                </select>
 
                 {editingJob.parsedBenefits.length > 0 && (
                   <div className={chipBoxContainer}>

@@ -104,15 +104,28 @@ export default function ApplicantRegister() {
     }
   };
 
-  const availableDisabilities = [
-    'Deafness', 'Blindness', 'Low Vision', 'Hard of Hearing', 'Color Blindness',
-    'Paraplegia (Lower Body)', 'Hemiplegia (One Side)', 'Upper Limb Amputation',
-    'Lower Limb Amputation', 'Cerebral Palsy', 'Limited Fine Motor Skills', 'Wheelchair User'
+const availableDisabilities = [
+    // Sensory: Vision
+    'Blindness', 'Low Vision', 'Color Blindness',
+    // Sensory: Hearing & Speech
+    'Deafness', 'Hard of Hearing', 'Muteness', 'Speech Impairment', 
+    // Sensory: Combinations
+    'Deafblindness', 
+    // Physical: Amputations
+    'Upper Limb Amputation (Left)', 'Upper Limb Amputation (Right)', 'Upper Limb Amputation (Both)',
+    'Lower Limb Amputation (Left)', 'Lower Limb Amputation (Right)', 'Lower Limb Amputation (Both)',
+    // Physical: Polio
+    'Polio (Upper Limbs)', 'Polio (Lower Limbs)', 'Polio (One Side)',
+    // Physical: Motor & Neuromuscular
+    'Paraplegia (Lower Body)', 'Hemiplegia (One Side)', 'Quadriplegia (All Limbs)', 
+    'Cerebral Palsy', 'Limited Fine Motor Skills'
   ];
+
   const extendedDisabilities = [
-    'Speech Impairment', 'Neurodivergent', 'Chronic Pain', 'Multiple Sclerosis', 
-    'Muscular Dystrophy', 'Spina Bifida', 'Dwarfism', 'Autism Spectrum', 'ADHD'
+    'Spinal Cord Injury', 'Muscular Dystrophy', 'Spina Bifida', 
+    'Dwarfism', 'Scoliosis', 'Multiple Sclerosis', 'Chronic Pain'
   ];
+
   const [selectedDisabilities, setSelectedDisabilities] = useState([]);
   const [showOtherDisability, setShowOtherDisability] = useState(false);
   const [otherDisability, setOtherDisability] = useState('');
@@ -127,37 +140,69 @@ export default function ApplicantRegister() {
     }
   };
 
-  const availableAccommodations = ['Screen Reader', 'Wheelchair Access', 'Sign Language Interpreter', 'Flexible Hours', 'Quiet Workspace'];
+  const availableAccommodations = ['Screen Reader', 'Wheelchair Access', 'Sign Language Interpreter', 'Flexible Hours', 'Quiet Workspace', 'Travel Assistant'];
+  
   const extendedAccommodations = [
     'Ergonomic Setup', 'Noise-Cancelling Headphones', 'Screen Magnifier', 'Braille Keyboard', 
     'Captioning Services', 'Remote Work', 'Frequent Breaks', 'Service Animal',
-    'Adjustable Desk', 'Voice-to-Text Software', 'Large Print Documents', 'Step-Free Access'
+    'Adjustable Desk', 'Voice-to-Text Software', 'Large Print Documents', 'Step-Free Access',
+   'Walking Assistant', 'Accessible Parking'
   ];
   const [selectedAccommodations, setSelectedAccommodations] = useState([]);
   const [showOtherAccommodation, setShowOtherAccommodation] = useState(false);
   const [otherAccommodation, setOtherAccommodation] = useState('');
 
-  const defaultAvailable = [
-    'Customer Service', 
+const defaultAvailable = [
     'Data Entry', 
-    'Communication', 
-    'Time Management', 
-    'Microsoft Office', 
-    'Teamwork'
+    'Customer Service', 
+    'Virtual Assistance',
+    'Graphic Design', 
+    'Social Media Management', 
+    'Massage Therapy'
   ];
 
   const defaultExtended = [
-    'Virtual Assistance', 
-    'Social Media Management', 
-    'Problem Solving', 
-    'Writing', 
-    'Inventory Management', 
-    'Graphic Design', 
-    'Scheduling', 
+    // Tactile & Therapy (Often pursued by individuals with visual impairments) 
+    'Reflexology', 
+    'Wellness Therapy', 
+    
+    // Accessibility & Language
+    'Braille Transcription', 
+    'Sign Language Instruction', 
+    'Translation', 
+    
+    // Auditory & Voice (Accessible for visual/mobility impairments)
+    'Audio Transcription', 
+    'Voice-Over Artistry', 
+    'Telemarketing', 
+    
+    // Tech & Development (Highly accessible for hearing/mobility impairments)
+    'Web Development', 
+    'Software Programming', 
+    'UI/UX Design', 
+    'QA Testing', 
+    'IT Helpdesk', 
+    'Database Administration',
+    
+    // Creative & Digital (Accessible for hearing/mobility impairments)
+    'Copywriting', 
+    'Video Editing', 
+    'Audio Editing', 
+    'Visual Arts / Illustration', 
+    
+    // Administration & Business
+    'Bookkeeping', 
     'Project Management', 
-    'Retail Sales',
-    'Copywriting'
+    'Scheduling', 
+    'Inventory Management', 
+    
+    // Core Soft Skills
+    'Communication', 
+    'Problem Solving', 
+    'Time Management', 
+    'Teamwork'
   ];
+
   const [availableSkills, setAvailableSkills] = useState(defaultAvailable);
   const [extendedSkills, setExtendedSkills] = useState(defaultExtended);
 
@@ -165,15 +210,24 @@ export default function ApplicantRegister() {
   const [showOtherSkill, setShowOtherSkill] = useState(false);
   const [otherSkill, setOtherSkill] = useState('');
 
-  useEffect(() => {
+useEffect(() => {
     const fetchPopularSkills = async () => {
       try {
         const response = await fetch('http://localhost:5001/api/skills/popular');
         if (response.ok) {
           const popularSkills = await response.json();
-          const combinedSkills = Array.from(new Set([...popularSkills, ...defaultAvailable, ...defaultExtended]));
-          setAvailableSkills(combinedSkills.slice(0, 6));
-          setExtendedSkills(combinedSkills.slice(6));
+          
+          // 1. Lock in the default available skills so they ALWAYS show on screen
+          setAvailableSkills(defaultAvailable);
+          
+          // 2. Combine the database popular skills with your extended list
+          const combinedExtended = Array.from(new Set([...popularSkills, ...defaultExtended]));
+          
+          // 3. Filter out any duplicates that are already showing on screen
+          const filteredExtended = combinedExtended.filter(skill => !defaultAvailable.includes(skill));
+          
+          // 4. Put the rest into the "Other" search dropdown
+          setExtendedSkills(filteredExtended);
         }
       } catch (error) {
         console.error("Failed to fetch popular skills:", error);
@@ -181,7 +235,7 @@ export default function ApplicantRegister() {
     };
 
     fetchPopularSkills();
-  }, []);
+  }, []); // Remember to keep this empty dependency array!
 
   const handleCustomSkillKeyDown = (e) => {
     if (e.key === 'Enter') {

@@ -64,7 +64,7 @@ export default function EmployerRegister() {
   const [lng, setLng] = useState(null);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
   const [isDetecting, setIsDetecting] = useState(false);
-  const [verificationDoc, setVerificationDoc] = useState(null);
+  const [verificationDocs, setVerificationDocs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -76,6 +76,21 @@ export default function EmployerRegister() {
   const [mapExpanded, setMapExpanded] = useState(false);
   const [satelliteView, setSatelliteView] = useState(false);
   const [legendOpen, setLegendOpen] = useState(true);
+
+  const industryOptions = [
+    "Select an industry...",
+    "Information Technology (IT)",
+    "Business Process Outsourcing (BPO)",
+    "Healthcare & Medical",
+    "Education & Training",
+    "Finance & Accounting",
+    "Retail & E-commerce",
+    "Manufacturing & Logistics",
+    "Hospitality & Tourism",
+    "Construction & Real Estate",
+    "Media & Creative Arts",
+    "Other"
+  ];
 
   useEffect(() => {
     const onKey = (e) => {
@@ -209,10 +224,11 @@ const handleAddressType = (e) => {
     
     if (lat) formData.append('latitude', lat);
     if (lng) formData.append('longitude', lng);
-    if (verificationDoc) {
-      formData.append('verificationDocument', verificationDoc);
+    if (verificationDocs && verificationDocs.length > 0) {
+      verificationDocs.forEach((file) => {
+        formData.append('verificationDocuments', file); // Use an array field name
+      });
     }
-
     try {
       const response = await fetch('http://localhost:5001/api/auth/register/employer', {
         method: 'POST',
@@ -456,16 +472,22 @@ const handleAddressType = (e) => {
 
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="industry" className="text-xs sm:text-sm font-semibold text-[#03045E] rounded">Industry Type <span className="text-[#03045E]">*</span></label>
-                  <input
+                  <select
                     id="industry"
-                    type="text"
                     value={industry}
                     onChange={(e) => setIndustry(e.target.value)}
-                    placeholder="e.g. Technology"
                     required
-                    className="w-full p-3 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition"
-                    aria-label="Industry Type. Please enter the industry your company belongs to."
-                  />
+                    tabIndex="0"
+                    title="Please select the industry your company belongs to from the dropdown menu."
+                    aria-label="Industry Type. Please select the industry your company belongs to from the dropdown menu."
+                    className="w-full p-3 border border-[#03045E]/20 rounded-lg bg-white text-[#03045E] focus:outline-none focus:border-[#2C7FFF] transition cursor-pointer appearance-none"
+                  >
+                    {industryOptions.map((ind, idx) => (
+                      <option key={idx} value={ind === "Select an industry..." ? "" : ind} disabled={idx === 0}>
+                        {ind}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="flex flex-col gap-1.5">
@@ -804,14 +826,39 @@ const handleAddressType = (e) => {
               <div className="p-4 rounded-md border-2 border-dashed border-[#03045E]/20 bg-[#f4f4f4]/50">
                 <label htmlFor="verificationDoc" className="block text-xs sm:text-sm font-bold text-[#03045E] mb-1 rounded">Company Registration (DTI / SEC / Mayor's Permit) <span className="text-[#03045E]">*</span></label>
                 <input
-                  id="verificationDoc"
+                  id="verificationDocs"
                   type="file"
                   accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={(e) => setVerificationDoc(e.target.files[0])}
+                  multiple
+                  tabIndex="0"
+                  title="Please upload 1 to 2 clear copies of your DTI, SEC, Business Permit, or Mayor's Permit. Max size 5 Megabytes."
+                  aria-label="Company registration document upload. Please upload 1 to 2 clear copies of your DTI, SEC, Business Permit, or Mayor's Permit. Max size 5 Megabytes."
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files);
+                    if (files.length > 2) {
+                      alert("You can only upload a maximum of 2 documents.");
+                      e.target.value = null; // Resets the input
+                      setVerificationDocs([]);
+                    } else {
+                      setVerificationDocs(files);
+                    }
+                  }}
                   className={`w-full text-[10px] sm:text-sm text-[#03045E] file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-2 file:border-[#03045E]/30 file:bg-white file:text-[#03045E] file:font-semibold cursor-pointer ${isAccessibilityDarkMode ? '[&::file-selector-button]:!text-black' : isDefaultDarkMode ? '[&::file-selector-button]:!text-black' : ''}`}
                   required
-                  aria-label="Company registration document upload. Please upload a clear copy of your DTI, SEC, Business Permit, or Mayor's Permit. Max size 5 Megabytes."
                 />
+                {verificationDocs && verificationDocs.length > 0 && (
+                  <div className="mt-3 p-3 bg-white rounded border border-[#03045E]/20">
+                    <p className="text-[10px] font-black uppercase tracking-wider text-[#03045E]/60 mb-1">Selected Files:</p>
+                    <ul className="flex flex-col gap-1 text-xs font-bold text-[#2C7FFF]">
+                      {verificationDocs.map((file, index) => (
+                        <li key={index} className="flex items-center gap-1.5">
+                          <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                          <span className="truncate">{file.name}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
                 <p className="text-[10px] sm:text-xs text-[#03045E]/70 mt-2 font-semibold rounded">
                   Supported formats: .pdf, .jpg, .jpeg, .png (Max size: 5MB)
                 </p>

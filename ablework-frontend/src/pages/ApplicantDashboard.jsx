@@ -49,7 +49,20 @@ export default function ApplicantDashboard() {
   const profilePanelRef = useRef(null);
 const logoutPanelRef = useRef(null);
 
-  const handleTabChange = (tab) => {
+const handleTabChange = (tab, skipSecurity = false) => {
+    // 1. GLOBAL SECURITY INTERCEPT: Force password check for Profile and Settings
+    if ((tab === 'profile' || tab === 'settings') && !skipSecurity) {
+      setAuthTargetTab(tab);
+      setSettingsAuthOpen(true); // Pops open the mobile modal
+      setAuthPassword('');
+      setAuthError('');
+      setShowAuthPassword(false);
+      setIsOpen(false); // Closes mobile hamburger menu
+      setProfileDropdownOpen(false); // Closes desktop dropdown
+      return; // STOPS the tab from opening!
+    }
+
+    // 2. Normal Tab Change
     setActiveTab(tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -78,7 +91,7 @@ const handleSettingsAuth = async (e) => {
       if (res.ok) {
         setSettingsAuthOpen(false);
         setAuthPassword('');
-        handleTabChange(authTargetTab);
+        handleTabChange(authTargetTab, true); 
       } else {
         // Show specific backend error or a fallback HTTP error message
         setAuthError(data.message || `Error: ${res.status} ${res.statusText}`);
@@ -105,11 +118,11 @@ const handleSettingsAuth = async (e) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+useEffect(() => {
     const handleClickOutside = (event) => {
+      
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setProfileDropdownOpen(false);
-        setSettingsAuthOpen(false);
       }
       if (notifRef.current && !notifRef.current.contains(event.target)) {
         setNotificationDropdownOpen(false);
@@ -397,6 +410,65 @@ const handleSettingsAuth = async (e) => {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MOBILE SECURITY CHECK MODAL */}
+      {settingsAuthOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
+          style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
+        >
+          <div 
+            id="mobile-auth-modal"
+            onClick={(e) => e.stopPropagation()} 
+            className={`relative w-full max-w-sm rounded-xl sm:rounded-2xl shadow-2xl p-6 animate-in zoom-in-95 duration-300 ${isContrast ? 'bg-black border-2 border-white' : 'bg-white border-2 border-[#2C7FFF]'}`}
+          >
+            <h3 className={`text-lg font-black mb-2 text-center ${isContrast || isDarkMode ? 'text-white' : 'text-[#03045E]'}`}>Security Check</h3>
+            <p className={`text-xs text-center font-bold mb-4 ${isContrast || isDarkMode ? 'text-white/70' : 'text-[#03045E]/70'}`}>Please enter your password to access {authTargetTab === 'profile' ? 'Profile' : 'Settings'}.</p>
+            
+            {authError && (
+              <div role="alert" className={`mb-3 p-2 rounded-lg text-xs text-center font-bold border-2 ${isContrast || isDarkMode ? 'text-red-500 border-red-500' : 'text-red-600 border-red-600'}`}>
+                {authError}
+              </div>
+            )}
+            
+            <form onSubmit={handleSettingsAuth} className="flex flex-col gap-4">
+              <div className="relative">
+                <input
+                  type={showAuthPassword ? "text" : "password"}
+                  value={authPassword}
+                  onChange={(e) => setAuthPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  required
+                  className={`w-full p-3 border-2 rounded-xl font-bold outline-none text-sm ${isContrast || isDarkMode ? 'bg-black border-white/30 text-white focus:border-white' : 'bg-[#f4f4f4] border-[#03045E]/20 text-[#03045E] focus:border-[#2C7FFF]'}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowAuthPassword(!showAuthPassword)}
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 ${isContrast || isDarkMode ? 'text-white/50 hover:text-white' : 'text-[#03045E]/50 hover:text-[#2C7FFF]'}`}
+                >
+                  {showAuthPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => { setSettingsAuthOpen(false); setAuthError(''); setAuthPassword(''); }}
+                  className={`flex-1 py-3 rounded-xl font-black text-xs uppercase tracking-wider border-2 transition-all cursor-pointer ${isContrast || isDarkMode ? 'bg-black text-white border-white/30 hover:bg-white/10' : 'bg-white text-[#03045E] border-[#03045E]/30 hover:bg-[#f4f4f4]'}`}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isAuthVerifying}
+                  className={`flex-1 py-3 rounded-xl font-black text-xs uppercase tracking-wider border-2 transition-all cursor-pointer disabled:opacity-50 ${isContrast || isDarkMode ? 'bg-white text-black border-white hover:bg-white/90' : 'bg-[#2C7FFF] text-white border-[#2C7FFF] hover:bg-[#03045E]'}`}
+                >
+                  {isAuthVerifying ? 'Verifying...' : 'Unlock'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
@@ -779,7 +851,7 @@ const handleSettingsAuth = async (e) => {
             <nav aria-label="Mobile navigation" className={`flex flex-col px-2.5 pt-2.5 pb-2.5 gap-2 sm:px-3 sm:pt-3 sm:pb-3 sm:gap-2.5 ${isContrast ? 'text-white' : 'text-[#03045E]'}`}>
               
               <button
-                onClick={() => { handleTabChange('profile'); setIsOpen(false); }}
+                onClick={() => { handleTabChange('profile')}}
                 aria-label="Profile"
                 aria-current={activeTab === 'profile' ? 'page' : undefined}
                 className={`relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-lg font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden focus:outline-none ${
@@ -811,7 +883,7 @@ const handleSettingsAuth = async (e) => {
               </button>
 
               <button
-                onClick={() => { handleTabChange('settings'); setIsOpen(false); }}
+                onClick={() => { handleTabChange('settings') }}
                 aria-label="Settings"
                 aria-current={activeTab === 'settings' ? 'page' : undefined}
                 className={`relative flex items-center gap-2.5 text-left pl-3 pr-2.5 py-2.5 rounded-lg font-extrabold transition-all duration-300 cursor-pointer border-2 group overflow-hidden focus:outline-none ${

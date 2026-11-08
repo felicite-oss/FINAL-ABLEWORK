@@ -111,7 +111,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
   const getStatusColor = (status) => {
     if (isHighContrastOrDarkComfort) {
       switch (status) {
-        case 'Pending': return 'bg-white text-black border border-white';
+        case 'Received': return 'bg-white text-black border border-white';
         case 'Under Review': return 'bg-white text-black border border-white';
         case 'Shortlisted': return 'bg-white text-black border border-white';
         case 'Hired': return 'bg-white text-emerald-400 border border-emerald-500';
@@ -121,7 +121,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
     }
     if (isDark) {
       switch (status) {
-        case 'Pending': return 'bg-black text-white border border-white';
+        case 'Received': return 'bg-black text-white border border-white';
         case 'Under Review': return 'bg-black text-white border border-white';
         case 'Shortlisted': return 'bg-black text-white border border-white';
         case 'Hired': return 'bg-black text-emerald-400 border border-emerald-500';
@@ -130,7 +130,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
       }
     }
     switch (status) {
-      case 'Pending': return 'bg-white text-[#03045E] border border-gray-200';
+      case 'Received': return 'bg-white text-[#03045E] border border-gray-200';
       case 'Under Review': return 'bg-white text-[#03045E] border border-gray-200';
       case 'Shortlisted': return 'bg-white text-[#03045E] border border-gray-200';
       case 'Hired': return 'bg-white text-emerald-700 border border-emerald-500';
@@ -149,7 +149,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
   const currentApps = filteredApplications.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredApplications.length / itemsPerPage);
 
-  const tabs = ['All', 'Pending', 'Under Review', 'Shortlisted', 'Hired', 'Rejected'];
+  const tabs = ['All', 'Received', 'Under Review', 'Shortlisted', 'Hired', 'Rejected'];
   const pageText = isDark ? 'text-white' : 'text-[#03045E]';
   const panelBg = isDark ? 'bg-black border-white' : 'bg-white border-gray-200';
   const cardBg = isDark ? 'bg-black border-white' : 'bg-white border-gray-200';
@@ -280,7 +280,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
                       setNextSteps({ isOpen: false, status: '' });
                       setMessageText('');
 
-                      if(app.application_status === 'Pending') {
+                      if(app.application_status === 'Received') {
                           updateStatus(app.application_id, 'Under Review', null, false);
                       }
                     }} 

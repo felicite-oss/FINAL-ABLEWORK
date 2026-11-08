@@ -12,6 +12,8 @@ export default function ApplicantJobTracker({ applications }) {
 
   const getStatusStyle = (status) => {
     switch (status) {
+      case 'Received':
+        return 'bg-gray-100 text-gray-600 border-gray-300';
       case 'Under Review':
         return 'bg-[#2C7FFF]/10 text-[#2C7FFF] border-[#2C7FFF]/30';
       case 'Shortlisted':
@@ -34,7 +36,7 @@ export default function ApplicantJobTracker({ applications }) {
     };
   };
 
-  const trackingTabs = ['All', 'Under Review', 'Shortlisted', 'Hired', 'Rejected'];
+  const trackingTabs = ['All', 'Received', 'Under Review', 'Shortlisted', 'Hired', 'Rejected'];
   const filteredApps = applications.filter(app => {
     if (filter === 'All') return true;
     return app.status === filter;
@@ -53,10 +55,12 @@ export default function ApplicantJobTracker({ applications }) {
   const getStatusMessage = (app) => {
     if (app.employer_message) return app.employer_message;
     switch (app.status) {
-      case 'Shortlisted':
-        return 'Employer may contact you soon';
+      case 'Received':
+        return 'Application submitted. Waiting for employer review.';
       case 'Under Review':
         return 'Employer is viewing your profile';
+      case 'Shortlisted':
+        return 'Employer may contact you soon';
       case 'Hired':
         return 'Congratulations on the new job!';
       case 'Rejected':

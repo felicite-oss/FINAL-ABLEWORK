@@ -34,21 +34,36 @@ function MapInvalidator({ trigger }) {
 }
 
 const SKILL_RECOMMENDATIONS = [
-  "Customer Service", "Microsoft Office", "Virtual Assistance", 
-  "Problem Solving", "Graphic Design", "Node.js", "UI/UX Design", "Data Entry", "Time Management", "Teamwork"
-];
+    'Data Entry', 'Customer Service', 'Virtual Assistance', 'Graphic Design', 'Social Media Management', 'Microsoft Office',
+    'Massage Therapy', 'Reflexology', 'Wellness Therapy', 'Braille Transcription', 'Sign Language Instruction', 'Translation',
+    'Audio Transcription', 'Voice-Over Artistry', 'Telemarketing', 'Web Development', 'Software Programming', 'UI/UX Design',
+    'QA Testing', 'IT Helpdesk', 'Database Administration', 'Copywriting', 'Video Editing', 'Audio Editing',
+    'Visual Arts / Illustration', 'Bookkeeping', 'Project Management', 'Scheduling', 'Inventory Management',
+    'Communication', 'Problem Solving', 'Time Management', 'Teamwork'
+  ];
 
 const ACCOMMODATION_RECOMMENDATIONS = [
-  "Wheelchair Access", "Screen Reader", "Sign Language Interpreter", 
-  "Quiet Workspace", "Ergonomic Setup", "Step-Free Access", 
-  "Noise-Cancelling Headphones", "Captioning Services", "Flexible Hours"
-];
+    'Screen Reader', 'Wheelchair Access', 'Sign Language Interpreter', 'Flexible Hours', 'Quiet Workspace',
+    'Ergonomic Setup', 'Noise-Cancelling Headphones', 'Screen Magnifier', 'Braille Keyboard', 'Captioning Services',
+    'Remote Work', 'Frequent Breaks', 'Service Animal', 'Adjustable Desk', 'Voice-to-Text Software',
+    'Large Print Documents', 'Step-Free Access', 'Travel Assistant', 'Walking Assistant', 'Accessible Parking'
+  ];
 
-const DISABILITY_OPTIONS = [
-  "Deafness", "Blindness", "Low Vision", "Hard of Hearing", 
-  "Color Blindness", "Paralysis", "Amputation", "Cerebral Palsy", 
-  "Limited Fine Motor Skills", "Wheelchair User"
-];
+const disabilityCategories = {
+    "Vision Impairments": ['Total Blindness','Partially Blind', 'Low Vision', 'Color Blindness'],
+    "Hearing & Speech": ['Deafness', 'Hard of Hearing', 'Muteness', 'Speech Impairment'],
+    "Combinations": ['Deafblindness'],
+    "Amputation": [
+      'Upper Limb Amputation (Left)', 'Upper Limb Amputation (Right)', 'Upper Limb Amputation (Both)', 
+      'Lower Limb Amputation (Left)', 'Lower Limb Amputation (Right)', 'Lower Limb Amputation (Both)'
+    ],
+    "Polio": ['Polio (Upper Limbs)', 'Polio (Lower Limbs)', 'Polio (One Side)'],
+    "Motor & Neuromuscular": [
+      'Paraplegia (Lower Body)', 'Hemiplegia (One Side)', 'Quadriplegia (All Limbs)', 
+      'Cerebral Palsy', 'Limited Fine Motor Skills', 'Spinal Cord Injury', 
+      'Muscular Dystrophy', 'Spina Bifida', 'Dwarfism', 'Scoliosis', 'Multiple Sclerosis', 'Chronic Pain'
+    ]
+  };
 
 const INDEPENDENCE_OPTIONS = [
   { value: 'Independent', label: 'Independent (Requires standard accommodations)', description: 'You can perform job duties with standard workplace adjustments.' },
@@ -75,18 +90,15 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
   const fileInputRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tempImagePreview, setTempImagePreview] = useState('');
-  
   const [profilePicFile, setProfilePicFile] = useState(null);
-  
   const [locationAlert, setLocationAlert] = useState({ isOpen: false, type: '', title: '', message: '', latitude: '', longitude: '' });
   const [saveSuccess, setSaveSuccess] = useState({ isOpen: false, message: '' });
-
   const [independenceOpen, setIndependenceOpen] = useState(false);
   const independenceRef = useRef(null);
-
   const [mapExpanded, setMapExpanded] = useState(false);
   const [satelliteView, setSatelliteView] = useState(false);
   const [legendOpen, setLegendOpen] = useState(true);
+  const [expandedCategory, setExpandedCategory] = useState(null);
 
   // 1. Create a state to hold the combined skills
   const [recommendedSkills, setRecommendedSkills] = useState(SKILL_RECOMMENDATIONS);
@@ -890,32 +902,93 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
           </div>
 
 
+{/* Categorized Primary Disability Type Section */}
           <div className="flex flex-col gap-1.5 sm:gap-2">
-            <span tabIndex="0" className="text-xs sm:text-sm font-bold text-[#03045E] rounded focus:outline-none focus:ring-2 focus:ring-[#2C7FFF] focus:px-1 w-fit">Primary Disability Type *</span>
-            <div role="group" aria-label="Primary disability type options" className="flex flex-wrap gap-1.5 sm:gap-2 p-2 sm:p-3 bg-white border border-[#03045E]/20 rounded-lg sm:rounded-xl">
-              {DISABILITY_OPTIONS.map((option, i) => {
-                const isSelected = selectedDisabilities.includes(option);
-                const selectedColor = isDarkMode ? '#000000' : '#ffffff';
+            <div>
+              <span tabIndex="0" className="text-xs sm:text-sm font-bold text-[#03045E] rounded focus:outline-none focus:ring-2 focus:ring-[#2C7FFF] focus:px-1 w-fit">
+                Primary Disability Type *
+              </span>
+              <p className="text-[10px] sm:text-xs font-semibold mt-1 text-[#03045E]/70">Select a category below to reveal specific conditions.</p>
+            </div>
+
+            {selectedDisabilities.length > 0 && (
+              <div role="region" aria-label="Currently selected disabilities" className="p-2 rounded-lg border border-[#03045E]/20 bg-white flex flex-wrap gap-1.5">
+                <span aria-hidden="true" className="w-full text-[10px] font-black uppercase tracking-wider text-[#03045E]/70">Currently Selected:</span>
+                {selectedDisabilities.map(disability => (
+                  <span key={disability} className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold rounded-md bg-[#2C7FFF] text-white shadow-sm">
+                    {disability}
+                    <button 
+                      type="button" 
+                      onClick={() => toggleDisability(disability)} 
+                      aria-label={`Remove ${disability}`}
+                      title={`Remove ${disability}`}
+                      className="font-bold ml-0.5 hover:text-red-300 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-white rounded"
+                    >
+                      <span aria-hidden="true">✕</span>
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            
+            <div role="group" aria-label="Disability categories" className="flex flex-wrap gap-1.5 sm:gap-2 mt-1">
+              {Object.keys(disabilityCategories).map(category => {
+                const isActive = expandedCategory === category;
+                const contentId = `category-${category.replace(/\s+/g, '-')}`;
                 return (
                   <button
                     type="button"
-                    key={i}
-                    aria-label={`${option}. ${isSelected ? 'Selected' : 'Not selected'}`}
-                    aria-pressed={isSelected}
-                    onClick={() => toggleDisability(option)}
-                    style={isSelected ? { color: selectedColor } : undefined}
-                    className={`px-2.5 py-1.5 sm:px-3.5 sm:py-2 text-[10px] sm:text-xs font-bold rounded-md sm:rounded-lg border transition-all cursor-pointer flex items-center gap-1 ${
-                      isSelected 
-                        ? 'bg-[#2C7FFF] border-[#2C7FFF] shadow-md' 
+                    key={category}
+                    aria-expanded={isActive}
+                    aria-controls={contentId}
+                    onClick={() => setExpandedCategory(isActive ? null : category)}
+                    className={`px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold border transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#2C7FFF] ${
+                      isActive
+                        ? 'bg-[#03045E] text-white border-[#03045E]'
                         : 'bg-white text-[#03045E] border-gray-200 hover:border-[#2C7FFF]'
                     }`}
                   >
-                    <span style={isSelected ? { color: selectedColor } : undefined}>{option}</span>
-                    <span aria-hidden="true" className="font-extrabold" style={isSelected ? { color: selectedColor } : undefined}>{isSelected ? '✓' : '+'}</span>
+                    <span>{category}</span>
+                    <span aria-hidden="true" className="ml-1">{isActive ? '▼' : '▶'}</span>
                   </button>
                 );
               })}
             </div>
+
+            {expandedCategory && (
+              <div 
+                id={`category-${expandedCategory.replace(/\s+/g, '-')}`}
+                role="group" 
+                aria-label={`Specific Conditions under ${expandedCategory}`}
+                className="p-3 sm:p-4 rounded-xl border border-[#03045E]/20 animate-fadeIn mt-1 bg-white shadow-sm"
+              >
+                <p aria-hidden="true" className="text-[10px] font-black uppercase tracking-wider mb-2 sm:mb-3 text-[#03045E]">
+                  Specific Conditions under {expandedCategory}:
+                </p>
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                  {disabilityCategories[expandedCategory].map(disability => {
+                    const isSelected = selectedDisabilities.includes(disability);
+                    return (
+                      <button
+                        type="button"
+                        key={disability}
+                        aria-pressed={isSelected}
+                        aria-label={`${disability}, ${isSelected ? 'Selected' : 'Not selected'}`}
+                        onClick={() => toggleDisability(disability)}
+                        className={`px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-bold border transition-colors cursor-pointer flex items-center focus:outline-none focus:ring-2 focus:ring-[#2C7FFF] ${
+                          isSelected
+                            ? 'bg-[#2C7FFF] text-white border-[#2C7FFF] shadow-md'
+                            : 'bg-white text-[#03045E] border-gray-200 hover:border-[#2C7FFF]'
+                        }`}
+                      >
+                        <span>{disability}</span>
+                        <span aria-hidden="true" className="ml-1 font-extrabold">{isSelected ? '✓' : '+'}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5 sm:gap-2">

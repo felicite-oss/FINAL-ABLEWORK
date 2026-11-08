@@ -1555,24 +1555,58 @@ borderColor: user.account_status === 'Disabled' ? '#dc2626' :
                     </span>
                   </div>
 
-                  <div className={`flex-1 ${surfaceBg} rounded-xl border-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/15'} overflow-hidden flex items-center justify-center relative shadow-inner p-2`}>
-                    {employerModal.user.verification_document ? (
-                      employerModal.user.verification_document.match(/\.(jpeg|jpg|png|gif)$/i) ? (
-                        <img
-                          src={`http://localhost:5001/uploads/${employerModal.user.verification_document.replace(/^uploads[\\/]/, '')}`}
-                          alt="Business Verification Document"
-                          className="max-h-full max-w-full object-contain rounded-lg shadow-md"
-                        />
-                      ) : (
-                        <iframe
-                          src={`http://localhost:5001/uploads/${employerModal.user.verification_document.replace(/^uploads[\\/]/, '')}`}
-                          title="Business Document PDF"
-                          className="w-full h-full rounded-lg"
-                        ></iframe>
-                      )
-                    ) : (
-                      <p className={`text-sm font-bold ${txtMuted}`}>No document uploaded.</p>
-                    )}
+                  <div className={`flex-1 ${surfaceBg} rounded-xl border-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/15'} overflow-hidden flex flex-col md:flex-row items-center justify-center relative shadow-inner p-2 gap-3 overflow-y-auto`}>
+                    {(() => {
+                      if (!employerModal.user.verification_document) {
+                        return <p className={`text-sm font-bold ${txtMuted}`}>No document uploaded.</p>;
+                      }
+
+                      // 1. Safely parse the document string (handles both old single files and new arrays)
+                      let docs = [];
+                      try {
+                        docs = JSON.parse(employerModal.user.verification_document);
+                        if (!Array.isArray(docs)) docs = [employerModal.user.verification_document];
+                      } catch (e) {
+                        docs = [employerModal.user.verification_document];
+                      }
+
+                      // 2. Map through the 1 or 2 documents and render them side-by-side
+                      return docs.map((doc, index) => {
+                        let cleanPath = doc.replace(/\\/g, '/');
+                        if (cleanPath.startsWith('/uploads/')) cleanPath = cleanPath.replace('/uploads/', '');
+                        else if (cleanPath.startsWith('uploads/')) cleanPath = cleanPath.replace('uploads/', '');
+                        
+                        const fileUrl = `http://localhost:5001/uploads/${cleanPath}`;
+                        const isImage = /\.(jpeg|jpg|png|gif)$/i.test(cleanPath);
+
+                        return (
+                          <div key={index} className="flex-1 w-full h-full min-h-[250px] flex flex-col rounded-lg overflow-hidden border border-[#03045E]/10 bg-white/50">
+                            {docs.length > 1 && (
+                              <div className="bg-[#03045E] text-white text-[10px] font-black uppercase tracking-widest py-1.5 px-3 text-center shrink-0">
+                                Document {index + 1}
+                              </div>
+                            )}
+                            <div className="flex-1 relative p-1">
+                              {isImage ? (
+                                <img
+                                  src={fileUrl}
+                                  alt={`Business Verification Document ${index + 1}`}
+                                  onClick={() => window.open(fileUrl, '_blank')}
+                                  title="Click to view full size and zoom"
+                                  className="w-full h-full object-contain rounded shadow-sm cursor-zoom-in hover:opacity-80 transition-opacity"
+                                />
+                              ) : (
+                                <iframe
+                                  src={fileUrl}
+                                  title={`Business Document PDF ${index + 1}`}
+                                  className="w-full h-full rounded shadow-sm border-0"
+                                ></iframe>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      });
+                    })()}
                   </div>
 
                   <div className={`flex gap-3 pt-2 border-t-2 ${isDark ? 'border-white/15' : 'border-[#03045E]/10'} shrink-0`}>

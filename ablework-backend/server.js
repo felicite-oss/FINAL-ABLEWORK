@@ -23,6 +23,57 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+const generateEmailTemplate = (title, message) => {
+  return `
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+      
+      <!-- HEADER -->
+      <tr>
+        <td style="background-color: #03045E; padding: 25px; text-align: center;">
+          <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 900; letter-spacing: 2px;">ABLEWORK</h1>
+        </td>
+      </tr>
+      
+      <!-- BODY -->
+      <tr>
+        <td style="padding: 35px 30px;">
+          <h2 style="color: #03045E; margin-top: 0; font-size: 20px; font-weight: 800;">${title}</h2>
+          <p style="color: #444444; line-height: 1.6; font-size: 15px; margin-bottom: 30px; font-weight: 500;">
+            ${message}
+          </p>
+          
+          <!-- ACTION BUTTON -->
+          <div style="text-align: center;">
+            <a href="http://localhost:5173" style="background-color: #2C7FFF; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-size: 14px; font-weight: bold; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">Log In to Dashboard</a>
+          </div>
+        </td>
+      </tr>
+      
+      <!-- FOOTER -->
+      <tr>
+        <td style="background-color: #f9f9f9; padding: 20px; text-align: center; border-top: 2px solid #eeeeee;">
+          <p style="color: #888888; font-size: 11px; margin: 0; font-weight: bold;">
+            This is an automated message from the AbleWork platform. Please do not reply directly to this email.
+          </p>
+          <p style="color: #bbbbbb; font-size: 11px; margin: 8px 0 0 0;">
+            &copy; ${new Date().getFullYear()} AbleWork. All rights reserved.
+          </p>
+        </td>
+      </tr>
+      
+    </table>
+  </body>
+  </html>
+  `;
+};
+
 async function sendNotification(userId, title, message, type) {
   try {
     let inAppMessage = message.replace(/Please log in to your AbleWork dashboard for more details\./gi, '').trim();
@@ -32,8 +83,8 @@ async function sendNotification(userId, title, message, type) {
     
     if (type === 'match') {
       inAppMessage += '. Check your Smart Matches tab for details.';
-    } else {
-      inAppMessage += '. Check your Job Tracker for details.';
+    } else if (type === 'update' || type === 'application') {
+      inAppMessage += ' Check your Job Tracker for details.';
     }
 
     await db.execute(
@@ -49,7 +100,7 @@ async function sendNotification(userId, title, message, type) {
           from: '"AbleWork Notifications" <ableworksys5i@gmail.com>',
           to: users[0].email,
           subject: title,
-          text: message
+          html: generateEmailTemplate(title, inAppMessage)
         });
       } catch (mailError) {
         console.error("Nodemailer Email Dispatch Error:", mailError.message);
@@ -279,7 +330,7 @@ app.get('/api/jobs', async (req, res) => {
 });
 
 // ---------------------------------------------------------
-// ROUTE: LOGIN ALL USERS (Strict Role-Based)
+// ROUTE: LOGIN STEP 1 (Validate Password & Send OTP)
 // ---------------------------------------------------------
 app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body;
@@ -289,9 +340,70 @@ app.post('/api/auth/login', async (req, res) => {
         if (users.length === 0) return res.status(401).json({ error: "Invalid credentials." });
         const user = users[0];
 
+        // 1. Check if account is disabled before proceeding
+        if (user.account_status === 'Disabled') {
+            return res.status(403).json({ error: "This account has been disabled. Please contact support." });
+        }
+
+        // 2. Verify Password
         const isMatch = await bcrypt.compare(password, user.password_hash);
         if (!isMatch) return res.status(401).json({ error: "Invalid credentials." });
 
+        // 3. Generate 6-digit OTP and set expiration (10 minutes)
+        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const expires = new Date(Date.now() + 10 * 60000);
+
+        await db.execute(
+            "UPDATE users SET otp_code = ?, otp_expires = ? WHERE id = ?",
+            [otpCode, expires, user.id]
+        );
+
+        // 4. Email the OTP to the user
+        await transporter.sendMail({
+            from: '"AbleWork Security" <ableworksys5i@gmail.com>',
+            to: email,
+            subject: 'AbleWork Login Verification Code',
+            text: `Hello,\n\nYour 6-digit login verification code is: ${otpCode}\n\nThis code will expire in 10 minutes. Do not share this code with anyone.`
+        });
+
+        // 5. Tell the frontend to show the OTP input screen instead of logging them in
+        res.status(200).json({ 
+            message: "Credentials verified. OTP sent to email.", 
+            requiresOtp: true,
+            email: user.email 
+        });
+
+    } catch (error) {
+        console.error("Login Error:", error.message);
+        res.status(500).json({ error: "Server error during login." });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: LOGIN STEP 2 (Verify OTP & Grant Access)
+// ---------------------------------------------------------
+app.post('/api/auth/verify-login-otp', async (req, res) => {
+    const { email, otpCode } = req.body;
+
+    try {
+        const [users] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
+        if (users.length === 0) return res.status(404).json({ error: "User not found." });
+        const user = users[0];
+
+        // 1. Check if OTP matches
+        if (user.otp_code !== otpCode) {
+            return res.status(401).json({ error: "Invalid verification code." });
+        }
+        
+        // 2. Check if OTP is expired
+        if (new Date() > new Date(user.otp_expires)) {
+            return res.status(401).json({ error: "Verification code has expired. Please log in again." });
+        }
+
+        // 3. Clear the OTP from the database so it cannot be reused
+        await db.execute("UPDATE users SET otp_code = NULL, otp_expires = NULL WHERE id = ?", [user.id]);
+
+        // 4. Return the actual user data to complete the login
         res.status(200).json({ 
             message: "Login successful", 
             user: { 
@@ -304,8 +416,8 @@ app.post('/api/auth/login', async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Login Error:", error.message);
-        res.status(500).json({ error: "Server error during login." });
+        console.error("OTP Verification Error:", error.message);
+        res.status(500).json({ error: "Server error verifying OTP." });
     }
 });
 
@@ -459,7 +571,7 @@ app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (re
 // ---------------------------------------------------------
 // ROUTE: FULL EMPLOYER REGISTRATION 
 // ---------------------------------------------------------
-app.post('/api/auth/register/employer', upload.single('verificationDocument'), async (req, res) => {
+app.post('/api/auth/register/employer', upload.array('verificationDocuments', 2), async (req, res) => {
     console.log("--- INCOMING EMPLOYER REGISTRATION ---");
     
     const { 
@@ -471,7 +583,16 @@ app.post('/api/auth/register/employer', upload.single('verificationDocument'), a
         return res.status(400).json({ message: "Password must be at least 8 characters long, with an uppercase, lowercase, number, and special character." });
     }
 
-    const documentFilename = req.file ? req.file.filename : null;
+    // Process the array of files instead of a single file
+    let documentPaths = null;
+    if (req.files && req.files.length > 0) {
+        const pathsArray = req.files.map(file => `/uploads/${file.filename}`);
+        documentPaths = JSON.stringify(pathsArray); // Store as stringified array in DB
+    }
+
+    if (!documentPaths) {
+        return res.status(400).json({ message: "At least one verification document is required." });
+    }
 
     try {
         const [existing] = await db.execute('SELECT id FROM users WHERE email = ?', [email]);
@@ -498,7 +619,7 @@ app.post('/api/auth/register/employer', upload.single('verificationDocument'), a
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
                     newUserId, companyName, companyDescription, industry, jobRole, 
-                    address, latitude || null, longitude || null, documentFilename 
+                    address, latitude || null, longitude || null, documentPaths 
                 ]
             );
 
@@ -576,7 +697,7 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
             SELECT jp.id, jp.employer_id, jp.job_title, jp.company_name, jp.job_description, 
                    jp.required_skills, jp.provided_accommodations, jp.accepted_disabilities, 
                    jp.salary_range, jp.benefits, jp.latitude, jp.longitude, 
-                   u.email AS contact_email, u.phone AS contact_number, e.workplace_address
+                   u.email AS contact_email, u.phone AS contact_number, e.workplace_address, e.industry
             FROM job_postings jp
             LEFT JOIN users u ON jp.employer_id = u.id
             LEFT JOIN employer_profiles e ON jp.employer_id = e.user_id
@@ -656,7 +777,6 @@ app.post('/api/applications/apply', upload.single('resume'), async (req, res) =>
 
     const { applicant_id, job_id, cover_letter } = req.body;
     
-
     const resumePath = req.file ? `/uploads/${req.file.filename}` : null;
 
     if (!applicant_id || !job_id) {
@@ -668,7 +788,7 @@ app.post('/api/applications/apply', upload.single('resume'), async (req, res) =>
     }
 
     try {
-
+        // 1. Check if the applicant already applied
         const [existing] = await db.execute(
             'SELECT id FROM applications WHERE applicant_id = ? AND job_id = ?', 
             [applicant_id, job_id]
@@ -678,9 +798,30 @@ app.post('/api/applications/apply', upload.single('resume'), async (req, res) =>
             return res.status(400).json({ message: "You have already applied for this job." });
         }
 
+        // ========================================================
+        // NEW ENFORCEMENT: Check the dynamic application limit
+        // ========================================================
+        
+        // A. Fetch the dynamic limit set by the employer
+        const [jobCheck] = await db.execute('SELECT max_applications FROM job_postings WHERE id = ?', [job_id]);
+        if (jobCheck.length === 0) {
+            return res.status(404).json({ message: "Job not found." });
+        }
+        
+        // Use the employer's limit, or default to 50 if it's null/empty
+        const dynamicLimit = jobCheck[0].max_applications || 50; 
+
+        // B. Count current applications and block if limit is reached
+        const [appCount] = await db.execute('SELECT COUNT(*) as total FROM applications WHERE job_id = ?', [job_id]);
+        if (appCount[0].total >= dynamicLimit) {
+            return res.status(403).json({ message: `This job has reached its maximum limit of ${dynamicLimit} applications.` });
+        }
+        // ========================================================
+
+        // 2. Insert the new application
         await db.execute(
             'INSERT INTO applications (applicant_id, job_id, status, resume_path, cover_letter) VALUES (?, ?, ?, ?, ?)',
-            [applicant_id, job_id, 'Under Review', resumePath, cover_letter || null]
+            [applicant_id, job_id, 'Received', resumePath, cover_letter || null] 
         );
 
         const [jobRows] = await db.execute(
@@ -708,6 +849,47 @@ app.post('/api/applications/apply', upload.single('resume'), async (req, res) =>
     } catch (error) {
         console.error("Application Submission Error:", error.message);
         res.status(500).json({ message: "Failed to submit application." });
+    }
+});
+
+// ---------------------------------------------------------
+// ROUTE: MARK APPLICATION AS VIEWED (UNDER REVIEW)
+// ---------------------------------------------------------
+app.put('/api/applications/:id/view', async (req, res) => {
+    const applicationId = req.params.id;
+    try {
+        // 1. Update the status to Under Review
+        const [updateResult] = await db.execute(
+            `UPDATE applications 
+             SET status = 'Under Review' 
+             WHERE id = ? AND status = 'Received'`,
+            [applicationId]
+        );
+
+        // 2. If successfully updated, fetch details to send a notification
+        if (updateResult.affectedRows > 0) {
+            const [appDetails] = await db.execute(`
+                SELECT a.applicant_id, j.job_title, j.company_name 
+                FROM applications a
+                JOIN job_postings j ON a.job_id = j.id
+                WHERE a.id = ?
+            `, [applicationId]);
+
+            if (appDetails.length > 0) {
+                const { applicant_id, job_title, company_name } = appDetails[0];
+
+                const alertTitle = `Application Update: Under Review`;
+                const alertMessage = `Great news! Your application for the ${job_title} role at ${company_name} has been viewed and marked as Under Review.`;
+
+                // Trigger your existing notification system (in-app + Brevo email)
+                await sendNotification(applicant_id, alertTitle, alertMessage, 'update');
+            }
+        }
+
+        res.status(200).json({ message: "Status updated to Under Review and applicant notified." });
+    } catch (error) {
+        console.error("View Status Update Error:", error.message);
+        res.status(500).json({ message: "Failed to update status." });
     }
 });
 
@@ -869,20 +1051,20 @@ app.post('/api/jobs/create', async (req, res) => {
     const { 
         employer_id, job_title, company_name, job_description, 
         required_skills, provided_accommodations, accepted_disabilities,
-        salary_range, benefits, latitude, longitude 
+        salary_range, benefits, latitude, longitude,
+        max_applications
     } = req.body;
 
     try {
         const [users] = await db.execute('SELECT verification_status FROM users WHERE id = ?', [employer_id]);
-        
         if (users.length === 0 || users[0].verification_status !== 'Approved') {
             return res.status(403).json({ message: "You must be an approved employer to post jobs." });
         }
 
         const [result] = await db.execute(
             `INSERT INTO job_postings 
-             (employer_id, job_title, company_name, job_description, required_skills, provided_accommodations, accepted_disabilities, salary_range, benefits, latitude, longitude, status) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active')`,
+             (employer_id, job_title, company_name, job_description, required_skills, provided_accommodations, accepted_disabilities, salary_range, benefits, latitude, longitude, max_applications, status) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active')`,
             [
                 employer_id ?? null, 
                 job_title ?? null, 
@@ -894,7 +1076,8 @@ app.post('/api/jobs/create', async (req, res) => {
                 salary_range ?? null,                       
                 benefits ? JSON.stringify(benefits) : '[]', 
                 latitude ?? null, 
-                longitude ?? null
+                longitude ?? null,
+                max_applications || 50
             ]
         );
 
@@ -1246,6 +1429,7 @@ app.put('/api/admin/users/:id/verify', async (req, res) => {
     const { status, rejection_reason } = req.body; 
 
     try {
+
         if (status === 'Rejected') {
             await db.execute(
                 `UPDATE users SET verification_status = ?, rejection_reason = ?, rejection_timestamp = NOW() WHERE id = ?`,
@@ -1258,7 +1442,24 @@ app.put('/api/admin/users/:id/verify', async (req, res) => {
             );
         }
         
-        res.status(200).json({ message: `User status updated to ${status}.` });
+
+        let alertTitle = '';
+        let alertMessage = '';
+
+        if (status === 'Approved') {
+            alertTitle = 'AbleWork System: Account Verification Update';
+            alertMessage = 'Your submitted verification documents have been reviewed and approved by the administration team. Your account standing is now Active. You may now access all platform features.';
+        } else if (status === 'Rejected') {
+            alertTitle = 'AbleWork System: Verification Document Issue';
+            alertMessage = `Your recent verification document was not approved. Reason: ${rejection_reason || 'Did not meet platform standards'}. Please log in to your dashboard to review the feedback and resubmit.`;
+        }
+
+        if (alertTitle && alertMessage) {
+            console.log(`Attempting to send email alert to User ID: ${id}`);
+            await sendNotification(id, alertTitle, alertMessage, 'system');
+        }
+        
+        res.status(200).json({ message: `User status updated to ${status} and notified.` });
     } catch (error) {
         console.error("Verification Error:", error.message);
         res.status(500).json({ message: "Error updating user status." });
@@ -1760,7 +1961,7 @@ app.post('/api/users/:id/verify-password', async (req, res) => {
 
         // Compare the submitted password with the stored hash
         const isMatch = await bcrypt.compare(password, users[0].password_hash);
-        s
+        
         if (!isMatch) {
             return res.status(401).json({ message: "Incorrect password." });
         }

@@ -64,7 +64,8 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [sweetAlert, setSweetAlert] = useState({ isOpen: false, title: '', text: '', type: 'notice' });
   const [searchQuery, setSearchQuery] = useState('');
-  const [maxDistance, setMaxDistance] = useState('Any');
+  const [selectedSalary, setSelectedSalary] = useState('Any');
+  const [selectedIndustry, setSelectedIndustry] = useState('Any');
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [selectedAccs, setSelectedAccs] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
@@ -93,7 +94,7 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, maxDistance, selectedSkills, selectedAccs, activeTab]);
+  }, [searchQuery, selectedSalary, selectedIndustry, selectedSkills, selectedAccs, activeTab]);
 
   const checkHasApplied = (jobId) => {
     return applications.some(app => String(app.job_id) === String(jobId)) || locallyAppliedJobs.some(id => String(id) === String(jobId));
@@ -161,6 +162,18 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
     return Array.from(terms).filter(Boolean).sort();
   }, [jobs]);
 
+  const availableSalaries = useMemo(() => {
+    if (!jobs) return [];
+    const all = jobs.map(job => job.salary_range).filter(Boolean);
+    return Array.from(new Set(all)).sort();
+  }, [jobs]);
+
+  const availableIndustries = useMemo(() => {
+    if (!jobs) return [];
+    const all = jobs.map(job => job.industry).filter(Boolean);
+    return Array.from(new Set(all)).sort();
+  }, [jobs]);
+
   const searchSuggestions = useMemo(() => {
     if (searchQuery.trim().length < 1) return [];
     const query = searchQuery.toLowerCase();
@@ -181,17 +194,29 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
   const filteredJobs = useMemo(() => {
     if (!jobs) return [];
     return jobs.filter(job => {
+      // 1. Search Query
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         if (!job.job_title?.toLowerCase().includes(query) && !job.company_name?.toLowerCase().includes(query)) return false;
       }
-      if (maxDistance !== 'Any') {
-        if (!job.distance_km || Number(job.distance_km) > Number(maxDistance)) return false;
+      
+      // 2. Salary Filter
+      if (selectedSalary !== 'Any') {
+        if (job.salary_range !== selectedSalary) return false;
       }
+      
+      // 3. Industry Filter
+      if (selectedIndustry !== 'Any') {
+        if (job.industry !== selectedIndustry) return false;
+      }
+
+      // 4. Skills Filter
       if (selectedSkills.length > 0) {
         const jobSkills = safeParse(job.required_skills);
         if (!selectedSkills.some(s => jobSkills.includes(s))) return false;
       }
+
+      // 5. Accommodations Filter
       if (selectedAccs.length > 0) {
         const jobAccs = safeParse(job.provided_accommodations);
         if (!selectedAccs.some(a => jobAccs.includes(a))) return false;
@@ -204,7 +229,7 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
         return !isApplied;
       }
     });
-  }, [jobs, searchQuery, maxDistance, selectedSkills, selectedAccs, applications, locallyAppliedJobs, activeTab]);
+  }, [jobs, searchQuery, selectedSalary, selectedIndustry, selectedSkills, selectedAccs, applications, locallyAppliedJobs, activeTab]);
 
   const indexOfLastJob = currentPage * jobsPerPage;
   const indexOfFirstJob = indexOfLastJob - jobsPerPage;
@@ -222,7 +247,7 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
           isOpen: true,
           type: 'notice',
           title: 'Resume Required',
-          text: 'Please upload your resume / CV before submitting your application.'
+          text: 'Please upload your resumé / CV before submitting your application.'
         });
         return;
     }
@@ -457,61 +482,44 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                   )}
                 </div>
 
-                <div className="flex flex-col gap-1 sm:gap-1.5 relative">
-                  <label htmlFor="distance-filter" className={`text-[10px] sm:text-xs font-extrabold uppercase tracking-widest ${isDarkScreen ? 'text-white' : 'text-[#03045E]'} focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded`} tabIndex="0">Maximum Distance</label>
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setDistanceOpen(!distanceOpen)}
-                      aria-haspopup="listbox"
-                      aria-expanded={distanceOpen}
-                      aria-label="Filter by maximum distance"
-                      className={`w-full flex items-center justify-between gap-2 p-3 sm:p-3.5 border-2 border-[#03045E]/25 rounded-xl sm:rounded-2xl bg-white font-bold focus:border-[#2C7FFF] outline-none transition text-xs sm:text-sm text-[#03045E] cursor-pointer`}
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                  
+                  <div className="flex flex-col gap-1 sm:gap-1.5">
+                    <label htmlFor="salary-filter" className={`text-[10px] sm:text-xs font-extrabold uppercase tracking-widest ${isDarkScreen ? 'text-white' : 'text-[#03045E]'}`}>
+                      Salary Range
+                    </label>
+                    <select
+                      id="salary-filter"
+                      aria-label="Filter by Salary Range"
+                      value={selectedSalary}
+                      onChange={(e) => setSelectedSalary(e.target.value)}
+                      className={`w-full p-3 border-2 border-[#03045E]/25 rounded-xl bg-white font-bold outline-none cursor-pointer appearance-none text-xs sm:text-sm text-[#03045E] focus:border-[#2C7FFF]`}
                     >
-                      <span>{maxDistance === 'Any' ? 'Within Profile Radius' : `Within ${maxDistance} km`}</span>
-                      <svg className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#03045E] transition-transform duration-200 ${distanceOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-                    {distanceOpen && (
-                      <div role="listbox" aria-label="Maximum distance options" className="absolute z-50 mt-2 w-full rounded-xl border-2 border-[#2C7FFF] bg-white shadow-[0_15px_40px_rgba(3,4,94,0.15)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
-                        {[
-                          { value: 'Any', label: 'Within Profile Radius' },
-                          { value: '5', label: 'Within 5 km' },
-                          { value: '15', label: 'Within 15 km' },
-                          { value: '30', label: 'Within 30 km' }
-                        ].map((option) => {
-                          const isSelected = maxDistance === option.value;
-                          return (
-                            <button
-                              key={option.value}
-                              type="button"
-                              role="option"
-                              aria-selected={isSelected}
-                              onClick={() => {
-                                setMaxDistance(option.value);
-                                setDistanceOpen(false);
-                              }}
-                              className={`w-full flex items-center gap-2.5 p-3 text-left transition-colors cursor-pointer border-b border-[#03045E]/10 last:border-b-0 text-xs sm:text-sm font-bold ${
-                                isSelected ? 'bg-[#2C7FFF]/10 text-[#03045E]' : 'bg-white text-[#03045E] hover:bg-[#f4f4f4]'
-                              }`}
-                            >
-                              <span aria-hidden="true" className={`shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                                isSelected ? 'border-[#2C7FFF] bg-[#2C7FFF]' : 'border-[#03045E]/30 bg-white'
-                              }`}>
-                                {isSelected && (
-                                  <svg className="w-2.5 h-2.5" fill="none" stroke={isDarkMode ? '#000000' : '#ffffff'} strokeWidth="3" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                  </svg>
-                                )}
-                              </span>
-                              {option.label}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
+                      <option value="Any">All Salaries</option>
+                      {availableSalaries.map(salary => (
+                        <option key={salary} value={salary}>{salary}</option>
+                      ))}
+                    </select>
                   </div>
+
+                  <div className="flex flex-col gap-1 sm:gap-1.5">
+                    <label htmlFor="industry-filter" className={`text-[10px] sm:text-xs font-extrabold uppercase tracking-widest ${isDarkScreen ? 'text-white' : 'text-[#03045E]'}`}>
+                      Industry
+                    </label>
+                    <select
+                      id="industry-filter"
+                      aria-label="Filter by Industry"
+                      value={selectedIndustry}
+                      onChange={(e) => setSelectedIndustry(e.target.value)}
+                      className={`w-full p-3 border-2 border-[#03045E]/25 rounded-xl bg-white font-bold outline-none cursor-pointer appearance-none text-xs sm:text-sm text-[#03045E] focus:border-[#2C7FFF]`}
+                    >
+                      <option value="Any">All Industries</option>
+                      {availableIndustries.map(industry => (
+                        <option key={industry} value={industry}>{industry}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
                 </div>
               </div>
 
@@ -563,10 +571,16 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                 </div>
               </div>
 
-              {(searchQuery || maxDistance !== 'Any' || selectedSkills.length > 0 || selectedAccs.length > 0) && (
+              {(searchQuery || selectedSalary !== 'Any' || selectedIndustry !== 'Any' || selectedSkills.length > 0 || selectedAccs.length > 0) && (
                 <div className="flex justify-end pt-1.5 sm:pt-2 border-t border-[#03045E]/15">
                   <button
-                    onClick={() => { setSearchQuery(''); setMaxDistance('Any'); setSelectedSkills([]); setSelectedAccs([]); }}
+                    onClick={() => { 
+                      setSearchQuery(''); 
+                      setSelectedSalary('Any'); 
+                      setSelectedIndustry('Any'); 
+                      setSelectedSkills([]); 
+                      setSelectedAccs([]); 
+                    }}
                     aria-label="Clear All Filters"
                     className={`text-[11px] sm:text-sm font-extrabold hover:underline cursor-pointer transition ${isDarkScreen ? '!text-black hover:!text-black' : 'text-[#2C7FFF] hover:text-[#03045E]'}`}
                   >
@@ -999,12 +1013,12 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                                <p tabIndex="0" role="text" aria-label={`Applying for ${selectedJob.job_title} at ${selectedJob.company_name}`} title={`Applying for ${selectedJob.job_title} at ${selectedJob.company_name}`} className="text-xs sm:text-base text-[#03045E] mb-6 sm:mb-8 font-bold focus:outline-none">Applying for <span className="font-black text-[#2C7FFF]">{selectedJob.job_title}</span> at {selectedJob.company_name}</p>
                 <form onSubmit={submitApplication} className="flex flex-col gap-4 sm:gap-6">
                   <div className="flex flex-col gap-1.5 sm:gap-2">
-                    <label htmlFor="resume-upload" tabIndex="0" aria-label="Upload Resume or CV, required" title="Upload Resume or CV, required" className="text-xs sm:text-sm font-black text-[#03045E] focus:outline-none">Upload Resume / CV <span className="text-red-500">*</span></label>
+                    <label htmlFor="resume-upload" tabIndex="0" aria-label="Upload Resumé or CV, required" title="Upload Resumé or CV, required" className="text-xs sm:text-sm font-black text-[#03045E] focus:outline-none">Upload Resumé / CV <span className="text-red-500">*</span></label>
                     <div className="border-2 border-dashed border-gray-300 p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-white flex flex-col items-center justify-center text-center">
                       <svg aria-hidden="true" className="w-8 h-8 sm:w-10 sm:h-10 text-[#2C7FFF] mb-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
-                      <input id="resume-upload" type="file" accept=".pdf,.doc,.docx" required onChange={(e) => setResumeFile(e.target.files[0])} aria-label="Upload Resume or CV" className={`text-[10px] sm:text-sm text-[#03045E] file:mr-2 sm:file:mr-4 file:py-1.5 sm:file:py-2.5 file:px-3 sm:file:px-5 file:rounded-lg file:text-[10px] sm:file:text-sm file:font-black cursor-pointer !file:bg-white !file:text-[#03045E] file:border-2 file:border-gray-300`} />
+                      <input id="resume-upload" type="file" accept=".pdf,.doc,.docx" required onChange={(e) => setResumeFile(e.target.files[0])} aria-label="Upload Resumé or CV" className={`text-[10px] sm:text-sm text-[#03045E] file:mr-2 sm:file:mr-4 file:py-1.5 sm:file:py-2.5 file:px-3 sm:file:px-5 file:rounded-lg file:text-[10px] sm:file:text-sm file:font-black cursor-pointer !file:bg-white !file:text-[#03045E] file:border-2 file:border-gray-300`} />
                       <p tabIndex="0" role="text" aria-label="Supported formats: PDF, DOCX (Max 5MB)" title="Supported formats: PDF, DOCX (Max 5MB)" className="text-[10px] sm:text-xs text-[#03045E]/70 mt-2 sm:mt-3 font-bold focus:outline-none">Supported formats: PDF, DOCX (Max 5MB)</p>
                     </div>
                   </div>
