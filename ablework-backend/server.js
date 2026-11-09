@@ -468,6 +468,7 @@ app.get('/api/applicant/:id/profile', async (req, res) => {
                 a.accommodations_needed, 
                 a.skills, 
                 a.pwd_document_path,
+                a.resume_path,
                 a.profile_picture
             FROM users u
             JOIN applicant_profiles a ON u.id = a.user_id
@@ -501,7 +502,7 @@ app.get('/api/applicant/:id/profile', async (req, res) => {
 // ---------------------------------------------------------
 // ROUTE: FULL APPLICANT REGISTRATION 
 // ---------------------------------------------------------
-app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (req, res) => {
+app.post('/api/auth/register/applicant', upload.fields([{ name: 'pwdDocument', maxCount: 1 }, { name: 'resume', maxCount: 1 }]), async (req, res) => {
     console.log("--- INCOMING APPLICANT REGISTRATION ---");
     
     if (!req.body) {
@@ -518,7 +519,9 @@ app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (re
         return res.status(400).json({ message: "Password must be at least 8 characters long, with an uppercase, lowercase, number, and special character." });
     }
 
-    const pwdDocumentPath = req.file ? req.file.path : null;
+    // Safely extract both file paths if they exist
+    const pwdDocumentPath = req.files && req.files['pwdDocument'] ? req.files['pwdDocument'][0].path : null;
+    const resumePath = req.files && req.files['resume'] ? req.files['resume'][0].path : null;
 
     try {
         const [existingUser] = await db.execute('SELECT id FROM users WHERE email = ?', [email]);
@@ -532,27 +535,22 @@ app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (re
         await connection.beginTransaction();
 
         try {
+            // 1. Create the base User account
             const [userResult] = await connection.execute(
                 `INSERT INTO users (email, phone, password_hash, ui_preference, verification_status, role) 
                  VALUES (?, ?, ?, ?, ?, ?)`,
-                [
-                    email, 
-                    phone, 
-                    hashedPassword, 
-                    'default', 
-                    'Pending', 
-                    'applicant'
-                ]
+                [email, phone, hashedPassword, 'default', 'Pending', 'applicant']
             );
 
             const newUserId = userResult.insertId;
             const parsedDisabilities = JSON.parse(disabilities || '[]');
             const disabilityString = parsedDisabilities.join(', ');
 
+            // 2. Create the Profile (Now including resume_path)
             await connection.execute(
                 `INSERT INTO applicant_profiles 
-                (user_id, firstname, middlename, lastname, birthdate, disability_type, residential_address, latitude, longitude, travel_radius_km, workplace_independence, accommodations_needed, skills, pwd_document_path) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                (user_id, firstname, middlename, lastname, birthdate, disability_type, residential_address, latitude, longitude, travel_radius_km, workplace_independence, accommodations_needed, skills, pwd_document_path, resume_path) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
                     newUserId, 
                     firstName, 
@@ -567,7 +565,8 @@ app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (re
                     independence, 
                     accommodations || '[]', 
                     skills || '[]',         
-                    pwdDocumentPath         
+                    pwdDocumentPath,
+                    resumePath // <--- Injected straight into the database!
                 ]
             );
 
@@ -791,24 +790,34 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
 });
 
 // ---------------------------------------------------------
-// ROUTE: SUBMIT A JOB APPLICATION (With Resume Upload)
+// ROUTE: SUBMIT A JOB APPLICATION (With Resume & Certificate)
 // ---------------------------------------------------------
-app.post('/api/applications/apply', upload.single('resume'), async (req, res) => {
+app.post('/api/applications/apply', upload.fields([{ name: 'resume', maxCount: 1 }, { name: 'certificate', maxCount: 1 }]), async (req, res) => {
 
-    const { applicant_id, job_id, cover_letter } = req.body;
+    const { applicant_id, job_id, cover_letter, use_existing_resume } = req.body;
     
-    const resumePath = req.file ? `/uploads/${req.file.filename}` : null;
-
     if (!applicant_id || !job_id) {
         return res.status(400).json({ message: "Missing applicant or job ID." });
     }
 
-    if (!resumePath) {
-        return res.status(400).json({ message: "A resume file is required to apply." });
+    let finalResumePath = null;
+    const uploadedResume = req.files && req.files['resume'] ? `/uploads/${req.files['resume'][0].filename}` : null;
+    const certificatePath = req.files && req.files['certificate'] ? `/uploads/${req.files['certificate'][0].filename}` : null;
+
+    if (use_existing_resume === 'true') {
+        const [profile] = await db.execute('SELECT resume_path FROM applicant_profiles WHERE user_id = ?', [applicant_id]);
+        if (profile.length > 0 && profile[0].resume_path) {
+            finalResumePath = profile[0].resume_path;
+        }
+    } else if (uploadedResume) {
+        finalResumePath = uploadedResume;
+    }
+
+    if (!finalResumePath) {
+        return res.status(400).json({ message: "A resume is required to apply." });
     }
 
     try {
-        // 1. Check if the applicant already applied
         const [existing] = await db.execute(
             'SELECT id FROM applications WHERE applicant_id = ? AND job_id = ?', 
             [applicant_id, job_id]
@@ -818,30 +827,22 @@ app.post('/api/applications/apply', upload.single('resume'), async (req, res) =>
             return res.status(400).json({ message: "You have already applied for this job." });
         }
 
-        // ========================================================
-        // NEW ENFORCEMENT: Check the dynamic application limit
-        // ========================================================
-        
-        // A. Fetch the dynamic limit set by the employer
         const [jobCheck] = await db.execute('SELECT max_applications FROM job_postings WHERE id = ?', [job_id]);
         if (jobCheck.length === 0) {
             return res.status(404).json({ message: "Job not found." });
         }
         
-        // Use the employer's limit, or default to 50 if it's null/empty
         const dynamicLimit = jobCheck[0].max_applications || 50; 
 
-        // B. Count current applications and block if limit is reached
         const [appCount] = await db.execute('SELECT COUNT(*) as total FROM applications WHERE job_id = ?', [job_id]);
         if (appCount[0].total >= dynamicLimit) {
             return res.status(403).json({ message: `This job has reached its maximum limit of ${dynamicLimit} applications.` });
         }
-        // ========================================================
 
         // 2. Insert the new application
         await db.execute(
-            'INSERT INTO applications (applicant_id, job_id, status, resume_path, cover_letter) VALUES (?, ?, ?, ?, ?)',
-            [applicant_id, job_id, 'Received', resumePath, cover_letter || null] 
+            'INSERT INTO applications (applicant_id, job_id, status, resume_path, cover_letter, certificate_path) VALUES (?, ?, ?, ?, ?, ?)',
+            [applicant_id, job_id, 'Received', finalResumePath, cover_letter || null, certificatePath] 
         );
 
         const [jobRows] = await db.execute(
@@ -1248,7 +1249,7 @@ app.get('/api/employer/:id/applications', async (req, res) => {
     try {
         const [applications] = await db.execute(`
             SELECT a.id as application_id, a.applicant_id, a.status as application_status, a.applied_at,
-                   a.resume_path, a.cover_letter, 
+                   a.resume_path, a.cover_letter, a.certificate_path, 
                    j.job_title, j.id as job_id,
                    ap.firstname, ap.lastname, ap.skills, ap.accommodations_needed, ap.disability_type,
                    u.email, u.phone
@@ -1275,17 +1276,38 @@ app.put('/api/applications/:id/status', async (req, res) => {
     const { status, employer_message, applicant_id, job_title, company_name } = req.body; 
 
     try {
+        // 1. Update the chosen applicant's status (e.g., to 'Hired')
         await db.execute(
             "UPDATE applications SET status = ?, employer_message = ? WHERE id = ?", 
             [status, employer_message || null, applicationId]
         );
 
+        // 2. NEW LOGIC: If the applicant is hired, ARCHIVE the job posting
+        if (status === 'Hired') {
+            // First, find out which job this application belongs to
+            const [appRecord] = await db.execute("SELECT job_id FROM applications WHERE id = ?", [applicationId]);
+            
+            if (appRecord.length > 0) {
+                const jobId = appRecord[0].job_id;
+                
+                // Change the job status to 'Archived' so it moves to the History tab
+                await db.execute("UPDATE job_postings SET status = 'Archived' WHERE id = ?", [jobId]);
+                
+                // Automatically reject all other pending applicants for this closed job
+                await db.execute(
+                    "UPDATE applications SET status = 'Rejected', employer_message = 'This position has been filled. Thank you for applying!' WHERE job_id = ? AND id != ?", 
+                    [jobId, applicationId]
+                );
+            }
+        }
+
+        // 3. Send notification to the applicant
         const alertTitle = `Application Status Update: ${status}`;
         const alertMessage = `Hello! Your application for the ${job_title} role at ${company_name} has been marked as ${status}. Please log in to your AbleWork dashboard for more details.`;
         
         await sendNotification(applicant_id, alertTitle, alertMessage, 'update');
 
-        res.status(200).json({ message: "Status updated and applicant notified!" });
+        res.status(200).json({ message: "Status updated successfully!" });
     } catch (error) {
         console.error("Status Update Error:", error.message);
         res.status(500).json({ error: "Failed to update status." });
@@ -1413,8 +1435,8 @@ app.get('/api/admin/stats', async (req, res) => {
 app.get('/api/admin/employers/all', async (req, res) => {
     try {
         const [employers] = await db.execute(`
-            SELECT u.id as user_id, u.email, u.created_at, u.verification_status, IFNULL(u.account_status, 'Active') as account_status,
-                   e.company_name, e.industry, e.verification_document
+            SELECT u.id as user_id, u.email, u.created_at, u.verification_status, IFNULL(u.account_status, 'Active') as account_status, u.reverification_attempts,
+                   e.company_name, e.industry, e.verification_document  
             FROM users u
             JOIN employer_profiles e ON u.id = e.user_id
             WHERE u.role = 'employer'
@@ -1430,7 +1452,7 @@ app.get('/api/admin/employers/all', async (req, res) => {
 app.get('/api/admin/applicants/all', async (req, res) => {
     try {
         const [applicants] = await db.execute(`
-            SELECT u.id as user_id, u.email, u.created_at, u.verification_status, IFNULL(u.account_status, 'Active') as account_status,
+            SELECT u.id as user_id, u.email, u.created_at, u.verification_status, IFNULL(u.account_status, 'Active') as account_status, u.reverification_attempts,
                    a.firstname, a.lastname, a.disability_type, a.pwd_document_path
             FROM users u
             JOIN applicant_profiles a ON u.id = a.user_id

@@ -61,6 +61,8 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
   const [modalView, setModalView] = useState('details'); 
   const [resumeFile, setResumeFile] = useState(null);
   const [coverLetter, setCoverLetter] = useState('');
+  const [useExistingResume, setUseExistingResume] = useState(true);
+  const [certificateFile, setCertificateFile] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [sweetAlert, setSweetAlert] = useState({ isOpen: false, title: '', text: '', type: 'notice' });
   const [searchQuery, setSearchQuery] = useState('');
@@ -242,13 +244,17 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
 
   const submitApplication = async (e) => {
     e.preventDefault();
-    if (!resumeFile) {
-        setSweetAlert({
-          isOpen: true,
-          type: 'notice',
-          title: 'Resume Required',
-          text: 'Please upload your resumé / CV before submitting your application.'
-        });
+
+    if (!useExistingResume && !resumeFile) {
+        setSweetAlert({ isOpen: true, type: 'notice', title: 'Resume Required', text: 'Please upload a new resumé / CV or select to use your existing one.' });
+        return;
+    }
+    if (resumeFile && resumeFile.size > 5 * 1024 * 1024) {
+        setSweetAlert({ isOpen: true, type: 'notice', title: 'File Too Large', text: 'Resume file size exceeds the 5MB limit.' });
+        return;
+    }
+    if (certificateFile && certificateFile.size > 5 * 1024 * 1024) {
+        setSweetAlert({ isOpen: true, type: 'notice', title: 'File Too Large', text: 'Certificate file size exceeds the 5MB limit.' });
         return;
     }
 
@@ -257,14 +263,24 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
     const formData = new FormData();
     formData.append('applicant_id', profile.user_id);
     formData.append('job_id', selectedJob.id);
-    formData.append('resume', resumeFile);
     formData.append('cover_letter', coverLetter);
 
+    if (!useExistingResume && resumeFile) {
+        formData.append('resume', resumeFile);
+    } else {
+        formData.append('use_existing_resume', 'true');
+    }
+    if (certificateFile) {
+        formData.append('certificate', certificateFile);
+    }
+
     try {
-      const res = await fetch('http://localhost:5001/api/applications/apply', {
-        method: 'POST',
-        body: formData 
-      });
+        const res = await fetch('http://localhost:5001/api/applications/apply', {
+            method: 'POST',
+            body: formData 
+        });
+   
+
       const data = await res.json();
       if (res.ok) {
         closeModal();
@@ -319,6 +335,8 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
     setSelectedJob(job);
     setResumeFile(null);
     setCoverLetter('');
+    setCertificateFile(null);
+    setUseExistingResume(!!profile?.resume_path);
     const isVerified = profile.verification_status === 'Approved';
     setModalView(isVerified ? 'form' : 'unverified');
   };
@@ -1012,16 +1030,45 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                 <h2 tabIndex="0" role="heading" aria-level="2" aria-label="Submit Application" title="Submit Application" className="text-lg sm:text-3xl font-black text-[#03045E] mb-1 sm:mb-2 focus:outline-none">Submit Application</h2>
                                <p tabIndex="0" role="text" aria-label={`Applying for ${selectedJob.job_title} at ${selectedJob.company_name}`} title={`Applying for ${selectedJob.job_title} at ${selectedJob.company_name}`} className="text-xs sm:text-base text-[#03045E] mb-6 sm:mb-8 font-bold focus:outline-none">Applying for <span className="font-black text-[#2C7FFF]">{selectedJob.job_title}</span> at {selectedJob.company_name}</p>
                 <form onSubmit={submitApplication} className="flex flex-col gap-4 sm:gap-6">
-                  <div className="flex flex-col gap-1.5 sm:gap-2">
-                    <label htmlFor="resume-upload" tabIndex="0" aria-label="Upload Resumé or CV, required" title="Upload Resumé or CV, required" className="text-xs sm:text-sm font-black text-[#03045E] focus:outline-none">Upload Resumé / CV <span className="text-red-500">*</span></label>
-                    <div className="border-2 border-dashed border-gray-300 p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-white flex flex-col items-center justify-center text-center">
+                <div className="flex flex-col gap-1.5 sm:gap-2">
+                  <label tabIndex="0" className="text-xs sm:text-sm font-black text-[#03045E] focus:outline-none">Resumé / CV <span className="text-red-500">*</span></label>
+                  
+                  {profile?.resume_path && (
+                    <div className="flex items-center gap-3 mb-2 p-3 rounded-lg border border-[#03045E]/20 bg-[#f4f4f4]">
+                      <input 
+                        type="checkbox" 
+                        id="use-existing-resume" 
+                        checked={useExistingResume}
+                        onChange={(e) => {
+                          setUseExistingResume(e.target.checked);
+                          if (e.target.checked) setResumeFile(null);
+                        }}
+                        className="w-4 h-4 accent-[#2C7FFF] cursor-pointer" 
+                      />
+                      <label htmlFor="use-existing-resume" className="text-xs sm:text-sm font-bold text-[#03045E] cursor-pointer">
+                        Use my profile's saved Resumé
+                      </label>
+                    </div>
+                  )}
+
+                  {!useExistingResume && (
+                    <div className="border-2 border-dashed border-gray-300 p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-white flex flex-col items-center justify-center text-center animate-fadeIn">
                       <svg aria-hidden="true" className="w-8 h-8 sm:w-10 sm:h-10 text-[#2C7FFF] mb-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
-                      <input id="resume-upload" type="file" accept=".pdf,.doc,.docx" required onChange={(e) => setResumeFile(e.target.files[0])} aria-label="Upload Resumé or CV" className={`text-[10px] sm:text-sm text-[#03045E] file:mr-2 sm:file:mr-4 file:py-1.5 sm:file:py-2.5 file:px-3 sm:file:px-5 file:rounded-lg file:text-[10px] sm:file:text-sm file:font-black cursor-pointer !file:bg-white !file:text-[#03045E] file:border-2 file:border-gray-300`} />
-                      <p tabIndex="0" role="text" aria-label="Supported formats: PDF, DOCX (Max 5MB)" title="Supported formats: PDF, DOCX (Max 5MB)" className="text-[10px] sm:text-xs text-[#03045E]/70 mt-2 sm:mt-3 font-bold focus:outline-none">Supported formats: PDF, DOCX (Max 5MB)</p>
+                      <input id="resume-upload" type="file" accept=".pdf,.doc,.docx" required={!useExistingResume} onChange={(e) => setResumeFile(e.target.files[0])} aria-label="Upload New Resumé or CV" className={`text-[10px] sm:text-sm text-[#03045E] file:mr-2 sm:file:mr-4 file:py-1.5 sm:file:py-2.5 file:px-3 sm:file:px-5 file:rounded-lg file:text-[10px] sm:file:text-sm file:font-black cursor-pointer !file:bg-white !file:text-[#03045E] file:border-2 file:border-gray-300`} />
+                      <p tabIndex="0" className="text-[10px] sm:text-xs text-[#03045E]/70 mt-2 sm:mt-3 font-bold focus:outline-none">Supported formats: PDF, DOCX (Max 5MB)</p>
                     </div>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-1.5 sm:gap-2 mt-2">
+                  <label htmlFor="certificate-upload" tabIndex="0" className="text-xs sm:text-sm font-black text-[#03045E] focus:outline-none">Certificates <span className="text-[#03045E]/70 font-semibold">(Optional)</span></label>
+                  <div className="border-2 border-dashed border-[#03045E]/20 p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#f4f4f4] flex flex-col items-center justify-center text-center">
+                    <input id="certificate-upload" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onChange={(e) => setCertificateFile(e.target.files[0])} aria-label="Upload Certificates" className={`text-[10px] sm:text-sm text-[#03045E] file:mr-2 sm:file:mr-4 file:py-1.5 sm:file:py-2 file:px-3 sm:file:px-4 file:rounded-lg file:text-[10px] sm:file:text-sm file:font-black cursor-pointer !file:bg-white !file:text-[#03045E] file:border-2 file:border-[#03045E]/20`} />
+                    <p tabIndex="0" className="text-[10px] sm:text-[11px] text-[#03045E]/70 mt-2 font-bold focus:outline-none">Upload supplementary certificates (Max 5MB)</p>
                   </div>
+                </div>
                   <div className="flex flex-col gap-1.5 sm:gap-2">
                     <label htmlFor="cover-letter" className="text-xs sm:text-sm font-black text-[#03045E]">Pitch / Cover Letter <span className="text-[#03045E]/70 font-semibold">(Optional)</span></label>
                     <textarea id="cover-letter" rows="3" value={coverLetter} onChange={(e) => setCoverLetter(e.target.value)} placeholder="Briefly explain why you are a great fit for this role..." aria-label="Cover Letter. Briefly explain why you are a great fit for this role." className="p-3 sm:p-4 border-2 border-[#03045E]/30 rounded-xl sm:rounded-2xl bg-white text-[#03045E] focus:border-[#2C7FFF] outline-none resize-none font-bold placeholder:text-gray-400 text-xs sm:text-sm"></textarea>

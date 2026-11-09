@@ -65,6 +65,7 @@ export default function ApplicantRegister() {
   const [isDetecting, setIsDetecting] = useState(false);
   const [radius, setRadius] = useState(10); 
   const [independence, setIndependence] = useState('');
+  const [resumeFile, setResumeFile] = useState(null);
   const [pwdFile, setPwdFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
@@ -106,7 +107,7 @@ export default function ApplicantRegister() {
 
 const availableDisabilities = [
     // Sensory: Vision
-    'Blindness', 'Low Vision', 'Color Blindness',
+    'Total Blindness','Partially Blind', 'Low Vision', 'Color Blindness',
     // Sensory: Hearing & Speech
     'Deafness', 'Hard of Hearing', 'Muteness', 'Speech Impairment', 
     // Sensory: Combinations
@@ -140,7 +141,7 @@ const availableDisabilities = [
     }
   };
 
-  const availableAccommodations = ['Screen Reader', 'Wheelchair Access', 'Sign Language Interpreter', 'Flexible Hours', 'Quiet Workspace', 'Travel Assistant'];
+  const availableAccommodations = ['Screen Reader', 'Wheelchair Access', 'Sign Language Interpreter', 'Flexible Hours', 'Quiet Workspace', 'Travel Assistant' ];
   
   const extendedAccommodations = [
     'Ergonomic Setup', 'Noise-Cancelling Headphones', 'Screen Magnifier', 'Braille Keyboard', 
@@ -358,6 +359,16 @@ const handleAddressType = (e) => {
       setStatusMessage({ type: 'error', text: "You must be 18 years or older to register on AbleWork." });
       return;
     }
+    if (!resumeFile) {
+      setStatusMessage({ type: 'error', text: "Please upload your Resume or CV." });
+      return;
+    }
+
+    if (resumeFile.size > 5 * 1024 * 1024) {
+      setStatusMessage({ type: 'error', text: "Resume file size exceeds the 5MB limit. Please upload a smaller file." });
+      return;
+    }
+
     if (!pwdFile) {
       setStatusMessage({ type: 'error', text: "Please upload your PWD ID or Certification." });
       return;
@@ -386,6 +397,7 @@ const handleAddressType = (e) => {
     formData.append('disabilities', JSON.stringify(selectedDisabilities));
     formData.append('accommodations', JSON.stringify(selectedAccommodations));
     formData.append('skills', JSON.stringify(selectedSkills));
+    formData.append('resume', resumeFile);
     formData.append('pwdDocument', pwdFile);
 
     const controller = new AbortController();
@@ -1331,6 +1343,26 @@ const handleAddressType = (e) => {
 
               <hr aria-hidden="true" className="border-[#03045E]/10" />
 
+              <div className="p-4 rounded-md border-2 border-dashed border-[#03045E]/20 bg-[#f4f4f4]/50 mb-3">
+                <label htmlFor="resumeFile" tabIndex="0" title="Upload Resume / CV" className="block text-xs sm:text-sm font-bold text-[#03045E] mb-1 focus:outline-none">
+                  Upload Resume / CV <span className="text-[#03045E]">*</span>
+                </label>
+                <input
+                  id="resumeFile"
+                  type="file"
+                  accept=".pdf,.docx,.doc"
+                  onChange={(e) => setResumeFile(e.target.files[0])}
+                  className={`w-full text-xs sm:text-sm ${isAccessibilityMode ? 'text-black' : isContrast || isDarkMode ? 'text-black' : 'text-[#03045E]'} file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-2 file:border-[var(--color-border)] file:bg-white ${isAccessibilityMode ? 'file:text-black' : isContrast || isDarkMode ? 'file:text-black' : '[&::file-selector-button]:!text-[var(--color-text)] [&::-webkit-file-upload-button]:!text-[var(--color-text)]'} file:font-semibold cursor-pointer`}
+                  style={{ color: primaryColor }}
+                  required
+                  title="Please upload your Resume or CV. Supported formats: .pdf, .docx (Max size 5MB)."
+                  aria-label="Resume upload. Please upload your Resume or CV. Supported formats: .pdf, .docx. Max size 5 Megabytes."
+                />
+                <p tabIndex="0" title="Supported formats: .pdf, .docx, .doc (Max size: 5MB)" className="text-[10px] sm:text-xs text-[#03045E] mt-2 font-semibold focus:outline-none">
+                  Supported formats: .pdf, .docx, .doc (Max size: 5MB)
+                </p>
+              </div>
+            
               <div className="p-4 rounded-md border-2 border-dashed border-[#03045E]/20 bg-[#f4f4f4]/50">
                 <label htmlFor="pwdId" tabIndex="0" title="Upload PWD ID / Certificates" className="block text-xs sm:text-sm font-bold text-[#03045E] mb-1 focus:outline-none">Upload PWD ID / Certificates <span className="text-[#03045E]">*</span></label>
                 <input

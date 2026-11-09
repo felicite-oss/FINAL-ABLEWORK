@@ -1200,10 +1200,17 @@ export default function AdminDashboard() {
                           <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-md sm:rounded-lg ${isDark ? 'bg-white text-black' : 'bg-[#03045E] text-white'} flex items-center justify-center font-black text-xs sm:text-sm shrink-0 shadow-sm`}>
                             {user.userType === 'Employer' ? (user.company_name?.[0] || 'E') : (user.firstname?.[0] || 'A')}
                           </div>
-                          <div className="min-w-0 flex-1">
-                            <h4 className={`text-xs sm:text-sm font-black truncate ${txtMain}`}>
-                              {user.userType === 'Employer' ? user.company_name : `${user.firstname} ${user.lastname}`}
-                            </h4>
+                         <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <h4 className={`text-xs sm:text-sm font-black truncate ${txtMain}`}>
+                                {user.userType === 'Employer' ? user.company_name : `${user.firstname} ${user.lastname}`}
+                              </h4>
+                              {user.reverification_attempts > 0 && (
+                                <span className={`px-2 py-0.5 text-[8px] sm:text-[9px] font-black uppercase tracking-wider rounded-md border shadow-sm ${isDark ? 'bg-amber-500/20 text-amber-400 border-amber-500/50' : 'bg-amber-100 text-amber-700 border-amber-300'}`}>
+                                  Resubmitted
+                                </span>
+                              )}
+                            </div>
                             <p className={`text-[10px] sm:text-xs font-bold truncate ${txtMuted}`}>{user.email}</p>
                           </div>
                         </div>
