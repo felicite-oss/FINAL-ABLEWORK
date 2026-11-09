@@ -6,10 +6,9 @@ export default function ColorPalettePicker() {
 
   return (
     <div className="flex flex-col gap-2">
-      <span tabIndex="0" className="text-[9px] sm:text-xs font-black uppercase tracking-wider text-[var(--color-textMuted)]">
-        Color Vision Palette
+      <span tabIndex="0" className="text-[0.6rem] sm:text-xs font-black uppercase tracking-wider text-[var(--color-textMuted)]">
       </span>
-      <p className="text-[8px] sm:text-[10px] font-bold text-[var(--color-textMuted)] -mt-1 mb-1 leading-snug">
+      <p className="text-[0.55rem] sm:text-[0.85rem] font-bold text-[var(--color-textMuted)] -mt-1 mb-1 leading-snug">
         Choose colors that work best for your eyes
       </p>
       <div className="grid grid-cols-2 gap-1.5 sm:gap-2 bg-[var(--color-surface)] border-2 border-[var(--color-border)] p-1.5 sm:p-2 rounded-xl sm:rounded-2xl">
@@ -44,8 +43,10 @@ export default function ColorPalettePicker() {
                 ))}
               </div>
               <div className="flex-1 min-w-0 w-full">
-                <p className="text-[9px] sm:text-[11px] font-black text-[var(--color-text)] truncate leading-tight">{p.name}</p>
-                <p className="text-[7px] sm:text-[9px] font-bold truncate leading-tight mt-0.5 text-[var(--color-textMuted)]">{p.description}</p>
+                {/* Changed from text-[9px] to text-[0.6rem] */}
+                <p className="text-[0.6rem] sm:text-[0.7rem] font-black text-[var(--color-text)] truncate leading-tight">{p.name}</p>
+                {/* Changed from text-[7px] to text-[0.45rem] */}
+                <p className="text-[0.45rem] sm:text-[0.6rem] font-bold truncate leading-tight mt-0.5 text-[var(--color-textMuted)]">{p.description}</p>
               </div>
             </button>
           );

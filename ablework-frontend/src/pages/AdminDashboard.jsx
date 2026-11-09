@@ -890,7 +890,7 @@ export default function AdminDashboard() {
             />
           ) : (
           <>
-         <div className={`sticky top-0 z-40 ${isDark ? 'bg-black' : 'bg-[#f4f4f4]'} flex flex-col -mx-3 sm:-mx-6 md:-mx-10 px-3 sm:px-6 md:px-10 pt-4 sm:pt-6 md:pt-10 pb-2`}>
+                 <div className={`sticky top-0 z-40 ${isDark ? 'bg-black' : 'bg-[#f4f4f4]'} flex flex-col -mx-3 sm:-mx-6 md:-mx-10 px-3 sm:px-6 md:px-10 pt-2 sm:pt-4 md:pt-6 pb-2`}>
             <div className={`pt-0 pb-5 border-b-2 ${isDark ? 'border-white/20' : 'border-[#03045E]/15'} flex flex-col sm:flex-row sm:items-center justify-between gap-4 pl-0`}>
               <div>
                 <h1 className={`text-3xl font-black tracking-tight ${txtMain}`}>Admin Control Center</h1>
@@ -1712,8 +1712,22 @@ borderColor: user.account_status === 'Disabled' ? '#dc2626' :
             </div>
           )}
 
-          </>
+             </>
           )}
+          
+                         <footer role="contentinfo" className={`mt-auto pt-6 pb-6 px-6 sm:px-10 md:px-14 border-t-4 -mx-3 -mb-3 sm:-mx-6 sm:-mb-6 md:-mx-10 md:-mb-10 bg-[#03045E] border-[#2C7FFF] transition-colors duration-300 animate-in fade-in slide-in-from-bottom-4`}>
+                <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
+                    <p className="text-[10px] sm:text-xs font-bold text-white/75">
+                      © {new Date().getFullYear()} AgileWork Inc. All rights reserved.
+                    </p>
+                    <span className="hidden sm:inline text-xs text-white/30">|</span>
+                    <p className={`text-[10px] sm:text-xs font-black uppercase tracking-widest ${isDark ? 'text-white' : 'text-[#f4f4f4]'}`}>
+                      Admin Portal v1.0
+                    </p>
+                  </div>
+                </div>
+             </footer>
         </main>
       </div>
     </div>

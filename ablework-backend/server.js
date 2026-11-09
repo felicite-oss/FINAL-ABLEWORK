@@ -349,7 +349,24 @@ app.post('/api/auth/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password_hash);
         if (!isMatch) return res.status(401).json({ error: "Invalid credentials." });
 
-        // 3. Generate 6-digit OTP and set expiration (10 minutes)
+        // ==========================================
+        // ADMIN BYPASS: Instantly log in the Admin
+        // ==========================================
+        if (user.role === 'admin') {
+            return res.status(200).json({ 
+                message: "Admin login successful", 
+                requiresOtp: false,
+                user: { 
+                    id: user.id, 
+                    email: user.email, 
+                    ui_preference: user.ui_preference,
+                    verification_status: user.verification_status,
+                    role: user.role 
+                } 
+            });
+        }
+
+        // 3. Generate 6-digit OTP for Applicants & Employers
         const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
         const expires = new Date(Date.now() + 10 * 60000);
 
@@ -366,7 +383,7 @@ app.post('/api/auth/login', async (req, res) => {
             text: `Hello,\n\nYour 6-digit login verification code is: ${otpCode}\n\nThis code will expire in 10 minutes. Do not share this code with anyone.`
         });
 
-        // 5. Tell the frontend to show the OTP input screen instead of logging them in
+        // 5. Tell the frontend to show the OTP input screen
         res.status(200).json({ 
             message: "Credentials verified. OTP sent to email.", 
             requiresOtp: true,
@@ -380,7 +397,7 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // ---------------------------------------------------------
-// ROUTE: LOGIN STEP 2 (Verify OTP & Grant Access)
+// ROUTE: LOGIN STEP 2 (Verify OTP & Complete Login)
 // ---------------------------------------------------------
 app.post('/api/auth/verify-login-otp', async (req, res) => {
     const { email, otpCode } = req.body;
@@ -390,20 +407,23 @@ app.post('/api/auth/verify-login-otp', async (req, res) => {
         if (users.length === 0) return res.status(404).json({ error: "User not found." });
         const user = users[0];
 
-        // 1. Check if OTP matches
-        if (user.otp_code !== otpCode) {
+        // 1. Verify the OTP code
+        if (!user.otp_code || user.otp_code !== otpCode) {
             return res.status(401).json({ error: "Invalid verification code." });
         }
-        
-        // 2. Check if OTP is expired
+
+        // 2. Check if the OTP has expired
         if (new Date() > new Date(user.otp_expires)) {
             return res.status(401).json({ error: "Verification code has expired. Please log in again." });
         }
 
-        // 3. Clear the OTP from the database so it cannot be reused
-        await db.execute("UPDATE users SET otp_code = NULL, otp_expires = NULL WHERE id = ?", [user.id]);
+        // 3. Clear the OTP from the database for security
+        await db.execute(
+            "UPDATE users SET otp_code = NULL, otp_expires = NULL WHERE id = ?",
+            [user.id]
+        );
 
-        // 4. Return the actual user data to complete the login
+        // 4. Send success response with user data to complete the login
         res.status(200).json({ 
             message: "Login successful", 
             user: { 

@@ -1083,12 +1083,10 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
               <p id="sweet-alert-text" className={`text-[11px] sm:text-sm font-bold leading-relaxed mb-5 sm:mb-8 max-w-xs ${(isDarkScreen) ? 'text-white/80' : 'text-[#03045E]/80'}`}>
                 {sweetAlert.text}
               </p>
-
               <button
                 onClick={closeSweetAlert}
                 aria-label="Got It. Close alert."
-                className={`w-full py-2.5 sm:py-4 rounded-lg sm:rounded-xl font-black text-[11px] sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 focus:outline-none`}
-                style={{ color: (isDarkScreen) ? '#ffffff' : '#03045E', borderColor: (isDarkScreen) ? '#ffffff' : '#03045E' }}
+                className={`w-full py-2.5 sm:py-4 rounded-lg sm:rounded-xl font-black text-[11px] sm:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer bg-transparent border-2 focus:outline-none text-[var(--color-text)] border-[var(--color-text)]`}
               >
                 Got It
               </button>

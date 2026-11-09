@@ -843,7 +843,7 @@ const handleAddressType = (e) => {
                       setVerificationDocs(files);
                     }
                   }}
-                  className={`w-full text-[10px] sm:text-sm text-[#03045E] file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-2 file:border-[#03045E]/30 file:bg-white file:text-[#03045E] file:font-semibold cursor-pointer ${isAccessibilityDarkMode ? '[&::file-selector-button]:!text-black' : isDefaultDarkMode ? '[&::file-selector-button]:!text-black' : ''}`}
+                                    className={`w-full text-[10px] sm:text-sm text-[var(--color-text)] file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-2 file:border-[var(--color-border)] file:bg-white file:font-semibold cursor-pointer [&::file-selector-button]:!text-[var(--color-text)] [&::-webkit-file-upload-button]:!text-[var(--color-text)] [&::file-selector-button]:!border-[var(--color-border)] [&::-webkit-file-upload-button]:!border-[var(--color-border)] ${isAccessibilityDarkMode ? '[&::file-selector-button]:!text-black' : isDefaultDarkMode ? '[&::file-selector-button]:!text-black' : ''}`}
                   required
                 />
                 {verificationDocs && verificationDocs.length > 0 && (

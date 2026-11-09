@@ -79,11 +79,12 @@ export function AccessibilityToolbar() {
   const isDarkMode = mode === 'Dark';
 
   return (
-    <div className="fixed bottom-6 left-4 sm:left-6 z-40 flex flex-col items-start">
+    <div className="fixed bottom-6 left-4 sm:left-6 z-[999999] flex flex-col items-start">
       
       {isOpen && (
         <div 
           ref={panelRef}
+          // ...
           tabIndex={-1}
           className="mb-3 w-[calc(100vw-2rem)] max-w-80 sm:w-80 relative rounded-xl sm:rounded-2xl border-2 border-[var(--color-border)] overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.35)] backdrop-blur-xl animate-in fade-in slide-in-from-bottom-3 duration-300 max-h-[62vh] flex flex-col bg-[var(--color-surface)] focus:outline-none"
           role="region"
@@ -102,8 +103,10 @@ export function AccessibilityToolbar() {
                   </svg>
                 </div>
                 <div>
-                  <h3 tabIndex="0" className="font-black text-[11px] sm:text-sm tracking-tight uppercase text-[var(--color-text)] leading-none transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 rounded w-fit">Accessibility</h3>
-                  <p tabIndex="0" className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] text-[var(--color-accent)] mt-0.5 sm:mt-1 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 rounded w-fit">Control Center</p>
+                  {/* Changed text-[11px] to text-[0.6875rem] */}
+                  <h3 tabIndex="0" className="font-black text-[0.6875rem] sm:text-sm tracking-tight uppercase text-[var(--color-text)] leading-none transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 rounded w-fit">Accessibility</h3>
+                  {/* Changed text-[8px] to text-[0.5rem] and text-[10px] to text-[0.625rem] */}
+                  <p tabIndex="0" className="text-[0.5rem] sm:text-[0.625rem] font-black uppercase tracking-[0.15em] text-[var(--color-accent)] mt-0.5 sm:mt-1 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 rounded w-fit">Control Center</p>
                 </div>
               </div>
               <button 
@@ -120,7 +123,8 @@ export function AccessibilityToolbar() {
             <div className="flex flex-col gap-1.5 sm:gap-2.5" role="group" aria-label="Display Theme Settings">
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-[var(--color-accent)]" aria-hidden="true"></span>
-                <span tabIndex="0" className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] text-[var(--color-textMuted)] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 rounded w-fit">Display Theme</span>
+                {/* Changed text-[8px] to text-[0.5rem] and text-[10px] to text-[0.625rem] */}
+                <span tabIndex="0" className="text-[0.5rem] sm:text-[0.625rem] font-black uppercase tracking-[0.15em] text-[var(--color-textMuted)] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 rounded w-fit">Display Theme</span>
               </div>
               <div className="grid grid-cols-2 gap-1.5 sm:gap-2.5">
                 <button
@@ -141,7 +145,8 @@ export function AccessibilityToolbar() {
                       <path strokeLinecap="round" d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
                     </svg>
                   </div>
-                  <span className="text-[9px] sm:text-[11px] font-black tracking-wide" aria-hidden="true">Standard</span>
+                  {/* Changed text-[9px] to text-[0.5625rem] and text-[11px] to text-[0.6875rem] */}
+                  <span className="text-[0.5625rem] sm:text-[0.6875rem] font-black tracking-wide" aria-hidden="true">Standard</span>
                 </button>
                 <button
                   onClick={() => handleThemeChange('Dark')}
@@ -160,7 +165,8 @@ export function AccessibilityToolbar() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                     </svg>
                   </div>
-                  <span className="text-[9px] sm:text-[11px] font-black tracking-wide" aria-hidden="true">Dark Mode</span>
+                  {/* Changed text-[9px] to text-[0.5625rem] and text-[11px] to text-[0.6875rem] */}
+                  <span className="text-[0.5625rem] sm:text-[0.6875rem] font-black tracking-wide" aria-hidden="true">Dark Mode</span>
                 </button>
               </div>
             </div>
@@ -169,7 +175,8 @@ export function AccessibilityToolbar() {
               <div className="flex flex-col gap-1.5 sm:gap-2.5 border-t-2 border-[var(--color-border)] pt-3 sm:pt-4" role="group" aria-label="Color Palette Settings">
                 <div className="flex items-center gap-1.5 sm:gap-2">
                   <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-[var(--color-accent)]" aria-hidden="true"></span>
-                  <span tabIndex="0" className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] text-[var(--color-textMuted)] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 rounded w-fit">Color Palette</span>
+                  {/* Changed text-[8px] to text-[0.5rem] and text-[10px] to text-[0.625rem] */}
+                  <span tabIndex="0" className="text-[0.5rem] sm:text-[0.625rem] font-black uppercase tracking-[0.15em] text-[var(--color-textMuted)] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 rounded w-fit">Color Palette</span>
                 </div>
                 <ColorPalettePicker />
               </div>
@@ -178,7 +185,8 @@ export function AccessibilityToolbar() {
             <div className="flex flex-col gap-1.5 sm:gap-2.5 border-t-2 border-[var(--color-border)] pt-3 sm:pt-4" role="group" aria-label="Text Size Settings">
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-[var(--color-accent)]" aria-hidden="true"></span>
-                <span tabIndex="0" className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] text-[var(--color-textMuted)] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 rounded w-fit">Text Size</span>
+                {/* Changed text-[8px] to text-[0.5rem] and text-[10px] to text-[0.625rem] */}
+                <span tabIndex="0" className="text-[0.5rem] sm:text-[0.625rem] font-black uppercase tracking-[0.15em] text-[var(--color-textMuted)] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 rounded w-fit">Text Size</span>
               </div>
               <div className="grid grid-cols-3 gap-1.5 sm:gap-2.5">
                 <button
@@ -191,8 +199,10 @@ export function AccessibilityToolbar() {
                   }`}
                   aria-label="Set Normal Font Size"
                 >
-                  <span className="text-[10px] sm:text-sm font-black leading-none" aria-hidden="true">A</span>
-                  <span className="text-[7px] sm:text-[9px] font-black uppercase tracking-wider opacity-80" aria-hidden="true">Normal</span>
+                  {/* Changed text-[10px] to text-[0.625rem] */}
+                  <span className="text-[0.625rem] sm:text-sm font-black leading-none" aria-hidden="true">A</span>
+                  {/* Changed text-[7px] to text-[0.4375rem] and text-[9px] to text-[0.5625rem] */}
+                  <span className="text-[0.4375rem] sm:text-[0.5625rem] font-black uppercase tracking-wider opacity-80" aria-hidden="true">Normal</span>
                 </button>
                 <button
                   onClick={() => handleFontSizeChange('large')}
@@ -205,7 +215,8 @@ export function AccessibilityToolbar() {
                   aria-label="Set Large Font Size"
                 >
                   <span className="text-xs sm:text-base font-black leading-none" aria-hidden="true">A+</span>
-                  <span className="text-[7px] sm:text-[9px] font-black uppercase tracking-wider opacity-80" aria-hidden="true">Large</span>
+                  {/* Changed text-[7px] to text-[0.4375rem] and text-[9px] to text-[0.5625rem] */}
+                  <span className="text-[0.4375rem] sm:text-[0.5625rem] font-black uppercase tracking-wider opacity-80" aria-hidden="true">Large</span>
                 </button>
                 <button
                   onClick={() => handleFontSizeChange('xlarge')}
@@ -218,14 +229,16 @@ export function AccessibilityToolbar() {
                   aria-label="Set Extra Large Font Size"
                 >
                   <span className="text-xs sm:text-base font-black leading-none" aria-hidden="true">A++</span>
-                  <span className="text-[7px] sm:text-[9px] font-black uppercase tracking-wider opacity-80" aria-hidden="true">Max</span>
+                  {/* Changed text-[7px] to text-[0.4375rem] and text-[9px] to text-[0.5625rem] */}
+                  <span className="text-[0.4375rem] sm:text-[0.5625rem] font-black uppercase tracking-wider opacity-80" aria-hidden="true">Max</span>
                 </button>
               </div>
             </div>
           </div>
 
           <div className="relative px-3 py-2 sm:px-5 sm:py-3 border-t-2 border-[var(--color-border)] flex items-center justify-between shrink-0">
-            <span tabIndex="0" className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] text-[var(--color-textMuted)] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 rounded w-fit">Settings Auto-Save</span>
+            {/* Changed text-[8px] to text-[0.5rem] and text-[10px] to text-[0.625rem] */}
+            <span tabIndex="0" className="text-[0.5rem] sm:text-[0.625rem] font-black uppercase tracking-[0.15em] text-[var(--color-textMuted)] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 rounded w-fit">Settings Auto-Save</span>
             <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[var(--color-accent)] animate-pulse" aria-hidden="true"></span>
           </div>
         </div>
@@ -245,7 +258,8 @@ export function AccessibilityToolbar() {
             <path d="M19 13h-2v-3c0-1.1-.9-2-2-2h-3.5c-.3-.6-.9-1-1.5-1h-2c-1.1 0-2 .9-2 2v5c0 1.1.9 2 2 2h2v4h2v-4h1v4h2v-5.5c0-.8-.7-1.5-1.5-1.5z" />
           </svg>
         </button>
-        <span className="absolute bottom-full left-0 mb-2 px-3 py-1.5 rounded-lg bg-[var(--color-text)] text-[var(--color-background)] text-[10px] sm:text-xs font-black uppercase tracking-wider whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 pointer-events-none shadow-lg z-50">
+        {/* Changed text-[10px] to text-[0.625rem] */}
+        <span className="absolute bottom-full left-0 mb-2 px-3 py-1.5 rounded-lg bg-[var(--color-text)] text-[var(--color-background)] text-[0.625rem] sm:text-xs font-black uppercase tracking-wider whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 pointer-events-none shadow-lg z-50">
           Accessibility
         </span>
       </div>

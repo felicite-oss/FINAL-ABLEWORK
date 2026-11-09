@@ -144,11 +144,21 @@ const handleLogin = async (e) => {
 
       const data = await response.json();
 
-      if (response.ok && data.requiresOtp) {
-        // Success! Password is correct. Now switch to OTP UI.
-        setOtpMode(true);
-        setErrorMessage('');
-        setIsLoading(false);
+      if (response.ok) {
+        if (data.requiresOtp) {
+          // Success for Applicants/Employers! Switch to OTP UI.
+          setOtpMode(true);
+          setErrorMessage('');
+          setIsLoading(false);
+        } else if (data.user) {
+          // Success for Admin! Bypass OTP and login directly.
+          localStorage.setItem('user', JSON.stringify(data.user));
+          setLoginRole('Admin');
+          
+          setTimeout(() => {
+            navigate('/admin/dashboard');
+          }, 2000);
+        }
       } else {
         setErrorMessage(data.error || 'Login failed. Please try again.');
         setIsLoading(false);

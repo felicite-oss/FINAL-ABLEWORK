@@ -761,7 +761,7 @@ const handleAddressType = (e) => {
                     <p tabIndex="0" role="alert" aria-label="Passwords do not match." title="Passwords do not match." className={`text-xs font-semibold mt-1 ${isDarkMode || isAccessibilityMode ? '!text-red-500' : 'text-red-500'}`} aria-live="polite">
                       Passwords do not match.
                     </p>
-                  )}s
+                  )}
                 </div>
                 
                 <div className="flex flex-col gap-1.5">
@@ -1338,7 +1338,7 @@ const handleAddressType = (e) => {
                   type="file"
                   accept=".jpg,.jpeg"
                   onChange={(e) => setPwdFile(e.target.files[0])}
-                  className={`w-full text-xs sm:text-sm ${isAccessibilityMode ? 'text-black' : isContrast || isDarkMode ? 'text-black' : 'text-[#03045E]'} file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-2 file:border-[#03045E]/30 file:bg-white ${isAccessibilityMode ? 'file:text-black' : isContrast || isDarkMode ? 'file:text-black' : 'file:text-[#03045E]'} file:font-semibold cursor-pointer`}
+                  className={`w-full text-xs sm:text-sm ${isAccessibilityMode ? 'text-black' : isContrast || isDarkMode ? 'text-black' : 'text-[#03045E]'} file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-2 file:border-[var(--color-border)] file:bg-white ${isAccessibilityMode ? 'file:text-black' : isContrast || isDarkMode ? 'file:text-black' : '[&::file-selector-button]:!text-[var(--color-text)] [&::-webkit-file-upload-button]:!text-[var(--color-text)]'} file:font-semibold cursor-pointer`}
                   style={{ color: primaryColor }}
                   required
                   title="Please upload a clear image of your PWD ID. Max size 5MB."

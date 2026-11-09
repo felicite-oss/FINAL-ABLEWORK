@@ -20,8 +20,9 @@ export default function EmployerApplications({ profile, refreshStats }) {
   const [messageText, setMessageText] = useState('');
   const [showStatusAlert, setShowStatusAlert] = useState(false);
   const [statusAlert, setStatusAlert] = useState({ title: '', subtitle: '', tone: 'default' });
-  const [currentPage, setCurrentPage] = useState(1);
+   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -108,37 +109,36 @@ export default function EmployerApplications({ profile, refreshStats }) {
     }
   };
 
-  const getStatusColor = (status) => {
+   const getStatusColor = (status) => {
     if (isHighContrastOrDarkComfort) {
       switch (status) {
-        case 'Received': return 'bg-white text-black border border-white';
-        case 'Under Review': return 'bg-white text-black border border-white';
-        case 'Shortlisted': return 'bg-white text-black border border-white';
-        case 'Hired': return 'bg-white text-emerald-400 border border-emerald-500';
-        case 'Rejected': return 'bg-white text-red-600 border border-red-500';
-        default: return 'bg-white text-black border border-white';
+        case 'Received': return 'bg-white text-black border-white';
+        case 'Under Review': return 'bg-white text-black border-white';
+        case 'Shortlisted': return 'bg-white text-black border-white';
+        case 'Hired': return 'bg-white text-emerald-400 border-emerald-500';
+        case 'Rejected': return 'bg-white text-red-600 border-red-500';
+        default: return 'bg-white text-black border-white';
       }
     }
     if (isDark) {
       switch (status) {
-        case 'Received': return 'bg-black text-white border border-white';
-        case 'Under Review': return 'bg-black text-white border border-white';
-        case 'Shortlisted': return 'bg-black text-white border border-white';
-        case 'Hired': return 'bg-black text-emerald-400 border border-emerald-500';
-        case 'Rejected': return 'bg-white text-red-600 border border-red-500';
-        default: return 'bg-black text-white border border-white';
+        case 'Received': return 'bg-black text-white border-white';
+        case 'Under Review': return 'bg-black text-white border-white';
+        case 'Shortlisted': return 'bg-black text-white border-white';
+        case 'Hired': return 'bg-black text-emerald-400 border-emerald-500';
+        case 'Rejected': return 'bg-white text-red-600 border-red-500';
+        default: return 'bg-black text-white border-white';
       }
     }
     switch (status) {
-      case 'Received': return 'bg-white text-[#03045E] border border-gray-200';
-      case 'Under Review': return 'bg-white text-[#03045E] border border-gray-200';
-      case 'Shortlisted': return 'bg-white text-[#03045E] border border-gray-200';
-      case 'Hired': return 'bg-white text-emerald-700 border border-emerald-500';
-      case 'Rejected': return 'bg-white text-red-600 border border-red-500';
-      default: return 'bg-white text-[#03045E] border border-gray-200';
+      case 'Received': return 'bg-white text-[#03045E] border-gray-200';
+      case 'Under Review': return 'bg-white text-[#03045E] border-gray-200';
+      case 'Shortlisted': return 'bg-white text-[#03045E] border-gray-200';
+      case 'Hired': return 'bg-white text-emerald-700 border-emerald-500';
+      case 'Rejected': return 'bg-white text-red-600 border-red-500';
+      default: return 'bg-white text-[#03045E] border-gray-200';
     }
   };
-
   const filteredApplications = applications.filter(app => {
     if (activeTab === 'All') return true;
     return app.application_status === activeTab;
@@ -180,12 +180,11 @@ export default function EmployerApplications({ profile, refreshStats }) {
     );
   };
 
-  const getAlertBadgeStyle = (tone) => {
+   const getAlertBadgeStyle = (tone) => {
     if (tone === 'rejected') return 'bg-red-500';
-    if (tone === 'hired') return 'bg-emerald-500';
+    if (tone === 'hired') return 'bg-[#2C7FFF]';
     return 'bg-[#2C7FFF]';
   };
-
   const getAlertPillLabel = (tone) => {
     if (tone === 'hired') return 'Applicant Hired';
     if (tone === 'shortlisted') return 'Applicant Shortlisted';
@@ -210,7 +209,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
         </div>
       </div>
       
-                     <div className={`flex gap-1 p-1 sm:gap-2 sm:p-2 rounded-lg sm:rounded-xl border-2 w-full overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] ${panelBg}`}>
+                                                      <div className={`flex gap-1 p-1 sm:gap-2 sm:p-2 rounded-xl sm:rounded-2xl border-2 w-full overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] ${panelBg}`}>
         {tabs.map(tab => {
           const count = tab === 'All' 
             ? applications.length 
@@ -219,7 +218,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex-1 min-w-0 px-1.5 py-1 sm:px-4 sm:py-2.5 rounded-md sm:rounded-lg font-extrabold text-[8px] sm:text-sm whitespace-nowrap transition-all flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 cursor-pointer ${
+              className={`flex-1 min-w-0 px-1.5 py-1 sm:px-4 sm:py-2.5 rounded-lg font-extrabold text-[8px] sm:text-sm whitespace-nowrap transition-all flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 cursor-pointer ${
                 activeTab === tab
                   ? (isHighContrastOrDarkComfort
                       ? (isDark ? 'bg-white text-black shadow-md' : 'bg-[#2C7FFF] !text-white shadow-md')
@@ -248,54 +247,60 @@ export default function EmployerApplications({ profile, refreshStats }) {
         })}
       </div>
       
-          {filteredApplications.length > 0 ? (
-        <div role="list" className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6 items-start">
-          {currentApps.map(app => (
-            <div 
-              key={app.application_id} 
-              role="listitem"
-              tabIndex={0}
-              className={`min-h-[180px] sm:min-h-[220px] p-3.5 sm:p-8 rounded-lg sm:rounded-xl border-2 transition-all duration-200 flex flex-col justify-between gap-2.5 sm:gap-5 ${cardBg}`}
-            >
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 sm:gap-4 w-full min-w-0">
-                <div className="flex-1 min-w-0 w-full">
-                  <h3 className={`text-sm sm:text-2xl font-extrabold leading-tight break-words w-full ${pageText}`}>
-                    {app.firstname} {app.lastname}
-                  </h3>
-                  <p className={`text-[10px] sm:text-sm font-extrabold mt-0.5 sm:mt-1.5 mb-1 sm:mb-2 break-words ${muted}`}>
-                    Applied for: <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>{app.job_title}</span>
-                  </p>
-                  <p className={`text-[9px] sm:text-xs font-semibold ${subtle}`}>
-                    Applied on {new Date(app.applied_at).toLocaleDateString()}
-                  </p>
-                </div>
+      {filteredApplications.length > 0 ? (
+               <div className="flex flex-col gap-6 w-full">
+          <div className={`w-full overflow-hidden rounded-2xl border-2 ${panelBg}`}>
+            <div className="w-full overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[800px]">
+              <thead>
+                <tr className={`border-b-2 ${isDark ? 'border-white/20 bg-black/50' : 'border-gray-200 bg-gray-50'}`}>
+                  <th className={`p-4 text-xs font-black uppercase tracking-wider ${pageText}`}>Applicant Details</th>
+                  <th className={`p-4 text-xs font-black uppercase tracking-wider ${pageText}`}>Applied For</th>
+                 <th className={`p-4 text-xs font-black uppercase tracking-wider text-center ${pageText}`}>Status</th>
+                  <th className={`p-4 text-xs font-black uppercase tracking-wider text-center ${pageText}`}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentApps.map(app => (
+                  <tr key={app.application_id} className={`border-b-2 last:border-b-0 transition-colors ${isDark ? 'border-white/10 hover:bg-white/5' : 'border-gray-100 hover:bg-gray-50'}`}>
+                    <td className="p-4 align-top">
+                      <h3 className={`text-sm sm:text-base font-bold leading-tight ${pageText}`}>{app.firstname} {app.lastname}</h3>
+                      <p className={`text-[10px] sm:text-xs mt-1 ${subtle}`}>Applied on {new Date(app.applied_at).toLocaleDateString()}</p>
+                    </td>
+                    <td className="p-4 align-top">
+                      <p className={`text-xs sm:text-sm font-semibold ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`}>{app.job_title}</p>
+                    </td>
+                   <td className="p-4 align-top text-center">
+  <span className={`inline-flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider border-2 ${getStatusColor(app.application_status)}`}>
+    {app.application_status}
+  </span>
+</td>
+                    <td className="p-4 align-top text-center">
+                      <button 
+                        onClick={() => {
+                          setSelectedApp(app);
+                          setNextSteps({ isOpen: false, status: '' });
+                          setMessageText('');
 
-                <div className="flex flex-row md:flex-col items-center md:items-end gap-2 sm:gap-2 min-w-0 w-full md:w-auto shrink-0 mt-2 md:mt-0">
-                  <span className={`px-2.5 py-1 sm:px-4 sm:py-2 text-[10px] sm:text-sm font-extrabold rounded-lg border whitespace-nowrap ${getStatusColor(app.application_status)}`}>
-                    {app.application_status}
-                  </span>
-                  <button 
-                    onClick={() => {
-                      setSelectedApp(app);
-                      setNextSteps({ isOpen: false, status: '' });
-                      setMessageText('');
-
-                      if(app.application_status === 'Received') {
-                          updateStatus(app.application_id, 'Under Review', null, false);
-                      }
-                    }} 
-                    className={`w-full md:w-auto px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold rounded-md sm:rounded-lg cursor-pointer border-2 ${
-                      isDark
-                        ? 'bg-black text-white border-white'
-                        : 'bg-white text-[#03045E] border-gray-200'
-                    }`}
-                  >
-                    View Details
-                  </button>
-                </div>
-              </div>
+                          if(app.application_status === 'Received') {
+                              updateStatus(app.application_id, 'Under Review', null, false);
+                          }
+                        }} 
+                        className={`px-3 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-black rounded-lg border-2 transition cursor-pointer ${
+                          isDark
+                            ? 'bg-black text-white border-white hover:bg-white hover:text-black'
+                            : 'bg-white text-[#03045E] border-gray-200 hover:bg-gray-100'
+                        }`}
+                      >
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                      </tbody>
+            </table>
             </div>
-          ))}
+          </div>
         </div>
       ) : (
         <div className={`p-5 sm:p-12 rounded-lg sm:rounded-xl border-2 border-dashed flex flex-col items-center justify-center text-center min-h-[200px] sm:min-h-[280px] ${
@@ -317,6 +322,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
               : `You don't have any applications currently in the "${activeTab}" state.`}
           </p>
         </div>
+        
       )}
 
       {totalPages > 1 && (
@@ -493,15 +499,31 @@ export default function EmployerApplications({ profile, refreshStats }) {
                     >
                       Cancel
                     </button>
-                    <button
-                      onClick={() => updateStatus(selectedApp.application_id, nextSteps.status, messageText, true, true)}
-                      className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 text-xs sm:text-sm font-bold rounded-md sm:rounded-lg cursor-pointer border-2 ${
+                                      <button
+                      onClick={async () => {
+                        setIsSubmitting(true);
+                        await new Promise(r => setTimeout(r, 2000));
+                        await updateStatus(selectedApp.application_id, nextSteps.status, messageText, true, true);
+                        setIsSubmitting(false);
+                      }}
+                      disabled={isSubmitting}
+                      className={`w-full sm:w-auto px-5 sm:px-7 py-2.5 text-xs sm:text-sm font-bold rounded-xl sm:rounded-2xl cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-70 flex items-center justify-center gap-2 ${
                         isDark 
-                          ? 'bg-white text-black border-white' 
-                          : 'bg-[#03045E] text-white border-[#03045E]'
+                          ? 'bg-white text-black border-2 border-white hover:bg-gray-200 hover:border-gray-200' 
+                          : 'bg-[#2C7FFF] text-white border-2 border-[#2C7FFF] hover:bg-[#1a5ce6] hover:border-[#1a5ce6]'
                       }`}
                     >
-                      Confirm & Send
+                      {isSubmitting ? (
+                        <>
+                          <svg className="w-4 h-4 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                          </svg>
+                          Sending...
+                        </>
+                      ) : (
+                        'Confirm & Send'
+                      )}
                     </button>
                   </div>
                 </div>
@@ -564,6 +586,23 @@ export default function EmployerApplications({ profile, refreshStats }) {
         </div>
       )}
 
+           {isSubmitting && (
+        <div
+          className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1px] animate-in fade-in transition-all duration-300"
+          style={{ backgroundColor: (isContrast || isDarkMode) ? 'rgba(0, 0, 0, 0.75)' : 'rgba(72, 71, 71, 0.6)', filter: 'none' }}
+        >
+          <div className={`border-2 px-8 py-10 rounded-2xl shadow-2xl flex flex-col items-center max-w-sm w-full mx-auto ${isDark ? 'bg-black border-[#2C7FFF]' : 'bg-white border-[#03045E]/20'}`}>
+            <div className="relative w-16 h-16 flex items-center justify-center mb-5">
+              <div className="absolute inset-0 rounded-full border-4 border-[#2C7FFF]/30 animate-pulse"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-t-[#2C7FFF] border-r-transparent border-b-[#03045E] border-l-transparent animate-spin"></div>
+              <div className={`w-6 h-6 rounded-full shadow-md animate-ping opacity-75 absolute ${isDark ? 'bg-white' : 'bg-[#03045E]'}`}></div>
+            </div>
+            <h3 className={`text-lg font-black tracking-tight text-center mb-1 ${isDark ? 'text-white' : 'text-[#03045E]'}`}>Sending Message</h3>
+            <p className={`text-xs text-center font-bold ${isDark ? 'text-white/80' : 'text-[#03045E]/80'}`}>Processing your update...</p>
+          </div>
+        </div>
+      )}
+
       {showStatusAlert && (
         <div
           className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 backdrop-blur-[1spx] animate-in fade-in transition-all duration-300"
@@ -593,7 +632,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
 
               <button
                 onClick={() => setShowStatusAlert(false)}
-                className={`w-full py-3 sm:py-3.5 rounded-md sm:rounded-lg font-black text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all cursor-pointer ${getAlertBadgeStyle(statusAlert.tone)} text-white hover:opacity-90`}
+                className={`w-full py-3 sm:py-3.5 rounded-md sm:rounded-lg font-black text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all cursor-pointer ${getAlertBadgeStyle(statusAlert.tone)} ${isDark ? '!text-black' : 'text-white'} hover:opacity-90`}
               >
                 Got it!
               </button>

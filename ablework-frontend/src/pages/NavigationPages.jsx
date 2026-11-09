@@ -8,6 +8,14 @@ import { AccessibilityWelcome } from '../components/AccessibilityWelcome';
 import lightLogo from '../assets/LIGHT MODE.png';
 import darkLogo from '../assets/DARK MODE.png';
 import backgroundImg from '../assets/BG.png';
+import teamImage from '../assets/Team Behind AbleWork.png';
+import outreach1 from '../assets/gath1.jpg';
+import outreach2 from '../assets/gath2.jpg';
+import outreach3 from '../assets/gath3.jpg';
+import outreach4 from '../assets/gath4.jpg';
+import outreach5 from '../assets/gath5.jpg';
+import outreach6 from '../assets/gath6.jpg';
+import promoVideo from '../assets/video.mp4';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -117,7 +125,19 @@ function SiteHeader() {
           </nav>
         </div>
 
-        <div className="hidden md:flex items-center">
+            <div className="hidden md:flex items-center gap-3">
+          <Link
+            to="/register-select"
+            aria-label="Sign Up"
+            title="Sign Up"
+            className={`signup-btn px-5 py-2 rounded-full text-sm font-bold border-2 transition transform duration-200 ${
+              isContrast 
+                ? 'bg-[var(--color-accent)] text-[var(--color-background)] border-[var(--color-accent)] hover:brightness-125' 
+                : 'bg-[#03045E] text-[#f4f4f4] border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF] hover:brightness-125'
+            }`}
+          >
+            Sign Up
+          </Link>
           <Link
             to="/login"
             aria-label="Log In"
@@ -878,6 +898,103 @@ export function About() {
           title="Our Goal"
           text="To connect qualified applicants with suitable employers."
         />
+      </div>
+
+          {/* --- TEAM SECTION --- */}
+      <div className="w-full mt-12 sm:mt-20 mb-12 sm:mb-20">
+        <div className="w-full max-w-6xl mx-auto flex justify-center">
+          <img 
+            src={teamImage} 
+            alt="Team Behind AbleWork" 
+            className="w-full h-auto object-contain drop-shadow-sm rounded-2xl"
+          />
+        </div>
+      </div>
+
+        {/* --- THESIS VALIDATION & DATA GATHERING SECTION --- */}
+      <div className="w-full mt-8 sm:mt-12 bg-[#f4f4f4] rounded-3xl p-6 sm:p-12 border-2 border-[#03045E]/10 shadow-xl mb-12 sm:mb-20">
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-4xl font-black text-[#03045E] mb-4 tracking-tight">
+            Thesis Validation & Data Gathering
+          </h2>
+          <p className="text-sm sm:text-lg font-semibold text-[#03045E]/70 leading-relaxed">
+            As part of our capstone thesis, we conducted interviews and gathered valuable insights directly from the PWD community. These moments reflect our research process in ensuring AbleWork addresses real-world needs.
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          {/* Image 1 */}
+          <div className="relative group rounded-2xl overflow-hidden shadow-lg border-4 border-white bg-white">
+            <img 
+              src={outreach1} 
+              alt="Interview with beneficiaries at Elmer Blind Massage" 
+              className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" 
+            />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#03045E]/90 to-transparent p-4 sm:p-6 pt-12">
+              <p className="text-white text-sm sm:text-base font-bold">Conducting thesis interviews with the Elmer Blind Massage community to gather firsthand insights.</p>
+            </div>
+          </div>
+
+          {/* Image 2 */}
+          <div className="relative group rounded-2xl overflow-hidden shadow-lg border-4 border-white bg-white">
+            <img 
+              src={outreach2} 
+              alt="Data gathering with PWD beneficiaries" 
+              className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" 
+            />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#03045E]/90 to-transparent p-4 sm:p-6 pt-12">
+              <p className="text-white text-sm sm:text-base font-bold">Validating our system's features by understanding the unique challenges of our target users.</p>
+            </div>
+          </div>
+
+          {/* Image 3 */}
+          <div className="relative group rounded-2xl overflow-hidden shadow-lg border-4 border-white bg-white">
+            <img 
+              src={outreach3} 
+              alt="Thesis research activity" 
+              className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" 
+            />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#03045E]/90 to-transparent p-4 sm:p-6 pt-12">
+              <p className="text-white text-sm sm:text-base font-bold">Gathering data to ensure AbleWork's smart matching algorithm is effective and inclusive.</p>
+            </div>
+          </div>
+
+          {/* Image 4 */}
+          <div className="relative group rounded-2xl overflow-hidden shadow-lg border-4 border-white bg-white">
+            <img 
+              src={outreach4} 
+              alt="Thesis research activity" 
+              className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" 
+            />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#03045E]/90 to-transparent p-4 sm:p-6 pt-12">
+              <p className="text-white text-sm sm:text-base font-bold">Engaging with PWDs to test the accessibility and usability of our capstone project.</p>
+            </div>
+          </div>
+
+          {/* Image 5 */}
+          <div className="relative group rounded-2xl overflow-hidden shadow-lg border-4 border-white bg-white">
+            <img 
+              src={outreach5} 
+              alt="Thesis research activity" 
+              className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" 
+            />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#03045E]/90 to-transparent p-4 sm:p-6 pt-12">
+              <p className="text-white text-sm sm:text-base font-bold">Documenting our research journey and the valuable feedback received from the community.</p>
+            </div>
+          </div>
+
+          {/* Image 6 */}
+          <div className="relative group rounded-2xl overflow-hidden shadow-lg border-4 border-white bg-white">
+            <img 
+              src={outreach6} 
+              alt="Thesis research activity" 
+              className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" 
+            />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#03045E]/90 to-transparent p-4 sm:p-6 pt-12">
+              <p className="text-white text-sm sm:text-base font-bold">Reviewing our findings and system architecture to ensure all thesis requirements are met.</p>
+            </div>
+          </div>
+        </div>
       </div>
 
     </PageLayout>
@@ -1751,11 +1868,16 @@ function SimpleFooter() {
           </p>
           <Link
             to="/register-select"
-            aria-label="Register Now"
-            title="Register Now"
-            className="register-btn inline-block bg-[var(--color-accent)] text-white px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-xl font-bold text-[9px] sm:text-xs uppercase tracking-wider shadow-md hover:brightness-125 hover:text-white transition-all border-2 border-[var(--color-accent)] hover:border-[var(--color-background)]"
+            aria-label="Sign Up"
+            title="Sign Up"
+            tabIndex="0"
+            className={`signup-btn px-5 py-2 rounded-full text-sm font-bold border-2 transition transform duration-200 ${
+              isContrast 
+                ? 'bg-[var(--color-accent)] text-[var(--color-background)] border-[var(--color-accent)] hover:brightness-125' 
+                : 'bg-[#03045E] text-[#f4f4f4] border-[#03045E] hover:bg-[#2C7FFF] hover:border-[#2C7FFF] hover:brightness-125'
+            }`}
           >
-            Register Now
+            Sign Up
           </Link>
         </div>
 

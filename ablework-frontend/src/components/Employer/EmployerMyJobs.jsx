@@ -29,9 +29,10 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
   const isDarkMode = mode && typeof mode === 'string' && (mode.toLowerCase().includes('dark') || mode.toLowerCase().includes('comfort'));
   const isDark = isContrast || isDarkMode;
   const isHighContrastOrDarkComfort = paletteKey === 'highContrast' || paletteKey === 'darkComfort';
-  const [editingJob, setEditingJob] = useState(null);
+   const [editingJob, setEditingJob] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [listTab, setListTab] = useState('active');
+  const [searchQuery, setSearchQuery] = useState('');
   const [currentSkill, setCurrentSkill] = useState('');
   const [currentAccommodation, setCurrentAccommodation] = useState('');
   const [currentBenefit, setCurrentBenefit] = useState('');
@@ -44,11 +45,10 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
   const [expandedJobs, setExpandedJobs] = useState([]);
   const [expandedCategory, setExpandedCategory] = useState(null);
 
-  const jobsPerPage = 12;
+   const jobsPerPage = 10;
   useEffect(() => {
     setCurrentPage(1);
-  }, [listTab]);
-
+  }, [listTab, searchQuery]);
   const pageText = isDark ? 'text-white' : 'text-[#03045E]';
   const muted = isDark ? 'text-white/80' : 'text-[#03045E]/80';
   const subtle = isDark ? 'text-white/60' : 'text-[#03045E]/60';
@@ -286,9 +286,15 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
     setArchiveStage('confirm');
   };
 
-   const displayedJobs = jobs.filter(job => 
-    listTab === 'active' ? job.status === 'Active' : job.status === 'Archived'
-  );
+   const displayedJobs = jobs.filter(job => {
+    const matchesTab = listTab === 'active' ? job.status === 'Active' : job.status === 'Archived';
+    const searchLower = searchQuery.toLowerCase();
+    const matchesSearch = 
+      (job.job_title || '').toLowerCase().includes(searchLower) || 
+      (job.job_description || '').toLowerCase().includes(searchLower);
+      
+    return matchesTab && matchesSearch;
+  });
 
   const indexOfLastJob = currentPage * jobsPerPage;
   const indexOfFirstJob = indexOfLastJob - jobsPerPage;
@@ -327,95 +333,133 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
           <p className={`text-xs sm:text-sm font-semibold mt-0.5 ${muted}`}>Manage active opportunities and review your archived posting history.</p>
         </div>
         
-        {/* Tab Container (Medium Outer) - FIXED FOR FONT SCALING */}
-        <div className={`flex gap-1 sm:gap-2 p-1 rounded-xl border-2 w-full md:w-auto ${tabContainerBg}`}>
-          <button 
-            onClick={() => setListTab('active')}
-            className={`flex items-center justify-center whitespace-nowrap flex-1 md:flex-none px-4 sm:px-6 py-2 rounded-lg font-bold text-xs sm:text-sm transition cursor-pointer ${listTab === 'active' ? `${tabActive} shadow` : tabInactive}`}
-          >
-            Active Jobs
-          </button>
-          <button 
-            onClick={() => setListTab('archived')}
-            className={`flex items-center justify-center whitespace-nowrap flex-1 md:flex-none px-4 sm:px-6 py-2 rounded-lg font-bold text-xs sm:text-sm transition cursor-pointer ${listTab === 'archived' ? `${tabActive} shadow` : tabInactive}`}
-          >
-            Archived / History
-          </button>
+        <div className="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto">
+          <div className="relative w-full md:w-64">
+            <span className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ${subtle}`}>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </span>
+            <input
+              type="text"
+              placeholder="Search jobs..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className={`w-full pl-9 pr-3 py-2 text-xs sm:text-sm font-bold border-2 rounded-xl outline-none transition-all ${inputBg}`}
+            />
+          </div>
+
+          {/* Tab Container (Medium Outer) - FIXED FOR FONT SCALING */}
+          <div className={`flex gap-1 sm:gap-2 p-1 rounded-xl border-2 w-full md:w-auto ${tabContainerBg}`}>
+            <button 
+              onClick={() => setListTab('active')}
+              className={`flex items-center justify-center whitespace-nowrap flex-1 md:flex-none px-4 sm:px-6 py-2 rounded-lg font-bold text-xs sm:text-sm transition cursor-pointer ${listTab === 'active' ? `${tabActive} shadow` : tabInactive}`}
+            >
+              Active Jobs
+            </button>
+            <button 
+              onClick={() => setListTab('archived')}
+              className={`flex items-center justify-center whitespace-nowrap flex-1 md:flex-none px-4 sm:px-6 py-2 rounded-lg font-bold text-xs sm:text-sm transition cursor-pointer ${listTab === 'archived' ? `${tabActive} shadow` : tabInactive}`}
+            >
+              Archived / History
+            </button>
+          </div>
         </div>
       </div>
 
-          <div className="flex flex-col gap-4 sm:gap-8">
+                  <div className="flex flex-col gap-4 sm:gap-8">
         {displayedJobs.length > 0 ? (
           <div className="flex flex-col gap-6 w-full">
-            <div role="list" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 w-full">
-              {currentJobs.map(job => (
-                <div key={job.id} className={`p-4 sm:p-6 rounded-2xl border-2 flex flex-col justify-between gap-4 transition-all ${cardBg}`}>
-                  
-                  {/* Content Wrapper with flex-col to stabilize layout */}
-                  <div className="flex-1 w-full min-w-0 flex flex-col">
-                    <h3 className={`text-base sm:text-xl font-bold leading-tight break-words w-full ${pageText}`}>{job.job_title}</h3>
-                    <p className={`text-[10px] sm:text-sm mt-2 ${subtle}`}>Posted on {new Date(job.created_at).toLocaleDateString()}</p>
-                    
-                    {job.job_description && (
-                      /* Matched ApplicantExploreJobs structure for the expandable area */
-                      <div className="flex-1 flex flex-col mt-3 min-h-[80px] sm:min-h-[100px]">
-                        <p
-                          onClick={() => toggleExpand(job.id)}
-                          className={`text-xs sm:text-sm font-semibold leading-relaxed cursor-pointer ${expandedJobs.includes(job.id) ? '' : 'line-clamp-2'} ${muted}`}
-                        >
-                          {job.job_description}
-                        </p>
-                        {job.job_description.length > 80 && (
-                          <button
+            <div className={`w-full overflow-x-auto rounded-2xl border-2 ${panelBg}`}>
+              <table className="w-full text-left border-collapse min-w-[800px]">
+                <thead>
+                  <tr className={`border-b-2 ${isDark ? 'border-white/20 bg-black/50' : 'border-gray-200 bg-gray-50'}`}>
+                    <th className={`p-4 text-xs font-black uppercase tracking-wider ${pageText}`}>Job Details</th>
+                    <th className={`p-4 text-xs font-black uppercase tracking-wider ${pageText}`}>Description</th>
+                    <th className={`p-4 text-xs font-black uppercase tracking-wider ${pageText}`}>Status</th>
+                    <th className={`p-4 text-xs font-black uppercase tracking-wider text-right ${pageText}`}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentJobs.map(job => (
+                    <tr key={job.id} className={`border-b-2 last:border-b-0 transition-colors ${isDark ? 'border-white/10 hover:bg-white/5' : 'border-gray-100 hover:bg-gray-50'}`}>
+                      <td className="p-4 align-top">
+                        <h3 className={`text-sm sm:text-base font-bold leading-tight ${pageText}`}>{job.job_title}</h3>
+                        <p className={`text-[10px] sm:text-xs mt-1 ${subtle}`}>Posted on {new Date(job.created_at).toLocaleDateString()}</p>
+                      </td>
+                      <td className="p-4 align-top">
+                        <div className="flex flex-col min-h-[60px] max-w-sm">
+                          <p
                             onClick={() => toggleExpand(job.id)}
-                            className={`text-[10px] sm:text-xs font-bold mt-1 cursor-pointer hover:underline text-left w-fit ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`}
+                            className={`text-xs sm:text-sm font-semibold leading-relaxed cursor-pointer ${expandedJobs.includes(job.id) ? '' : 'line-clamp-2'} ${muted}`}
                           >
-                            {expandedJobs.includes(job.id) ? 'Read less' : 'Read more'}
-                          </button>
+                            {job.job_description || 'No description provided.'}
+                          </p>
+                                                  {job.job_description && job.job_description.length > 150 && (
+                            <button
+                              onClick={() => toggleExpand(job.id)}
+                              className={`text-[10px] font-bold mt-1 cursor-pointer hover:underline text-left w-fit ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`}
+                            >
+                              {expandedJobs.includes(job.id) ? 'Read less' : 'Read more'}
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-4 align-top">
+                        {job.status === 'Active' ? (
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider border-2 bg-transparent ${isDark ? 'text-green-400 border-green-500' : 'text-green-600 border-green-600'}`}>
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                            Active
+                          </span>
+                        ) : (
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider border-2 ${closedBadge}`}>
+                            Closed
+                          </span>
                         )}
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="shrink-0 w-full flex flex-row gap-2 mt-auto pt-2">
-                    {job.status === 'Active' ? (
-                      <>
-                        <button 
-                          onClick={() => {
-                            setEditingJob({
-                              ...job, 
-                              parsedSkills: parseToArray(job.required_skills), 
-                              parsedAccoms: parseToArray(job.provided_accommodations),
-                              parsedBenefits: parseToArray(job.benefits),
-                              parsedDisabilities: parseToArray(job.accepted_disabilities),
-                              salary_range: job.salary_range || ''
-                            });
-                            setCurrentSkill('');
-                            setCurrentAccommodation('');
-                            setCurrentBenefit('');
-                          }} 
-                          className={`flex-1 px-2 sm:px-4 py-2.5 text-xs font-black rounded-xl border-2 transition cursor-pointer ${isDark ? 'text-white bg-black border-white hover:bg-white hover:text-black' : 'text-[#03045E] bg-white border-gray-200 hover:bg-gray-100'}`}
-                        >
-                          Edit
-                        </button>
-                        
-                        <button 
-                          onClick={() => handleArchiveJob(job.id)} 
-                          className={`flex-1 px-2 sm:px-4 py-2.5 text-xs font-black rounded-xl border-2 transition cursor-pointer ${
-                            isDark 
-                              ? 'bg-black !text-red-500 border-red-500' 
-                              : 'bg-white !text-red-600 border-red-600'
-                          }`}
-                        >
-                          Archive
-                        </button>
-                      </>
-                    ) : (
-                      <span className={`w-full text-center px-4 py-2.5 text-xs font-black rounded-xl border-2 ${closedBadge}`}>Closed</span>
-                    )}
-                  </div>
-                </div>
-              ))}
+                      </td>
+                      <td className="p-4 align-top text-right">
+                        <div className="flex flex-col sm:flex-row gap-2 justify-end">
+                          {job.status === 'Active' ? (
+                            <>
+                              <button 
+                                onClick={() => {
+                                  setEditingJob({
+                                    ...job, 
+                                    parsedSkills: parseToArray(job.required_skills), 
+                                    parsedAccoms: parseToArray(job.provided_accommodations),
+                                    parsedBenefits: parseToArray(job.benefits),
+                                    parsedDisabilities: parseToArray(job.accepted_disabilities),
+                                    salary_range: job.salary_range || ''
+                                  });
+                                  setCurrentSkill('');
+                                  setCurrentAccommodation('');
+                                  setCurrentBenefit('');
+                                }} 
+                                className={`px-3 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-black rounded-lg border-2 transition cursor-pointer ${isDark ? 'text-white bg-black border-white hover:bg-white hover:text-black' : 'text-[#03045E] bg-white border-gray-200 hover:bg-gray-100'}`}
+                              >
+                                Edit
+                              </button>
+                              
+                                                                <button 
+                                onClick={() => handleArchiveJob(job.id)} 
+                                className={`px-3 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-black rounded-lg border-2 transition cursor-pointer bg-transparent ${
+                                  isDark 
+                                    ? '!text-red-500 border-red-500' 
+                                    : '!text-red-600 border-red-600'
+                                }`}
+                              >
+                                Archive
+                              </button>
+                            </>
+                          ) : (
+                            <span className={`px-3 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-black rounded-lg border-2 opacity-50 cursor-not-allowed ${closedBadge}`}>Archived</span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
             
             {totalPages > 1 && (

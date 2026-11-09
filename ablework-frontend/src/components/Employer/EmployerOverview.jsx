@@ -84,15 +84,15 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={stats.chartData || mockChartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? '#ffffff' : '#03045E'} strokeOpacity={0.15} />
-            <XAxis 
+                     <XAxis 
               dataKey="name" 
-              tick={{ fontSize: expanded ? 14 : 10, fill: (isDark || isHighContrastOrDarkComfort) ? '#ffffff' : '#03045E', fontWeight: 'bold' }} 
+              tick={{ fontSize: expanded ? 14 : 10, fill: (isDark || isHighContrastOrDarkComfort) ? '#ffffff' : 'var(--color-text, #03045E)', fontWeight: 'bold' }} 
               axisLine={false} 
               tickLine={false} 
               dy={10} 
             />
             <YAxis 
-              tick={{ fontSize: expanded ? 14 : 10, fill: (isDark || isHighContrastOrDarkComfort) ? '#ffffff' : '#03045E', fontWeight: 'bold' }} 
+              tick={{ fontSize: expanded ? 14 : 10, fill: (isDark || isHighContrastOrDarkComfort) ? '#ffffff' : 'var(--color-text, #03045E)', fontWeight: 'bold' }} 
               axisLine={false} 
               tickLine={false} 
             />
