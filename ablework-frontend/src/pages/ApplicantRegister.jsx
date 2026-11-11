@@ -453,7 +453,7 @@ const handleAddressType = (e) => {
                 className="h-9 sm:h-12 md:h-14 w-auto object-contain max-h-full"
               />
             </div>
-            <nav aria-label="Main navigation" className={`hidden md:flex items-center gap-6 text-[15px] font-medium ${isAccessibilityMode ? '!text-white' : (isContrast ? 'text-white' : 'text-[#03045E]')}`}>
+<nav aria-label="Main navigation" className={`hidden md:flex items-center gap-6 text-[0.9375rem] font-medium ${isAccessibilityMode ? '!text-white' : (isContrast ? 'text-white' : 'text-[#03045E]')}`}>
               <Link to="/" aria-label="Home" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#03045e]')} transition`}>Home</Link>
               <Link to="/about" aria-label="About Us" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#03045e]')} transition`}>About Us</Link>
               <Link to="/policy" aria-label="Policy" className={`${isAccessibilityMode ? '!text-white hover:!text-white' : (isContrast ? 'hover:text-blue-400' : 'hover:text-[#03045e]')} transition`}>Policy</Link>
@@ -518,7 +518,7 @@ const handleAddressType = (e) => {
                   </svg>
                 </div>
                 <div aria-hidden="true" className="flex-1 min-w-0">
-                  <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Home</span>
+               <span className="text-[0.8125rem] tracking-wide font-black block leading-tight text-[#03045E] break-words">Home</span>
                 </div>
                 <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -532,7 +532,7 @@ const handleAddressType = (e) => {
                   </svg>
                 </div>
                 <div aria-hidden="true" className="flex-1 min-w-0">
-                  <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">About Us</span>
+                 <span className="text-[0.8125rem] tracking-wide font-black block leading-tight text-[#03045E] break-words">About Us</span>
                 </div>
                 <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -546,7 +546,7 @@ const handleAddressType = (e) => {
                   </svg>
                 </div>
                 <div aria-hidden="true" className="flex-1 min-w-0">
-                  <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Policy</span>
+                 <span className="text-[0.8125rem] tracking-wide font-black block leading-tight text-[#03045E] break-words">Policy</span>
                 </div>
                 <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -565,7 +565,7 @@ const handleAddressType = (e) => {
                       </svg>
                     </div>
                     <div aria-hidden="true" className="flex-1 min-w-0">
-                      <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Log In</span>
+<span className="text-[0.8125rem] tracking-wide font-black block leading-tight text-[#03045E] break-words">Log In</span>
                     </div>
                     <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />

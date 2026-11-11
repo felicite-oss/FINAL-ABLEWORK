@@ -29,8 +29,8 @@ export default function RegisterSelect() {
     const isAPlusPlus = mode === 'A++' || mode === 'Assist' || mode === 'a++' || mode === 'assist';
   const isAPlus = mode === 'A+' || mode === 'a+';
   
-  const navSize = isAPlusPlus ? 'text-xl' : isAPlus ? 'text-lg' : 'text-[15px]';
-  const mobileNavSize = isAPlusPlus ? 'text-base' : isAPlus ? 'text-sm' : 'text-[13px]';
+    const navSize = isAPlusPlus ? 'text-xl' : isAPlus ? 'text-lg' : 'text-[0.9375rem]';
+  const mobileNavSize = isAPlusPlus ? 'text-base' : isAPlus ? 'text-sm' : 'text-[0.8125rem]';
 
   const titleSize = 'text-xl sm:text-2xl md:text-3xl lg:text-4xl';
   const subtitleSize = 'text-xs sm:text-base md:text-lg';
@@ -125,8 +125,8 @@ const containerMaxWidth = 'max-w-[94%] sm:max-w-md md:max-w-xl lg:max-w-2xl';
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
                     </div>
-                    <div aria-hidden="true" className="flex-1 min-w-0">
-                      <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Policy</span>
+                                       <div aria-hidden="true" className="flex-1 min-w-0">
+                      <span className={`${mobileNavSize} tracking-wide font-black block leading-tight text-[#03045E] break-words`}>Policy</span>
                     </div>
                     <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -147,7 +147,7 @@ const containerMaxWidth = 'max-w-[94%] sm:max-w-md md:max-w-xl lg:max-w-2xl';
                       </svg>
                     </div>
                     <div aria-hidden="true" className="flex-1 min-w-0">
-                      <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Log In</span>
+                      <span className={`${mobileNavSize} tracking-wide font-black block leading-tight text-[#03045E] break-words`}>Log In</span>
                     </div>
                     <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />

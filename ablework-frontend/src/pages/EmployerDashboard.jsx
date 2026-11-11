@@ -23,7 +23,7 @@ export default function EmployerDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [profile, setProfile] = useState(null);
   const [jobs, setJobs] = useState([]);
-  const [stats, setStats] = useState({ activeJobs: 0, pendingApps: 0, shortlistedApps: 0, recentActivity: [] });
+ const [stats, setStats] = useState({ activeJobs: 0, pendingApps: 0, shortlistedApps: 0, recentActivity: [], disabilityData: [] });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
    const [showProfileDropdown, setShowProfileDropdown] = useState(false);
@@ -125,8 +125,12 @@ export default function EmployerDashboard() {
 
         const statsRes = await fetch(`http://localhost:5001/api/employer/${storedUser.id}/dashboard-stats`);
         const statsData = await statsRes.json();
-        if (statsRes.ok) setStats(statsData);
-
+        if (statsRes.ok) {
+          setStats({
+            ...statsData,
+            disabilityData: statsData.disabilityData || [] // Ensures the array exists
+          });
+        }
         const notifRes = await fetch(`http://localhost:5001/api/users/${storedUser.id}/notifications`);
         const notifData = await notifRes.json();
         if (notifRes.ok) setNotifications(notifData);

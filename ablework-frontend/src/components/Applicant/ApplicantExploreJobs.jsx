@@ -47,6 +47,48 @@ const getMatchColor = (percentage) => {
   return 'bg-[#f4f4f4] text-[#03045E] border-[#03045E]/20';
 };
 
+// 👇 PASTE THE NEW COMPONENT HERE 👇
+const JobCardDescription = ({ description, isExpanded, onToggle }) => {
+  const textRef = useRef(null);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+
+  useEffect(() => {
+    const checkOverflow = () => {
+      if (textRef.current) {
+        setIsOverflowing(textRef.current.scrollHeight > textRef.current.clientHeight);
+      }
+    };
+    checkOverflow();
+    window.addEventListener('resize', checkOverflow);
+    return () => window.removeEventListener('resize', checkOverflow);
+  }, [description, isExpanded]);
+
+  return (
+    <div className="flex-1 flex flex-col min-h-[80px] sm:min-h-[100px]">
+      <p 
+        ref={textRef}
+        onClick={() => (isOverflowing || isExpanded) && onToggle()}
+        className={`text-[#03045E] text-xs sm:text-sm font-semibold leading-relaxed ${(isOverflowing || isExpanded) ? 'cursor-pointer' : ''} ${isExpanded ? '' : 'line-clamp-2'}`}
+      >
+        {description}
+      </p>
+      
+      {(isOverflowing || isExpanded) && (
+        <button 
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggle();
+          }}
+          className="text-[10px] sm:text-xs font-bold text-[#2C7FFF] hover:underline mt-1 cursor-pointer text-left w-fit"
+        >
+          {isExpanded ? 'Read less' : 'Read more'}
+        </button>
+      )}
+    </div>
+  );
+};
+// 👆 END OF NEW COMPONENT 👆
+
 // ADD highlightId TO PROPS
 export default function ApplicantExploreJobs({ profile, jobs, applications = [], refreshData, initialSelectedJob, clearJobFromMap, highlightId }) {
   const {
@@ -651,22 +693,11 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                     </div>
                     <h2 className="text-base sm:text-2xl font-black text-[#03045E] leading-tight break-words w-full">{job.job_title}</h2>
                     <p className="text-xs sm:text-base font-black text-[#2C7FFF] mt-0.5 sm:mt-1 mb-2 sm:mb-3 break-words">{job.company_name}</p>
-                    <div className="flex-1 flex flex-col min-h-[80px] sm:min-h-[100px]">
-                      <p 
-                        onClick={() => toggleExpand(job.id)}
-                        className={`text-[#03045E] text-xs sm:text-sm font-semibold leading-relaxed cursor-pointer ${expandedJobs.includes(job.id) ? '' : 'line-clamp-2'}`}
-                      >
-                        {job.job_description}
-                      </p>
-                      {job.job_description && job.job_description.length > 80 && (
-                        <button 
-                          onClick={() => toggleExpand(job.id)}
-                          className="text-[10px] sm:text-xs font-bold text-[#2C7FFF] hover:underline mt-1 cursor-pointer text-left w-fit"
-                        >
-                          {expandedJobs.includes(job.id) ? 'Read less' : 'Read more'}
-                        </button>
-                      )}
-                    </div>
+                                     <JobCardDescription 
+                      description={job.job_description} 
+                      isExpanded={expandedJobs.includes(job.id)} 
+                      onToggle={() => toggleExpand(job.id)} 
+                    />
                   </div>
 
                                    <div className="shrink-0 w-full flex flex-row gap-2 mt-auto pt-2">
@@ -677,19 +708,19 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                     >
                       View Details
                     </button>
-                                     <button 
-                      onClick={() => openApplyModal(job)}
-                      disabled={hasApplied}
-                      aria-label={hasApplied ? `Already applied to ${job.job_title} at ${job.company_name}` : `Apply now to ${job.job_title} at ${job.company_name}`}
+                                                           <button 
+                      onClick={() => { if (!hasApplied) openApplyModal(job); }}
+                      aria-disabled={hasApplied}
+                      aria-label={hasApplied ? `Applied to ${job.job_title} at ${job.company_name}` : `Apply now to ${job.job_title} at ${job.company_name}`}
                       style={!hasApplied ? { color: '#ffffff' } : undefined}
-                      className={`flex-1 min-w-0 px-2 sm:px-4 py-2.5 font-black text-xs rounded-lg transition-all duration-200 text-center border-2 ${
+                      className={`flex-1 min-w-0 px-2 sm:px-4 py-2.5 font-black text-xs rounded-lg transition-all duration-200 text-center border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-1 ${
                         hasApplied 
                           ? 'bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed opacity-70' 
                           : `${isDarkScreen ? 'bg-black border-white cursor-pointer' : 'bg-[#2C7FFF] border-[#2C7FFF] cursor-pointer'}`
                       }`}
                     >
                       {hasApplied ? (
-                        <span className="inline-flex items-center justify-center gap-1 sm:gap-1.5">
+                        <span tabIndex="0" role="text" aria-label="Applied" className="inline-flex items-center justify-center gap-1 sm:gap-1.5 outline-none">
                           <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                           Applied
                         </span>

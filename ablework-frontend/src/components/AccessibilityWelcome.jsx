@@ -141,14 +141,26 @@ export function AccessibilityWelcome() {
       aria-label="Accessibility setup"
     >
       <style>{`
-        @keyframes awPop { 0% { opacity: 0; transform: scale(.9) translateY(16px); } 60% { opacity: 1; transform: scale(1.01) translateY(-2px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
-        @keyframes awOut { to { opacity: 0; transform: scale(.94) translateY(8px); } }
-        @keyframes awSlide { 0% { opacity: 0; transform: translateX(12px); } 100% { opacity: 1; transform: translateX(0); } }
-        .aw-pop { animation: awPop .5s cubic-bezier(.22,1.4,.36,1) both; }
-        .aw-leaving { animation: awOut .35s ease forwards; }
-        .aw-step { animation: awSlide .35s cubic-bezier(.22,1,.36,1) both; }
+        /* Background fade-in */
+        @keyframes awFade { from { opacity: 0; } to { opacity: 1; } }
+        
+        /* Bouncy pop-up effect */
+        @keyframes awPop { 
+          0% { opacity: 0; transform: scale(0.85) translateY(40px); } 
+          70% { opacity: 1; transform: scale(1.02) translateY(-5px); } 
+          100% { opacity: 1; transform: scale(1) translateY(0); } 
+        }
+        
+        @keyframes awOut { to { opacity: 0; transform: scale(0.9) translateY(20px); } }
+        @keyframes awSlide { 0% { opacity: 0; transform: translateX(20px); } 100% { opacity: 1; transform: translateX(0); } }
+        
+        .aw-backdrop { animation: awFade 0.3s ease-out both; }
+        .aw-pop { animation: awPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+        .aw-leaving { animation: awOut 0.35s ease-in forwards; }
+        .aw-step { animation: awSlide 0.4s cubic-bezier(.22,1,.36,1) both; }
+        
         @media (prefers-reduced-motion: reduce) {
-          .aw-pop, .aw-leaving, .aw-step { animation: none !important; }
+          .aw-pop, .aw-leaving, .aw-step, .aw-backdrop { animation: none !important; }
         }
       `}</style>
 
@@ -204,7 +216,7 @@ export function AccessibilityWelcome() {
         <div
           ref={panelRef}
           tabIndex={-1}
-          className="relative flex flex-col max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-2.5rem)] md:max-h-[calc(100dvh-3rem)] overflow-hidden rounded-xl sm:rounded-2xl border-2 border-[#03045E]/20 bg-white shadow-[0_30px_80px_rgba(3,4,94,0.4)] focus:outline-none"
+          className="relative flex flex-col h-[85vh] sm:h-[600px] md:h-[650px] max-h-[90dvh] overflow-hidden rounded-xl sm:rounded-2xl border-2 border-[#03045E]/20 bg-white shadow-[0_30px_80px_rgba(3,4,94,0.4)] focus:outline-none"
         >
           <div className="h-1 sm:h-1.5 w-full shrink-0 bg-[#2C7FFF]" />
 
@@ -247,7 +259,7 @@ export function AccessibilityWelcome() {
             ))}
           </div>
 
-          <div key={step} className="aw-step flex-1 min-h-0 overflow-y-auto px-3.5 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 flex flex-col">
+                    <div key={step} className="aw-step flex-1 min-h-0 overflow-y-auto px-3.5 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 flex flex-col [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
             {step === 0 && (
               <div className="flex flex-col gap-3 sm:gap-4">
                 <div>
@@ -255,11 +267,12 @@ export function AccessibilityWelcome() {
                   <p tabIndex="0" className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs font-semibold text-[#03045E]/60 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1 w-fit">Pick the look that's easiest on your eyes.</p>
                 </div>
                 <div className="grid grid-cols-2 gap-2 sm:gap-2.5 md:gap-3">
-                  {THEMES.map((theme) => {
+                                {THEMES.map((theme) => {
                     const isSelected = selectedTheme === theme.key;
                     const dark = theme.key === 'Dark';
                     const isDarkDefault = dark && !isDarkScreen;
                     const labelColor = isDarkDefault ? 'text-[#03045E]' : 'text-white';
+                    
                     return (
                       <button
                         key={theme.key}
@@ -268,28 +281,31 @@ export function AccessibilityWelcome() {
                         aria-pressed={isSelected}
                         className={`flex flex-col gap-1.5 sm:gap-2 rounded-xl sm:rounded-2xl border-2 p-2 sm:p-2.5 md:p-3 transition-all focus:outline-none ${
                           isSelected
-                            ? 'border-[#2C7FFF] bg-[#2C7FFF]/5 shadow-md'
-                            : 'border-[#03045E]/15 bg-white hover:border-[#2C7FFF]/50'
+                            ? `border-[#2C7FFF] ${dark ? 'bg-black' : 'bg-[#2C7FFF]/5'} shadow-md`
+                            : `border-[#03045E]/15 ${dark ? 'bg-black' : 'bg-white'} hover:border-[#2C7FFF]/50`
                         }`}
                       >
-                        <div className={`flex h-11 sm:h-14 md:h-16 items-center justify-center rounded-lg sm:rounded-xl border ${dark ? 'border-white/10 bg-[#0B1020]' : 'border-[#03045E]/10 bg-[#F6F8FF]'}`}>
+                        <div className={`flex h-11 sm:h-14 md:h-16 items-center justify-center rounded-lg sm:rounded-xl border ${dark ? 'border-white/20 bg-black' : 'border-[#03045E]/10 bg-[#F6F8FF]'}`}>
                           {dark
                             ? <MoonIcon className="h-4 w-4 sm:h-5 sm:w-5" forceColor="#FFFFFF" />
                             : <SunIcon className="h-4 w-4 sm:h-5 sm:w-5" forceColor={isDarkScreen ? '#000000' : undefined} />}
                         </div>
                         <div className="flex items-center justify-between gap-1">
                           <div className="text-left min-w-0">
-                            <p className={`text-[11px] sm:text-xs font-black truncate ${labelColor}`}>{theme.label}</p>
-                            <p className={`text-[9px] sm:text-[10px] font-bold truncate ${labelColor}`}>{theme.tagline}</p>
+                            {/* ONLY forces white text for dark mode. Standard mode uses the exact original labelColor */}
+                            <p className={`text-[11px] sm:text-xs font-black truncate ${dark ? 'text-white' : labelColor}`}>{theme.label}</p>
+                            <p className={`text-[9px] sm:text-[10px] font-bold truncate ${dark ? 'text-white/70' : labelColor}`}>{theme.tagline}</p>
                           </div>
                           {isSelected && (
                             <span
                               className={`flex h-4 w-4 sm:h-5 sm:w-5 shrink-0 items-center justify-center rounded-full text-[8px] sm:text-[10px] font-black ${
-                                isDarkScreen
+                                dark
                                   ? 'bg-white text-black'
-                                  : isDarkDefault
-                                    ? 'bg-[#F6F8FF] text-[#03045E]'
-                                    : 'bg-[#2C7FFF] text-white'
+                                  : (isDarkScreen
+                                      ? 'bg-white text-black'
+                                      : isDarkDefault
+                                        ? 'bg-[#F6F8FF] text-[#03045E]'
+                                        : 'bg-[#2C7FFF] text-white')
                               }`}
                             >
                               ✓
@@ -307,9 +323,26 @@ export function AccessibilityWelcome() {
                     <ColorPalettePicker />
                   </div>
                 )}
+
+                {/* ADDED: Pro Tip Card for Dark Mode */}
+                             {/* ADDED: Pro Tip Card for Dark Mode */}
+                {selectedTheme === 'Dark' && (
+                  <div className="mt-2 rounded-xl sm:rounded-2xl border-2 p-3 sm:p-4 flex gap-3 items-start animate-in fade-in slide-in-from-top-2 duration-300 bg-black border-white/20">
+                    <div className="shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-white/10 text-white">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="text-xs sm:text-sm font-black text-white">Pro Tip: Dark Mode</h4>
+                      <p className="text-[10px] sm:text-xs font-semibold mt-1 leading-relaxed text-white/70">
+                        Dark Mode is excellent for reducing glare and eye strain in low-light environments. If you have astigmatism, feel free to switch back to Standard Mode anytime.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
-
             {step === 1 && (
               <div className="flex flex-col gap-3 sm:gap-4">
                 <div>

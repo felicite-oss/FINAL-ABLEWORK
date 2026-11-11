@@ -271,7 +271,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
                       <p className={`text-xs sm:text-sm font-semibold ${isDark ? 'text-white' : 'text-[#2C7FFF]'}`}>{app.job_title}</p>
                     </td>
                    <td className="p-4 align-top text-center">
-  <span className={`inline-flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider border-2 ${getStatusColor(app.application_status)}`}>
+  <span className={`inline-flex items-center justify-center w-28 sm:w-32 px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-black uppercase tracking-wider border-1 ${getStatusColor(app.application_status)}`}>
     {app.application_status}
   </span>
 </td>
@@ -361,7 +361,7 @@ export default function EmployerApplications({ profile, refreshStats }) {
                 <h2 className={`text-xl sm:text-3xl font-extrabold ${pageText}`}>{selectedApp.firstname} {selectedApp.lastname}</h2>
                 <p className={`text-xs sm:text-base font-semibold mt-1 ${muted}`}>Applying for: <span className={isDark ? 'text-white' : 'text-[#2C7FFF]'}>{selectedApp.job_title}</span></p>
               </div>
-              <span className={`px-3 sm:px-4 py-1 sm:py-2 rounded-full text-[10px] sm:text-sm font-bold border-2 ${getStatusColor(selectedApp.application_status)}`}>
+                         <span className={`inline-flex items-center justify-center min-w-[120px] sm:min-w-[150px] px-3 sm:px-4 py-1 sm:py-2 rounded-full text-[10px] sm:text-sm font-bold border-2 ${getStatusColor(selectedApp.application_status)}`}>
                 {selectedApp.application_status}
               </span>
             </div>

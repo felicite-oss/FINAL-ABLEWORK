@@ -1061,11 +1061,11 @@ useEffect(() => {
                   >
                     {item.icon}
                   </div>
-                  <div className={`flex flex-col text-left transition-all duration-300 ease-in-out overflow-hidden whitespace-nowrap ${
+                                  <div className={`flex flex-col text-left transition-all duration-300 ease-in-out overflow-hidden whitespace-nowrap ${
                     showDesktopSidebar ? 'opacity-100 max-w-[150px] ml-3.5 flex-1' : 'opacity-0 max-w-0 ml-0 flex-none'
                   }`}>
-                    <span className={`text-[15px] tracking-wide font-black truncate block leading-tight text-[#03045E]`}>{item.label}</span>
-                    <span className={`text-[10px] font-bold uppercase tracking-widest block mt-0.5 truncate text-[#03045E]/70`}>
+                    <span className={`text-[0.9375rem] tracking-wide font-black truncate block leading-tight text-[#03045E]`}>{item.label}</span>
+                    <span className={`text-[0.625rem] font-bold uppercase tracking-widest block mt-0.5 truncate text-[#03045E]/70`}>
                       {item.desc}
                     </span>
                   </div>

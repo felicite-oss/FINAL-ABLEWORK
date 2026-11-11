@@ -15,7 +15,9 @@ import outreach3 from '../assets/gath3.jpg';
 import outreach4 from '../assets/gath4.jpg';
 import outreach5 from '../assets/gath5.jpg';
 import outreach6 from '../assets/gath6.jpg';
-import promoVideo from '../assets/video.mp4';
+import mobileImage from '../assets/Mobile.png';
+import laptopImage from '../assets/Laptop.png';
+import gifVideo from '../assets/GIF.mp4';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -91,7 +93,7 @@ function SiteHeader() {
               className="h-9 sm:h-12 md:h-14 w-auto object-contain max-h-full"
             />
           </div>
-          <nav className={`hidden md:flex items-center gap-6 text-[15px] font-semibold ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`} aria-label="Main navigation">
+        <nav className={`hidden md:flex items-center gap-6 text-[0.9375rem] font-semibold ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`} aria-label="Main navigation">
             <NavLink 
               to="/" 
               aria-label="Home"
@@ -198,7 +200,7 @@ function SiteHeader() {
                     </svg>
                   </div>
                   <div aria-hidden="true" className="flex-1 min-w-0">
-                    <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Home</span>
+<span className="text-[0.8125rem] tracking-wide font-black block leading-tight text-[#03045E] break-words">Home</span>
                   </div>
                   <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -223,7 +225,7 @@ function SiteHeader() {
                     </svg>
                   </div>
                   <div aria-hidden="true" className="flex-1 min-w-0">
-                    <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">About Us</span>
+<span className="text-[0.8125rem] tracking-wide font-black block leading-tight text-[#03045E] break-words">About Us</span>
                   </div>
                   <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -248,7 +250,7 @@ function SiteHeader() {
                     </svg>
                   </div>
                   <div aria-hidden="true" className="flex-1 min-w-0">
-                    <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Policy</span>
+                  <span className="text-[0.8125rem] tracking-wide font-black block leading-tight text-[#03045E] break-words">Policy</span>
                   </div>
                   <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -275,7 +277,7 @@ function SiteHeader() {
                     </svg>
                   </div>
                   <div aria-hidden="true" className="flex-1 min-w-0">
-                    <span className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Log In</span>
+<span className="text-[0.8125rem] tracking-wide font-black block leading-tight text-[#03045E] break-words">Log In</span>
                   </div>
                   <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -292,7 +294,7 @@ function SiteHeader() {
 
 export function Home() {
   const { mode } = useContext(AccessibilityContext);
-  const { paletteKey } = useColorPalette();
+  const { paletteKey, palette } = useColorPalette();
 
   const isAccessibilityContrast = mode && typeof mode === 'string' && mode.toLowerCase().includes('contrast');
   const isDarkMode = mode && typeof mode === 'string' && mode.toLowerCase().includes('dark');
@@ -310,6 +312,14 @@ export function Home() {
   const [legendOpen, setLegendOpen] = useState(true);
   const [mapExpanded, setMapExpanded] = useState(false);
 
+    const [scrollOffset, setScrollOffset] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => setScrollOffset(window.scrollY);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === 'Escape') setMapExpanded(false);
@@ -319,13 +329,9 @@ export function Home() {
   }, []);
 
   useEffect(() => {
-    if (mapExpanded) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
-  }, []);
+  document.body.style.overflow = mapExpanded ? 'hidden' : '';
+  return () => { document.body.style.overflow = ''; };
+}, [mapExpanded]);   // ✅
 
     const defaultCenter = [10.6766, 122.9509];
   useEffect(() => {
@@ -385,7 +391,7 @@ export function Home() {
   const mappedJobs = jobs.filter(j => j.latitude && j.longitude);
 
   return (
-    <div role="main" aria-label="Home Screen" className={`min-h-screen flex flex-col ${isContrast ? 'dark-mode-fix bg-[var(--color-background)] text-[var(--color-text)]' : 'bg-white text-[#03045E]'}`}>
+   <div role="main" aria-label="Home Screen" className={`min-h-screen flex flex-col ${(isContrast || isDarkMode) ? 'dark-mode-fix bg-[var(--color-background)] text-[var(--color-text)]' : 'bg-white text-[#03045E]'}`}>
 
       {usePlainWhiteText && (
         <style>{`
@@ -463,11 +469,12 @@ export function Home() {
                   Welcome to AbleWork
                 </span>
 
-                <h1 tabIndex="0" role="heading" aria-level="1" aria-label="Building an Inclusive Workforce for Everyone" title="Building an Inclusive Workforce for Everyone" className={`text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight mb-4 sm:mb-6 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'} [text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`} style={(isContrast || isDarkMode) ? { textShadow: 'none' } : undefined}>
+                <h1 tabIndex="0" role="heading" aria-level="1" aria-label="Building an Inclusive Workforce for Everyone" title="Building an Inclusive Workforce for Everyone" className={`text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight mb-4 sm:mb-6 ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#03045E]'} [text-shadow:0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(255,255,255,0.85),0_0_24px_rgba(255,255,255,0.7),0_2px_4px_rgba(255,255,255,0.9)]`} style={isContrast ? { textShadow: 'none' } : undefined}>
                   Building an Inclusive Workforce for Everyone
                 </h1>
 
-<p tabIndex="0" role="text" aria-label="AbleWork helps persons with disabilities find suitable employment opportunities based on their unique skills, qualifications, and preferred locations." title="AbleWork helps persons with disabilities find suitable employment opportunities based on their unique skills, qualifications, and preferred locations." className={`text-sm sm:text-lg font-semibold leading-relaxed mb-5 sm:mb-8 p-2.5 sm:p-3 rounded-xl ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'} [text-shadow:0_0_6px_rgba(255,255,255,1),0_0_12px_rgba(255,255,255,1),0_0_24px_rgba(255,255,255,0.9),0_2px_4px_rgba(255,255,255,0.9)]`} style={(isContrast || isDarkMode) ? { textShadow: 'none' } : undefined}>
+<p tabIndex="0" role="text" aria-label="AbleWork helps persons with disabilities find suitable employment opportunities based on their unique skills, qualifications, and preferred locations." title="AbleWork helps persons with disabilities find suitable employment opportunities based on their unique skills, qualifications, and preferred locations." 
+className={`text-sm sm:text-lg font-semibold leading-relaxed mb-5 sm:mb-8 p-2.5 sm:p-3 rounded-xl ${(isContrast || isDarkMode) ? 'text-white' : 'text-[#03045E]'} [text-shadow:0_0_6px_rgba(255,255,255,1),0_0_12px_rgba(255,255,255,1),0_0_24px_rgba(255,255,255,0.9),0_2px_4px_rgba(255,255,255,0.9)]`} style={(isContrast || isDarkMode) ? { textShadow: 'none' } : undefined}>
   AbleWork helps persons with disabilities find suitable employment opportunities based on their unique skills, qualifications, and preferred locations.
 </p>
 
@@ -490,11 +497,11 @@ export function Home() {
                     to="/about"
                     aria-label="Learn More"
                     title="Learn More"
-                    className={`learn-more-btn px-5 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl font-bold transition-all shadow-sm text-sm sm:text-base ${
-                      isContrast
-                        ? 'bg-[#1a1a1a] text-white border-2 border-white hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'
-                        : `bg-[var(--color-surface)]/50 ${isDarkMode ? 'text-black' : 'text-[#03045E]'} border-2 border-[#f4f4f4] hover:bg-[#2c7fff] hover:text-[#f4f4f4] hover:brightness-125`
-                    }`}
+className={`learn-more-btn px-5 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl font-bold transition-all shadow-sm text-sm sm:text-base ${
+  isContrast
+    ? 'bg-[#1a1a1a] text-white border-2 border-white hover:bg-[#2C7FFF] hover:border-[#2C7FFF]'
+    : `bg-[var(--color-surface)]/50 ${isDarkMode ? 'text-black' : 'text-[#03045E]'} border-2 border-transparent hover:bg-[#2c7fff] hover:text-[#f4f4f4] hover:brightness-125`
+}`}
                   >
                     Learn More
                   </Link>
@@ -814,32 +821,414 @@ export function Home() {
               </MapContainer>
             </ExpandableMap>
 
-          </div>
-        </section>
+                </div>
+              </section>
 
-    <section className={`py-10 sm:py-16 px-4 sm:px-6 md:px-10 my-6 sm:my-8 ${isContrast ? 'bg-[var(--color-background)] border-y border-[var(--color-border)]' : 'bg-[#f4f4f4] border-y border-[#d1d5db]'}`}>
-          <div className="max-w-5xl mx-auto text-center space-y-4 sm:space-y-6">
-            <h2 tabIndex="0" role="heading" aria-level="2" aria-label="Ready to Take the Next Step in Your Career?" title="Ready to Take the Next Step in Your Career?" className={`text-xl sm:text-4xl font-black tracking-tight ${isContrast ? '!text-white' : 'text-[#03045E]'}`}>Ready to Take the Next Step in Your Career?</h2>
-            <p tabIndex="0" role="text" aria-label="Join our growing community of empowered candidates and inclusive companies building a barrier-free workplace." title="Join our growing community of empowered candidates and inclusive companies building a barrier-free workplace." className={`text-xs sm:text-lg font-semibold max-w-2xl mx-auto ${isContrast ? '!text-white' : 'text-[#03045E]'}`}>
-              Join our growing community of empowered candidates and inclusive companies building a barrier-free workplace.
-            </p>
-            <div className="pt-2">
-              <Link
-                to="/register-select"
-                aria-label="Create Your Free Account"
-                title="Create Your Free Account"
-                className={`inline-block px-6 py-3 sm:px-9 sm:py-4 rounded-xl sm:rounded-2xl font-black shadow-xl hover:bg-[var(--color-accent)] hover:text-[var(--color-background)] hover:scale-105 hover:brightness-125 transition-all border-2 text-sm sm:text-base ${
-                  isContrast 
-                    ? 'bg-[var(--color-surface)]/50 !text-black border-[var(--color-accent)]' 
-                    : 'bg-[#03045E] text-[#f4f4f4] border-[#2C7FFF]'
-                }`}
-              >
-                Create Your Free Account
-              </Link>
+                          {/* --- REDESIGNED DEVICES SHOWCASE SECTION --- */}
+<section className={`w-full relative py-12 sm:py-16 md:py-20 px-3 sm:px-6 md:px-10 overflow-hidden ${isContrast ? 'bg-[var(--color-background)]' : 'bg-gradient-to-b from-transparent via-[#f8f9fa] to-[#eef2ff]'}`}>
+                
+                {/* --- ANIMATION KEYFRAMES --- */}
+                <style>{`
+                  @keyframes floatDevice {
+                    0%, 100% { transform: translateY(0px) rotate(0deg); }
+                    50% { transform: translateY(-15px) rotate(-1deg); }
+                  }
+                  @keyframes floatElement {
+                    0%, 100% { transform: translateY(0px) translateX(0px); }
+                    50% { transform: translateY(-20px) translateX(10px); }
+                  }
+                  @keyframes floatElementReverse {
+                    0%, 100% { transform: translateY(0px) translateX(0px); }
+                    50% { transform: translateY(15px) translateX(-10px); }
+                  }
+                  @keyframes spinSlow {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                  }
+                  @keyframes pulseGlow {
+                    0%, 100% { opacity: 0.4; transform: scale(1); }
+                    50% { opacity: 0.7; transform: scale(1.1); }
+                  }
+                  .perspective-container {
+                    perspective: 1200px;
+                  }
+                `}</style>
+
+                {/* Background Animated Glows */}
+                <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                  <div className="absolute top-10 left-10 w-72 h-72 bg-[#2C7FFF]/20 rounded-full blur-[100px]" style={{ animation: 'pulseGlow 8s ease-in-out infinite' }}></div>
+                  <div className="absolute bottom-10 right-10 w-96 h-96 bg-[#03045E]/10 rounded-full blur-[120px]" style={{ animation: 'pulseGlow 10s ease-in-out infinite reverse' }}></div>
+                </div>
+
+<div className="w-full flex flex-col md:flex-row items-center justify-between gap-10 md:gap-16 lg:gap-24 relative z-10">
+                  
+                  {/* Left Side: Devices with 3D Tilt & Motion */}
+                  <div 
+                    className="w-full md:w-1/2 flex justify-center items-center relative perspective-container group min-h-[350px] sm:min-h-[450px]"
+                    style={{ transform: `translateY(calc(${Math.min(scrollOffset * 0.05, 30)}px - 35px))` }}
+                  >
+
+                    {/* Rotating Background Rings */}
+                    <div className="absolute inset-0 m-auto w-[73%] sm:w-[60%] md:w-[110%] lg:w-[100%] max-w-[500px] aspect-square rounded-full border border-[#2C7FFF]/20 pointer-events-none" style={{ animation: 'spinSlow 25s linear infinite' }}></div>
+                    <div className="absolute inset-0 m-auto w-[50%] sm:w-[60%] md:w-[85%] lg:w-[90%] max-w-[400px] aspect-square rounded-full border-2 border-dashed border-[#03045E]/10 pointer-events-none" style={{ animation: 'spinSlow 35s linear infinite reverse' }}></div>
+                    {/* Main Device Container with Hover Flatten Effect */}
+                                                   <div className="relative transition-transform duration-700 ease-out preserve-3d z-10"
+                         style={{ 
+                           transform: 'rotateY(-15deg) rotateX(5deg)', 
+                           animation: 'floatDevice 6s ease-in-out infinite' 
+                         }}
+                    >
+                                                 {/* Laptop Image (Mobile View) */}
+                      <img
+                        src={laptopImage}
+                        alt="AbleWork Laptop Interface"
+                        className="block md:hidden w-full max-w-[250px] sm:max-w-[350px] object-contain transition-all duration-500 group-hover:scale-105 group-hover:rotate-0 mx-auto"
+                        style={{ filter: `drop-shadow(0 25px 35px ${(isDarkMode || isDarkComfort) ? '#FFFFFF33' : `${palette.colors.accent}33`})` }}
+                      />
+                      
+                      {/* Mobile Image (Desktop View) */}
+                      <img
+                        src={mobileImage}
+                        alt="AbleWork Mobile Interface"
+                        className="hidden md:block w-full max-w-[320px] lg:max-w-[420px] object-contain transition-all duration-500 group-hover:scale-105 group-hover:rotate-0"
+                        style={{ filter: `drop-shadow(0 25px 35px ${(isDarkMode || isDarkComfort) ? '#FFFFFF4D' : `${palette.colors.accent}4D`})` }}
+                      />
+                      {/* Floating Glassmorphic UI Elements (Hidden on very small screens) */}
+                                           <div className="hidden sm:flex absolute -right-6 lg:-right-12 top-16 bg-white/80 backdrop-blur-md border border-white/40 shadow-xl rounded-2xl p-3 items-center gap-3" style={{ animation: 'floatElement 5s ease-in-out infinite' }}>
+                        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black text-[#03045E] uppercase tracking-wide">Smart Match</p>
+                          <p className="text-[10px] font-semibold text-gray-500">Job found near you!</p>
+                        </div>
+                      </div>
+
+                                          <div className="hidden sm:flex absolute -left-8 lg:-left-16 bottom-24 bg-white/80 backdrop-blur-md border border-white/40 shadow-xl rounded-2xl p-3 items-center gap-3" style={{ animation: 'floatElementReverse 7s ease-in-out infinite' }}>
+                        <div className="w-8 h-8 rounded-full bg-[#2C7FFF]/10 flex items-center justify-center text-[#2C7FFF]">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black text-[#03045E] uppercase tracking-wide">100% Inclusive</p>
+                          <p className="text-[10px] font-semibold text-gray-500">Accessible workspace</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                                {/* Right Side: Contextual Text */}
+                  <div className="w-full md:w-1/2 flex flex-col items-center md:items-start justify-center">
+<span tabIndex="0" role="text" aria-label="Cross-Platform Access" title="Cross-Platform Access" className={`inline-block px-4 py-1.5 rounded-full font-black text-[10px] sm:text-xs uppercase tracking-widest mb-4 border shadow-sm backdrop-blur-sm cursor-default ${isContrast ? 'bg-[var(--color-accentSoft)] text-[var(--color-text)] border-[var(--color-accent)]' : 'bg-white/60 text-[#2C7FFF] border-[#2C7FFF]/30'}`}>
+  Cross-Platform Access
+</span>
+                    
+                                     <h2 tabIndex="0" role="heading" aria-level="2" aria-label="Seamless Experience on Any Device" title="Seamless Experience on Any Device" className={`text-3xl sm:text-5xl font-black tracking-tight mb-6 text-center md:text-left leading-[1.15] ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
+                      Seamless Experience on <span className="text-[var(--color-accent)] relative inline-block group">
+                        Any Device
+                        <span className="absolute bottom-1 left-0 w-full h-2 bg-[var(--color-accent)]/20 -z-10 rounded-full group-hover:bg-[var(--color-accent)]/40 transition-colors"></span>
+                      </span>
+                    </h2>
+                    
+                    <p tabIndex="0" role="text" aria-label="Whether you are browsing on a mobile phone or managing your profile on a laptop, AbleWork adapts to your screen. Experience a unified, fully accessible platform built to connect you with inclusive opportunities and manage your PWD accommodations anywhere." title="Whether you are browsing on a mobile phone or managing your profile on a laptop, AbleWork adapts to your screen. Experience a unified, fully accessible platform built to connect you with inclusive opportunities and manage your PWD accommodations anywhere." className={`text-sm sm:text-lg font-semibold leading-relaxed mb-8 text-center md:text-left max-w-lg ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/70'}`}>
+                      Whether you are browsing on a mobile phone or managing your profile on a laptop, AbleWork adapts to your screen. Experience a unified, fully accessible platform built to connect you with inclusive opportunities and manage your PWD accommodations anywhere.
+                    </p>
+
+                                    {/* Expanded Feature Grid to fill space */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-2 w-full max-w-lg text-left">
+                       
+                       {/* Item 1: PWD Verification */}
+                       <div 
+                         tabIndex="0"
+                         role="group"
+                         aria-label="PWD Verification: Verified ID and certificate validation for a trusted community."
+                         title="PWD Verification: Verified ID and certificate validation for a trusted community."
+                         className="flex items-start gap-3 p-2 -m-2 rounded-xl outline-none focus:ring-2 focus:ring-[var(--color-accent)]" 
+                         style={{ transform: `translateY(${Math.sin(scrollOffset * 0.004) * 10}px)` }}
+                       >
+                         <div className="w-6 h-6 rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] flex items-center justify-center shrink-0 mt-0.5">
+                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                         </div>
+                         <div>
+                           <h4 className="text-sm font-black text-[#03045E]">PWD Verification</h4>
+                           <p className="text-xs font-semibold text-[#03045E]/60 mt-0.5">Verified ID and certificate validation for a trusted community.</p>
+                         </div>
+                       </div>
+
+                       {/* Item 2: Accommodation Matching */}
+                       <div 
+                         tabIndex="0"
+                         role="group"
+                         aria-label="Accommodation Matching: Aligns your required workplace accommodations with employer guarantees."
+                         title="Accommodation Matching: Aligns your required workplace accommodations with employer guarantees."
+                         className="flex items-start gap-3 p-2 -m-2 rounded-xl outline-none focus:ring-2 focus:ring-[var(--color-accent)]" 
+                         style={{ transform: `translateY(${Math.sin((scrollOffset * 0.004) + 1.5) * 10}px)` }}
+                       >
+                         <div className="w-6 h-6 rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] flex items-center justify-center shrink-0 mt-0.5">
+                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                         </div>
+                         <div>
+                           <h4 className="text-sm font-black text-[#03045E]">Accommodation Matching</h4>
+                           <p className="text-xs font-semibold text-[#03045E]/60 mt-0.5">Aligns your required workplace accommodations with employer guarantees.</p>
+                         </div>
+                       </div>
+
+                       {/* Item 3: Travel Radius Filter */}
+                       <div 
+                         tabIndex="0"
+                         role="group"
+                         aria-label="Travel Radius Filter: Calculates Haversine distance to show jobs within your preferred commute."
+                         title="Travel Radius Filter: Calculates Haversine distance to show jobs within your preferred commute."
+                         className="flex items-start gap-3 p-2 -m-2 rounded-xl outline-none focus:ring-2 focus:ring-[var(--color-accent)]" 
+                         style={{ transform: `translateY(${Math.sin((scrollOffset * 0.004) + 3) * 10}px)` }}
+                       >
+                         <div className="w-6 h-6 rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] flex items-center justify-center shrink-0 mt-0.5">
+                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                         </div>
+                         <div>
+                           <h4 className="text-sm font-black text-[#03045E]">Travel Radius Filter</h4>
+                           <p className="text-xs font-semibold text-[#03045E]/60 mt-0.5">Calculates Haversine distance to show jobs within your preferred commute.</p>
+                         </div>
+                       </div>
+
+                       {/* Item 4: Secure Employer Portal */}
+                       <div 
+                         tabIndex="0"
+                         role="group"
+                         aria-label="Secure Employer Portal: All employers are vetted through strict business registration verification."
+                         title="Secure Employer Portal: All employers are vetted through strict business registration verification."
+                         className="flex items-start gap-3 p-2 -m-2 rounded-xl outline-none focus:ring-2 focus:ring-[var(--color-accent)]" 
+                         style={{ transform: `translateY(${Math.sin((scrollOffset * 0.004) + 4.5) * 10}px)` }}
+                       >
+                         <div className="w-6 h-6 rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] flex items-center justify-center shrink-0 mt-0.5">
+                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                         </div>
+                         <div>
+                           <h4 className="text-sm font-black text-[#03045E]">Secure Employer Portal</h4>
+                           <p className="text-xs font-semibold text-[#03045E]/60 mt-0.5">All employers are vetted through strict business registration verification.</p>
+                         </div>
+                       </div>
+                    </div>
+                  </div>
+
+                </div>
+              </section>
+
+            <section className={`relative py-12 sm:py-20 px-3 sm:px-6 md:px-10 my-6 sm:my-8 overflow-hidden ${isContrast ? 'bg-[var(--color-background)] border-y border-[var(--color-border)]' : 'bg-[#f4f4f4] border-y border-[#d1d5db]'}`}>
+          
+          {/* Subtle background glow to fill space */}
+          <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[var(--color-accent)]/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+          {/* Changed max-w-6xl to w-full max-w-[1700px] to match header/footer and changed md: to lg: for tablets */}
+          <div className="w-full max-w-[1700px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center relative z-10">
+            
+                {/* LEFT SIDE: Your text + New Badge + Hover Animations */}
+            <div className="text-center lg:text-left space-y-4 sm:space-y-6 px-2 sm:px-0">
+              <style>{`
+                @keyframes textSlideUp {
+                  0% { opacity: 0; transform: translateY(15px); }
+                  100% { opacity: 1; transform: translateY(0); }
+                }
+                .text-anim-1 { animation: textSlideUp 0.6s ease-out forwards; }
+                .text-anim-2 { animation: textSlideUp 0.6s ease-out 0.15s forwards; opacity: 0; }
+                .text-anim-3 { animation: textSlideUp 0.6s ease-out 0.3s forwards; opacity: 0; }
+                .text-anim-4 { animation: textSlideUp 0.6s ease-out 0.45s forwards; opacity: 0; }
+              `}</style>
+
+              {/* NEW: Added Badge */}
+              <div className="text-anim-1">
+                <span tabIndex="0" role="text" aria-label="Take the Leap" title="Take the Leap" className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-black text-[10px] sm:text-xs uppercase tracking-widest border border-[var(--color-accent)]/20 shadow-sm">
+                  <span aria-hidden="true" className="w-2 h-2 rounded-full bg-[var(--color-accent)] animate-pulse"></span>
+                  Take the Leap
+                </span>
+              </div>
+
+              <h2 tabIndex="0" role="heading" aria-level="2" aria-label="Ready to Take the Next Step in Your Career?" title="Ready to Take the Next Step in Your Career?" className={`text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-anim-1 leading-tight ${isContrast ? '!text-white' : 'text-[#03045E]'}`}>Ready to Take the Next Step in Your Career?</h2>
+              
+              <p tabIndex="0" role="text" aria-label="Join our growing community of empowered candidates and inclusive companies building a barrier-free workplace." title="Join our growing community of empowered candidates and inclusive companies building a barrier-free workplace." className={`text-sm sm:text-lg font-semibold max-w-2xl mx-auto lg:mx-0 text-anim-2 leading-relaxed ${isContrast ? '!text-white' : 'text-[#03045E]/80'}`}>
+                Join our growing community of empowered candidates and inclusive companies building a barrier-free workplace.
+              </p>
+
+                               {/* Enhanced Text List with Hover Animations */}
+              <ul role="list" className={`space-y-3 text-left mx-auto lg:mx-0 max-w-md text-anim-3 ${isContrast ? '!text-white' : 'text-[#03045E]/80'}`}>
+                <li tabIndex="0" role="listitem" aria-label="Smart job matching based on your unique skills" title="Smart job matching based on your unique skills" className="flex items-center gap-3 text-xs sm:text-sm font-bold group hover:translate-x-1 transition-transform duration-300 outline-none">
+                  <span aria-hidden="true" className="flex items-center justify-center w-5 h-5 rounded-full bg-[var(--color-accent)]/20 text-[var(--color-accent)] shrink-0 group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+                  </span>
+                  Smart job matching based on your unique skills
+                </li>
+                <li tabIndex="0" role="listitem" aria-label="Direct connection to verified inclusive employers" title="Direct connection to verified inclusive employers" className="flex items-center gap-3 text-xs sm:text-sm font-bold group hover:translate-x-1 transition-transform duration-300 outline-none">
+                  <span aria-hidden="true" className="flex items-center justify-center w-5 h-5 rounded-full bg-[var(--color-accent)]/20 text-[var(--color-accent)] shrink-0 group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+                  </span>
+                  Direct connection to verified inclusive employers
+                </li>
+                <li tabIndex="0" role="listitem" aria-label="Opportunities filtered by your preferred travel radius" title="Opportunities filtered by your preferred travel radius" className="flex items-center gap-3 text-xs sm:text-sm font-bold group hover:translate-x-1 transition-transform duration-300 outline-none">
+                  <span aria-hidden="true" className="flex items-center justify-center w-5 h-5 rounded-full bg-[var(--color-accent)]/20 text-[var(--color-accent)] shrink-0 group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+                  </span>
+                  Opportunities filtered by your preferred travel radius
+                </li>
+              </ul>
+              <div className="pt-3 text-anim-4">
+                <Link
+                  to="/register-select"
+                  aria-label="Create Your Free Account"
+                  title="Create Your Free Account"
+                  className={`inline-block px-6 py-3.5 sm:px-10 sm:py-4 rounded-xl sm:rounded-2xl font-black shadow-[0_0_20px_rgba(44,127,255,0.3)] hover:shadow-[0_0_30px_rgba(44,127,255,0.6)] hover:-translate-y-1 hover:bg-[var(--color-accent)] hover:text-[var(--color-background)] transition-all duration-300 border-2 text-sm sm:text-base ${
+                    isContrast 
+                      ? 'bg-[var(--color-surface)]/50 !text-black border-[var(--color-accent)]' 
+                      : 'bg-[#03045E] text-[#f4f4f4] border-[#2C7FFF]'
+                  }`}
+                >
+                  Create Your Free Account
+                </Link>
+              </div>
             </div>
+
+            {/* RIGHT SIDE: Graphic */}
+            <div className="w-full flex justify-center lg:justify-end relative">
+              <div className={`relative w-full max-w-lg lg:max-w-2xl ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
+                
+                <style>{`
+                  @keyframes awFloat { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
+                  @keyframes awRingRotate { 0%,100% { transform: rotate(0deg) scale(1); opacity: 0.2; } 50% { transform: rotate(180deg) scale(1.05); opacity: 0.5; } 100% { transform: rotate(360deg) scale(1); opacity: 0.2; } }
+                  @keyframes awDash  { to { stroke-dashoffset: -72 } }
+                  @keyframes awHeartBeat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.15); } 30% { transform: scale(1); } 45% { transform: scale(1.15); } 60% { transform: scale(1); } }
+                  @keyframes awWheelSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+                  @keyframes awSmallWheelSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+                  @keyframes awWalk { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+                  @keyframes awWalkOpposite { 0%, 100% { transform: rotate(6deg); } 50% { transform: rotate(-6deg); } }
+                  @keyframes awArmSwing { 0%, 100% { transform: rotate(5deg); } 50% { transform: rotate(-5deg); } }
+                  @keyframes awArmSwingOpposite { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+                  @keyframes awParticleFloat { 0% { transform: translateY(0) scale(1); opacity: 0; } 20% { opacity: 0.8; } 100% { transform: translateY(-50px) scale(0.5); opacity: 0; } }
+
+                  .aw-float { animation: awFloat 6s ease-in-out infinite; transform-origin: center }
+                  .aw-ring  { animation: awRingRotate 8s ease-in-out infinite; transform-origin: 180px 172px }
+                  .aw-dash  { animation: awDash 2s linear infinite }
+                  .aw-heart { animation: awHeartBeat 1.5s ease-in-out infinite; transform-origin: 180px 92px }
+                  
+                  .aw-wheel-spin { animation: awWheelSpin 4s linear infinite; transform-origin: 136px 214px; }
+                  .aw-small-wheel-spin { animation: awSmallWheelSpin 2s linear infinite; transform-origin: 184px 240px; }
+                  
+                  .aw-leg-left { animation: awWalk 1.5s ease-in-out infinite; transform-origin: 236px 182px; }
+                  .aw-leg-right { animation: awWalkOpposite 1.5s ease-in-out infinite; transform-origin: 236px 182px; }
+                  
+                  .aw-arm-left { animation: awArmSwingOpposite 1.5s ease-in-out infinite; transform-origin: 240px 142px; }
+                  .aw-arm-right { animation: awArmSwing 1.5s ease-in-out infinite; transform-origin: 240px 142px; }
+                  
+                  .aw-wc-arm { animation: awArmSwing 1.5s ease-in-out infinite; transform-origin: 130px 145px; }
+                  
+                  .aw-particle { animation: awParticleFloat 4s ease-in-out infinite; }
+
+                  @media (prefers-reduced-motion: reduce) {
+                    .aw-float, .aw-ring, .aw-dash, .aw-heart, .aw-wheel-spin, .aw-small-wheel-spin, .aw-leg-left, .aw-leg-right, .aw-arm-left, .aw-arm-right, .aw-wc-arm, .aw-particle { 
+                      animation: none !important 
+                    }
+                  }
+                `}</style>
+
+                <svg
+                  viewBox="0 0 360 320"
+                  className="relative w-full h-auto z-10 drop-shadow-2xl"
+                  role="img"
+                  aria-label="Animated illustration of a person offering support to a friend who uses a wheelchair, representing an inclusive and accessible workplace."
+                >
+                  <defs>
+                    <linearGradient id="awGlow" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%"   stopColor="var(--color-accent, #2C7FFF)" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="var(--color-accent, #2C7FFF)" stopOpacity="0.02" />
+                    </linearGradient>
+                  </defs>
+
+                  <g className="aw-particle" style={{ animationDelay: '0s' }}>
+                    <circle cx="100" cy="220" r="4" fill="var(--color-accent, #2C7FFF)" opacity="0.6" />
+                  </g>
+                  <g className="aw-particle" style={{ animationDelay: '1.5s' }}>
+                    <circle cx="260" cy="190" r="3" fill="var(--color-accent, #2C7FFF)" opacity="0.6" />
+                  </g>
+                  <g className="aw-particle" style={{ animationDelay: '3s' }}>
+                    <circle cx="150" cy="120" r="2.5" fill="var(--color-accent, #2C7FFF)" opacity="0.6" />
+                  </g>
+                  <g className="aw-particle" style={{ animationDelay: '2.2s' }}>
+                    <circle cx="230" cy="250" r="3.5" fill="var(--color-accent, #2C7FFF)" opacity="0.6" />
+                  </g>
+
+                  <ellipse cx="180" cy="276" rx="124" ry="17" fill="url(#awGlow)" />
+                  
+                  <circle
+                    className="aw-ring" cx="180" cy="172" r="112"
+                    fill="none" stroke="var(--color-accent, #2C7FFF)"
+                    strokeWidth="2" strokeDasharray="8 12" strokeLinecap="round"
+                  />
+
+                  <path
+                    className="aw-dash"
+                    d="M174 132 Q 190 106 208 128"
+                    fill="none" stroke="var(--color-accent, #2C7FFF)"
+                    strokeWidth="3" strokeDasharray="6 8" strokeLinecap="round" opacity="0.65"
+                  />
+
+                  <g className="aw-heart">
+                    <path
+                      d="M180 108 C 170 98 162 92 162 84 C 162 76 170 73 176 76 C 178 77 180 80 180 82 C 180 80 182 77 184 76 C 190 73 198 76 198 84 C 198 92 190 98 180 108 Z"
+                      fill="var(--color-accent, #2C7FFF)" opacity="0.92"
+                    />
+                  </g>
+
+                  <g className="aw-float">
+                    <path d="M104 142 v40 h52" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" opacity="0.7" />
+                    
+                    <g className="aw-wheel-spin">
+                      <circle cx="136" cy="214" r="44" fill="none" stroke="currentColor" strokeWidth="6" opacity="0.85" />
+                      <line x1="136" y1="174" x2="136" y2="254" stroke="currentColor" strokeWidth="3" opacity="0.3" />
+                      <line x1="96" y1="214" x2="176" y2="214" stroke="currentColor" strokeWidth="3" opacity="0.3" />
+                      <line x1="107.7" y1="185.7" x2="164.3" y2="242.3" stroke="currentColor" strokeWidth="3" opacity="0.3" />
+                      <line x1="107.7" y1="242.3" x2="164.3" y2="185.7" stroke="currentColor" strokeWidth="3" opacity="0.3" />
+                      <circle cx="136" cy="214" r="8" fill="var(--color-accent, #2C7FFF)" />
+                    </g>
+
+                    <g className="aw-small-wheel-spin">
+                      <circle cx="184" cy="240" r="11" fill="none" stroke="currentColor" strokeWidth="5" opacity="0.55" />
+                      <line x1="184" y1="229" x2="184" y2="251" stroke="currentColor" strokeWidth="2" opacity="0.4" />
+                      <line x1="173" y1="240" x2="195" y2="240" stroke="currentColor" strokeWidth="2" opacity="0.4" />
+                    </g>
+
+                    <circle cx="130" cy="110" r="17" fill="var(--color-accent, #2C7FFF)" opacity="0.9" />
+                    <path d="M130 129 v47" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+                    
+                    <g className="aw-wc-arm">
+                      <path d="M130 145 L172 138" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+                    </g>
+
+                    <path d="M130 176 h30 v28" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M160 204 h14" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+
+                    <circle cx="242" cy="104" r="17" fill="var(--color-accent, #2C7FFF)" opacity="0.9" />
+                    <path d="M242 123 L236 182" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+                    
+                    <g className="aw-arm-left">
+                      <path d="M240 142 L200 152" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+                    </g>
+                    
+                    <g className="aw-arm-right">
+                      <path d="M240 142 L266 176" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+                    </g>
+
+                    <g className="aw-leg-left">
+                      <path d="M236 182 L216 236" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+                      <path d="M206 238 h20" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+                    </g>
+                    <g className="aw-leg-right">
+                      <path d="M236 182 L256 236" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+                      <path d="M246 238 h20" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+                    </g>
+                  </g>
+                </svg>
+              </div>
+            </div>
+
           </div>
         </section>
-
         <SimpleFooter />
 
       </div>
@@ -901,7 +1290,7 @@ export function About() {
       </div>
 
           {/* --- TEAM SECTION --- */}
-      <div className="w-full mt-12 sm:mt-20 mb-12 sm:mb-20">
+      <div className="w-full mt-10 sm:mt-20 mb-12 sm:mb-20">
         <div className="w-full max-w-6xl mx-auto flex justify-center">
           <img 
             src={teamImage} 
@@ -1973,9 +2362,18 @@ export default function ApplicantRegister() {
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-    const [satelliteView, setSatelliteView] = useState(false);
+     const [satelliteView, setSatelliteView] = useState(false);
   const [legendOpen, setLegendOpen] = useState(true);
   const [mapExpanded, setMapExpanded] = useState(false);
+  const [scrollOffset, setScrollOffset] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollOffset(window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const onKey = (e) => {

@@ -240,7 +240,7 @@ const handleLogin = async (e) => {
                 className="h-9 sm:h-12 md:h-14 w-auto object-contain max-h-full"
               />
             </div>
-            <nav className="hidden md:flex items-center gap-6 text-[15px] font-medium text-[#03045E]">
+            <nav className="hidden md:flex items-center gap-6 text-[0.9375rem] font-medium text-[#03045E]">
               <Link to="/" aria-label="Home" title="Home" className="text-[#03045E] hover:text-[#03045E] transition pb-0.5">Home</Link>
               <Link to="/about" aria-label="About Us" title="About Us" className="text-[#03045E] hover:text-[#03045E] transition">About Us</Link>
               <Link to="/policy" aria-label="Policy" title="Policy" className="text-[#03045E] hover:text-[#03045E] transition">Policy</Link>
@@ -292,7 +292,7 @@ const handleLogin = async (e) => {
                   </svg>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <span aria-hidden="true" className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Home</span>
+ <span aria-hidden="true" className="text-[0.8125rem] tracking-wide font-black block leading-tight text-[#03045E] break-words">Home</span>
                 </div>
                 <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -316,7 +316,7 @@ const handleLogin = async (e) => {
                   </svg>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <span aria-hidden="true" className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">About Us</span>
+<span aria-hidden="true" className="text-[0.8125rem] tracking-wide font-black block leading-tight text-[#03045E] break-words">About Us</span>
                 </div>
                 <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -340,7 +340,7 @@ const handleLogin = async (e) => {
                   </svg>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <span aria-hidden="true" className="text-[13px] tracking-wide font-black block leading-tight text-[#03045E] break-words">Policy</span>
+ <span aria-hidden="true" className="text-[0.8125rem] tracking-wide font-black block leading-tight text-[#03045E] break-words">Policy</span>
                 </div>
                 <svg aria-hidden="true" className="w-3 h-3 shrink-0 transition-transform duration-300 text-[#03045E]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -414,10 +414,10 @@ const handleLogin = async (e) => {
                   </svg>
                 </div>
                 
-                <h3 className={`${labelSize} ${isAccessibilityMode ? '!text-white' : (isContrast ? '!text-white' : '')} text-center`}>
+                <h3 tabIndex="0" role="heading" aria-level="3" aria-label="Check your inbox" title="Check your inbox" className={`${labelSize} ${isAccessibilityMode ? '!text-white' : (isContrast ? '!text-white' : '')} text-center`}>
                   Check your inbox
                 </h3>
-                <p className={`text-xs sm:text-sm text-center font-bold px-2 ${isAccessibilityMode ? '!text-white/80' : (isContrast ? '!text-white/80' : 'text-[#03045E]/70')}`}>
+                <p tabIndex="0" role="text" aria-label={`We sent a 6-digit verification code to ${email}.`} title={`We sent a 6-digit verification code to ${email}.`} className={`text-xs sm:text-sm text-center font-bold px-2 ${isAccessibilityMode ? '!text-white/80' : (isContrast ? '!text-white/80' : 'text-[#03045E]/70')}`}>
                   We sent a 6-digit verification code to <span className="font-black underline">{email}</span>.
                 </p>
 
