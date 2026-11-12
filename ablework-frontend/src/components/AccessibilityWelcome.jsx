@@ -421,7 +421,7 @@ export function AccessibilityWelcome() {
                     className={`font-semibold leading-relaxed transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded p-1 -m-1 w-fit ${isDarkScreen ? 'text-black' : 'text-[#03045E]'}`}
                     style={{ fontSize: `${PREVIEW_PX[fontSize]}px`, ...(isDarkScreen ? { color: '#000000', WebkitTextFillColor: '#000000' } : {}) }}
                   >
-                    AbleWork connects persons with disabilities to inclusive employers who value every ability.
+                    ABLEWORK connects persons with disabilities to inclusive employers who value every ability.
                   </p>
                 </div>
               </div>

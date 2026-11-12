@@ -516,7 +516,7 @@ const accommodationSuggestions = [
 
         <hr className={divider} />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-start">
           <div className="flex flex-col gap-2 sm:gap-3">
             <label className={`text-xs sm:text-sm font-extrabold uppercase tracking-wider ${pageText}`}>
               Required Skills <span className={isDark ? 'text-white' : 'text-red-500'}>*</span>
@@ -542,7 +542,7 @@ const accommodationSuggestions = [
               </div>
             )}
             {selectedSkills.length > 0 && (
-              <div className={chipContainer}>
+                           <div className={`${chipContainer} flex-col`}>
                 {selectedSkills.map(skill => (
                   <span key={skill} className={`inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-md border-2 ${isDark ? 'bg-black text-white border-white' : 'bg-white text-[#03045E] border-gray-200'}`}>
                     {skill} <button type="button" onClick={() => removeSkill(skill)} className={`font-bold ml-0.5 transition ${isDark ? 'text-white hover:text-red-500' : 'text-[#03045E] hover:text-red-500'}`}>✕</button>

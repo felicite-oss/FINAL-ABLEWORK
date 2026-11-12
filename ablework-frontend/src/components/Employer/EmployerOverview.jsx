@@ -240,87 +240,114 @@ export default function EmployerOverview({ profile, stats, setActiveTab }) {
         </div>
         <p className={`text-[10px] sm:text-sm font-semibold ${isDark ? 'text-gray-300' : 'text-[#03045E]/80'} mb-6`}>Percentage breakdown of applicant demographics for this month.</p>
         
-        {/* 2-Column Layout for Chart and Details */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12 items-center w-full">
-          
-          {/* Left Side: Pie Chart */}
-                   {/* Left Side: Pie Chart */}
-          <div className="w-full h-[400px] sm:h-[500px] relative" role="img" aria-label="Pie chart showing the monthly percentage breakdown of applicant disabilities.">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={stats?.disabilityData?.length > 0 ? stats.disabilityData : mockDisabilityData}
-                  cx="50%"
-                  cy="50%" 
-                  outerRadius={180}
-                  dataKey="value"
-                  stroke={isDark ? '#000000' : '#ffffff'}
-                  strokeWidth={3}
-                >
-                  {(stats?.disabilityData?.length > 0 ? stats.disabilityData : mockDisabilityData).map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color || '#2C7FFF'} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  formatter={(value) => [`${value}%`, 'Percentage']}
-                  contentStyle={{ 
-                    borderRadius: '16px', 
-                    border: isDark ? '2px solid #ffffff' : '1px solid rgba(3,4,94,0.1)', 
-                    boxShadow: '0 10px 30px rgba(3,4,94,0.1)', 
-                    backgroundColor: isDark ? '#000000' : '#fff', 
-                    color: isDark ? '#ffffff' : '#03045E', 
-                    fontWeight: 'bold',
-                    fontSize: '14px'
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+{/* 2-Column Layout for Chart and Details */}
+        {(() => {
+          const liveDisabilityData = stats?.disabilityData || mockDisabilityData;
+          const activePieSlices = liveDisabilityData.filter(d => d.value > 0);
+          const hasData = activePieSlices.length > 0;
+          const topCategory = liveDisabilityData[0];
 
-          {/* Right Side: Detailed Breakdown & Insight */}
-          <div className="flex flex-col gap-5 w-full">
-            
-            {/* Progress Bars List */}
-            <div className="flex flex-col gap-4">
-              {(stats?.disabilityData?.length > 0 ? stats.disabilityData : mockDisabilityData).map((item, index) => (
-                <div key={index} className="w-full">
-                  <div className="flex justify-between items-center mb-1.5">
-                    <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: item.color }}></span>
-                      <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-[#03045E]'}`}>{item.name}</span>
-                    </div>
-                    <span className={`text-sm font-black ${isDark ? 'text-white' : 'text-[#03045E]'}`}>{item.value}%</span>
+          return (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12 items-center w-full">
+              
+              {/* Left Side: Pie Chart */}
+              <div className="w-full h-[360px] sm:h-[450px] relative flex items-center justify-center" role="img" aria-label="Pie chart showing the monthly percentage breakdown of applicant disabilities.">
+                {hasData ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={activePieSlices}
+                        cx="50%"
+                        cy="50%" 
+                        outerRadius={165}
+                        dataKey="value"
+                        stroke={isDark ? '#000000' : '#ffffff'}
+                        strokeWidth={3}
+                      >
+                        {activePieSlices.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color || '#2C7FFF'} />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        formatter={(value, name, props) => [`${value}% (${props.payload.count || 0} applicant${props.payload.count === 1 ? '' : 's'})`, name]}
+                        contentStyle={{ 
+                          borderRadius: '16px', 
+                          border: isDark ? '2px solid #ffffff' : '1px solid rgba(3,4,94,0.1)', 
+                          boxShadow: '0 10px 30px rgba(3,4,94,0.1)', 
+                          backgroundColor: isDark ? '#000000' : '#fff', 
+                          color: isDark ? '#ffffff' : '#03045E', 
+                          fontWeight: 'bold',
+                          fontSize: '14px'
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className={`w-64 h-64 sm:w-80 sm:h-80 rounded-full border-4 border-dashed flex flex-col items-center justify-center p-6 text-center ${isDark ? 'border-white/20 text-white/60' : 'border-[#03045E]/20 text-[#03045E]/60'}`}>
+                    <svg className="w-10 h-10 mb-2 opacity-50" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                    </svg>
+                    <p className="text-xs sm:text-sm font-black uppercase tracking-wider">No Applicant Data Yet</p>
+                    <p className="text-[10px] sm:text-xs font-semibold mt-1">Demographics will appear here once candidates apply to your job postings.</p>
                   </div>
-                  {/* Progress Bar Background */}
-                  <div className={`w-full h-2.5 rounded-full overflow-hidden ${isDark ? 'bg-zinc-800' : 'bg-gray-200'}`}>
-                    {/* Progress Bar Fill */}
-                    <div 
-                      className="h-full rounded-full transition-all duration-1000 ease-out"
-                      style={{ width: `${item.value}%`, backgroundColor: item.color }}
-                    ></div>
+                )}
+              </div>
+
+              {/* Right Side: Detailed Breakdown & Insight */}
+              <div className="flex flex-col gap-5 w-full">
+                
+                {/* Progress Bars List */}
+                <div className="flex flex-col gap-4">
+                  {liveDisabilityData.map((item, index) => (
+                    <div key={index} className="w-full">
+                      <div className="flex justify-between items-center mb-1.5">
+                        <div className="flex items-center gap-2">
+                          <span className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: item.color }}></span>
+                          <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-[#03045E]'}`}>{item.name}</span>
+                        </div>
+                        <span className={`text-sm font-black ${isDark ? 'text-white' : 'text-[#03045E]'}`}>{item.value}%</span>
+                      </div>
+                      {/* Progress Bar Background */}
+                      <div className={`w-full h-2.5 rounded-full overflow-hidden ${isDark ? 'bg-zinc-800' : 'bg-gray-200'}`}>
+                        {/* Progress Bar Fill */}
+                        <div 
+                          className="h-full rounded-full transition-all duration-1000 ease-out"
+                          style={{ width: `${item.value}%`, backgroundColor: item.color }}
+                        ></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Insight Box */}
+                <div className={`mt-2 p-4 rounded-xl border-2 flex items-start gap-3 ${isDark ? 'bg-zinc-900 border-[#2C7FFF]/40' : 'bg-[#f4f4f4] border-[#03045E]'}`}>
+                  <div className={`p-2 rounded-lg shrink-0 ${isDark ? 'bg-[#2C7FFF]' : 'bg-[#03045E]'}`}>
+                    <svg className="w-5 h-5" fill="none" stroke={isDark ? '#000000' : '#FFFFFF'} strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className={`text-sm font-black ${isDark ? 'text-white' : 'text-[#03045E]'}`}>Key Insight</h4>
+                    {hasData ? (
+                      <p className={`text-xs font-semibold mt-1 leading-relaxed ${isDark ? 'text-white' : 'text-[#03045E]'}`}>
+                        The majority of your applicants identify with <span className={`font-bold underline decoration-2 underline-offset-2 ${isDark ? 'text-white decoration-[#2C7FFF]' : 'text-[#03045E] decoration-[#03045E]'}`}>{topCategory?.name}</span> disabilities ({topCategory?.value}%).
+                      </p>
+                    ) : (
+                      <p className={`text-xs font-semibold mt-1 leading-relaxed ${isDark ? 'text-white/80' : 'text-[#03045E]/80'}`}>
+                        No applications received yet. Post an inclusive job opening to start gathering candidate demographic insights!
+                      </p>
+                    )}
                   </div>
                 </div>
-              ))}
-            </div>
 
-                       {/* Insight Box */}
-            <div className={`mt-2 p-4 rounded-xl border-2 flex items-start gap-3 ${isDark ? 'bg-zinc-900 border-[#2C7FFF]/40' : 'bg-[#f4f4f4] border-[#03045E]'}`}>
-<div className={`p-2 rounded-lg shrink-0 ${isDark ? 'bg-[#2C7FFF]' : 'bg-[#03045E]'}`}>
-  <svg className="w-5 h-5" fill="none" stroke={isDark ? '#000000' : '#FFFFFF'} strokeWidth="2.5" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-</div>
-              <div>
-                <h4 className={`text-sm font-black ${isDark ? 'text-white' : 'text-[#03045E]'}`}>Key Insight</h4>
-                <p className={`text-xs font-semibold mt-1 leading-relaxed ${isDark ? 'text-white' : 'text-[#03045E]'}`}>
-                  The majority of your applicants this month identify with <span className={`font-bold underline decoration-2 underline-offset-2 ${isDark ? 'text-white decoration-[#2C7FFF]' : 'text-[#03045E] decoration-[#03045E]'}`}>{(stats?.disabilityData?.length > 0 ? stats.disabilityData : mockDisabilityData)[0]?.name}</span> disabilities ({(stats?.disabilityData?.length > 0 ? stats.disabilityData : mockDisabilityData)[0]?.value}%).
-                </p>
               </div>
+
             </div>
+          );
+        })()}
 
-          </div>
-
-        </div>
+     
       </div>
 
       {analyticsExpanded && (

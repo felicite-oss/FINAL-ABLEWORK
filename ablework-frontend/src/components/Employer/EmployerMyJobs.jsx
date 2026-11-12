@@ -599,7 +599,7 @@ export default function EmployerMyJobs({ jobs, refreshData }) {
                   </div>
                 )}
                 
-                             <div className="flex flex-wrap gap-1.5 mt-1">
+                 <div className="flex flex-wrap gap-1.5 mt-1">
                   {Object.keys(disabilityCategories).map(category => {
                     const isActive = expandedCategory === category;
                     return (

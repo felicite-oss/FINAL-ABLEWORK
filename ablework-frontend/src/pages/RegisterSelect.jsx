@@ -217,7 +217,7 @@ const containerMaxWidth = 'max-w-[94%] sm:max-w-md md:max-w-xl lg:max-w-2xl';
                 <h4 title="Platform" tabIndex="0" className="font-bold mb-2 sm:mb-4 text-white text-xs sm:text-base">Platform</h4>
                 <ul className="space-y-1 sm:space-y-3 text-[10px] sm:text-sm font-semibold text-white/80">
                   <li><Link to="/" aria-label="Home" title="Home" className="transition-all hover:translate-x-1 inline-flex items-center gap-1 hover:text-[#7FB0FF]">Home</Link></li>
-                  <li><Link to="/about" aria-label="About AbleWork" title="About AbleWork" className="transition-all hover:translate-x-1 inline-flex items-center gap-1 hover:text-[#7FB0FF]">About AbleWork</Link></li>
+                  <li><Link to="/about" aria-label="About AbleWork" title="About AbleWork" className="transition-all hover:translate-x-1 inline-flex items-center gap-1 hover:text-[#7FB0FF]">About ABLEWORK</Link></li>
                   <li><Link to="/policy" aria-label="Platform Policy" title="Platform Policy" className="transition-all hover:translate-x-1 inline-flex items-center gap-1 hover:text-[#7FB0FF]">Platform Policy</Link></li>
                 </ul>
               </div>

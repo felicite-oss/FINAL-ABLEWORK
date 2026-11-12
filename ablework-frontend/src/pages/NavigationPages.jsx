@@ -526,7 +526,7 @@ className={`learn-more-btn px-5 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl f
               <div className={`h-full flex flex-col justify-center rounded-xl sm:rounded-[2rem] p-4 sm:p-8 shadow-xl border ${isContrast ? 'bg-[var(--color-surface)]/70 border-[var(--color-border)] text-[var(--color-text)]' : 'bg-[var(--color-surface)]/70 border-[#03045E]/20 text-[#03045E]'}`}>
                 <h2 tabIndex="0" role="heading" aria-level="2" aria-label="Why Choose AbleWork?" title="Why Choose AbleWork?" className={`text-lg sm:text-2xl font-black mb-4 sm:mb-6 tracking-tight flex items-center gap-3 ${isContrast ? 'text-[var(--color-text)]' : 'text-[#03045E]'}`}>
                   <span aria-hidden="true" className="w-3 h-3 rounded-full bg-[var(--color-accent)]"></span>
-                  Why Choose AbleWork?
+                  Why Choose ABLEWORK?
                 </h2>
 
                 <div className="space-y-4 sm:space-y-6">
@@ -930,7 +930,7 @@ className={`learn-more-btn px-5 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl f
                     </h2>
                     
                     <p tabIndex="0" role="text" aria-label="Whether you are browsing on a mobile phone or managing your profile on a laptop, AbleWork adapts to your screen. Experience a unified, fully accessible platform built to connect you with inclusive opportunities and manage your PWD accommodations anywhere." title="Whether you are browsing on a mobile phone or managing your profile on a laptop, AbleWork adapts to your screen. Experience a unified, fully accessible platform built to connect you with inclusive opportunities and manage your PWD accommodations anywhere." className={`text-sm sm:text-lg font-semibold leading-relaxed mb-8 text-center md:text-left max-w-lg ${isContrast ? 'text-[var(--color-textMuted)]' : 'text-[#03045E]/70'}`}>
-                      Whether you are browsing on a mobile phone or managing your profile on a laptop, AbleWork adapts to your screen. Experience a unified, fully accessible platform built to connect you with inclusive opportunities and manage your PWD accommodations anywhere.
+                      Whether you are browsing on a mobile phone or managing your profile on a laptop, ABLEWORK adapts to your screen. Experience a unified, fully accessible platform built to connect you with inclusive opportunities and manage your PWD accommodations anywhere.
                     </p>
 
                                     {/* Expanded Feature Grid to fill space */}
@@ -1245,10 +1245,10 @@ export function About() {
 
         <InfoBox>
           <h2 tabIndex="0" aria-label="About AbleWork" title="About AbleWork" className="text-lg sm:text-2xl font-black mb-3 sm:mb-5">
-            About AbleWork
+            About ABLEWORK
           </h2>
           <p tabIndex="0" aria-label="AbleWork is a web-based employment assistance system designed to help persons with disabilities find appropriate employment opportunities." title="AbleWork is a web-based employment assistance system designed to help persons with disabilities find appropriate employment opportunities." className="text-xs sm:text-base font-semibold leading-6 sm:leading-7">
-            AbleWork is a web-based employment assistance system
+            ABLEWORK is a web-based employment assistance system
             designed to help persons with disabilities find
             appropriate employment opportunities.
           </p>
@@ -1307,7 +1307,7 @@ export function About() {
             Thesis Validation & Data Gathering
           </h2>
           <p className="text-sm sm:text-lg font-semibold text-[#03045E]/70 leading-relaxed">
-            As part of our capstone thesis, we conducted interviews and gathered valuable insights directly from the PWD community. These moments reflect our research process in ensuring AbleWork addresses real-world needs.
+            As part of our capstone thesis, we conducted interviews and gathered valuable insights directly from the PWD community. These moments reflect our research process in ensuring ABLEWORK addresses real-world needs.
           </p>
         </div>
         
@@ -1344,7 +1344,7 @@ export function About() {
               className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" 
             />
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#03045E]/90 to-transparent p-4 sm:p-6 pt-12">
-              <p className="text-white text-sm sm:text-base font-bold">Gathering data to ensure AbleWork's smart matching algorithm is effective and inclusive.</p>
+              <p className="text-white text-sm sm:text-base font-bold">Gathering data to ensure ABLEWORK's smart matching algorithm is effective and inclusive.</p>
             </div>
           </div>
 

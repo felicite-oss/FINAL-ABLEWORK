@@ -370,7 +370,7 @@ const handleLogin = async (e) => {
               title="Login to AbleWork"
               className={`${titleSize} ${isAccessibilityMode ? '!text-white' : (isContrast ? '!text-white' : '')} tracking-tight mb-1.5 sm:mb-2`}
             >
-              Login to AbleWork
+              Login to ABLEWORK
             </h1>
             <p
               tabIndex="0"

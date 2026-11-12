@@ -15,7 +15,7 @@ export default function EmployerAccountSettings({ profile }) {
   const isHighContrastOrDarkComfort = paletteKey === 'highContrast' || paletteKey === 'darkComfort';
 
   const isRejected = profile?.verification_status === 'Rejected';
-  const [openSection, setOpenSection] = useState(isRejected ? 'verification' : 'email');
+  const [openSection, setOpenSection] = useState('verification');
   const toggleSection = (section) => {
     setOpenSection(openSection === section ? null : section);
   };
@@ -244,13 +244,20 @@ export default function EmployerAccountSettings({ profile }) {
 
   const handleResubmitVerification = async (e) => {
     e.preventDefault();
-    if (!verificationDoc) return setVerStatus({ type: 'error', msg: 'Please select a file first.' });
+    if (!verificationDoc || verificationDoc.length === 0) {
+      return setVerStatus({ type: 'error', msg: 'Please select at least one file first.' });
+    }
+    if (verificationDoc.length > 2) {
+      return setVerStatus({ type: 'error', msg: 'You can upload a maximum of 2 verification documents.' });
+    }
 
     setIsResubmitting(true);
     setVerStatus({ type: '', msg: '' });
 
     const formData = new FormData();
-    formData.append('document', verificationDoc);
+    Array.from(verificationDoc).forEach((file) => {
+      formData.append('document', file);
+    });
 
     try {
       const response = await fetch(`http://localhost:5001/api/users/${profile.user_id}/resubmit`, {
@@ -433,13 +440,52 @@ export default function EmployerAccountSettings({ profile }) {
                     <div className="w-7 h-7 rounded-lg bg-[#2C7FFF]/15 flex items-center justify-center shrink-0">
                       <svg className="w-4 h-4 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-[#03045E]/60">Uploaded Document</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-[#03045E]/60">Uploaded Documents</p>
                   </div>
-                  <a href={`http://localhost:5001/${profile?.verification_document?.replace(/\\/g, '/')}`} target="_blank" rel="noopener noreferrer" aria-label="View Business Document on File, opens in new tab" tabIndex="0" className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#2C7FFF] hover:underline rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2">
-                    View Business Document on File
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                  </a>
-                  <p className="text-[10px] font-semibold text-[#03045E]/50 mt-2.5 leading-relaxed">Your submitted business document on file.</p>
+
+                  {(() => {
+                    let docs = [];
+                    if (profile?.verification_document) {
+                      try {
+                        const parsed = JSON.parse(profile.verification_document);
+                        docs = Array.isArray(parsed) ? parsed : [profile.verification_document];
+                      } catch (e) {
+                        docs = [profile.verification_document];
+                      }
+                    }
+                    docs = docs.filter(Boolean);
+
+                    if (docs.length === 0) {
+                      return <p className="text-xs font-bold text-[#03045E]/50 italic">No business document on file.</p>;
+                    }
+
+                    return (
+                      <div className="flex flex-col gap-2">
+                        {docs.map((doc, idx) => {
+                          let cleanPath = String(doc).replace(/\\/g, '/').replace(/^\/+/, '');
+                          if (!cleanPath.startsWith('uploads/')) {
+                            cleanPath = `uploads/${cleanPath}`;
+                          }
+                          return (
+                            <a
+                              key={idx}
+                              href={`http://localhost:5001/${cleanPath}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label={`View Business Document ${docs.length > 1 ? idx + 1 : ''} on File, opens in new tab`}
+                              tabIndex="0"
+                              className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#2C7FFF] hover:underline rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit"
+                            >
+                              {docs.length > 1 ? `View Business Document ${idx + 1}` : 'View Business Document on File'}
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                            </a>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+
+                  <p className="text-[10px] font-semibold text-[#03045E]/50 mt-2.5 leading-relaxed">Your submitted business document(s) on file.</p>
                 </div>
 
                 {isRejected && (
@@ -454,7 +500,15 @@ export default function EmployerAccountSettings({ profile }) {
                       </div>
                     )}
                     <form onSubmit={handleResubmitVerification} className="flex flex-col gap-2">
-                      <input type="file" accept=".jpg,.jpeg,.png,.pdf" disabled={!canResubmit || isResubmitting} onChange={(e) => setVerificationDoc(e.target.files[0])} aria-label="Upload a new business registration document. Only JPG, JPEG, PNG, and PDF formats are allowed." className="text-[10px] text-[#03045E] file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-[#03045E] file:text-white hover:file:bg-[#2C7FFF] disabled:opacity-50 cursor-pointer" />
+                      <input
+                        type="file"
+                        multiple
+                        accept=".jpg,.jpeg,.png,.pdf"
+                        disabled={!canResubmit || isResubmitting}
+                        onChange={(e) => setVerificationDoc(e.target.files)}
+                        aria-label="Upload up to 2 business registration documents. Only JPG, JPEG, PNG, and PDF formats are allowed."
+                        className="text-[10px] text-[#03045E] file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-[#03045E] file:text-white hover:file:bg-[#2C7FFF] disabled:opacity-50 cursor-pointer"
+                      />
                       {canResubmit && (
                         <button type="submit" disabled={isResubmitting || !verificationDoc} aria-label={isResubmitting ? 'Uploading new document, please wait' : 'Submit New Document'} className="py-2 bg-[#03045E] hover:bg-[#2C7FFF] text-white font-extrabold text-xs rounded-md transition disabled:opacity-50 shadow-sm cursor-pointer">
                           {isResubmitting ? 'Uploading...' : 'Submit New Document'}
@@ -468,98 +522,6 @@ export default function EmployerAccountSettings({ profile }) {
           )}
         </div>
 
-        <div className={`bg-white rounded-xl sm:rounded-2xl border shadow-md overflow-hidden transition-all duration-300 ${openSection === 'email' ? 'border-[#2C7FFF]/40' : 'border-[#03045E]/20 hover:border-[#2C7FFF]/30'}`}>
-          <button
-            type="button"
-            onClick={() => toggleSection('email')}
-            aria-expanded={openSection === 'email'}
-            aria-controls="account-settings-email-panel"
-            className="w-full p-4 sm:p-5 flex justify-between items-center bg-transparent focus:outline-none cursor-pointer"
-          >
-            <span className="sr-only">
-              Work Email Address. Update your work email with OTP verification.
-            </span>
-            <div className="flex flex-col items-start gap-1 w-fit text-left">
-              <h2
-                tabIndex="0"
-                className="text-base sm:text-lg font-extrabold text-[#03045E] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
-              >
-                Work Email Address
-              </h2>
-              <p
-                tabIndex="0"
-                className="text-[11px] sm:text-sm text-[#03045E]/90 mt-0.5 font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 rounded-lg p-1 -m-1"
-              >
-                Update your work email with OTP verification.
-              </p>
-            </div>
-            <ChevronIcon isOpen={openSection === 'email'} />
-          </button>
-
-          {openSection === 'email' && (
-            <div
-              id="account-settings-email-panel"
-              role="region"
-              aria-label="Work Email Address details"
-              className="px-3 pb-3 sm:px-5 sm:pb-5 border-t border-[#03045E]/10 pt-3 sm:pt-4 animate-fadeIn"
-            >
-              <div className="p-3 mb-3 rounded-lg border border-[#03045E]/10 bg-[#f4f4f4] flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-[#2C7FFF]/15 flex items-center justify-center shrink-0">
-                  <svg className="w-3.5 h-3.5 text-[#2C7FFF]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-[#03045E]/50">Current Email</p>
-                  <p className="text-xs font-extrabold text-[#03045E] truncate">{profile?.email}</p>
-                </div>
-              </div>
-
-              {emailStatus.msg && (
-                <div role={emailStatus.type === 'error' ? 'alert' : 'status'} aria-live="assertive" className={`p-2.5 mb-3 rounded-md text-xs font-bold border-2 ${emailStatus.type === 'error' ? errorMsg : successMsg}`}>
-                  {emailStatus.msg}
-                </div>
-              )}
-
-              {emailStep === 1 ? (
-                <form onSubmit={handleRequestEmailUpdate} aria-label="Request email update form" className="flex flex-col sm:flex-row gap-3 items-end">
-                  <div className="flex-1 w-full">
-                    <label htmlFor="account-settings-new-email" className="text-[10px] font-black uppercase tracking-widest text-[#03045E]/60 mb-1 block">New Work Email</label>
-                    <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#03045E]/30" aria-hidden="true">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                      </div>
-                      <input id="account-settings-new-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="you@company.com" aria-label="Enter new work email address" className="w-full pl-10 pr-3 py-2.5 border border-[#03045E]/20 rounded-lg bg-white focus:border-[#2C7FFF] outline-none transition font-semibold text-xs text-[#03045E]" />
-                    </div>
-                  </div>
-                  <button type="submit" disabled={email === profile?.email} aria-label="Send verification code to new email" className="w-full sm:w-auto px-5 py-2.5 bg-[#03045E] hover:bg-[#2C7FFF] text-white font-black text-xs rounded-lg transition disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5">
-                    Send Code
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                  </button>
-                </form>
-              ) : (
-                <form onSubmit={handleVerifyAndUpdateEmail} aria-label="Verify and update email form" className="flex flex-col gap-3">
-                  <div className="flex flex-col sm:flex-row gap-3 items-end">
-                    <div className="flex-1 w-full">
-                      <label htmlFor="account-settings-new-email-disabled" tabIndex="0" className="text-[10px] font-black uppercase tracking-widest text-[#03045E]/60 mb-1 block rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit">New Email</label>
-                      <input id="account-settings-new-email-disabled" type="email" value={email} disabled aria-label={`New email address: ${email}. This field is locked.`} className="w-full px-3 py-2.5 bg-[#f4f4f4] border border-[#03045E]/15 rounded-lg text-[#03045E]/50 outline-none cursor-not-allowed font-semibold text-xs" />
-                    </div>
-                    <div className="flex-1 w-full">
-                      <label htmlFor="account-settings-email-otp" tabIndex="0" className="text-[10px] font-black uppercase tracking-widest text-[#03045E]/60 mb-1 block rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C7FFF] focus-visible:ring-offset-2 w-fit">Verification Code</label>
-                      <input id="account-settings-email-otp" type="text" value={emailOtp} onChange={(e) => setEmailOtp(e.target.value)} required placeholder="000000" maxLength="6" aria-label="Enter the 6-digit verification code sent to your new email address" className="w-full px-3 py-2.5 border border-[#03045E]/20 rounded-lg bg-white focus:border-[#2C7FFF] outline-none transition tracking-[0.3em] text-center font-mono font-bold text-sm text-[#03045E]" />
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <button type="button" aria-label="Cancel email change" onClick={() => { setEmailStep(1); setEmailStatus({type:'', msg:''}); }} className="px-4 py-2.5 bg-[#f4f4f4] border border-[#03045E]/15 text-[#03045E] font-black text-xs rounded-lg hover:bg-white transition cursor-pointer">
-                      Cancel
-                    </button>
-                    <button type="submit" disabled={isUpdatingEmail || emailOtp.length < 6} aria-label={isUpdatingEmail ? 'Verifying code, please wait' : 'Verify and update email'} style={{ color: isDarkMode ? '#000000' : '#ffffff' }} className="flex-1 px-4 py-2.5 bg-[#03045E] font-black text-xs rounded-lg shadow-md hover:bg-[#2C7FFF] transition disabled:opacity-50 cursor-pointer">
-                      {isUpdatingEmail ? 'Verifying...' : 'Verify & Update Email'}
-                    </button>
-                  </div>
-                </form>
-              )}
-            </div>
-          )}
-        </div>
 
         <div className={`bg-white rounded-xl sm:rounded-2xl border shadow-md overflow-hidden transition-all duration-300 ${openSection === 'password' ? 'border-[#2C7FFF]/40' : 'border-[#03045E]/20 hover:border-[#2C7FFF]/30'}`}>
           <button
