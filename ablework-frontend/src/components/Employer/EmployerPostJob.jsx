@@ -613,7 +613,7 @@ const accommodationSuggestions = [
             </div>
           )}
           
-          {/* Main Category Buttons */}
+                 {/* Main Category Buttons */}
           <div className="flex flex-wrap gap-2 mt-1">
             {Object.keys(disabilityCategories).map(category => {
               const isActive = expandedCategory === category;
@@ -622,13 +622,23 @@ const accommodationSuggestions = [
                   type="button"
                   key={category}
                   onClick={() => setExpandedCategory(isActive ? null : category)}
-                  className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold border-2 transition-colors ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold border-2 transition-colors ${
                     isActive
                       ? (isDark ? 'bg-white text-black border-white' : 'bg-[#03045E] text-white border-[#03045E]')
                       : (isDark ? 'bg-black text-white border-white/50 hover:border-white' : 'bg-white text-[#03045E] border-gray-200 hover:border-[#03045E]')
                   }`}
                 >
-                  {category} {isActive ? '▼' : '▶'}
+                  {category} 
+                  <svg 
+                    className={`w-3 h-3 shrink-0 transition-transform duration-300 ${isActive ? 'rotate-0' : '-rotate-90'}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="3" 
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
                 </button>
               );
             })}

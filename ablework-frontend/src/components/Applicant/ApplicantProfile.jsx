@@ -931,7 +931,7 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
               </div>
             )}
             
-            <div role="group" aria-label="Disability categories" className="flex flex-wrap gap-1.5 sm:gap-2 mt-1">
+                      <div role="group" aria-label="Disability categories" className="flex flex-wrap gap-1.5 sm:gap-2 mt-1">
               {Object.keys(disabilityCategories).map(category => {
                 const isActive = expandedCategory === category;
                 const contentId = `category-${category.replace(/\s+/g, '-')}`;
@@ -942,19 +942,30 @@ export default function ApplicantProfile({ profile, refreshData, setProfile }) {
                     aria-expanded={isActive}
                     aria-controls={contentId}
                     onClick={() => setExpandedCategory(isActive ? null : category)}
-                    className={`px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold border transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#2C7FFF] ${
+                    /* Added: inline-flex items-center gap-1 to perfectly align text and icon */
+                    className={`inline-flex items-center gap-1 sm:gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold border transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#2C7FFF] ${
                       isActive
                         ? 'bg-[#03045E] text-white border-[#03045E]'
                         : 'bg-white text-[#03045E] border-gray-200 hover:border-[#2C7FFF]'
                     }`}
                   >
                     <span>{category}</span>
-                    <span aria-hidden="true" className="ml-1">{isActive ? '▼' : '▶'}</span>
+                    {/* Replaced text with SVG Chevron */}
+                    <svg
+                      aria-hidden="true"
+                      className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 transition-transform duration-200 ${isActive ? 'rotate-90' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
                   </button>
                 );
               })}
             </div>
-
             {expandedCategory && (
               <div 
                 id={`category-${expandedCategory.replace(/\s+/g, '-')}`}
