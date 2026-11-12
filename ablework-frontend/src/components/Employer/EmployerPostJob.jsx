@@ -628,7 +628,17 @@ const accommodationSuggestions = [
                       : (isDark ? 'bg-black text-white border-white/50 hover:border-white' : 'bg-white text-[#03045E] border-gray-200 hover:border-[#03045E]')
                   }`}
                 >
-                  {category} {isActive ? '▼' : '▶'}
+                  {category} 
+                  <svg 
+                    className={`w-3 h-3 shrink-0 transition-transform duration-300 ${isActive ? 'rotate-0' : '-rotate-90'}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="3" 
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
                 </button>
               );
             })}

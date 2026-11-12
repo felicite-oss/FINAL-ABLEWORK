@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const db = require('./config/db');
 const multer = require('multer'); 
 const path = require('path'); 
+const fs = require('fs');
 const helmet = require('helmet');
 require('dotenv').config();
 
@@ -126,9 +127,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/');
+        cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
         cb(null, Date.now() + path.extname(file.originalname));
@@ -141,15 +147,16 @@ const upload = multer({
     fileFilter: (req, file, cb) => {
         if (file.fieldname === 'pwdDocument') {
             const ext = path.extname(file.originalname).toLowerCase();
-            if (ext !== '.jpg' && ext !== '.jpeg') {
-                return cb(new Error('Only .jpeg and .jpg files are allowed for PWD ID uploads.'), false);
+            if (ext !== '.jpg' && ext !== '.jpeg' && ext !== '.png') {
+                return cb(new Error('Only .jpeg, .jpg, and .png files are allowed for PWD ID uploads.'), false);
             }
         }
         cb(null, true);
     }
 });
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(uploadDir));
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 async function getUserLiveContext(userId, role) {
     let contextSummary = { role };
@@ -281,7 +288,7 @@ PLATFORM PROCESSES & BUSINESS LOGIC (Use this to explain how the app works):
 
 STRICT RULES FOR ANSWERING (CRITICAL FOR EVALUATION):
 1. DOMAIN LOCK: You MUST NOT answer questions unrelated to AbleWork, job searching, platform navigation, or accessibility. If asked about unrelated topics (e.g., food recipes, weather, math, general trivia), you must reply EXACTLY: "I am Abby, the AbleWork assistant. I can only answer questions related to the AbleWork platform."
-2. GUEST USERS (NO HALLUCINATION): If the CURRENT LIVE DATABASE STATE says "GUEST USER - NOT LOGGED IN", the user is browsing anonymously. You MUST NOT invent a name, skills, or account status for them. Greet them simply as "there" or "Guest".
+​2. GUEST USERS (NO HALLUCINATION): If the CURRENT LIVE DATABASE STATE says "GUEST USER - NOT LOGGED IN", the user is browsing anonymously. You MUST NOT invent a name, skills, or account status for them. Greet them simply as "there" or "Guest".
 3. DATA GROUNDING: You must use the LIVE DATABASE STATE above to answer questions about the user's account, active jobs, applications, or profile. If the user asks about data not present in the LIVE DATABASE STATE, you must reply EXACTLY: "I do not currently have that information." Do not guess or provide hypothetical data.
 4. DIRECT METRICS: If the user asks for a count or status (e.g., "How many active jobs do I have?"), state the exact number from the JSON data in your very first sentence.
 5. CAPABILITIES: You are an informational assistant. You cannot apply to jobs, archive jobs, or approve accounts on behalf of the user. Guide them on how to do it themselves using the UI.
@@ -468,6 +475,7 @@ app.get('/api/applicant/:id/profile', async (req, res) => {
                 a.accommodations_needed, 
                 a.skills, 
                 a.pwd_document_path,
+                a.resume_path,
                 a.profile_picture
             FROM users u
             JOIN applicant_profiles a ON u.id = a.user_id
@@ -501,7 +509,10 @@ app.get('/api/applicant/:id/profile', async (req, res) => {
 // ---------------------------------------------------------
 // ROUTE: FULL APPLICANT REGISTRATION 
 // ---------------------------------------------------------
-app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (req, res) => {
+app.post('/api/auth/register/applicant', upload.fields([
+    { name: 'pwdDocument', maxCount: 2 },
+    { name: 'resume', maxCount: 1 }
+]), async (req, res) => {
     console.log("--- INCOMING APPLICANT REGISTRATION ---");
     
     if (!req.body) {
@@ -518,7 +529,12 @@ app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (re
         return res.status(400).json({ message: "Password must be at least 8 characters long, with an uppercase, lowercase, number, and special character." });
     }
 
-    const pwdDocumentPath = req.file ? req.file.path : null;
+    let pwdDocumentPath = null;
+    if (req.files && req.files['pwdDocument']) {
+        const pwdFiles = req.files['pwdDocument'].map(f => `/uploads/${f.filename}`);
+        pwdDocumentPath = pwdFiles.length === 1 ? pwdFiles[0] : JSON.stringify(pwdFiles);
+    }
+    const resumePath = (req.files && req.files['resume']) ? `/uploads/${req.files['resume'][0].filename}` : null;
 
     try {
         const [existingUser] = await db.execute('SELECT id FROM users WHERE email = ?', [email]);
@@ -551,8 +567,8 @@ app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (re
 
             await connection.execute(
                 `INSERT INTO applicant_profiles 
-                (user_id, firstname, middlename, lastname, birthdate, disability_type, residential_address, latitude, longitude, travel_radius_km, workplace_independence, accommodations_needed, skills, pwd_document_path) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                (user_id, firstname, middlename, lastname, birthdate, disability_type, residential_address, latitude, longitude, travel_radius_km, workplace_independence, accommodations_needed, skills, pwd_document_path, resume_path) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
                     newUserId, 
                     firstName, 
@@ -567,7 +583,8 @@ app.post('/api/auth/register/applicant', upload.single('pwdDocument'), async (re
                     independence, 
                     accommodations || '[]', 
                     skills || '[]',         
-                    pwdDocumentPath         
+                    pwdDocumentPath,
+                    resumePath         
                 ]
             );
 
@@ -793,11 +810,31 @@ app.get('/api/applicant/:id/matches', async (req, res) => {
 // ---------------------------------------------------------
 // ROUTE: SUBMIT A JOB APPLICATION (With Resume Upload)
 // ---------------------------------------------------------
-app.post('/api/applications/apply', upload.single('resume'), async (req, res) => {
+app.post('/api/applications/apply', upload.fields([
+    { name: 'resume', maxCount: 1 },
+    { name: 'certificate', maxCount: 1 }
+]), async (req, res) => {
 
-    const { applicant_id, job_id, cover_letter } = req.body;
+    const { applicant_id, job_id, cover_letter, use_existing_resume } = req.body;
     
-    const resumePath = req.file ? `/uploads/${req.file.filename}` : null;
+    let resumePath = null;
+    let certificatePath = null;
+
+    if (use_existing_resume === 'true') {
+        const [profileRows] = await db.execute(
+            'SELECT resume_path FROM applicant_profiles WHERE user_id = ?',
+            [applicant_id]
+        );
+        if (profileRows.length > 0) {
+            resumePath = profileRows[0].resume_path;
+        }
+    } else if (req.files && req.files['resume']) {
+        resumePath = `/uploads/${req.files['resume'][0].filename}`;
+    }
+
+    if (req.files && req.files['certificate']) {
+        certificatePath = `/uploads/${req.files['certificate'][0].filename}`;
+    }
 
     if (!applicant_id || !job_id) {
         return res.status(400).json({ message: "Missing applicant or job ID." });
@@ -840,8 +877,8 @@ app.post('/api/applications/apply', upload.single('resume'), async (req, res) =>
 
         // 2. Insert the new application
         await db.execute(
-            'INSERT INTO applications (applicant_id, job_id, status, resume_path, cover_letter) VALUES (?, ?, ?, ?, ?)',
-            [applicant_id, job_id, 'Received', resumePath, cover_letter || null] 
+            'INSERT INTO applications (applicant_id, job_id, status, resume_path, certificate_path, cover_letter) VALUES (?, ?, ?, ?, ?, ?)',
+            [applicant_id, job_id, 'Received', resumePath, certificatePath, cover_letter || null] 
         );
 
         const [jobRows] = await db.execute(
@@ -951,7 +988,8 @@ app.get('/api/employer/:id/profile', async (req, res) => {
                    u.rejection_reason,
                    u.rejection_timestamp,
                    e.company_name, e.industry, e.job_role, e.workplace_address,
-                   e.company_description, e.latitude, e.longitude, e.company_logo 
+                   e.company_description, e.latitude, e.longitude, e.company_logo,
+                   e.verification_document
             FROM users u
             JOIN employer_profiles e ON u.id = e.user_id
             WHERE u.id = ?
@@ -982,7 +1020,7 @@ app.get('/api/employer/:id/dashboard-stats', async (req, res) => {
 
         const [appStats] = await db.execute(
             `SELECT 
-                SUM(CASE WHEN a.status IN ('Pending', 'Under Review') THEN 1 ELSE 0 END) as pending_count,
+                SUM(CASE WHEN a.status IN ('Pending', 'Received', 'Under Review') THEN 1 ELSE 0 END) as pending_count,
                 SUM(CASE WHEN a.status = 'Shortlisted' THEN 1 ELSE 0 END) as shortlisted_count
              FROM applications a
              JOIN job_postings j ON a.job_id = j.id
@@ -1031,12 +1069,78 @@ app.get('/api/employer/:id/dashboard-stats', async (req, res) => {
             });
         }
 
+        // =========================================================
+        // NEW: CALCULATE REAL DISABILITY BREAKDOWN FOR THIS EMPLOYER
+        // =========================================================
+        const [disabilityRows] = await db.execute(
+            `SELECT ap.disability_type 
+             FROM applications a
+             JOIN job_postings j ON a.job_id = j.id
+             JOIN applicant_profiles ap ON a.applicant_id = ap.user_id
+             WHERE j.employer_id = ?`,
+             [employerId]
+        );
+
+        const categoryMap = {
+            'Motor & Neuromuscular': ['Paraplegia (Lower Body)', 'Hemiplegia (One Side)', 'Quadriplegia (All Limbs)', 'Cerebral Palsy', 'Limited Fine Motor Skills', 'Spinal Cord Injury', 'Muscular Dystrophy', 'Spina Bifida', 'Dwarfism', 'Scoliosis', 'Multiple Sclerosis', 'Chronic Pain', 'Wheelchair User', 'Paralysis'],
+            'Vision Impairments': ['Blindness', 'Total Blindness', 'Partially Blind', 'Low Vision', 'Color Blindness'],
+            'Hearing & Speech': ['Deafness', 'Hard of Hearing', 'Muteness', 'Speech Impairment'],
+            'Amputation': ['Upper Limb Amputation (Left)', 'Upper Limb Amputation (Right)', 'Upper Limb Amputation (Both)', 'Lower Limb Amputation (Left)', 'Lower Limb Amputation (Right)', 'Lower Limb Amputation (Both)', 'Upper Limb Amputation', 'Lower Limb Amputation', 'Amputation'],
+            'Polio': ['Polio (Upper Limbs)', 'Polio (Lower Limbs)', 'Polio (One Side)', 'Polio'],
+            'Deafblindness': ['Deafblindness']
+        };
+
+        const categoryCounts = {
+            'Motor & Neuromuscular': 0,
+            'Vision Impairments': 0,
+            'Hearing & Speech': 0,
+            'Amputation': 0,
+            'Polio': 0,
+            'Deafblindness': 0
+        };
+
+        const categoryColors = {
+            'Motor & Neuromuscular': '#2C7FFF',
+            'Vision Impairments': '#10B981',
+            'Hearing & Speech': '#F59E0B',
+            'Amputation': '#8B5CF6',
+            'Polio': '#EC4899',
+            'Deafblindness': '#6B7280'
+        };
+
+        let totalMatchedCategories = 0;
+
+        disabilityRows.forEach(row => {
+            if (!row.disability_type) return;
+            const dStr = row.disability_type.toLowerCase();
+
+            for (const [category, keywords] of Object.entries(categoryMap)) {
+                const hasMatch = keywords.some(k => dStr.includes(k.toLowerCase()));
+                if (hasMatch) {
+                    categoryCounts[category]++;
+                    totalMatchedCategories++;
+                }
+            }
+        });
+
+        let disabilityData = Object.keys(categoryCounts).map(cat => ({
+            name: cat,
+            value: totalMatchedCategories > 0 ? Math.round((categoryCounts[cat] / totalMatchedCategories) * 100) : 0,
+            count: categoryCounts[cat],
+            color: categoryColors[cat]
+        }));
+
+        // Sort highest to lowest so index [0] is always the top category for Key Insight
+        disabilityData.sort((a, b) => b.value - a.value);
+
         res.status(200).json({
             activeJobs: activeJobs[0].count || 0,
             pendingApps: appStats[0].pending_count || 0,
             shortlistedApps: appStats[0].shortlisted_count || 0,
             recentActivity: recentActivity,
-            chartData: chartData 
+            chartData: chartData,
+            disabilityData: disabilityData,
+            totalDisabilitiesCount: totalMatchedCategories
         });
 
     } catch (error) {
@@ -1248,7 +1352,7 @@ app.get('/api/employer/:id/applications', async (req, res) => {
     try {
         const [applications] = await db.execute(`
             SELECT a.id as application_id, a.applicant_id, a.status as application_status, a.applied_at,
-                   a.resume_path, a.cover_letter, 
+                   a.resume_path, a.certificate_path, a.cover_letter, 
                    j.job_title, j.id as job_id,
                    ap.firstname, ap.lastname, ap.skills, ap.accommodations_needed, ap.disability_type,
                    u.email, u.phone
@@ -1279,6 +1383,20 @@ app.put('/api/applications/:id/status', async (req, res) => {
             "UPDATE applications SET status = ?, employer_message = ? WHERE id = ?", 
             [status, employer_message || null, applicationId]
         );
+
+        if (status === 'Hired') {
+            const [appRows] = await db.execute('SELECT job_id FROM applications WHERE id = ?', [applicationId]);
+            if (appRows.length > 0) {
+                const jobId = appRows[0].job_id;
+                
+                await db.execute("UPDATE job_postings SET status = 'Archived' WHERE id = ?", [jobId]);
+                
+                await db.execute(
+                    "UPDATE applications SET status = 'Rejected', employer_message = 'The position has been filled.' WHERE job_id = ? AND id != ?",
+                    [jobId, applicationId]
+                );
+            }
+        }
 
         const alertTitle = `Application Status Update: ${status}`;
         const alertMessage = `Hello! Your application for the ${job_title} role at ${company_name} has been marked as ${status}. Please log in to your AbleWork dashboard for more details.`;
@@ -1413,7 +1531,7 @@ app.get('/api/admin/stats', async (req, res) => {
 app.get('/api/admin/employers/all', async (req, res) => {
     try {
         const [employers] = await db.execute(`
-            SELECT u.id as user_id, u.email, u.created_at, u.verification_status, IFNULL(u.account_status, 'Active') as account_status,
+            SELECT u.id as user_id, u.email, u.created_at, u.verification_status, IFNULL(u.account_status, 'Active') as account_status, u.reverification_attempts,
                    e.company_name, e.industry, e.verification_document
             FROM users u
             JOIN employer_profiles e ON u.id = e.user_id
@@ -1430,7 +1548,7 @@ app.get('/api/admin/employers/all', async (req, res) => {
 app.get('/api/admin/applicants/all', async (req, res) => {
     try {
         const [applicants] = await db.execute(`
-            SELECT u.id as user_id, u.email, u.created_at, u.verification_status, IFNULL(u.account_status, 'Active') as account_status,
+            SELECT u.id as user_id, u.email, u.created_at, u.verification_status, IFNULL(u.account_status, 'Active') as account_status, u.reverification_attempts,
                    a.firstname, a.lastname, a.disability_type, a.pwd_document_path
             FROM users u
             JOIN applicant_profiles a ON u.id = a.user_id
@@ -1607,9 +1725,8 @@ app.get('/api/skills/popular', async (req, res) => {
 // ---------------------------------------------------------
 // ROUTE: USER RESUBMIT VERIFICATION DOCUMENT
 // ---------------------------------------------------------
-app.post('/api/users/:id/resubmit', upload.single('document'), async (req, res) => {
+app.post('/api/users/:id/resubmit', upload.array('document', 2), async (req, res) => {
     const userId = req.params.id;
-    
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
     try {
@@ -1618,7 +1735,6 @@ app.post('/api/users/:id/resubmit', upload.single('document'), async (req, res) 
                 'SELECT SUM(reverification_attempts) as total_attempts FROM users WHERE ip_address = ?', 
                 [clientIp]
             );
-            
             const attempts = ipCheck[0].total_attempts || 0;
             if (attempts >= 3) {
                 return res.status(403).json({ 
@@ -1639,7 +1755,6 @@ app.post('/api/users/:id/resubmit', upload.single('document'), async (req, res) 
         if (user.verification_status === 'Rejected' && user.rejection_timestamp) {
             const rejectionDate = new Date(user.rejection_timestamp);
             const currentDate = new Date();
-            
             const diffTime = Math.abs(currentDate - rejectionDate);
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
@@ -1651,24 +1766,25 @@ app.post('/api/users/:id/resubmit', upload.single('document'), async (req, res) 
             }
         }
 
-        const filePath = req.file ? req.file.path : null; 
-        if (!filePath) {
+        if (!req.files || req.files.length === 0) {
             return res.status(400).json({ message: "No document file provided." });
         }
 
-        // Dynamically update the correct table based on user role
         if (user.role === 'applicant') {
+            const filePath = `/uploads/${req.files[0].filename}`;
             await db.execute(`
                 UPDATE applicant_profiles 
                 SET pwd_document_path = ? 
                 WHERE user_id = ?
             `, [filePath, userId]);
         } else {
+            const pathsArray = req.files.map(file => `/uploads/${file.filename}`);
+            const documentPaths = JSON.stringify(pathsArray);
             await db.execute(`
                 UPDATE employer_profiles 
                 SET verification_document = ? 
                 WHERE user_id = ?
-            `, [filePath, userId]);
+            `, [documentPaths, userId]);
         }
         
         await db.execute(`
@@ -1681,7 +1797,7 @@ app.post('/api/users/:id/resubmit', upload.single('document'), async (req, res) 
             WHERE id = ?
         `, [clientIp, userId]);
 
-        res.status(200).json({ message: "Document resubmitted successfully. Your account is back under review." });
+        res.status(200).json({ message: "Document(s) resubmitted successfully. Your account is back under review." });
 
     } catch (error) {
         console.error("Resubmit Error:", error.message);

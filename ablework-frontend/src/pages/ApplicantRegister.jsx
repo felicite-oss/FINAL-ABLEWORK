@@ -66,6 +66,7 @@ export default function ApplicantRegister() {
   const [radius, setRadius] = useState(10); 
   const [independence, setIndependence] = useState('');
   const [pwdFile, setPwdFile] = useState(null);
+  const [resumeFile, setResumeFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -362,6 +363,11 @@ const handleAddressType = (e) => {
       setStatusMessage({ type: 'error', text: "Please upload your PWD ID or Certification." });
       return;
     }
+    
+    if (!resumeFile) {
+      setStatusMessage({ type: 'error', text: "Please upload your Base Resume." });
+      return;
+    }
 
     if (pwdFile.size > 5 * 1024 * 1024) {
       setStatusMessage({ type: 'error', text: "File size exceeds the 5MB limit. Please upload a smaller file." });
@@ -387,6 +393,7 @@ const handleAddressType = (e) => {
     formData.append('accommodations', JSON.stringify(selectedAccommodations));
     formData.append('skills', JSON.stringify(selectedSkills));
     formData.append('pwdDocument', pwdFile);
+    formData.append('resume', resumeFile);
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
@@ -1331,22 +1338,42 @@ const handleAddressType = (e) => {
 
               <hr aria-hidden="true" className="border-[#03045E]/10" />
 
-              <div className="p-4 rounded-md border-2 border-dashed border-[#03045E]/20 bg-[#f4f4f4]/50">
-                <label htmlFor="pwdId" tabIndex="0" title="Upload PWD ID / Certificates" className="block text-xs sm:text-sm font-bold text-[#03045E] mb-1 focus:outline-none">Upload PWD ID / Certificates <span className="text-[#03045E]">*</span></label>
-                <input
-                  id="pwdId"
-                  type="file"
-                  accept=".jpg,.jpeg"
-                  onChange={(e) => setPwdFile(e.target.files[0])}
-                  className={`w-full text-xs sm:text-sm ${isAccessibilityMode ? 'text-black' : isContrast || isDarkMode ? 'text-black' : 'text-[#03045E]'} file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-2 file:border-[var(--color-border)] file:bg-white ${isAccessibilityMode ? 'file:text-black' : isContrast || isDarkMode ? 'file:text-black' : '[&::file-selector-button]:!text-[var(--color-text)] [&::-webkit-file-upload-button]:!text-[var(--color-text)]'} file:font-semibold cursor-pointer`}
-                  style={{ color: primaryColor }}
-                  required
-                  title="Please upload a clear image of your PWD ID. Max size 5MB."
-                  aria-label="PWD ID document upload. Please upload a clear image of your PWD ID. Max size 5 Megabytes."
-                />
-                <p tabIndex="0" title="Supported formats: .jpg, .jpeg (Max size: 5MB)" className="text-[10px] sm:text-xs text-[#03045E] mt-2 font-semibold focus:outline-none">
-                  Supported formats: .jpg, .jpeg (Max size: 5MB)
-                </p>
+              <div className="flex flex-col sm:flex-row gap-4 w-full">
+                <div className="flex-1 p-4 rounded-md border-2 border-dashed border-[#03045E]/20 bg-[#f4f4f4]/50 min-w-0">
+                  <label htmlFor="pwdId" tabIndex="0" title="Upload PWD ID" className="block text-xs sm:text-sm font-bold text-[#03045E] mb-1 focus:outline-none">Upload PWD ID <span className="text-red-500">*</span></label>
+                  <input
+                    id="pwdId"
+                    type="file"
+                    accept=".jpg,.jpeg,.png"
+                    onChange={(e) => setPwdFile(e.target.files[0])}
+                    className={`w-full text-xs sm:text-sm ${isAccessibilityMode || isContrast || isDarkMode ? 'text-black' : 'text-[#03045E]'} file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-2 file:border-[var(--color-border)] file:bg-white file:text-xs file:font-bold cursor-pointer`}
+                    style={{ color: primaryColor }}
+                    required
+                    title="Please upload a clear image of your PWD ID."
+                    aria-label="PWD ID document upload."
+                  />
+                  <p tabIndex="0" className="text-[10px] text-[#03045E]/70 mt-2 font-semibold focus:outline-none">
+                    Supported: .jpg, .jpeg, .png (Max: 5MB)
+                  </p>
+                </div>
+
+                <div className="flex-1 p-4 rounded-md border-2 border-dashed border-[#03045E]/20 bg-[#f4f4f4]/50 min-w-0">
+                  <label htmlFor="resumeFile" tabIndex="0" title="Upload Resume" className="block text-xs sm:text-sm font-bold text-[#03045E] mb-1 focus:outline-none">Base Resume <span className="text-red-500">*</span></label>
+                  <input
+                    id="resumeFile"
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={(e) => setResumeFile(e.target.files[0])}
+                    className={`w-full text-xs sm:text-sm ${isAccessibilityMode || isContrast || isDarkMode ? 'text-black' : 'text-[#03045E]'} file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-2 file:border-[var(--color-border)] file:bg-white file:text-xs file:font-bold cursor-pointer`}
+                    style={{ color: primaryColor }}
+                    required
+                    title="Please upload your Base Resume."
+                    aria-label="Resume document upload."
+                  />
+                  <p tabIndex="0" className="text-[10px] text-[#03045E]/70 mt-2 font-semibold focus:outline-none">
+                    Supported: .pdf, .docx
+                  </p>
+                </div>
               </div>
 
               <div className="flex flex-col gap-3 mt-2 mb-2">

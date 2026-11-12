@@ -102,6 +102,8 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
   const [selectedJob, setSelectedJob] = useState(null);
   const [modalView, setModalView] = useState('details'); 
   const [resumeFile, setResumeFile] = useState(null);
+  const [certificateDoc, setCertificateDoc] = useState(null);
+  const [useExistingResume, setUseExistingResume] = useState(false);
   const [coverLetter, setCoverLetter] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [sweetAlert, setSweetAlert] = useState({ isOpen: false, title: '', text: '', type: 'notice' });
@@ -281,15 +283,14 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
   const closeSweetAlert = () => {
     setSweetAlert({ ...sweetAlert, isOpen: false });
   };
-
   const submitApplication = async (e) => {
     e.preventDefault();
-    if (!resumeFile) {
+    if (!useExistingResume && !resumeFile) {
         setSweetAlert({
           isOpen: true,
           type: 'notice',
           title: 'Resume Required',
-          text: 'Please upload your resumé / CV before submitting your application.'
+          text: 'Please upload your resumé / CV or select the option to use your existing profile resume.'
         });
         return;
     }
@@ -299,8 +300,15 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
     const formData = new FormData();
     formData.append('applicant_id', profile.user_id);
     formData.append('job_id', selectedJob.id);
-    formData.append('resume', resumeFile);
     formData.append('cover_letter', coverLetter);
+    formData.append('use_existing_resume', useExistingResume);
+    
+    if (!useExistingResume && resumeFile) {
+        formData.append('resume', resumeFile);
+    }
+    if (certificateDoc) {
+        formData.append('certificate', certificateDoc);
+    }
 
     try {
       const res = await fetch('http://localhost:5001/api/applications/apply', {
@@ -1043,14 +1051,57 @@ export default function ApplicantExploreJobs({ profile, jobs, applications = [],
                 <h2 tabIndex="0" role="heading" aria-level="2" aria-label="Submit Application" title="Submit Application" className="text-lg sm:text-3xl font-black text-[#03045E] mb-1 sm:mb-2 focus:outline-none">Submit Application</h2>
                                <p tabIndex="0" role="text" aria-label={`Applying for ${selectedJob.job_title} at ${selectedJob.company_name}`} title={`Applying for ${selectedJob.job_title} at ${selectedJob.company_name}`} className="text-xs sm:text-base text-[#03045E] mb-6 sm:mb-8 font-bold focus:outline-none">Applying for <span className="font-black text-[#2C7FFF]">{selectedJob.job_title}</span> at {selectedJob.company_name}</p>
                 <form onSubmit={submitApplication} className="flex flex-col gap-4 sm:gap-6">
-                  <div className="flex flex-col gap-1.5 sm:gap-2">
-                    <label htmlFor="resume-upload" tabIndex="0" aria-label="Upload Resumé or CV, required" title="Upload Resumé or CV, required" className="text-xs sm:text-sm font-black text-[#03045E] focus:outline-none">Upload Resumé / CV <span className="text-red-500">*</span></label>
-                    <div className="border-2 border-dashed border-gray-300 p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-white flex flex-col items-center justify-center text-center">
-                      <svg aria-hidden="true" className="w-8 h-8 sm:w-10 sm:h-10 text-[#2C7FFF] mb-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <input id="resume-upload" type="file" accept=".pdf,.doc,.docx" required onChange={(e) => setResumeFile(e.target.files[0])} aria-label="Upload Resumé or CV" className={`text-[10px] sm:text-sm text-[#03045E] file:mr-2 sm:file:mr-4 file:py-1.5 sm:file:py-2.5 file:px-3 sm:file:px-5 file:rounded-lg file:text-[10px] sm:file:text-sm file:font-black cursor-pointer !file:bg-white !file:text-[#03045E] file:border-2 file:border-gray-300`} />
-                      <p tabIndex="0" role="text" aria-label="Supported formats: PDF, DOCX (Max 5MB)" title="Supported formats: PDF, DOCX (Max 5MB)" className="text-[10px] sm:text-xs text-[#03045E]/70 mt-2 sm:mt-3 font-bold focus:outline-none">Supported formats: PDF, DOCX (Max 5MB)</p>
+                  <div className="flex flex-col gap-4 w-full">
+                    {/* Resume Section */}
+                    <div className={`p-4 rounded-xl border-2 ${isDarkScreen ? 'border-white/10 bg-black' : 'border-[#03045E]/10 bg-[#f4f4f4]'}`}>
+                      <label className={`text-xs font-black uppercase tracking-wider mb-3 block ${isDarkScreen ? 'text-white/70' : 'text-[#03045E]/70'}`}>Resume Submission <span className="text-red-500">*</span></label>
+                      
+                      {/* Toggle between new upload or existing */}
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
+                        <label className={`flex items-center gap-2 text-sm font-bold cursor-pointer ${isDarkScreen ? 'text-white' : 'text-[#03045E]'}`}>
+                          <input 
+                            type="radio" 
+                            name="resumeOption" 
+                            checked={!useExistingResume} 
+                            onChange={() => setUseExistingResume(false)}
+                            className="w-4 h-4 text-[#2C7FFF] focus:ring-[#2C7FFF]"
+                          />
+                          Upload New Resume
+                        </label>
+                        <label className={`flex items-center gap-2 text-sm font-bold cursor-pointer ${isDarkScreen ? 'text-white' : 'text-[#03045E]'}`}>
+                          <input 
+                            type="radio" 
+                            name="resumeOption" 
+                            checked={useExistingResume} 
+                            onChange={() => setUseExistingResume(true)}
+                            className="w-4 h-4 text-[#2C7FFF] focus:ring-[#2C7FFF]"
+                          />
+                          Use Profile Resume
+                        </label>
+                      </div>
+
+                      {/* Show file input only if uploading a new one */}
+                      {!useExistingResume && (
+                        <input 
+                          type="file" 
+                          accept=".pdf,.doc,.docx"
+                          required={!useExistingResume}
+                          onChange={(e) => setResumeFile(e.target.files[0])}
+                          className={`w-full text-xs file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-black file:bg-[#03045E] file:text-white hover:file:bg-[#2C7FFF] cursor-pointer ${isDarkScreen ? 'text-white' : 'text-[#03045E]'}`}
+                        />
+                      )}
+                    </div>
+
+                    {/* Certificate Section (Optional) */}
+                    <div className={`p-4 rounded-xl border-2 ${isDarkScreen ? 'border-white/10 bg-black' : 'border-[#03045E]/10 bg-[#f4f4f4]'}`}>
+                      <label className={`text-xs font-black uppercase tracking-wider mb-1 block ${isDarkScreen ? 'text-white/70' : 'text-[#03045E]/70'}`}>Training Certificate (Optional)</label>
+                      <p className={`text-[10px] font-semibold mb-3 ${isDarkScreen ? 'text-white/60' : 'text-[#03045E]/60'}`}>Upload any relevant certificates or licenses for this role.</p>
+                      <input 
+                        type="file" 
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(e) => setCertificateDoc(e.target.files[0])}
+                        className={`w-full text-xs file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-black hover:file:bg-gray-200 cursor-pointer ${isDarkScreen ? 'text-white file:bg-white/20 file:text-white' : 'text-[#03045E] file:bg-white file:text-[#03045E]'}`}
+                      />
                     </div>
                   </div>
                   <div className="flex flex-col gap-1.5 sm:gap-2">

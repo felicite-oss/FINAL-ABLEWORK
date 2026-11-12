@@ -14,7 +14,7 @@ export default function PreLanding() {
 
       <div className="text-center p-8 bg-[var(--bg-card)] rounded-lg shadow-xl border-l-8 border-[var(--border-accent)]">
         <h1 className={`${headingSize} font-bold text-[var(--text-primary)] mb-4`}>
-          Welcome to AbleWork
+          Welcome to ABLEWORK
         </h1>
         <p className="text-xl text-[var(--text-secondary)] font-semibold">
           Please select your preferred viewing mode:

@@ -1201,9 +1201,16 @@ export default function AdminDashboard() {
                             {user.userType === 'Employer' ? (user.company_name?.[0] || 'E') : (user.firstname?.[0] || 'A')}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <h4 className={`text-xs sm:text-sm font-black truncate ${txtMain}`}>
-                              {user.userType === 'Employer' ? user.company_name : `${user.firstname} ${user.lastname}`}
-                            </h4>
+                            <div className="flex items-center gap-2">
+                              <h4 className={`text-xs sm:text-sm font-black truncate ${txtMain}`}>
+                                {user.userType === 'Employer' ? user.company_name : `${user.firstname} ${user.lastname}`}
+                              </h4>
+                              {user.reverification_attempts > 0 && (
+                                <span className={`px-2 py-0.5 text-[8px] sm:text-[9px] font-black uppercase tracking-wider rounded-md border shadow-sm ${isDark ? 'bg-amber-500/20 text-amber-400 border-amber-500/50' : 'bg-amber-100 text-amber-700 border-amber-300'}`}>
+                                  Resubmitted
+                                </span>
+                              )}
+                            </div>
                             <p className={`text-[10px] sm:text-xs font-bold truncate ${txtMuted}`}>{user.email}</p>
                           </div>
                         </div>
@@ -1719,7 +1726,7 @@ borderColor: user.account_status === 'Disabled' ? '#dc2626' :
                 <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-4">
                   <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
                     <p className="text-[10px] sm:text-xs font-bold text-white/75">
-                      © {new Date().getFullYear()} AgileWork Inc. All rights reserved.
+                      © {new Date().getFullYear()} ABLEWORK Inc. All rights reserved.
                     </p>
                     <span className="hidden sm:inline text-xs text-white/30">|</span>
                     <p className={`text-[10px] sm:text-xs font-black uppercase tracking-widest ${isDark ? 'text-white' : 'text-[#f4f4f4]'}`}>

@@ -277,13 +277,26 @@ export default function EmployerApplications({ profile, refreshStats }) {
 </td>
                     <td className="p-4 align-top text-center">
                       <button 
-                        onClick={() => {
-                          setSelectedApp(app);
+                        onClick={async () => {
                           setNextSteps({ isOpen: false, status: '' });
                           setMessageText('');
 
-                          if(app.application_status === 'Received') {
-                              updateStatus(app.application_id, 'Under Review', null, false);
+                          if (app.application_status === 'Received') {
+                              // 1. Instantly update UI so the modal shows 'Under Review' immediately
+                              setSelectedApp({ ...app, application_status: 'Under Review' });
+                              
+                              // 2. Call your dedicated backend 'view' route to safely send notifications!
+                              try {
+                                  await fetch(`http://localhost:5001/api/applications/${app.application_id}/view`, { 
+                                      method: 'PUT' 
+                                  });
+                                  fetchApplications();
+                                  if (refreshStats) refreshStats();
+                              } catch (err) {
+                                  console.error("Failed to mark as viewed:", err);
+                              }
+                          } else {
+                              setSelectedApp(app);
                           }
                         }} 
                         className={`px-3 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-black rounded-lg border-2 transition cursor-pointer ${
@@ -394,30 +407,70 @@ export default function EmployerApplications({ profile, refreshStats }) {
 
                 <div>
                   <h4 className={`text-[10px] sm:text-xs font-extrabold uppercase tracking-wider mb-3 sm:mb-4 ${subtle}`}>Application Documents</h4>
-                  <div className="flex flex-col gap-3 sm:gap-4">
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                     {selectedApp.resume_path ? (
-                      <a 
-                        href={`http://localhost:5001${selectedApp.resume_path}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-base font-bold rounded-lg sm:rounded-xl border-2 ${
-                          isDark 
-                            ? 'bg-white text-black border-white' 
-                            : 'bg-[#03045E] text-white border-[#03045E]'
-                        }`}
-                      >
-                        <svg className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <span>View Attached Resume</span>
-                      </a>
+                      (() => {
+                        let cleanPath = String(selectedApp.resume_path).replace(/\\/g, '/').replace(/^\/+/, '');
+                        if (!cleanPath.startsWith('uploads/')) cleanPath = `uploads/${cleanPath}`;
+                        
+                        return (
+                          <a 
+                            href={`http://localhost:5001/${cleanPath}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`flex-1 inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 text-[10px] sm:text-sm font-bold rounded-lg sm:rounded-xl border-2 shadow-sm transition-all hover:shadow-md ${
+                              isDark 
+                                ? 'bg-white text-black border-white' 
+                                : 'bg-[#03045E] text-white border-[#03045E]'
+                            }`}
+                          >
+                            <svg className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span>View Attached Resume</span>
+                          </a>
+                        );
+                      })()
                     ) : (
-                      <p className={`text-xs sm:text-sm font-semibold p-2.5 sm:p-3 rounded-lg sm:rounded-xl border-2 text-center ${
+                      <p className={`flex-1 text-xs sm:text-sm font-semibold p-2.5 sm:p-3 rounded-lg sm:rounded-xl border-2 text-center flex items-center justify-center ${
                         isDark 
                           ? 'text-white bg-black border-white' 
                           : 'text-[#03045E] bg-white border-gray-200'
                       }`}>
-                        No resume file was attached.
+                        No resume attached.
+                      </p>
+                    )}
+
+                    {selectedApp.certificate_path ? (
+                      (() => {
+                        let cleanCertPath = String(selectedApp.certificate_path).replace(/\\/g, '/').replace(/^\/+/, '');
+                        if (!cleanCertPath.startsWith('uploads/')) cleanCertPath = `uploads/${cleanCertPath}`;
+
+                        return (
+                          <a 
+                            href={`http://localhost:5001/${cleanCertPath}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`flex-1 inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 text-[10px] sm:text-sm font-bold rounded-lg sm:rounded-xl border-2 shadow-sm transition-all hover:shadow-md ${
+                              isDark 
+                                ? 'bg-white text-black border-white' 
+                                : 'bg-[#03045E] text-white border-[#03045E]'
+                            }`}
+                          >
+                            <svg className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                            </svg>
+                            <span>View Certificate</span>
+                          </a>
+                        );
+                      })()
+                    ) : (
+                      <p className={`flex-1 text-xs sm:text-sm font-semibold p-2.5 sm:p-3 rounded-lg sm:rounded-xl border-2 text-center flex items-center justify-center opacity-60 ${
+                        isDark 
+                          ? 'text-white bg-black border-white' 
+                          : 'text-[#03045E] bg-white border-gray-200'
+                      }`}>
+                        No certificate attached.
                       </p>
                     )}
                   </div>
